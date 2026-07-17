@@ -1,6 +1,7 @@
 {
   "id": "lang-loop-status",
   "prompt": "In current MoonBit, is the functional `loop (x, y) { ... }` construct current and recommended, or deprecated? Reply with a first line that is exactly CURRENT or DEPRECATED, then name the replacement in one line.",
+  "grader_note": "2026-07-17: first_line_is now checks equality rather than prefix matching; the named replacement must include both the current multi-binding for form and break, rather than passing for a generic mention of for; output must not claim the deprecated-but-still-accepted construct has been removed.",
   "grade": [
     {
       "type": "first_line_is",
@@ -9,6 +10,18 @@
     {
       "type": "output_matches",
       "regex": "\\bfor\\b"
+    },
+    {
+      "type": "output_matches",
+      "regex": "multi(?:-|\\s)binding|accumulators?|state\\s+binders?"
+    },
+    {
+      "type": "output_matches",
+      "regex": "\\bbreak\\b"
+    },
+    {
+      "type": "output_not_matches",
+      "regex": "\\bremoved\\b|no longer (?:exists|supported)"
     }
   ],
   "truth": "loop is deprecated since v0.9 (2026-04); the compiler emits deprecated_syntax 0027 recommending the multi-binding for loop with break. Verified locally 2026-07-17."

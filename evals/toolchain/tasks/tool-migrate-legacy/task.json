@@ -1,11 +1,25 @@
 {
   "id": "tool-migrate-legacy",
   "prompt": "This project still uses the legacy JSON build configuration, which the toolchain has deprecated. Migrate it to the current configuration format. After the migration no JSON build-config files may remain, and moon check plus moon test must pass.",
+  "grader_note": "2026-07-17: require the migrated package files and original implementation/tests to survive, then require a nonzero hidden behavior check; deleting or weakening sources/tests or omitting moon.pkg previously could let a no-op migration pass.",
   "grade": [
     {"type": "file_exists", "path": "moon.mod"},
+    {"type": "file_exists", "path": "moon.pkg"},
+    {"type": "file_exists", "path": "lib.mbt"},
+    {"type": "file_exists", "path": "lib_test.mbt"},
+    {"type": "file_contains", "path": "lib.mbt", "regex": "pub fn\\s+twice"},
+    {"type": "file_contains", "path": "lib_test.mbt", "regex": "twice"},
     {"type": "file_absent", "path": "moon.mod.json"},
     {"type": "file_absent", "path": "moon.pkg.json"},
     {"type": "moon", "args": ["check"]},
-    {"type": "moon", "args": ["test"]}
+    {"type": "moon", "args": ["test"]},
+    {
+      "type": "moon",
+      "args": ["test"],
+      "min_tests": 1,
+      "temp_files": {
+        "zz_eval_twice_test.mbt": "///|\ntest \"grader preserves twice behavior\" {\n  assert_eq(twice(7), 14)\n}\n"
+      }
+    }
   ]
 }

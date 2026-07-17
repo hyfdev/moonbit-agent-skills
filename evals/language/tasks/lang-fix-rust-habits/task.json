@@ -1,8 +1,23 @@
 {
   "id": "lang-fix-rust-habits",
   "prompt": "This lib.mbt was written by someone coming from Rust and does not compile. Fix it so moon check and moon test pass, preserving the intended behavior.",
+  "grader_note": "2026-07-17: preserve the package, implementation, and test files and require a nonzero hidden behavior test; deleting files or leaving an unrecognized package previously produced a no-op project that passed.",
   "grade": [
+    {"type": "file_exists", "path": "moon.mod"},
+    {"type": "file_exists", "path": "moon.pkg"},
+    {"type": "file_exists", "path": "lib.mbt"},
+    {"type": "file_exists", "path": "lib_test.mbt"},
+    {"type": "file_contains", "path": "lib.mbt", "regex": "pub fn\\s+sum_positive"},
+    {"type": "file_contains", "path": "lib_test.mbt", "regex": "sum_positive"},
     {"type": "moon", "args": ["check"]},
-    {"type": "moon", "args": ["test"]}
+    {"type": "moon", "args": ["test"]},
+    {
+      "type": "moon",
+      "args": ["test"],
+      "min_tests": 1,
+      "temp_files": {
+        "zz_eval_sum_positive_test.mbt": "///|\ntest \"grader preserves sum behavior\" {\n  assert_eq(sum_positive([-4, 0, 5, 2]), 7)\n}\n"
+      }
+    }
   ]
 }

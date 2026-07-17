@@ -1,8 +1,26 @@
 {
   "id": "int-fix-code-and-config",
   "prompt": "moon test fails in this project for more than one reason. Find and fix everything so moon check and moon test pass. The helpers package should provide the is_even function the root package uses.",
+  "grader_note": "2026-07-17: preserve both recognized package configs, implementations, and the test, then require a nonzero hidden count_even behavior check; deleting the broken sources or package files previously let a no-op project pass.",
   "grade": [
+    {"type": "file_exists", "path": "moon.mod"},
+    {"type": "file_exists", "path": "moon.pkg"},
+    {"type": "file_exists", "path": "helpers/moon.pkg"},
+    {"type": "file_exists", "path": "lib.mbt"},
+    {"type": "file_exists", "path": "lib_test.mbt"},
+    {"type": "file_exists", "path": "helpers/even.mbt"},
+    {"type": "file_contains", "path": "lib.mbt", "regex": "pub fn\\s+count_even"},
+    {"type": "file_contains", "path": "helpers/even.mbt", "regex": "pub fn\\s+is_even"},
+    {"type": "file_contains", "path": "lib_test.mbt", "regex": "count_even"},
     {"type": "moon", "args": ["check"]},
-    {"type": "moon", "args": ["test"]}
+    {"type": "moon", "args": ["test"]},
+    {
+      "type": "moon",
+      "args": ["test"],
+      "min_tests": 1,
+      "temp_files": {
+        "zz_eval_count_even_test.mbt": "///|\ntest \"grader count_even behavior\" {\n  assert_eq(count_even([2, 5, 6, 8]), 3)\n}\n"
+      }
+    }
   ]
 }

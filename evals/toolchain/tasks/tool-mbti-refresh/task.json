@@ -1,8 +1,18 @@
 {
   "id": "tool-mbti-refresh",
   "prompt": "Generate the public interface files for this module so API changes can be reviewed in diffs, and state the exact command you used.",
+  "grader_note": "2026-07-17: preserve the recognized package and verify a successful observed moon info invocation plus the generated marker and area signature; an arbitrary empty pkg.generated.mbti, an unrecognized package, or an unexecuted command claim previously passed.",
   "grade": [
+    {"type": "file_exists", "path": "moon.mod"},
+    {"type": "file_exists", "path": "moon.pkg"},
     {"type": "file_exists", "path": "pkg.generated.mbti"},
+    {"type": "file_contains", "path": "pkg.generated.mbti", "regex": "Generated using `moon info`"},
+    {"type": "file_contains", "path": "pkg.generated.mbti", "regex": "pub fn area\\(Int, Int\\) -> Int"},
+    {
+      "type": "command_matches",
+      "regex": "^\\s*(?:\\S*/)?moon\\s+info(?:\\s+\\S+)?(?:\\s+2>&1)?\\s*$",
+      "output_regex": "Finished\\. moon: ran \\d+ tasks?"
+    },
     {"type": "output_matches", "regex": "moon info"}
   ]
 }

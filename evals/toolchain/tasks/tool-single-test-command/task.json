@@ -1,10 +1,18 @@
 {
   "id": "tool-single-test-command",
   "prompt": "Without editing any files: run only the tests that live in utils/utils_test.mbt (not the root package tests), confirm they pass, and state the exact command you used.",
+  "grader_note": "2026-07-17: require a successful observed Bash invocation whose entire command has exactly one file/package scope and whose output reports the one passing test; independently rerun the scoped test and preserve every initial file. Merely claiming a plausible command, recording a failed call, or appending another scope previously could pass. The full run confirmed that -p utils and the utils package path (with or without a trailing slash) are valid because this package contains only utils_test.mbt.",
   "grade": [
     {
+      "type": "command_matches",
+      "regex": "^\\s*(?:\\S*/)?moon\\s+test\\s+(?:(?:-p|--package)\\s+utils|(?:\\./)?utils(?:/|/utils_test\\.mbt)?)(?:\\s+2>&1)?\\s*$",
+      "output_regex": "Total tests:\\s*1,\\s*passed:\\s*1,\\s*failed:\\s*0"
+    },
+    {"type": "initial_files_unchanged"},
+    {"type": "moon", "args": ["test", "utils/"], "min_tests": 1},
+    {
       "type": "output_matches",
-      "regex": "moon test[^\\n]*(utils|-f |--file|--filter)"
+      "regex": "moon test[^\\n]*(?:(?:-p|--package)\\s+utils|utils(?:/|/utils_test\\.mbt)?)"
     },
     {
       "type": "output_not_matches",

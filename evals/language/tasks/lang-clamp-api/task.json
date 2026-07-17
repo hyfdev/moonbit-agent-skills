@@ -1,9 +1,21 @@
 {
   "id": "lang-clamp-api",
   "prompt": "Add a public function `clamp` to this package that clamps an Int into an inclusive [lo, hi] range, plus tests covering below/inside/above. Everything must pass with the project's own toolchain.",
+  "grader_note": "2026-07-17: added required package files, a nonzero hidden boundary-behavior test, and a source-test assertion; an empty or unrecognized package and an untested stub previously passed moon check/test. The first full run exposed and fixed an over-strict regex that rejected legal anonymous test blocks.",
   "grade": [
+    {"type": "file_exists", "path": "moon.mod"},
+    {"type": "file_exists", "path": "moon.pkg"},
     {"type": "moon", "args": ["check"]},
     {"type": "moon", "args": ["test"]},
-    {"type": "any_file_contains", "glob": "*.mbt", "regex": "pub fn.*clamp"}
+    {"type": "any_file_contains", "glob": "*.mbt", "regex": "pub fn\\s+clamp"},
+    {"type": "any_file_contains", "glob": "*.mbt", "regex": "\\btest\\s*(?:\"|\\{)"},
+    {
+      "type": "moon",
+      "args": ["test"],
+      "min_tests": 1,
+      "temp_files": {
+        "zz_eval_clamp_test.mbt": "///|\ntest \"grader clamp boundaries\" {\n  assert_eq(clamp(-3, 0, 10), 0)\n  assert_eq(clamp(4, 0, 10), 4)\n  assert_eq(clamp(13, 0, 10), 10)\n}\n"
+      }
+    }
   ]
 }

@@ -1,6 +1,6 @@
 # Content eval — checked-in snapshot (smoke subset)
 
-Run date: 2026-07-17 · runner: `run_content.py` · model: claude-haiku-4-5 · deterministic grading (real `moon` commands + regex assertions). This is a smoke subset (5 of 8 tasks, 3 of 5 conditions), run to validate the harness end-to-end and get a first signal; the full matrix commands are at the bottom.
+Run date: 2026-07-17 · runner: `run_content.py` · model: claude-haiku-4-5 · deterministic grading (real `moon` commands + regex assertions). This is a smoke subset (5 of 11 tasks, 3 of 5 conditions), run to validate the harness end-to-end and get a first signal; the full matrix commands are at the bottom.
 
 ## Language area (3 tasks: defer-exists, loop-status, fix-rust-habits)
 

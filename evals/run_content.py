@@ -120,7 +120,7 @@ def grade(check: dict, project: Path, final_text: str) -> tuple[bool, str]:
         ok = any(
             re.search(check["regex"], f.read_text()) is not None
             for f in project.rglob(check["glob"])
-            if f.is_file()
+            if f.is_file() and "_build" not in f.parts
         )
         return ok, f"any_file_contains {check['glob']} ~ /{check['regex']}/ -> {ok}"
     if kind == "output_matches":

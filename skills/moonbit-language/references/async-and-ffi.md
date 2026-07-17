@@ -1,5 +1,7 @@
 # Async and FFI declarations
 
+> Coverage note: snippets in this file were hand-verified against the pinned toolchain on the targets stated per snippet, but are NOT re-executed by CI (async needs external deps; FFI is target-specific). On any toolchain version mismatch, re-verify before relying on them.
+
 This file is plain Markdown, not a checked `.mbt.md`: its code blocks are illustrative and are **not** run by the verification suite. Every snippet below was verified by hand against the pinned toolchain; each block notes the target it was checked on. Build, link, and dependency wiring (`moon.pkg` imports, `is-main`, `supported_targets`, stub sources, `--target`) is the **moonbit-toolchain** skill — this file covers only what the language accepts.
 
 ## Async syntax

@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
   pull_request:
+  schedule:
+    - cron: "17 3 * * 1"  # weekly drift watch even when the repo is quiet
 
 jobs:
   static:

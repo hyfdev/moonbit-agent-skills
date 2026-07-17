@@ -16,6 +16,11 @@ Two guarantees:
    flags, so cosmetic argument differences don't defeat the check while
    an undocumented-flag example still fails it.
 
+Known limitations (accepted for now): expectations apply to the LAST
+step of a multi-step entry only, and coverage signatures ignore flag
+values/short flags — a wrong value in a doc example could hide behind a
+matching signature. Tighten if either ever bites.
+
 Usage: python3 tooling/verify_commands.py [-v] [--skip-network]
 """
 

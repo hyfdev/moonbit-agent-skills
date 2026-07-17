@@ -47,7 +47,7 @@ The official [moonbitlang/skills](https://github.com/moonbitlang/skills) bundle 
 2. **Language / toolchain separation.** One 58 KB monolithic guide becomes two small, independently versioned, independently activatable skills with an explicit ownership boundary and a duplication check.
 3. **Verified negative knowledge.** The official guides teach correct MoonBit; agents also need to know what is *wrong now* — Rust/TS/Go habits and stale MoonBit that the compiler rejects (or worse, silently accepts with different meaning). This repo ships fixtures proving each rejection/trap, including deprecated syntax the official language-fundamentals reference still teaches (e.g. `loop`, fn-less trait signatures).
 4. **Activation evals.** Frontmatter descriptions are treated as a tested interface: prompt sets measure trigger recall, false positives on confusables (moonrepo, moon phases, generic wasm questions), language/toolchain routing, and multi-skill activation — without ever naming skills in prompts.
-5. **Everything executable is executed in CI** — reference examples (all `mbt check` blocks, all pinned targets), fixtures, and every documented `moon` command line (coverage-checked manifest), with a nightly drift-watch lane.
+5. **Everything executable is executed in CI** — reference examples (all `mbt check` blocks, all pinned targets), fixtures, and every documented `moon` command line (coverage-checked manifest), with a drift-watch lane on the nightly toolchain channel (runs on push/PR and a weekly schedule). Two documents (async/FFI notes and part of the cross-language list) are hand-verified at the pin rather than re-executed by CI; they say so inline.
 
 ## Repository map
 

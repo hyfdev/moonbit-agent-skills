@@ -32,7 +32,7 @@ Every command and configuration shape in this skill was executed for real agains
 - **Run commands, don't recall them.** Flags and defaults changed repeatedly (build dir is `_build` now, not `target`; `moon ide` exists; `moon explain` exists). If you cannot execute, quote `--help` output or mark the answer unverified.
 - **Config formats are mid-migration.** The current formats are the non-JSON `moon.mod` / `moon.pkg` DSL; `moon.mod.json` / `moon.pkg.json` are deprecated in v0.10.4 and scheduled for removal. Both still parse at the pin. Never create new JSON configs; never mix advice between the two formats without labeling which is which. See references/project-layout-and-config.md.
 - **Don't guess package or API availability.** Use `moon ide doc '<query>'` for installed APIs and the mooncakes registry for packages; a familiar name from npm/crates is not evidence a MoonBit package exists.
-- **Prefer the narrowest verifying command** and show it: `moon check` after config edits, targeted `moon test -f <file>` for test questions, `moon info` to prove API-surface claims.
+- **Prefer the narrowest verifying command** and show it: `moon check` after config edits, targeted `moon test <path>` for test questions, `moon info` to prove API-surface claims.
 - **Never run destructive or account-level commands unprompted**: `moon publish`, `moon register`, `moon login`, `moon upgrade` change global or remote state — describe them instead, and only run them on explicit request.
 
 ## Reference routing
@@ -48,7 +48,7 @@ Load only what the task needs:
 - moon.work workspaces, .mbtx script mode, pre-build rules → references/workspaces-and-scripts.md
 - Diagnosing build/test/dependency failures, moon explain, warning lists → references/diagnostics-and-recovery.md
 
-Every `moon ...` command line shown in these references is executed by this repository's CI (tooling/verify_commands.py) against the pinned toolchain — the examples are guaranteed to have run, not just to look plausible.
+Every `moon ...` command line shown in these references is executed against the pinned toolchain by the source repository's CI — the examples are guaranteed to have run, not just to look plausible.
 
 ## Boundary
 

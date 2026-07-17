@@ -73,4 +73,4 @@ These still compile, but only as deprecated legacy syntax (`moon check` passes w
 
 ---
 
-Every behavior in this file was verified against the real toolchain; the highest-value cases are pinned as fixtures under `verification/fixtures/` — `lang-neg-*` for rejected syntax, `lang-dep-*` for deprecated-but-still-compiling forms, `lang-trap-*` for silent traps.
+Every behavior in this file was verified against the real toolchain at the pin (a subset is additionally re-executed in CI); the highest-value cases are pinned as fixtures under `verification/fixtures/` — `lang-neg-*` for rejected syntax, `lang-dep-*` for deprecated-but-still-compiling forms, `lang-trap-*` for silent traps.

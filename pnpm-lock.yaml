@@ -219,6 +219,9 @@ importers:
       '@types/node':
         specifier: ^26.1.1
         version: 26.1.1
+      shell-quote:
+        specifier: ^1.10.0
+        version: 1.10.0
       typescript:
         specifier: ^7.0.2
         version: 7.0.2
@@ -1042,6 +1045,10 @@ packages:
   react-is@17.0.2:
     resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
 
+  shell-quote@1.10.0:
+    resolution: {integrity: sha512-w1aiOKwKuRgtwAReIIj89puqg+I7GvX4IbLrvmhXbzQsj1+Zwi4VO3+fa6ZF91TWSjIxoEkKnMeHcLEODK5ZXA==}
+    engines: {node: '>= 0.4'}
+
   siginfo@2.0.0:
     resolution: {integrity: sha512-ybx0WO1/8bSBLEWXZvEd7gMW3Sn3JFlW3TvX1nREbDLRNQNaeNN8WK0meBwPdAaOI7TtRRRJn/Es1zhrrCHu7g==}
 
@@ -1691,6 +1698,8 @@ snapshots:
       react-is: 17.0.2
 
   react-is@17.0.2: {}
+
+  shell-quote@1.10.0: {}
 
   siginfo@2.0.0: {}
 

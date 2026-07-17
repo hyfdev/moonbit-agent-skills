@@ -29,14 +29,14 @@ verification/fixtures/<fixture-id>/
 | `fix` | One-line statement of the correct MoonBit way. |
 | `targets` | Targets the runner exercises for this fixture (default `["wasm-gc"]`). |
 | `source` | Where the knowledge comes from: `observed` (toolchain behavior), plus optional documentation URL. |
-| `verified` | Stamped by `vp run run-fixtures -- --stamp`: exact component versions, platform, and date of the last passing run. Never hand-edited. |
+| `verified` | Stamped by `vp run run-fixtures --stamp`: exact component versions, platform, and date of the last passing run. Never hand-edited. |
 
 ## Running
 
 ```sh
 vp run run-fixtures                                                   # run all fixtures, exit non-zero on any mismatch
-vp run run-fixtures -- --stamp --date YYYY-MM-DD                     # additionally record passing runs in fixture.json
-vp run run-fixtures -- lang-neg-rust-match-arrow                     # run a subset
+vp run run-fixtures --stamp --date YYYY-MM-DD                        # additionally record passing runs in fixture.json
+vp run run-fixtures lang-neg-rust-match-arrow                        # run a subset
 ```
 
 The runner materializes each fixture into a throwaway module under the system temp directory (`moon.mod` + `moon.pkg` + the fixture code, or a copy of `module/`), so fixtures stay tiny and never share state.

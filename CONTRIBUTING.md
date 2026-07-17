@@ -20,10 +20,10 @@ include the summary numbers in the PR description.
 ## Updating to a new MoonBit release
 
 1. `moon upgrade` (or install the new channel build).
-2. `vp run snapshot-toolchain -- --date $(date +%F)`
+2. `vp run snapshot-toolchain --date $(date +%F)`
 3. Run the three verification runners; fix any content the new toolchain
    invalidates (that is the point of this repository).
-4. `vp run run-fixtures -- --stamp --date $(date +%F)`
+4. `vp run run-fixtures --stamp --date $(date +%F)`
 5. Update both skills' frontmatter `metadata` pins and compatibility lines,
    bump their `skill-version`, and run `vp run check-versions`.
 6. Record notable behavior changes in the relevant reference files with the

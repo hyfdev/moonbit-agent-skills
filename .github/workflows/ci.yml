@@ -70,13 +70,11 @@ jobs:
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
           echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
       - name: Compare installed toolchain against the committed snapshot
-        run: |
-          moon version --all
-          vp run compare-toolchain
+        run: vp run compare-toolchain
       - name: Checked reference documents (all targets)
         run: vp run run-checked-docs
       - name: Fixtures behave as declared
-        run: vp run run-fixtures -- --verbose
+        run: vp run run-fixtures --verbose
       - name: Toolchain command examples actually run
         run: vp run verify-commands
 
@@ -101,6 +99,6 @@ jobs:
       - name: Checked reference documents
         run: vp run run-checked-docs
       - name: Fixtures
-        run: vp run run-fixtures -- --verbose
+        run: vp run run-fixtures --verbose
       - name: Command examples
         run: vp run verify-commands

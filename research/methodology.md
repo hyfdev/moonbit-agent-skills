@@ -32,7 +32,7 @@ Probe agents also ran internal adversarial review rounds on their own findings f
 
 ## Phase 4 — The version contract
 
-`vp run snapshot-toolchain -- --date …` writes the canonical snapshot; skill frontmatter, SKILL.md prose, and fixture stamps must agree with it (`tooling/check_versions.ts`). Fixtures are stamped by `vp run run-fixtures -- --stamp`. Nothing hand-writes a version string. The re-pin procedure for a new MoonBit release is in CONTRIBUTING.md.
+`vp run snapshot-toolchain --date …` writes the canonical snapshot; skill frontmatter, SKILL.md prose, and fixture stamps must agree with it (`tooling/check_versions.ts`). Fixtures are stamped by `vp run run-fixtures --stamp`. Nothing hand-writes a version string. The re-pin procedure for a new MoonBit release is in CONTRIBUTING.md.
 
 ## Phase 5 — Activation as a tested interface
 

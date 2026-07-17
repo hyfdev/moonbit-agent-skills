@@ -91,7 +91,7 @@ The official [moonbitlang/skills](https://github.com/moonbitlang/skills) bundle 
 - `verification/` — toolchain snapshot, pinned upstream sources, fixtures (positive, negative, semantic-trap), command manifest + template project.
 - `evals/` — activation and content evals with deterministic graders; see `evals/README.md` and checked-in `RESULTS.md` snapshots.
 - `tooling/` — validators, verification runners, README generator, and their tests (mirrored in `.github/workflows/ci.yml`).
-- `research/` — research note: making LLM agents reliable in a language with low pretraining coverage.
+- `research/` — the research note (LLM reliability in a low-coverage language), the production methodology (`research/methodology.md` — how to re-run and audit every phase), and the raw probe evidence the skills were authored from (`research/probes/`).
 
 ## License
 

@@ -15,7 +15,22 @@ MoonBit is young and evolves fast, so model pretraining about it is thin, stale,
 
 ## Install
 
-Copy the two skill directories into your agent's skill path, e.g. for Claude Code:
+Recommended — the [`skills`](https://skills.sh) CLI installs straight from this repo into your agent's skill directory:
+
+```sh
+# Claude Code
+npx skills@latest add hyfdev/moonbit-agent-skills -g --agent claude-code --skill "*" --copy -y
+
+# Codex, or the portable cross-agent directory
+npx skills@latest add hyfdev/moonbit-agent-skills -g --agent codex --skill "*" --copy -y
+npx skills@latest add hyfdev/moonbit-agent-skills -g --agent universal --skill "*" --copy -y
+
+# list what's here / install one skill only
+npx skills@latest add hyfdev/moonbit-agent-skills --list
+npx skills@latest add hyfdev/moonbit-agent-skills -g --agent claude-code --skill moonbit-language --copy -y
+```
+
+Manual fallback — copy the two skill directories yourself:
 
 ```sh
 git clone https://github.com/hyfdev/moonbit-agent-skills
@@ -39,6 +54,16 @@ After installing, just ask normally. You never need to know or type a skill name
 
 If your client only supports manually invoked skills, that is a client capability limit — the skills still work when invoked manually, but automatic activation is the designed and tested path.
 
+## When the skills are wrong: consented error reporting
+
+These skills ship a self-report protocol (`references/reporting-errors.md` in each skill). If the real toolchain contradicts something a skill states, the agent is instructed to:
+
+1. reproduce the contradiction with a **freshly written, generic** minimal snippet — never your project code, paths, or names;
+2. draft an issue containing only that repro plus toolchain versions and OS/arch;
+3. show you the complete issue text and ask for your explicit go-ahead before filing it to this repository's issue tracker.
+
+**Nothing is ever filed without your confirmation.** If you decline — or the agent simply can't ask you — the draft is saved locally instead and filing is skipped. Reports arrive as [skill-error issues](https://github.com/hyfdev/moonbit-agent-skills/issues) and drive re-verification.
+
 ## Why not just the official MoonBit guides?
 
 The official [moonbitlang/skills](https://github.com/moonbitlang/skills) bundle (which includes the [moonbit-agent-guide](https://github.com/moonbitlang/moonbit-agent-guide)) is good, and this repository deliberately does not duplicate its specialized skills (C bindings, OCaml migration, proofs, refactoring). Audited at commit `5caf81c` (2026-07-06), the gaps this repository fills are:
@@ -52,8 +77,8 @@ The official [moonbitlang/skills](https://github.com/moonbitlang/skills) bundle 
 ## Repository map
 
 <!-- BEGIN GENERATED: inventory -->
-- `moonbit-language` v0.1.0: SKILL.md (44 lines) + 12 reference file(s)
-- `moonbit-toolchain` v0.1.0: SKILL.md (41 lines) + 8 reference file(s)
+- `moonbit-language` v0.1.0: SKILL.md (47 lines) + 13 reference file(s)
+- `moonbit-toolchain` v0.1.0: SKILL.md (44 lines) + 9 reference file(s)
 - Verification fixtures: 35
 - Activation eval prompts: 35 (combined 5, language-only 10, negative 10, toolchain-only 10)
 <!-- END GENERATED: inventory -->

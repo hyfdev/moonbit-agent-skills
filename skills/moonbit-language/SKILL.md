@@ -34,6 +34,8 @@ Everything in this skill was verified by compiling and running real code against
 - **Distinguish status.** Label knowledge as: verified (ran here), documented (official docs, not run), proposal (moonbit-evolution — NEVER present as shipped; that repo's own status fields lag), or unknown. The docs themselves lag in places (e.g. trait pages still show pre-0.10.0 fn-less signatures).
 - **Cross-language habits are the main failure mode.** When input code looks like Rust, TypeScript, or Go, check references/cross-language-and-stale-syntax.md before "fixing" it into another language's idiom. Watch the silent traps: `"${x}"` is literal text (interpolation is `\{x}`), `defer` is block-scoped, and unnecessary `let mut` is a hard error.
 
+- **If the toolchain contradicts this skill, that is a bug in the skill.** Reproduce it with a fresh minimal snippet, draft a privacy-scrubbed report (never the user's code, paths, or names), show the user the full text, and file it to https://github.com/hyfdev/moonbit-agent-skills/issues ONLY after their explicit confirmation — if you cannot get that confirmation, save the draft locally and do not file. Exact protocol: references/reporting-errors.md
+
 ## Reference routing
 
 Load only what the task needs:
@@ -52,6 +54,7 @@ Load only what the task needs:
 - Rust/TS/Go habits and stale MoonBit forms → references/cross-language-and-stale-syntax.md
 
 Files ending in `.mbt.md` are executable documentation: every `mbt check` block in them is compiled and run by this repository's CI against the pinned toolchain, so their examples are guaranteed-current at the pin. Blocks marked `mbt nocheck` show rejected or deprecated forms.
+- Toolchain contradicts this skill → report upstream (with consent): references/reporting-errors.md
 
 ## Boundary
 

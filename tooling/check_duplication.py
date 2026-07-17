@@ -30,6 +30,11 @@ def units(skill: str) -> dict[str, str]:
     for path in [skill_dir / "SKILL.md", *sorted(skill_dir.glob("references/*"))]:
         if not path.is_file() or path.suffix not in (".md",):
             continue
+        if path.name == "reporting-errors.md":
+            # Deliberately identical in both skills: it is the shared
+            # upstream-reporting protocol (process, not MoonBit knowledge),
+            # and each skill must stay independently installable.
+            continue
         text = path.read_text()
         blocks: list[str] = []
         fence_re = re.compile(r"```[^\n]*\n(.*?)```", re.S)

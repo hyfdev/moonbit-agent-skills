@@ -36,6 +36,8 @@ Every command and configuration shape in this skill was executed for real agains
 - **Prefer the narrowest verifying command** and show it: `moon check` after config edits, targeted `moon test <path>` for test questions, `moon info` to prove API-surface claims.
 - **Never run destructive or account-level commands unprompted**: `moon publish`, `moon register`, `moon login`, `moon upgrade` change global or remote state — describe them instead, and only run them on explicit request.
 
+- **A command or config behaving differently than described here is a defect in this skill — report it upstream.** Rebuild the mismatch in a scratch module with generic names (no user code, paths, or project identifiers), then follow references/reporting-errors.md: the user sees the full drafted issue and must explicitly approve before anything is filed to the tracker; no approval means no filing, draft saved locally.
+
 ## Reference routing
 
 Load only what the task needs:
@@ -50,6 +52,7 @@ Load only what the task needs:
 - Diagnosing build/test/dependency failures, moon explain, warning lists → references/diagnostics-and-recovery.md
 
 Every `moon ...` command line shown in these references is executed against the pinned toolchain by the source repository's CI — the examples are guaranteed to have run, not just to look plausible.
+- Toolchain contradicts this skill → report upstream (with consent): references/reporting-errors.md
 
 ## Boundary
 

@@ -1,0 +1,684 @@
+{
+  "generated_by": "tooling/snapshot_release.ts",
+  "items": [
+    {
+      "id": "language-1",
+      "kind": "numbered-item",
+      "section": "language",
+      "text": "Added the `extend` syntax; the implicit behavior of turning `impl`s into methods is deprecated."
+    },
+    {
+      "id": "language-1-p1",
+      "kind": "paragraph",
+      "parent": "language-1",
+      "section": "language",
+      "text": "Previously, for every `impl Trait for Type` declaration, if `Type` was defined in the current package, the compiler would automatically attach all methods of `Trait` to `Type` as its methods, so that users could conveniently call the methods in the `impl` directly. However, this behavior had several problems:"
+    },
+    {
+      "id": "language-1-b1",
+      "kind": "bullet",
+      "parent": "language-1",
+      "section": "language",
+      "text": "It breaks refactoring safety: after an upstream package adds a new method with a default implementation to `Trait`, downstream code may fail to type check due to dot-syntax ambiguity"
+    },
+    {
+      "id": "language-1-b2",
+      "kind": "bullet",
+      "parent": "language-1",
+      "section": "language",
+      "text": "It is implicit and uncontrollable: if you only want to expose the `impl Trait for Type` relationship without exposing certain `impl`s as methods, there is no way to do so under the old semantics"
+    },
+    {
+      "id": "language-1-p2",
+      "kind": "paragraph",
+      "parent": "language-1",
+      "section": "language",
+      "text": "Therefore, we plan to deprecate this automatic method-attaching behavior. As a replacement, we provide a new syntax, `extend Type with Trait::{f, g}`, which manually attaches the methods `f` and `g` of `impl Trait for Type` to `Type` as methods. Adding `pub` in front of `extend` attaches `f` and `g` as public methods. Here are some semantic details of the `extend` syntax worth noting:"
+    },
+    {
+      "id": "language-1-b3",
+      "kind": "bullet",
+      "parent": "language-1",
+      "section": "language",
+      "text": "If `f` and `g` have no explicit implementation and use the default implementation instead, `Self` is specialized to `Type` when they are attached as methods"
+    },
+    {
+      "id": "language-1-b4",
+      "kind": "bullet",
+      "parent": "language-1",
+      "section": "language",
+      "text": "Even if `Type` is private, you can still add a private `extend` declaration for it. In that case, `f` and `g` are attached as local methods and can be called with dot syntax within the current package"
+    },
+    {
+      "id": "language-1-b5",
+      "kind": "bullet",
+      "parent": "language-1",
+      "section": "language",
+      "text": "`extend` is a new keyword, so it is currently implemented as a soft keyword: you can still use `extend` as a variable name, but the compiler will emit a warning wherever it is used as one. Later, `extend` will become a reserved word and eventually a real keyword, at which point it can no longer be used as a variable name"
+    },
+    {
+      "id": "language-1-p3",
+      "kind": "paragraph",
+      "parent": "language-1",
+      "section": "language",
+      "text": "Compared with the old semantics, the `extend` syntax gives explicit control over which methods are attached, so it avoids the refactoring-safety and controllability issues of the old semantics."
+    },
+    {
+      "id": "language-1-p4",
+      "kind": "paragraph",
+      "parent": "language-1",
+      "section": "language",
+      "text": "For library authors, the expected migration path is to add a corresponding `extend` declaration for every `impl` that triggered the previous implicit attaching behavior. If you do not want users to call certain `impl`s in method form, you can put markers such as `#deprecated` on the `extend` declaration to help downstream users migrate. We provide a new warning, `implicit_impl_as_method (79)`, to help library authors migrate: it reports every location that triggers the old implicit attaching behavior. This warning is currently off by default and can be enabled manually; it will be enabled by default in the next release."
+    },
+    {
+      "id": "language-1-p5",
+      "kind": "paragraph",
+      "parent": "language-1",
+      "section": "language",
+      "text": "Besides regular `impl`s, the semantics of calling methods on the trait object type `&Trait` and on type parameters have also been adjusted to match the semantic change of `impl`:"
+    },
+    {
+      "id": "language-1-b6",
+      "kind": "bullet",
+      "parent": "language-1",
+      "section": "language",
+      "text": "Previously, methods of `Trait`'s super traits could be called with dot syntax on the `&Trait` type. This behavior is now deprecated; in the future, only methods of `&Trait` itself can be called directly in method form. Using this call style produces a warning as of this release. Users need to migrate to the `Trait::f(..)` call form, or manually add an `extend` declaration for the `&Trait` type"
+    },
+    {
+      "id": "language-1-b7",
+      "kind": "bullet",
+      "parent": "language-1",
+      "section": "language",
+      "text": "For type parameters with a single constraint, such as `X : Hash`, methods of `Hash` itself can still be called with dot syntax, but methods from super traits will no longer be callable with dot syntax in the future, and such call sites currently receive a warning. Users should migrate the warned locations to the `Trait::f(..)` call form"
+    },
+    {
+      "id": "language-1-b8",
+      "kind": "bullet",
+      "parent": "language-1",
+      "section": "language",
+      "text": "For type parameters with multiple constraints, such as `X : Eq + Hash`, since different constraints may contain methods with the same name, it will no longer be possible to call methods from any of the constraints with dot syntax in the future, and such call sites currently receive a warning. Users likewise need to migrate to the `Trait::f(..)` call form"
+    },
+    {
+      "id": "language-2",
+      "kind": "numbered-item",
+      "section": "language",
+      "text": "Or-patterns now support default values via `with`."
+    },
+    {
+      "id": "language-2-p1",
+      "kind": "paragraph",
+      "parent": "language-2",
+      "section": "language",
+      "text": "Or-patterns require all branches to bind exactly the same variables. As a result, when several cases share the same handling logic, you had to duplicate code or extract a local function:"
+    },
+    {
+      "id": "language-2-c1",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "language-2",
+      "section": "language",
+      "text": "fn f(x : Int) {\n  ... // handle x\n}\n\nmatch s {\n  Some(x) => f(x)\n  None => f(0)\n}"
+    },
+    {
+      "id": "language-2-p2",
+      "kind": "paragraph",
+      "parent": "language-2",
+      "section": "language",
+      "text": "Now you can use `with` to provide default values for branches that do not bind a variable, merging the duplicated handling logic:"
+    },
+    {
+      "id": "language-2-c2",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "language-2",
+      "section": "language",
+      "text": "match s {\n  Some(x) | None with x = 0 => ... // handle x\n}"
+    },
+    {
+      "id": "language-2-p3",
+      "kind": "paragraph",
+      "parent": "language-2",
+      "section": "language",
+      "text": "Multiple variables require parentheses:"
+    },
+    {
+      "id": "language-2-c3",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "language-2",
+      "section": "language",
+      "text": "match t {\n  A(a, b) | B with (a = 0, b = 0) => ...\n}"
+    },
+    {
+      "id": "language-3",
+      "kind": "numbered-item",
+      "section": "language",
+      "text": "Added an explicit `Iter` literal syntax `[| .. |]`."
+    },
+    {
+      "id": "language-3-c1",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "language-3",
+      "section": "language",
+      "text": "// Explicitly construct an Iter\nlet xs : Iter[Int] = [| 1, 2, 3 |]\n// Spread, list comprehension, and other forms can be used inside\nlet ys = [| ..xs, 4, 5 |]"
+    },
+    {
+      "id": "language-3-p1",
+      "kind": "paragraph",
+      "parent": "language-3",
+      "section": "language",
+      "text": "The evaluation order of `Iter` literals is as follows:"
+    },
+    {
+      "id": "language-3-b1",
+      "kind": "bullet",
+      "parent": "language-3",
+      "section": "language",
+      "text": "For plain literals `[| x, y, z |]`, the elements `x`, `y`, `z` are evaluated when the literal is constructed, just like regular array literals"
+    },
+    {
+      "id": "language-3-b2",
+      "kind": "bullet",
+      "parent": "language-3",
+      "section": "language",
+      "text": "For a spread `..xs`, `xs` itself is evaluated on the spot when the literal is constructed, but the computation inside the iterator obtained by evaluating `xs` only happens when the outer iterator `[| .. |]` reaches the corresponding elements"
+    },
+    {
+      "id": "language-3-b3",
+      "kind": "bullet",
+      "parent": "language-3",
+      "section": "language",
+      "text": "In the comprehension form `[| for .. |]`, all computation inside `[| .. |]` is lazy: it only happens when the outer iterator reaches the corresponding elements"
+    },
+    {
+      "id": "language-3-p2",
+      "kind": "paragraph",
+      "parent": "language-3",
+      "section": "language",
+      "text": "Previously, when the expected type was `Iter[_]`, a spread literal `[ x, ..xs, y ]` would automatically construct an `Iter` via type-based overloading. This behavior is now deprecated: code relying on it receives a compiler warning suggesting `[| .. |]` instead. The motivation for this change is that we do not want the evaluation order of a program to change implicitly depending on types."
+    },
+    {
+      "id": "language-4",
+      "kind": "numbered-item",
+      "section": "language",
+      "text": "Array spreads now support conditional spreading `..if cond { expr }`."
+    },
+    {
+      "id": "language-4-c1",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "language-4",
+      "section": "language",
+      "text": "let xs = [1, 2, ..if cond { extra }, 3]\n// When cond is true, equivalent to [1, 2, ..extra, 3]\n// When cond is false, equivalent to [1, 2, 3]"
+    },
+    {
+      "id": "language-5",
+      "kind": "numbered-item",
+      "section": "language",
+      "text": "Added Bytes string interpolation `b\"...\\{x}\"`."
+    },
+    {
+      "id": "language-5-p1",
+      "kind": "paragraph",
+      "parent": "language-5",
+      "section": "language",
+      "text": "The semantics of Bytes string interpolation is to convert the result of the string interpolation into UTF-8 encoded `Bytes`:"
+    },
+    {
+      "id": "language-5-c1",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "language-5",
+      "section": "language",
+      "text": "let x = 42\nlet b : Bytes = b\"value=\\{x}\" // Equivalent to @utf8.encode(\"value=\\{x}\")\n\n// Template write syntax also supports Bytes\nbuf <+ b\"value=\\{x}\""
+    },
+    {
+      "id": "language-6",
+      "kind": "numbered-item",
+      "section": "language",
+      "text": "Custom constructors can now be defined for any type."
+    },
+    {
+      "id": "language-6-p1",
+      "kind": "paragraph",
+      "parent": "language-6",
+      "section": "language",
+      "text": "Previously, only `struct` types could have custom constructors. Now, all types can define custom constructors using the `fn Type::Type(..)` syntax, and the standard library has used this to unify the construction APIs of its container types (see the standard library updates). Note that a custom constructor cannot share a name with an existing constructor of the type. For example, `struct Tuple(..)` cannot have a custom constructor, because it would conflict with the built-in `Tuple(..)` constructor."
+    },
+    {
+      "id": "language-7",
+      "kind": "numbered-item",
+      "section": "language",
+      "text": "Empty `{}` literals now trigger an ambiguity warning."
+    },
+    {
+      "id": "language-7-p1",
+      "kind": "paragraph",
+      "parent": "language-7",
+      "section": "language",
+      "text": "An empty `{}` could be either an empty map or an empty JSON object. The compiler now emits an ambiguity warning for this form, along with suggested alternatives:"
+    },
+    {
+      "id": "language-7-c1",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "language-7",
+      "section": "language",
+      "text": "let json : Json = { \"object\": {} }\n                          //  ^^---- prefer `Json::empty_object()`\nlet dict : Map = {}\n              // ^^--- prefer `Map([])`\nlet result = { stmt1(); {} }\n                     // ^^--- prefer the todo syntax `...` or remove the empty block\nlet record = {}\n          // ^^--- prefer `Record::{}`"
+    },
+    {
+      "id": "language-8",
+      "kind": "numbered-item",
+      "section": "language",
+      "text": "The experimental lexmatch expression has been upgraded to the lexscan expression."
+    },
+    {
+      "id": "language-8-c1",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "language-8",
+      "section": "language",
+      "text": "fn find_eol(s : StringView) -> Int? {\n  lexscan s {\n    (re\"\\r?\\n\", before=line, after=_) => Some(line.length())\n    _ => None\n  }\n}\n\nenum Token {\n  IDENT(String)\n  NUMBER(String)\n}\n\nfn tokenize(s : String) -> Array[Token] {\n  let tokens = []\n  for curr = s {\n    lexscan s with longest {\n      (re\"^[ \\t\\r\\n]+\", after=rest) => continue rest\n      (re\"^[A-Za-z][A-Za-z0-9_]*\" as t, after=rest) => {\n        tokens.push(IDENT(t.to_owned()))\n        continue rest\n      }\n      (re\"^[0-9]+\" as t, after=rest) => {\n        tokens.push(NUMBER(t.to_owned()))\n        continue rest\n      }\n      _ => break\n    }\n  }\n  tokens\n}"
+    },
+    {
+      "id": "language-8-p1",
+      "kind": "paragraph",
+      "parent": "language-8",
+      "section": "language",
+      "text": "The case patterns of lexscan expressions are largely the same as the right-hand side of regex match expressions, but lexscan expressions additionally support the longest-match strategy."
+    },
+    {
+      "id": "language-8-p2",
+      "kind": "paragraph",
+      "parent": "language-8",
+      "section": "language",
+      "text": "The original lexmatch expression has been deprecated, and the compiler provides migration hints. The new lexscan expression does not support `Bytes`/`BytesView` or guards; such cases need to be rewritten manually."
+    },
+    {
+      "id": "language-8-p3",
+      "kind": "paragraph",
+      "parent": "language-8",
+      "section": "language",
+      "text": "_(Streaming mode support for lexscan expressions is coming soon — stay tuned)_"
+    },
+    {
+      "id": "language-9",
+      "kind": "numbered-item",
+      "section": "language",
+      "text": "Support for the old moon.pkg.json / moon.mod.json will be removed soon."
+    },
+    {
+      "id": "language-9-p1",
+      "kind": "paragraph",
+      "parent": "language-9",
+      "section": "language",
+      "text": "We plan to remove build system and compiler support for moon.pkg.json / moon.mod.json in the next release, and recommend migrating to moon.pkg / moon.mod. The migration from the old format in moon fmt will be kept."
+    },
+    {
+      "id": "language-10",
+      "kind": "numbered-item",
+      "section": "language",
+      "text": "The `@` switch in warnings configuration will be deprecated."
+    },
+    {
+      "id": "language-10-p1",
+      "kind": "paragraph",
+      "parent": "language-10",
+      "section": "language",
+      "text": "We plan to simplify the syntax of the warnings configuration string and remove the `@` switch. We recommend using moon's `--deny-warn` in CI instead."
+    },
+    {
+      "id": "toolchain-1",
+      "kind": "numbered-item",
+      "section": "toolchain",
+      "text": "Expanded platform support for the new MoonBit native backend. When it was released last month, the new backend only supported macOS on Apple Silicon. This month we added:"
+    },
+    {
+      "id": "toolchain-1-b1",
+      "kind": "bullet",
+      "parent": "toolchain-1",
+      "section": "toolchain",
+      "text": "x86-64 Linux (gnu) support"
+    },
+    {
+      "id": "toolchain-1-b2",
+      "kind": "bullet",
+      "parent": "toolchain-1",
+      "section": "toolchain",
+      "text": "x86_64-pc-windows-msvc support, now available in nightly. Windows users need to install the MSVC Build Tools manually."
+    },
+    {
+      "id": "toolchain-1-b3",
+      "kind": "bullet",
+      "parent": "toolchain-1",
+      "section": "toolchain",
+      "text": "The build strategy has been adjusted: debug builds use the new native backend (faster compilation), while release builds use the C backend and invoke the system C compiler with -O2 optimization (faster execution)"
+    },
+    {
+      "id": "toolchain-2",
+      "kind": "numbered-item",
+      "section": "toolchain",
+      "text": "The new MoonBit native backend is now enabled by default for debug builds on macOS Apple Silicon. Setting the environment variable `MOONBIT_NEW_NATIVE=0` disables the new native backend, so that both debug and release builds use the C backend. On other platforms, the default remains the C backend, and debug builds use the new native backend only when `MOONBIT_NEW_NATIVE=1` is set."
+    },
+    {
+      "id": "toolchain-3",
+      "kind": "numbered-item",
+      "section": "toolchain",
+      "text": "Windows development experience improvements"
+    },
+    {
+      "id": "toolchain-3-b1",
+      "kind": "bullet",
+      "parent": "toolchain-3",
+      "section": "toolchain",
+      "text": "Native backend builds no longer require launching the terminal from an MSVC environment; moon automatically locates cl.exe / clang-cl.exe"
+    },
+    {
+      "id": "toolchain-4",
+      "kind": "numbered-item",
+      "section": "toolchain",
+      "text": "moon.pkg adds a new `pkgtype` declaration, along with a new `#export_name` attribute"
+    },
+    {
+      "id": "toolchain-4-c1",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "toolchain-4",
+      "section": "toolchain",
+      "text": "// moon.pkg\npkgtype(kind: \"executable\")      // replaces the previous options(\"is-main\": true)\npkgtype(kind: \"foreign_library\") // replaces the previous options(link: true)\npkgtype(kind: \"library\")         // the default"
+    },
+    {
+      "id": "toolchain-4-p1",
+      "kind": "paragraph",
+      "parent": "toolchain-4",
+      "section": "toolchain",
+      "text": "`#export_name` specifies the name of a function in the generated code, for example:"
+    },
+    {
+      "id": "toolchain-4-c2",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "toolchain-4",
+      "section": "toolchain",
+      "text": "#export_name(\"attr_add\")\npub fn add_by_attr(n : Int) -> Int {\n  n + 42\n}"
+    },
+    {
+      "id": "toolchain-4-p2",
+      "kind": "paragraph",
+      "parent": "toolchain-4",
+      "section": "toolchain",
+      "text": "In the generated Wasm/JS/C artifacts, the function is exported under the specified symbol. `#export_name` can only be used in foreign library packages, and only functions in the foreign library itself are exported; symbols from its upstream dependencies are not. Compiling to static/dynamic libraries on the native backend is still being polished, so this feature is currently mainly applicable to the Wasm/JS backends."
+    },
+    {
+      "id": "toolchain-5",
+      "kind": "numbered-item",
+      "section": "toolchain",
+      "text": "Stabilized configuration options such as `source` and `formatter` have been promoted to the top level of moon.mod / moon.pkg:"
+    },
+    {
+      "id": "toolchain-5-c1",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "toolchain-5",
+      "section": "toolchain",
+      "text": "// moon.pkg\nformatter(ignore: [\"file1\", \"file2\"])\n\n// moon.mod\nsource = \"src\""
+    },
+    {
+      "id": "toolchain-6",
+      "kind": "numbered-item",
+      "section": "toolchain",
+      "text": "Fixed a number of LSP crashes and intermittent failures."
+    },
+    {
+      "id": "toolchain-7",
+      "kind": "numbered-item",
+      "section": "toolchain",
+      "text": "moon behavior fixes and improvements"
+    },
+    {
+      "id": "toolchain-7-b1",
+      "kind": "bullet",
+      "parent": "toolchain-7",
+      "section": "toolchain",
+      "text": "The working directories of prebuild and test are now unified to the module root, and prebuild paths are now relative"
+    },
+    {
+      "id": "toolchain-7-b2",
+      "kind": "bullet",
+      "parent": "toolchain-7",
+      "section": "toolchain",
+      "text": "File watching on macOS has switched to FSEvents, fixing crashes in `moon check --watch`"
+    },
+    {
+      "id": "toolchain-7-b3",
+      "kind": "bullet",
+      "parent": "toolchain-7",
+      "section": "toolchain",
+      "text": "`moon run` now correctly propagates the exit code of the program being run"
+    },
+    {
+      "id": "toolchain-7-b4",
+      "kind": "bullet",
+      "parent": "toolchain-7",
+      "section": "toolchain",
+      "text": "`moon bench` supports path filtering"
+    },
+    {
+      "id": "toolchain-7-b5",
+      "kind": "bullet",
+      "parent": "toolchain-7",
+      "section": "toolchain",
+      "text": "The workspace-level preferred-target has been deprecated; `moon run` now respects the module's own preferred-target"
+    },
+    {
+      "id": "toolchain-8",
+      "kind": "numbered-item",
+      "section": "toolchain",
+      "text": "The skills.mooncakes.io marketplace"
+    },
+    {
+      "id": "toolchain-8-p1",
+      "kind": "paragraph",
+      "parent": "toolchain-8",
+      "section": "toolchain",
+      "text": "Page links can now be recognized and installed directly by the `npx skills` tool, for example `npx skills@latest add https://mooncakes.io/skills/Milky2018/pptz@0.2.4`"
+    },
+    {
+      "id": "toolchain-9",
+      "kind": "numbered-item",
+      "section": "toolchain",
+      "text": "Parser error recovery improvements"
+    },
+    {
+      "id": "toolchain-9-p1",
+      "kind": "paragraph",
+      "parent": "toolchain-9",
+      "section": "toolchain",
+      "text": "Improved the parser's error recovery when handling statements."
+    },
+    {
+      "id": "standard-library-1",
+      "kind": "numbered-item",
+      "section": "standard-library",
+      "text": "`moonbitlang/async` is now at version 0.20.2. The main updates since the previous monthly report (0.19.2) are:"
+    },
+    {
+      "id": "standard-library-1-b1",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "Added experimental Wasm1 backend support; API signatures and behavior are identical to the native backend. `.wasm` files built from projects using `moonbitlang/async` currently must be run with the latest `moonrun`, and are not yet compatible with other Wasm runtimes"
+    },
+    {
+      "id": "standard-library-1-p1",
+      "kind": "paragraph",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "`.wasm` binaries built from programs using `moonbitlang/async` are cross-platform: the same `.wasm` program can run on any hardware architecture and operating system where `moonrun` is available, without rebuilding"
+    },
+    {
+      "id": "standard-library-1-p2",
+      "kind": "paragraph",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "The Wasm1 support in `moonbitlang/async` is currently experimental. In the **future**, we will guarantee backward compatibility of `.wasm` binaries: `.wasm` files built with older versions of `moonbitlang/async` will still run on the latest `moonrun`"
+    },
+    {
+      "id": "standard-library-1-p3",
+      "kind": "paragraph",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "The Wasm1 backend of `moonbitlang/async` does not yet support the following features:"
+    },
+    {
+      "id": "standard-library-1-b2",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "`@websocket`"
+    },
+    {
+      "id": "standard-library-1-b3",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "`@fs.Watcher` and `@fs.realpath`"
+    },
+    {
+      "id": "standard-library-1-p4",
+      "kind": "paragraph",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "Support for all of them will be added soon"
+    },
+    {
+      "id": "standard-library-1-b4",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "`@fs.Watcher` gained a new `.wait()` method, which returns a series of events describing the changes that actually happened in the file system. The `@fs.Watcher(..)` constructor also gained new options controlling how events are reported; see the API documentation for details. The file system watching provided by `@fs.Watcher` remains fully cross-platform: the same file system operations produce the same event sequence on all supported operating systems"
+    },
+    {
+      "id": "standard-library-1-b5",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "Adjusted the read/write semantics of `@fs.File` so that it no longer relies on the file pointer maintained by the operating system, whose semantics are inconsistent across platforms and buggy on some of them. The new semantics of `@fs.File` are:"
+    },
+    {
+      "id": "standard-library-1-b6",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "Sequential reads and writes via `@io.Reader`/`@io.Writer` are now two completely independent streams that do not interfere with each other. Random-access reads and writes via `read_at` and `write_at` are completely independent from sequential reads/writes, and can be performed in parallel across multiple tasks (as long as the written ranges do not overlap)"
+    },
+    {
+      "id": "standard-library-1-b7",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "For files opened in append mode (passing `append=true` to `@fs.open`), the semantics of sequential reads via `@io.Reader` are unaffected and still start from the beginning of the file. Sequential writes via `@io.Writer` always append to the end of the file. Random reads via `read_at` are likewise unaffected by append mode, but for files opened in append mode, random writes via `write_at` now throw an error immediately, because the relevant system call on Linux is buggy and the correct semantics cannot be implemented"
+    },
+    {
+      "id": "standard-library-1-p5",
+      "kind": "paragraph",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "This change is incompatible with the previous behavior, but most programs should not be affected"
+    },
+    {
+      "id": "standard-library-1-b8",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "If a program references standard input/output such as `@stdio.stdin` and `@stdio.stdout`, and `moonbitlang/async` fails while initializing them internally (for example, on Windows, standard input/output may not exist), the program used to crash immediately during initialization. In the latest version, the program no longer crashes in this situation; instead, an error is thrown on the first use of the corresponding standard input/output pipe. As a result, `@stdio.{Input,Output}::fd` can now throw an error, which is an incompatible change"
+    },
+    {
+      "id": "standard-library-1-b9",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "The `sync` option of `@fs.open` now also takes effect on Windows: both `sync=Data` and `sync=Full` map to the Windows `FILE_FLAG_WRITE_THROUGH` flag, guaranteeing that when a file write operation returns, the content has been synced to the actual file system rather than sitting only in a cache"
+    },
+    {
+      "id": "standard-library-1-b10",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "When the target of a symbolic link created by `@fs.symlink` is an existing directory, on Windows it now first tries to create an NTFS junction instead of a symbolic link, because creating symbolic links on Windows requires administrator privileges. This behavior can be explicitly turned off with `force_symlink=true` (the default is `false`)"
+    },
+    {
+      "id": "standard-library-1-b11",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "Lots of bug fixes and some performance optimizations"
+    },
+    {
+      "id": "standard-library-2",
+      "kind": "numbered-item",
+      "section": "standard-library",
+      "text": "`moonbitlang/core`"
+    },
+    {
+      "id": "standard-library-2-b1",
+      "kind": "bullet",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "Added an experimental v128 SIMD package and used SIMD to optimize several hot paths: Bytes search and comparison, UTF-16 decoding, and more. In addition, StringBuilder writes, common Array/FixedArray operations, BigInt, strconv, JSON parsing, and others also received substantial performance optimizations"
+    },
+    {
+      "id": "standard-library-2-b2",
+      "kind": "bullet",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "The immutable containers (HashMap / HashSet / SortedMap / SortedSet, etc.) gained constructors named after their types, and `from_array` has been deprecated, keeping the style consistent with language-level custom constructors"
+    },
+    {
+      "id": "standard-library-2-b3",
+      "kind": "bullet",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "argparse: parse errors now come with subcommand spelling suggestions, and default subcommand dispatch is supported"
+    },
+    {
+      "id": "standard-library-2-b4",
+      "kind": "bullet",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "Added `Json::empty_object()`; String gained convenience APIs such as `all` / `any` / `contains_code_unit`; Int16 / UInt16 gained `lnot`"
+    },
+    {
+      "id": "standard-library-2-b5",
+      "kind": "bullet",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "The view operators no longer support negative indices"
+    },
+    {
+      "id": "standard-library-2-b6",
+      "kind": "bullet",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "Cleaned up deprecated APIs: removed `#alias(T)` on collection types, `IterResult`, and others"
+    },
+    {
+      "id": "standard-library-2-b7",
+      "kind": "bullet",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "Fixed an issue where the APIs in `@env` for environment variables, command-line arguments, the current directory, etc. did not handle Unicode strings correctly on Windows"
+    }
+  ],
+  "release": "0.10.4",
+  "release_date": "2026-07-13",
+  "schema_version": 2,
+  "source": {
+    "commit": "a6222f7292ce50f2a08847ef0852b1a8d456a393",
+    "path": "updates/2026-07-13-moonbit-0-10-4-release/index.md",
+    "repository": "https://github.com/moonbitlang/website",
+    "sha256": "2c02657eab65b6f1da12af2933f26c16fd814d165e877a0e5163e5e72478832c",
+    "web_url": "https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release"
+  }
+}

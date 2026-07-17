@@ -1,6 +1,6 @@
 # Pattern matching, `is`, and `guard`
 
-Every `mbt check` block in this file is compiled and run by the repository's verification suite (`tooling/run_checked_docs.py`). Blocks marked `mbt nocheck` show rejected or deprecated forms and are never compiled.
+Every `mbt check` block in this file is compiled and run by the repository's verification suite (`tooling/run_checked_docs.ts`). Blocks marked `mbt nocheck` show rejected or deprecated forms and are never compiled.
 
 ## match basics
 
@@ -25,6 +25,39 @@ test "match arms: guards, or-patterns, ranges" {
   assert_eq(classify(50), "large")
   assert_eq(classify(-2), "negative")
   assert_eq(classify(1000), "huge")
+}
+```
+
+Since 0.10.4, an or-pattern may provide defaults with `with` for branches that do not bind every variable. This keeps shared handling in one arm. Enclose the entire branch carrying defaults in parentheses; separate multiple assignments with commas: `A(a, b) | (B with a = 0, b = 0) => ...`.
+
+```mbt check
+enum ReleasePair {
+  Pair(Int, Int)
+  NoPair
+}
+
+fn sum_release_pair(value : ReleasePair) -> Int {
+  match value {
+    Pair(a, b) | (NoPair with a = 0, b = 0) => a + b
+  }
+}
+
+test "or-pattern defaults with multiple binders" {
+  assert_eq(sum_release_pair(Pair(2, 3)), 5)
+  assert_eq(sum_release_pair(NoPair), 0)
+}
+```
+
+```mbt check
+test "or-pattern defaults with with" {
+  fn value_or_zero(value : Int?) -> Int {
+    match value {
+      Some(n) | (None with n = 0) => n
+    }
+  }
+
+  assert_eq(value_or_zero(Some(7)), 7)
+  assert_eq(value_or_zero(None), 0)
 }
 ```
 
@@ -94,6 +127,40 @@ test "map patterns: required and optional keys" {
   assert_eq(pick({ "a": 1 }), (1, None))
   assert_eq(pick({ "z": 0 }), (-1, None))
 }
+```
+
+## `lexscan` for regular-expression scanning
+
+The experimental `lexmatch` form was deprecated in 0.10.4 and replaced by `lexscan`, which also supports a `with longest` strategy. Its cases may bind the text before and after a regex match. **Documented, not executed for legacy edge cases:** the [0.10.4 release notes](https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release) say `lexscan` does not support Bytes/BytesView inputs or guards, so those old `lexmatch` cases need a manual rewrite.
+
+```mbt check
+fn pattern_find_eol(s : StringView) -> Int? {
+  lexscan s {
+    (re"\r?\n", before=line, after=_) => Some(line.length())
+    _ => None
+  }
+}
+
+fn pattern_longest_prefix(s : StringView) -> Int? {
+  lexscan s with longest {
+    (re"^a", after=_) => Some(1)
+    (re"^ab", after=_) => Some(2)
+    _ => None
+  }
+}
+
+test "lexscan finds the prefix before an end-of-line" {
+  let source : StringView = "abc\ndef"[0:7]
+  assert_eq(pattern_find_eol(source), Some(3))
+  let no_eol : StringView = "abc"[0:3]
+  assert_eq(pattern_find_eol(no_eol), None)
+  let overlapping : StringView = "ab"[0:2]
+  assert_eq(pattern_longest_prefix(overlapping), Some(2))
+}
+```
+
+```mbt nocheck
+lexmatch source { ... } // DEPRECATED in 0.10.4: migrate to lexscan
 ```
 
 ## `is` expressions

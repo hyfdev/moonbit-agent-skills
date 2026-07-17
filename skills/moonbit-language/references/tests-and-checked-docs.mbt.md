@@ -1,6 +1,6 @@
 # Tests, snapshots, doc tests, and literate `.mbt.md`
 
-Every `mbt check` block in this file is compiled and run by the repository's verification suite (`tooling/run_checked_docs.py`). Blocks marked `mbt nocheck` show rejected or deprecated forms and are never compiled. This file is itself a literate `.mbt.md` document — the last section explains what that means.
+Every `mbt check` block in this file is compiled and run by the repository's verification suite (`tooling/run_checked_docs.ts`). Blocks marked `mbt nocheck` show rejected or deprecated forms and are never compiled. This file is itself a literate `.mbt.md` document — the last section explains what that means.
 
 ## Test blocks and assertions
 

@@ -1,0 +1,7 @@
+interface:
+  display_name: "MoonBit Skills Maintainer"
+  short_description: "Audit and update MoonBit release coverage without omissions"
+  default_prompt: "Use $moonbit-agent-skills-maintainer to audit or update hyfdev/moonbit-agent-skills from pinned MoonBit release notes, with complete source inventory, evidence, tests, and release gates."
+
+policy:
+  allow_implicit_invocation: true

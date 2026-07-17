@@ -3,13 +3,13 @@ name: moonbit-language
 description: Verified knowledge of the MoonBit programming language, pinned to an exact moonc version - syntax, structs, enums, pattern matching, traits, generics, visibility, checked errors and raise, async, tests, FFI declarations. Use when reading, writing, explaining, reviewing, or fixing MoonBit code in .mbt or .mbt.md files, fixing MoonBit type, pattern, visibility, or error-handling diagnostics, designing MoonBit APIs, judging whether a MoonBit language feature currently exists, or translating Rust, TypeScript, or Go habits into MoonBit. Language semantics only - for moon commands, moon.mod or moon.pkg configuration, dependencies, targets, or project setup use moonbit-toolchain; load both for tasks that touch code and project configuration together.
 license: MIT
 user-invocable: false
-compatibility: Verified only against moonc v0.10.4+ade96c819 (MoonBit v0.10.4, 2026-07-13). Needs the moon CLI for verification steps.
+compatibility: Verified only against moonc v0.10.4+2cc641edf (MoonBit v0.10.4, 2026-07-15). Needs the moon CLI for verification steps.
 metadata:
-  skill-version: "0.1.0"
-  moonc-version: "0.10.4+ade96c819"
+  skill-version: "0.2.0"
+  moonc-version: "0.10.4+2cc641edf"
   moonbit-release: "0.10.4"
-  verified-date: "2026-07-17"
-  verified-platform: "Darwin-arm64"
+  verified-date: "2026-07-18"
+  verified-platform: "Linux-x86_64"
   verified-targets: "wasm-gc,wasm,js,native"
   source-docs: "https://docs.moonbitlang.com/en/latest/ (MoonBit v0.10.4 documentation)"
 ---
@@ -18,7 +18,7 @@ metadata:
 
 ## Verification contract
 
-Everything in this skill was verified by compiling and running real code against **moonc v0.10.4+ade96c819** (MoonBit release 0.10.4, build 2026-07-13) on Darwin arm64, targets wasm-gc, wasm, js, native, on **2026-07-17**. MoonBit is pre-1.0 and changes fast; there is no language version separate from the compiler — language behavior is keyed to the moonc version.
+Everything in this skill was verified by compiling and running real code against **moonc v0.10.4+2cc641edf** (MoonBit release 0.10.4, build 2026-07-15) on Linux x86_64, targets wasm-gc, wasm, js, native, on **2026-07-18**. MoonBit is pre-1.0 and changes fast; there is no language version separate from the compiler — language behavior is keyed to the moonc version.
 
 **Before relying on this skill, run `moon version --all`.** If the local moonc differs from the pin above:
 
@@ -30,7 +30,7 @@ Everything in this skill was verified by compiling and running real code against
 ## Non-negotiable working rules
 
 - **The compiler is the oracle.** Never assert that MoonBit syntax exists, or that code is correct, from memory alone — MoonBit changed too fast for pretraining to be trusted. If you cannot run `moon check`, say so and mark the answer unverified.
-- **Write current syntax, not remembered syntax.** The highest-risk drift areas, all verified 2026-07-17: entry point is `fn main { }` (no parens); `fn init { }` (bare `init { }` is gone); type parameters are prefix (`fn[T] id`, not `fn id[T]`); trait/impl bodies never use `impl Type { }` blocks; error handling is `suberror` + `-> T raise E` + `try/catch/noraise` (the `!Error`, `f!()`, `try?` forms are deprecated); `loop` is deprecated; `derive(Show)` for debugging is deprecated in favor of `Debug`.
+- **Write current syntax, not remembered syntax.** The highest-risk drift areas, all verified 2026-07-18: entry point is `fn main { }` (no parens); `fn init { }` (bare `init { }` is gone); type parameters are prefix (`fn[T] id`, not `fn id[T]`); trait/impl bodies never use `impl Type { }` blocks; error handling is `suberror` + `-> T raise E` + `try/catch/noraise` (the `!Error`, `f!()`, `try?` forms are deprecated); `loop` is deprecated; `derive(Show)` for debugging is deprecated in favor of `Debug`.
 - **Distinguish status.** Label knowledge as: verified (ran here), documented (official docs, not run), proposal (moonbit-evolution — NEVER present as shipped; that repo's own status fields lag), or unknown. The docs themselves lag in places (e.g. trait pages still show pre-0.10.0 fn-less signatures).
 - **Cross-language habits are the main failure mode.** When input code looks like Rust, TypeScript, or Go, check references/cross-language-and-stale-syntax.md before "fixing" it into another language's idiom. Watch the silent traps: `"${x}"` is literal text (interpolation is `\{x}`), `defer` is block-scoped, and unnecessary `let mut` is a hard error.
 

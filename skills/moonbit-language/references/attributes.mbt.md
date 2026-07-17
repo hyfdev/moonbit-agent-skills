@@ -1,6 +1,6 @@
 # Attributes
 
-Every `mbt check` block in this file is compiled and run by the repository's verification suite (`tooling/run_checked_docs.py`). Blocks marked `mbt nocheck` show rejected or deprecated forms and are never compiled. Attributes are written `#name(...)` on the line above a declaration; run `moon explain --attribute <name>` for the authoritative per-attribute reference.
+Every `mbt check` block in this file is compiled and run by the repository's verification suite (`tooling/run_checked_docs.ts`). Blocks marked `mbt nocheck` show rejected or deprecated forms and are never compiled. Attributes are written `#name(...)` on the line above a declaration; run `moon explain --attribute <name>` for the authoritative per-attribute reference.
 
 ## The catalog
 
@@ -82,7 +82,7 @@ test "attr alias is a real callable name" {
 
 ## `#warnings` and `#alert`
 
-`#warnings("<spec>")` tunes warnings for one declaration: `-name` disables, `+name` enables, `@name` promotes to an error. `#alert(category, "msg")` attaches a custom alert that fires as `Warning (alert_<category>)` on use.
+`#warnings("<spec>")` tunes warnings for one declaration: `-name` disables and `+name` enables. **Documented, not executed as a deprecation diagnostic:** the [`0.10.4` release notes](https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release) say the still-working `@name` error-promotion switch is planned for deprecation; use moon's `--deny-warn` in CI instead. `#alert(category, "msg")` attaches a custom alert that fires as `Warning (alert_<category>)` on use.
 
 ```mbt check
 #warnings("-unused_value")

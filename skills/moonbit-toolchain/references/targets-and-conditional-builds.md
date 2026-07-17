@@ -1,6 +1,6 @@
 # Targets and conditional builds
 
-All verified at the pin on macOS arm64 (native backend uses the system C compiler).
+All verified at the pin on Linux x86_64 (native backend uses the system C compiler).
 
 ## Target selection
 
@@ -16,9 +16,13 @@ moon run --target native cmd/main
 - **`llvm` depends on the install channel** (both outcomes verified 2026-07-17): on the stable/latest channel it prints `Warning: LLVM backend is experimental and only supported on nightly moonbit toolchain for now`, then dies with an internal-compiler-error banner (exit 255 — a required prelude file ships only on nightly); on the nightly channel the same command builds successfully, keeping the experimental warning.
 - Per-target artifact paths and names: see the table in references/commands.md (`_build/<target>/<debug|release>/build/...`; native executables are `*.exe` even on macOS; js builds also emit `.d.ts` files).
 
+## Native backend selection in 0.10.4
+
+**Documented, not executed across the full platform matrix:** the [0.10.4 release notes](https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release) say the new native backend supports macOS Apple Silicon and x86-64 Linux, with Windows MSVC support on nightly. Debug builds on macOS Apple Silicon use it by default; set `MOONBIT_NEW_NATIVE=0` to force the C backend. Other platforms default to the C backend and opt into the new debug backend with `MOONBIT_NEW_NATIVE=1`. Release builds still use the C backend with `-O2`. Do not assume a successful `--target native` build identifies which backend was selected.
+
 ## Default target: preferred_target
 
-`preferred_target = "js"` in moon.mod (or `options("preferred-target": "js")` — both spellings parse, see references/project-layout-and-config.md) changes what a bare `moon build`/`moon run`/`moon test` targets. Verified: with `js`, artifacts appear only under `_build/js/`.
+`preferred_target = "js"` in moon.mod (or `options("preferred-target": "js")` — both spellings parse, see references/project-layout-and-config.md) changes what a bare `moon build`/`moon run`/`moon test` targets. Verified: with `js`, artifacts appear only under `_build/js/`. **Documented, not executed for a workspace-level key:** the [0.10.4 release notes](https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release) deprecate workspace-level `preferred-target`; put the setting in each module. `moon run` now respects the selected module's own value.
 
 ## Restricting targets: supported_targets
 

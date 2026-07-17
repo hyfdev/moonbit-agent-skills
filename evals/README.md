@@ -37,7 +37,7 @@ One JSON object per line:
 | Field | Meaning |
 | --- | --- |
 | `id` | unique prompt id |
-| `category` | `language-only` / `toolchain-only` / `combined` / `negative` |
+| `category` | `language-only` / `toolchain-only` / `combined` / `maintenance-only` / `negative` |
 | `moonbit_named` | whether the prompt text says "MoonBit" (false = infer it from files, configs, or commands) |
 | `prompt` | the natural user request, exactly as sent |
 | `workspace` | optional map of relative path to file content materialized in the project |

@@ -1,0 +1,1077 @@
+{
+  "schema_version": 2,
+  "release": "0.10.4",
+  "status": "current",
+  "source_inventory": "source.json",
+  "decisions": [
+    {
+      "source_ids": [
+        "language-1",
+        "language-1-p1",
+        "language-1-b1",
+        "language-1-b2",
+        "language-1-p2",
+        "language-1-b3",
+        "language-1-b4",
+        "language-1-p3"
+      ],
+      "summary": "Use explicit extend declarations to choose which trait implementations become dot-call methods.",
+      "change": "new-feature",
+      "agent_behavior": "Recommend extend Type with Trait::{method}; use pub extend when the attached method must be public.",
+      "claims": [
+        {
+          "text": "An explicit extend declaration selects which implemented trait methods are available through dot syntax.",
+          "evidence_roles": ["recommended-form"]
+        },
+        {
+          "text": "A private extend can attach a default trait implementation to a private type for local dot calls with Self specialized to that type.",
+          "evidence_roles": ["recommended-form"]
+        },
+        {
+          "text": "pub extend is accepted for a public type and public trait method.",
+          "evidence_roles": ["public-extend"]
+        },
+        {
+          "text": "The language skill causes an agent to add an explicit extend when repairing an implicit dot-call method.",
+          "evidence_roles": ["agent-behavior"]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "evidence": [
+        {
+          "kind": "checked-doc",
+          "path": "skills/moonbit-language/references/traits-and-generics.mbt.md",
+          "marker": "extend Robot with Greeter::{greet}",
+          "role": "recommended-form"
+        },
+        {
+          "kind": "content-eval",
+          "path": "evals/language/tasks/lang-explicit-extend/task.json",
+          "marker": "lang-explicit-extend",
+          "role": "agent-behavior"
+        },
+        {
+          "kind": "checked-doc",
+          "path": "skills/moonbit-language/references/traits-and-generics.mbt.md",
+          "marker": "pub extend PublicRobot with PublicGreeter::{public_greet}",
+          "role": "public-extend"
+        }
+      ]
+    },
+    {
+      "source_ids": ["language-1-b5"],
+      "summary": "Using extend as an identifier warns because it is transitioning from a soft keyword to a reserved keyword.",
+      "change": "deprecation",
+      "agent_behavior": "Rename identifiers named extend and reserve extend for explicit method attachment.",
+      "claims": [
+        {
+          "text": "Using extend as an identifier emits the soft-keyword warning at the pinned release.",
+          "evidence_roles": ["deprecated-form"]
+        },
+        {
+          "text": "Renaming the identifier passes with warnings denied.",
+          "evidence_roles": ["replacement"]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "evidence": [
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-dep-extend-identifier/fixture.json",
+          "marker": "lang-dep-extend-identifier",
+          "role": "deprecated-form"
+        },
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-dep-extend-identifier/fixture.json",
+          "marker": "Rename identifiers named extend",
+          "role": "replacement"
+        }
+      ]
+    },
+    {
+      "source_ids": ["language-1-p4"],
+      "summary": "Implicit impl-to-method attachment is deprecated and is a default warning at the pinned post-release compiler build.",
+      "change": "deprecation",
+      "agent_behavior": "Audit with --deny-warn, add explicit extend declarations for intended dot methods, and mark compatibility-only extend declarations deprecated when steering callers to qualified calls.",
+      "claims": [
+        {
+          "text": "The pinned 2026-07-15 compiler detects implicit impl-to-method attachment with the default warning set and --deny-warn.",
+          "evidence_roles": ["deprecated-form"]
+        },
+        {
+          "text": "An explicit extend declaration is the passing replacement for an intended dot-call method.",
+          "evidence_roles": ["replacement"]
+        },
+        {
+          "text": "A #deprecated extend makes its compatibility dot call warn, while the qualified trait call passes as the migration target.",
+          "evidence_roles": ["deprecated-extend-form", "deprecated-extend-replacement"]
+        },
+        {
+          "text": "The language skill causes an agent to deny warnings and apply the explicit migration.",
+          "evidence_roles": ["agent-behavior"]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "evidence": [
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-dep-implicit-impl-as-method/fixture.json",
+          "marker": "implicitly promoted",
+          "role": "deprecated-form"
+        },
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-dep-implicit-impl-as-method/fixture.json",
+          "marker": "Add extend ReleaseRobot",
+          "role": "replacement"
+        },
+        {
+          "kind": "content-eval",
+          "path": "evals/language/tasks/lang-explicit-extend/task.json",
+          "marker": "moon check --deny-warn",
+          "role": "agent-behavior"
+        },
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-dep-deprecated-extend/fixture.json",
+          "marker": "lang-dep-deprecated-extend",
+          "role": "deprecated-extend-form"
+        },
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-dep-deprecated-extend/fixture.json",
+          "marker": "qualified form",
+          "role": "deprecated-extend-replacement"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "language-1-p5",
+        "language-1-b6",
+        "language-1-b7",
+        "language-1-b8"
+      ],
+      "summary": "Supertrait dot calls through trait objects and constrained type parameters are deprecated.",
+      "change": "deprecation",
+      "agent_behavior": "Call the declaring trait explicitly as Trait::method(value) when the method comes from a supertrait or an ambiguous constraint set.",
+      "claims": [
+        {
+          "text": "A supertrait method dot-called through a subtrait object is detected with warnings denied.",
+          "evidence_roles": ["deprecated-form"]
+        },
+        {
+          "text": "A supertrait method dot-called through a singly constrained type parameter is detected with warnings denied.",
+          "evidence_roles": ["deprecated-form"]
+        },
+        {
+          "text": "A method dot-called through a multiply constrained type parameter is detected with warnings denied.",
+          "evidence_roles": ["deprecated-form"]
+        },
+        {
+          "text": "Calling the declaring trait in qualified form passes for all three migration cases.",
+          "evidence_roles": ["replacement", "recommended-form"]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "evidence": [
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-dep-supertrait-dot-call/fixture.json",
+          "marker": "lang-dep-supertrait-dot-call",
+          "role": "deprecated-form"
+        },
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-dep-supertrait-dot-call/fixture.json",
+          "marker": "ReleaseBase::base(value)",
+          "role": "replacement"
+        },
+        {
+          "kind": "checked-doc",
+          "path": "skills/moonbit-language/references/traits-and-generics.mbt.md",
+          "marker": "Greeter::greet(l)",
+          "role": "recommended-form"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "language-2",
+        "language-2-p1",
+        "language-2-c1",
+        "language-2-c2",
+        "language-2-p2",
+        "language-2-c3",
+        "language-2-p3"
+      ],
+      "summary": "Or-patterns may supply defaults with with, including parenthesized defaults for multiple binders.",
+      "change": "new-feature",
+      "agent_behavior": "Use Pattern(x) | (Other with x = default) to merge arms that differ only by a missing binder.",
+      "claims": [
+        {
+          "text": "with supplies a default for one binder missing from an or-pattern branch.",
+          "evidence_roles": ["single-binder"]
+        },
+        {
+          "text": "Parenthesized with defaults supply multiple missing binders.",
+          "evidence_roles": ["multiple-binders"]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "evidence": [
+        {
+          "kind": "checked-doc",
+          "path": "skills/moonbit-language/references/pattern-matching.mbt.md",
+          "marker": "Some(n) | (None with n = 0)",
+          "role": "single-binder"
+        },
+        {
+          "kind": "checked-doc",
+          "path": "skills/moonbit-language/references/pattern-matching.mbt.md",
+          "marker": "test \"or-pattern defaults with multiple binders\"",
+          "role": "multiple-binders"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "language-3",
+        "language-3-p1",
+        "language-3-b1",
+        "language-3-b2",
+        "language-3-b3",
+        "language-3-c1"
+      ],
+      "summary": "Explicit Iter literals use [| .. |] and preserve documented eager/lazy evaluation boundaries.",
+      "change": "new-feature",
+      "agent_behavior": "Construct Iter values with [| .. |]; treat element expressions as eager and spread/comprehension iteration as lazy.",
+      "claims": [
+        {
+          "text": "The explicit [| .. |] syntax constructs an Iter.",
+          "evidence_roles": ["recommended-form"]
+        },
+        {
+          "text": "Direct elements are eager while spread iteration and comprehension bodies are lazy.",
+          "evidence_roles": ["evaluation-semantics"]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "evidence": [
+        {
+          "kind": "checked-doc",
+          "path": "skills/moonbit-language/references/control-flow-and-iteration.mbt.md",
+          "marker": "let direct : Iter[Int] = [| 1, 2, 3 |]",
+          "role": "recommended-form"
+        },
+        {
+          "kind": "checked-doc",
+          "path": "skills/moonbit-language/references/control-flow-and-iteration.mbt.md",
+          "marker": "test \"control flow: Iter literal evaluation order\"",
+          "role": "evaluation-semantics"
+        }
+      ]
+    },
+    {
+      "source_ids": ["language-3-p2"],
+      "summary": "Expected-type overloading of an array-spread literal to Iter is deprecated.",
+      "change": "deprecation",
+      "agent_behavior": "Replace an overloaded [x, ..iter] expression with the explicit [| x, ..iter |] Iter literal.",
+      "claims": [
+        {
+          "text": "An array-spread literal overloaded to Iter emits the deprecation.",
+          "evidence_roles": ["deprecated-form"]
+        },
+        {
+          "text": "The explicit Iter literal passes under the same warning gate.",
+          "evidence_roles": ["replacement"]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "evidence": [
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-dep-implicit-iter-literal/fixture.json",
+          "marker": "lang-dep-implicit-iter-literal",
+          "role": "deprecated-form"
+        },
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-dep-implicit-iter-literal/fixture.json",
+          "marker": "explicit [| .. |] Iter literal",
+          "role": "replacement"
+        }
+      ]
+    },
+    {
+      "source_ids": ["language-4", "language-4-c1"],
+      "summary": "Array literals support conditional spreads.",
+      "change": "new-feature",
+      "agent_behavior": "Use ..if condition { values } inside an array literal when a spread is conditional.",
+      "claims": [
+        {
+          "text": "..if condition { values } conditionally spreads values into an array literal.",
+          "evidence_roles": ["recommended-form"]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "evidence": [
+        {
+          "kind": "checked-doc",
+          "path": "skills/moonbit-language/references/data-types.mbt.md",
+          "marker": "..if true { a }",
+          "role": "recommended-form"
+        }
+      ]
+    },
+    {
+      "source_ids": ["language-5", "language-5-c1", "language-5-p1"],
+      "summary": "Bytes literals support UTF-8 interpolation and Bytes template writes.",
+      "change": "new-feature",
+      "agent_behavior": "Use b\"...\\{value}\" when the interpolated result should be UTF-8 Bytes, including with Buffer <+ b\"...\" template writes.",
+      "claims": [
+        {
+          "text": "A Bytes literal can interpolate a MoonBit value.",
+          "evidence_roles": ["interpolation"]
+        },
+        {
+          "text": "Non-ASCII interpolated text is encoded as UTF-8 Bytes.",
+          "evidence_roles": ["utf8"]
+        },
+        {
+          "text": "Buffer <+ accepts a Bytes interpolation template and writes the resulting bytes.",
+          "evidence_roles": ["bytes-template-write"]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "evidence": [
+        {
+          "kind": "checked-doc",
+          "path": "skills/moonbit-language/references/data-types.mbt.md",
+          "marker": "let interpolated : Bytes = b\"value=\\{answer}\"",
+          "role": "interpolation"
+        },
+        {
+          "kind": "checked-doc",
+          "path": "skills/moonbit-language/references/data-types.mbt.md",
+          "marker": "let utf8 : Bytes = b\"\\{\"月🌙\"}\"",
+          "role": "utf8"
+        },
+        {
+          "kind": "checked-doc",
+          "path": "skills/moonbit-language/references/data-types.mbt.md",
+          "marker": "buf <+ b\"value=\\{answer}; text=",
+          "role": "bytes-template-write"
+        }
+      ]
+    },
+    {
+      "source_ids": ["language-6", "language-6-p1"],
+      "summary": "Any type may define a type-named custom constructor when the name does not conflict with an existing constructor.",
+      "change": "new-feature",
+      "agent_behavior": "Define fn Type::Type(..) for a custom constructor and check that the type has no existing constructor with that name.",
+      "claims": [
+        {
+          "text": "A type without a conflicting constructor can define and call fn Type::Type(..).",
+          "evidence_roles": ["recommended-form"]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "evidence": [
+        {
+          "kind": "checked-doc",
+          "path": "skills/moonbit-language/references/types-structs-enums.mbt.md",
+          "marker": "fn Figure::Figure(radius : Double) -> Figure",
+          "role": "recommended-form"
+        }
+      ]
+    },
+    {
+      "source_ids": ["language-7", "language-7-c1", "language-7-p1"],
+      "summary": "Bare empty braces are ambiguous and must be replaced with the constructor matching the intended type.",
+      "change": "behavior-change",
+      "agent_behavior": "Use Map([]), Json::empty_object(), Type::{}, or remove an empty block and return Unit explicitly instead of bare {}.",
+      "claims": [
+        {
+          "text": "Bare empty braces fail the warning gate as ambiguous.",
+          "evidence_roles": ["ambiguous-warning"]
+        },
+        {
+          "text": "Map([]) and Json::empty_object() are passing explicit empty collection constructors.",
+          "evidence_roles": ["collection-fixes"]
+        },
+        {
+          "text": "Type::{} is the passing explicit constructor for an empty record.",
+          "evidence_roles": ["record-fix"]
+        },
+        {
+          "text": "Removing the ambiguous empty block and returning Unit explicitly passes.",
+          "evidence_roles": ["unit-fix"]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "evidence": [
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-dep-ambiguous-empty-braces/fixture.json",
+          "marker": "lang-dep-ambiguous-empty-braces",
+          "role": "ambiguous-warning"
+        },
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-dep-ambiguous-empty-braces/fixture.json",
+          "marker": "Map([]), Json::empty_object()",
+          "role": "collection-fixes"
+        },
+        {
+          "kind": "checked-doc",
+          "path": "skills/moonbit-language/references/data-types.mbt.md",
+          "marker": "let record : EmptyDataRecord = EmptyDataRecord::{}",
+          "role": "record-fix"
+        },
+        {
+          "kind": "checked-doc",
+          "path": "skills/moonbit-language/references/data-types.mbt.md",
+          "marker": "let unit : Unit = ()",
+          "role": "unit-fix"
+        }
+      ]
+    },
+    {
+      "source_ids": ["language-8", "language-8-c1", "language-8-p1"],
+      "summary": "lexscan replaces the experimental scanner and adds longest-match support.",
+      "change": "new-feature",
+      "agent_behavior": "Use lexscan for regex scanning and add with longest when tokenization requires longest-match behavior.",
+      "claims": [
+        {
+          "text": "lexscan scans a StringView with regex cases.",
+          "evidence_roles": ["basic-scan"]
+        },
+        {
+          "text": "lexscan with longest selects the longest of overlapping anchored matches.",
+          "evidence_roles": ["longest-match"]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "evidence": [
+        {
+          "kind": "checked-doc",
+          "path": "skills/moonbit-language/references/pattern-matching.mbt.md",
+          "marker": "lexscan s {",
+          "role": "basic-scan"
+        },
+        {
+          "kind": "checked-doc",
+          "path": "skills/moonbit-language/references/pattern-matching.mbt.md",
+          "marker": "assert_eq(pattern_longest_prefix(overlapping), Some(2))",
+          "role": "longest-match"
+        }
+      ]
+    },
+    {
+      "source_ids": ["language-8-p2"],
+      "summary": "lexmatch is deprecated; Bytes/BytesView and guarded cases need manual rewrites because lexscan does not support them.",
+      "change": "deprecation",
+      "agent_behavior": "Migrate supported cases to lexscan and explicitly redesign old Bytes or guard-dependent cases.",
+      "reason": "The executable fixture proves the supported lexmatch-to-lexscan migration, but the removed Bytes/BytesView and guard forms cannot be expressed as passing lexscan cases and remain source-documented.",
+      "claims": [
+        {
+          "text": "lexmatch is deprecated and supported StringView cases migrate to lexscan.",
+          "evidence_roles": ["deprecated-form", "replacement", "unsupported-edge-cases"]
+        },
+        {
+          "text": "Former Bytes/BytesView or guarded lexmatch cases require a manual redesign because lexscan does not support them.",
+          "evidence_roles": ["unsupported-edge-cases"]
+        }
+      ],
+      "disposition": "documented",
+      "owner_skill": "moonbit-language",
+      "evidence": [
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-dep-lexmatch/fixture.json",
+          "marker": "lang-dep-lexmatch",
+          "role": "deprecated-form"
+        },
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-dep-lexmatch/fixture.json",
+          "marker": "Replace lexmatch with lexscan",
+          "role": "replacement"
+        },
+        {
+          "kind": "documented",
+          "path": "skills/moonbit-language/references/pattern-matching.mbt.md",
+          "marker": "Documented, not executed for legacy edge cases",
+          "source_url": "https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release",
+          "role": "unsupported-edge-cases"
+        }
+      ]
+    },
+    {
+      "source_ids": ["language-8-p3"],
+      "summary": "Streaming lexscan support is a future announcement, not current behavior.",
+      "change": "new-feature",
+      "disposition": "not-actionable",
+      "reason": "The release explicitly describes this as future work, so the current skills must not claim or teach it."
+    },
+    {
+      "source_ids": ["language-9", "language-9-p1"],
+      "summary": "Legacy JSON build configuration is deprecated and moon fmt migrates it to the DSL files.",
+      "change": "deprecation",
+      "agent_behavior": "Do not create moon.mod.json or moon.pkg.json; migrate existing files with moon fmt and review the deletion.",
+      "claims": [
+        {
+          "text": "The legacy JSON files are accepted as the deprecated input to the migration command.",
+          "evidence_roles": ["deprecated-form"]
+        },
+        {
+          "text": "moon fmt creates the replacement DSL files and removes the legacy JSON files.",
+          "evidence_roles": ["replacement"]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-toolchain",
+      "evidence": [
+        {
+          "kind": "command",
+          "entry_id": "fmt-migrates-json",
+          "role": "deprecated-form"
+        },
+        {
+          "kind": "command",
+          "entry_id": "fmt-migrates-json",
+          "role": "replacement"
+        }
+      ]
+    },
+    {
+      "source_ids": ["language-10", "language-10-p1"],
+      "summary": "The @ warning switch is planned for deprecation in favor of moon --deny-warn.",
+      "change": "deprecation",
+      "agent_behavior": "Use +name or -name for warning selection and enforce warnings in CI with --deny-warn instead of @name.",
+      "reason": "The release announces a future deprecation rather than a diagnostic available at the 0.10.4 pin, so both sides of the migration are documented from the pinned source instead of claimed executable.",
+      "claims": [
+        {
+          "text": "The @ warning switch is the deprecated-form side of the announced migration.",
+          "evidence_roles": ["deprecated-form"]
+        },
+        {
+          "text": "Warning selection should use +name/-name and CI error promotion should use moon --deny-warn.",
+          "evidence_roles": ["replacement"]
+        }
+      ],
+      "disposition": "documented",
+      "owner_skill": "moonbit-language",
+      "evidence": [
+        {
+          "kind": "documented",
+          "path": "skills/moonbit-language/references/attributes.mbt.md",
+          "marker": "still-working `@name` error-promotion switch",
+          "source_url": "https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release",
+          "role": "deprecated-form"
+        },
+        {
+          "kind": "documented",
+          "path": "skills/moonbit-language/references/attributes.mbt.md",
+          "marker": "use moon's `--deny-warn` in CI instead",
+          "source_url": "https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release",
+          "role": "replacement"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "toolchain-1",
+        "toolchain-1-b1",
+        "toolchain-1-b2",
+        "toolchain-1-b3",
+        "toolchain-2",
+        "toolchain-3",
+        "toolchain-3-b1"
+      ],
+      "summary": "The 0.10.4 native backend platform matrix, defaults, overrides, and release-build strategy vary by OS and channel.",
+      "change": "platform",
+      "agent_behavior": "Check OS, architecture, channel, build mode, and MOONBIT_NEW_NATIVE before diagnosing which native backend is active.",
+      "claims": [
+        {
+          "text": "The native-backend availability, default selection, release-build strategy, and override depend on the documented 0.10.4 platform matrix.",
+          "evidence_roles": ["platform-matrix"]
+        }
+      ],
+      "disposition": "documented",
+      "owner_skill": "moonbit-toolchain",
+      "evidence": [
+        {
+          "kind": "documented",
+          "path": "skills/moonbit-toolchain/references/targets-and-conditional-builds.md",
+          "marker": "Documented, not executed across the full platform matrix",
+          "source_url": "https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release",
+          "role": "platform-matrix"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "toolchain-4",
+        "toolchain-4-c1",
+        "toolchain-4-p1",
+        "toolchain-4-c2"
+      ],
+      "summary": "moon.pkg supports pkgtype and foreign-library functions support #export_name.",
+      "change": "new-feature",
+      "agent_behavior": "Use pkgtype(kind: ...) for package type and #export_name only on functions declared by a foreign_library package.",
+      "claims": [
+        {
+          "text": "moon.pkg accepts the new pkgtype(kind: ...) declaration.",
+          "evidence_roles": ["config-and-syntax"]
+        },
+        {
+          "text": "A foreign_library package accepts #export_name on its function.",
+          "evidence_roles": ["config-and-syntax"]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-toolchain",
+      "evidence": [
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/tool-config-0-10-4/fixture.json",
+          "marker": "tool-config-0-10-4",
+          "role": "config-and-syntax"
+        }
+      ]
+    },
+    {
+      "source_ids": ["toolchain-4-p2"],
+      "summary": "#export_name export scope and native library maturity have backend-specific limits.",
+      "change": "platform",
+      "agent_behavior": "Expect exported symbols only from the foreign-library package itself and prefer Wasm/JS at the 0.10.4 pin.",
+      "claims": [
+        {
+          "text": "#export_name only exports functions from the foreign-library package itself, and native library output remains less mature than Wasm/JS at this pin.",
+          "evidence_roles": ["backend-limits"]
+        }
+      ],
+      "disposition": "documented",
+      "owner_skill": "moonbit-toolchain",
+      "evidence": [
+        {
+          "kind": "documented",
+          "path": "skills/moonbit-toolchain/references/project-layout-and-config.md",
+          "marker": "Documented, not executed end-to-end",
+          "source_url": "https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release",
+          "role": "backend-limits"
+        }
+      ]
+    },
+    {
+      "source_ids": ["toolchain-5", "toolchain-5-c1"],
+      "summary": "source and formatter are top-level configuration declarations.",
+      "change": "new-feature",
+      "agent_behavior": "Write source in moon.mod and formatter(ignore: ...) in moon.pkg at top level rather than hiding them in options.",
+      "claims": [
+        {
+          "text": "moon.mod accepts top-level source and moon.pkg accepts top-level formatter(ignore: ...).",
+          "evidence_roles": ["config-parser"]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-toolchain",
+      "evidence": [
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/tool-config-0-10-4/fixture.json",
+          "marker": "top-level formatter configuration",
+          "role": "config-parser"
+        }
+      ]
+    },
+    {
+      "source_ids": ["toolchain-6"],
+      "summary": "The release fixes unspecified LSP crashes and intermittent failures.",
+      "change": "bug-fix",
+      "disposition": "not-actionable",
+      "reason": "No stable command, configuration, or troubleshooting rule is specified; claiming more would invent behavior beyond the release note."
+    },
+    {
+      "source_ids": ["toolchain-7"],
+      "summary": "This is a heading for separately assessed moon behavior changes.",
+      "change": "behavior-change",
+      "disposition": "not-actionable",
+      "reason": "The heading contains no behavior beyond its five child items, each of which has its own decision."
+    },
+    {
+      "source_ids": ["toolchain-7-b1"],
+      "summary": "Tests and pre-build steps now run from the module root and pre-build paths are relative to it.",
+      "change": "behavior-change",
+      "agent_behavior": "Resolve test and pre-build paths from the module root, not the nested package directory.",
+      "claims": [
+        {
+          "text": "Test and pre-build working directories and pre-build relative paths use the module root at this release.",
+          "evidence_roles": ["working-directory"]
+        }
+      ],
+      "disposition": "documented",
+      "owner_skill": "moonbit-toolchain",
+      "evidence": [
+        {
+          "kind": "documented",
+          "path": "skills/moonbit-toolchain/references/workspaces-and-scripts.md",
+          "marker": "Documented, not executed from a nested package",
+          "source_url": "https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release",
+          "role": "working-directory"
+        }
+      ]
+    },
+    {
+      "source_ids": ["toolchain-7-b2"],
+      "summary": "macOS watch mode moved to FSEvents to fix crashes.",
+      "change": "bug-fix",
+      "disposition": "not-actionable",
+      "reason": "The command and user workflow are unchanged; the implementation fix creates no durable skill guidance."
+    },
+    {
+      "source_ids": ["toolchain-7-b3"],
+      "summary": "moon run propagates the executed program's exit code.",
+      "change": "behavior-change",
+      "agent_behavior": "Treat moon run's exit status as the program exit status in scripts and CI.",
+      "claims": [
+        {
+          "text": "moon run returns the nonzero exit code produced by the executed program.",
+          "evidence_roles": ["exit-code"]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-toolchain",
+      "evidence": [
+        {
+          "kind": "command",
+          "entry_id": "run-propagates-program-exit",
+          "role": "exit-code"
+        }
+      ]
+    },
+    {
+      "source_ids": ["toolchain-7-b4"],
+      "summary": "moon bench accepts path filtering.",
+      "change": "new-feature",
+      "agent_behavior": "Pass a package or file path positionally to moon bench to narrow benchmark scope.",
+      "claims": [
+        {
+          "text": "moon bench accepts a positional package or file path filter.",
+          "evidence_roles": ["path-filter"]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-toolchain",
+      "evidence": [
+        {
+          "kind": "command",
+          "entry_id": "bench-textutil",
+          "role": "path-filter"
+        }
+      ]
+    },
+    {
+      "source_ids": ["toolchain-7-b5"],
+      "summary": "Workspace-level preferred-target is deprecated and moon run uses the module's value.",
+      "change": "deprecation",
+      "agent_behavior": "Place preferred_target in each module and do not recommend a workspace-level setting.",
+      "reason": "The repository has no multi-module workspace fixture for the old key; the pinned release and explicitly labeled reference document both the removed placement and module-level replacement.",
+      "claims": [
+        {
+          "text": "The workspace-level preferred-target placement is deprecated.",
+          "evidence_roles": ["deprecated-form"]
+        },
+        {
+          "text": "preferred_target belongs in each module and moon run respects the module value.",
+          "evidence_roles": ["replacement"]
+        }
+      ],
+      "disposition": "documented",
+      "owner_skill": "moonbit-toolchain",
+      "evidence": [
+        {
+          "kind": "documented",
+          "path": "skills/moonbit-toolchain/references/targets-and-conditional-builds.md",
+          "marker": "deprecate workspace-level `preferred-target`",
+          "source_url": "https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release",
+          "role": "deprecated-form"
+        },
+        {
+          "kind": "documented",
+          "path": "skills/moonbit-toolchain/references/targets-and-conditional-builds.md",
+          "marker": "put the setting in each module",
+          "source_url": "https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release",
+          "role": "replacement"
+        }
+      ]
+    },
+    {
+      "source_ids": ["toolchain-8", "toolchain-8-p1"],
+      "summary": "The Mooncakes skills marketplace accepts page URLs through npx skills.",
+      "change": "ecosystem",
+      "disposition": "out-of-scope",
+      "reason": "This is an external skill-distribution marketplace behavior, not MoonBit language semantics or moon project operation covered by the two product skills."
+    },
+    {
+      "source_ids": ["toolchain-9", "toolchain-9-p1"],
+      "summary": "Parser error recovery improved without a specified syntax or diagnostic contract.",
+      "change": "bug-fix",
+      "disposition": "not-actionable",
+      "reason": "The release gives no stable diagnostic or recovery behavior that a user-facing skill can safely promise."
+    },
+    {
+      "source_ids": [
+        "standard-library-1",
+        "standard-library-1-b1",
+        "standard-library-1-p1",
+        "standard-library-1-p2",
+        "standard-library-1-p3",
+        "standard-library-1-b2",
+        "standard-library-1-b3",
+        "standard-library-1-p4"
+      ],
+      "summary": "moonbitlang/async 0.20.2 adds an experimental Wasm1 runtime with explicit compatibility and API limits.",
+      "change": "platform",
+      "agent_behavior": "Distinguish Wasm1 from wasm-gc, require the latest moonrun for async Wasm1 artifacts, and check the documented unsupported APIs before recommending that backend.",
+      "claims": [
+        {
+          "text": "moonbitlang/async 0.20.2 adds experimental Wasm1 support with native-compatible API signatures and behavior.",
+          "evidence_roles": ["wasm1-support"]
+        },
+        {
+          "text": "Its Wasm1 artifacts require the latest moonrun and do not yet run in other WebAssembly runtimes.",
+          "evidence_roles": ["runtime-requirement"]
+        },
+        {
+          "text": "The same artifact is cross-platform wherever the required moonrun is available.",
+          "evidence_roles": ["cross-platform"]
+        },
+        {
+          "text": "Backward compatibility for artifacts built with older async package versions is not promised yet.",
+          "evidence_roles": ["compatibility-state"]
+        },
+        {
+          "text": "The experimental backend does not yet support @websocket, @fs.Watcher, or @fs.realpath, and their support is future work.",
+          "evidence_roles": ["unsupported-apis"]
+        }
+      ],
+      "disposition": "documented",
+      "owner_skill": "moonbit-language",
+      "evidence": [
+        {
+          "kind": "documented",
+          "path": "skills/moonbit-language/references/async-and-ffi.md",
+          "marker": "add experimental Wasm1 support to `moonbitlang/async` 0.20.2",
+          "source_url": "https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release",
+          "role": "wasm1-support"
+        },
+        {
+          "kind": "documented",
+          "path": "skills/moonbit-language/references/async-and-ffi.md",
+          "marker": "currently require the latest `moonrun`",
+          "source_url": "https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release",
+          "role": "runtime-requirement"
+        },
+        {
+          "kind": "documented",
+          "path": "skills/moonbit-language/references/async-and-ffi.md",
+          "marker": "artifact is otherwise cross-platform",
+          "source_url": "https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release",
+          "role": "cross-platform"
+        },
+        {
+          "kind": "documented",
+          "path": "skills/moonbit-language/references/async-and-ffi.md",
+          "marker": "not a backward-compatibility promise",
+          "source_url": "https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release",
+          "role": "compatibility-state"
+        },
+        {
+          "kind": "documented",
+          "path": "skills/moonbit-language/references/async-and-ffi.md",
+          "marker": "does not yet support `@websocket`, `@fs.Watcher`, or `@fs.realpath`",
+          "source_url": "https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release",
+          "role": "unsupported-apis"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "standard-library-1-b4",
+        "standard-library-1-b5",
+        "standard-library-1-b6",
+        "standard-library-1-b7",
+        "standard-library-1-p5",
+        "standard-library-1-b8",
+        "standard-library-1-b9",
+        "standard-library-1-b10",
+        "standard-library-1-b11"
+      ],
+      "summary": "moonbitlang/async 0.20.2 changes package-specific filesystem, I/O, and Windows APIs.",
+      "change": "behavior-change",
+      "disposition": "out-of-scope",
+      "reason": "The language skill now documents the async runtime boundary that affects whether language-level async code runs, but it does not catalogue the versioned filesystem, I/O, stdio, symlink, or Windows API surface of the external moonbitlang/async package; those calls must follow the installed package documentation."
+    },
+    {
+      "source_ids": ["standard-library-2"],
+      "summary": "This is a heading for separately assessed moonbitlang/core changes.",
+      "change": "behavior-change",
+      "disposition": "not-actionable",
+      "reason": "The heading contains no behavior beyond the seven child items, each of which has its own decision."
+    },
+    {
+      "source_ids": ["standard-library-2-b1"],
+      "summary": "Core added experimental SIMD and internal performance improvements.",
+      "change": "performance",
+      "disposition": "not-actionable",
+      "reason": "These optimizations do not change source syntax, API selection, or a stable user workflow the skills need to teach."
+    },
+    {
+      "source_ids": ["standard-library-2-b2"],
+      "summary": "Immutable containers use type-named constructors and deprecate from_array.",
+      "change": "deprecation",
+      "agent_behavior": "Generate @package.Type([...]) for immutable containers and migrate Type::from_array calls.",
+      "claims": [
+        {
+          "text": "The immutable-container Type::from_array constructor emits a deprecation.",
+          "evidence_roles": ["deprecated-form"]
+        },
+        {
+          "text": "The type-named immutable-container constructor passes as the replacement.",
+          "evidence_roles": ["replacement"]
+        },
+        {
+          "text": "The language skill causes an agent to replace from_array without incorrectly changing mutable Set construction.",
+          "evidence_roles": ["agent-behavior"]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "evidence": [
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-dep-immutable-hashset-from-array/fixture.json",
+          "marker": "lang-dep-immutable-hashset-from-array",
+          "role": "deprecated-form"
+        },
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-immutable-hashset-constructor/fixture.json",
+          "marker": "lang-immutable-hashset-constructor",
+          "role": "replacement"
+        },
+        {
+          "kind": "content-eval",
+          "path": "evals/language/tasks/lang-immutable-constructor-migration/task.json",
+          "marker": "lang-immutable-constructor-migration",
+          "role": "agent-behavior"
+        }
+      ]
+    },
+    {
+      "source_ids": ["standard-library-2-b3"],
+      "summary": "The moonbitlang/core argparse package improved subcommand parsing.",
+      "change": "new-feature",
+      "disposition": "out-of-scope",
+      "reason": "The product skills do not catalogue APIs of optional core packages; this is not the moon CLI parser and should be discovered from the installed argparse package docs."
+    },
+    {
+      "source_ids": ["standard-library-2-b4"],
+      "summary": "Core added Json::empty_object, String predicates and code-unit search, and Int16/UInt16 lnot.",
+      "change": "new-feature",
+      "agent_behavior": "Use these current core APIs when their exact behavior fits instead of recreating helpers or writing ambiguous empty JSON braces.",
+      "claims": [
+        {
+          "text": "Json::empty_object constructs an empty JSON object.",
+          "evidence_roles": ["api-behavior"]
+        },
+        {
+          "text": "String all/any predicates and contains_code_unit execute with their documented behavior.",
+          "evidence_roles": ["api-behavior"]
+        },
+        {
+          "text": "Int16 and UInt16 lnot execute with fixed-width complement behavior.",
+          "evidence_roles": ["api-behavior"]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "evidence": [
+        {
+          "kind": "checked-doc",
+          "path": "skills/moonbit-language/references/data-types.mbt.md",
+          "marker": "test \"data types: 0.10.4 core convenience APIs\"",
+          "role": "api-behavior"
+        }
+      ]
+    },
+    {
+      "source_ids": ["standard-library-2-b5"],
+      "summary": "View operators no longer accept negative indices.",
+      "change": "behavior-change",
+      "agent_behavior": "Compute a nonnegative index explicitly before slicing a StringView, BytesView, or ArrayView.",
+      "claims": [
+        {
+          "text": "Negative ArrayView, StringView, and BytesView indices trigger the observed failure, and explicit nonnegative indices are passing replacements.",
+          "evidence_roles": ["runtime-trap-and-fix"]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "evidence": [
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-neg-negative-view-index/fixture.json",
+          "marker": "lang-neg-negative-view-index",
+          "role": "runtime-trap-and-fix"
+        }
+      ]
+    },
+    {
+      "source_ids": ["standard-library-2-b6"],
+      "summary": "Deprecated collection aliases and IterResult were removed.",
+      "change": "removal",
+      "agent_behavior": "Do not generate collection #alias(T) APIs or IterResult; use current constructors and Iter APIs from the installed core library.",
+      "claims": [
+        {
+          "text": "Collection #alias(T) APIs and IterResult are removed and must not be generated at this release.",
+          "evidence_roles": ["removed-api"]
+        }
+      ],
+      "disposition": "documented",
+      "owner_skill": "moonbit-language",
+      "evidence": [
+        {
+          "kind": "documented",
+          "path": "skills/moonbit-language/references/cross-language-and-stale-syntax.md",
+          "marker": "Documented, not executed as removal diagnostics",
+          "source_url": "https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release",
+          "role": "removed-api"
+        }
+      ]
+    },
+    {
+      "source_ids": ["standard-library-2-b7"],
+      "summary": "Core environment APIs fixed Unicode handling on Windows.",
+      "change": "bug-fix",
+      "disposition": "not-actionable",
+      "reason": "The API and recommended usage are unchanged; the platform bug fix creates no durable skill instruction."
+    }
+  ]
+}

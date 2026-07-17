@@ -1,6 +1,6 @@
 # Content eval — full matrix
 
-Run date: 2026-07-17 · runner: `run_content.py` · client: Claude Code CLI 2.1.212 · requested full-matrix model: `claude-haiku-4-5-20251001` · turn budget: 50 per cell · deterministic grading with the pinned MoonBit toolchain. The run host was Linux x86_64; `moon`, `moonc`, and `moonrun` exactly matched `verification/toolchains/current.json`, whose original verification platform was Darwin arm64. The official condition used `moonbitlang/skills@5caf81c57cb2ae45654b8f99c5c8f68c812beb91`.
+Run date: 2026-07-17 · runner: `run_content.py` · client: Claude Code CLI 2.1.212 · requested full-matrix model: `claude-haiku-4-5-20251001` · turn budget: 50 per cell · deterministic grading with an exact MoonBit toolchain build. The full matrix ran on Linux x86_64 with moonc `v0.10.4+ade96c819` (2026-07-13). A release-drift follow-up ran with the current snapshot, moonc `v0.10.4+2cc641edf` (2026-07-15). The official condition used `moonbitlang/skills@5caf81c57cb2ae45654b8f99c5c8f68c812beb91`.
 
 The current client environment uses a mixed model stack: stream events name `deepseek-v4-flash`, while `modelUsage` also records the requested Haiku or Sonnet model. The labels below therefore describe requested Claude Code conditions, not isolated single-model API calls. This affects model attribution, not the deterministic pass/fail checks.
 
@@ -62,10 +62,22 @@ The original matrix could not isolate negative knowledge: `forced-language` isol
 
 On `fix-rust-habits`, full `forced-language` and the ablation both passed; `none`, `official`, and `ours` also passed. In the path-corrected pair, the full condition read `cross-language-and-stale-syntax.md`, used 19 turns, and cost $0.1337; the ablation had no such file, used 17 turns, and cost $0.1148. One stochastic run is not an efficiency comparison. **Verdict: H4 is not supported by this experiment.** The compiler made this single task self-correcting, and the ablation does not prove that negative knowledge has no value on silent semantic traps.
 
+## 0.10.4 release-derived supplement
+
+Two deterministic edit tasks were added on 2026-07-18 for guidance introduced by the release audit. The requested model was `claude-haiku-4-5-20251001`; the same mixed client routing disclosed above resolved both that name and `deepseek-v4-flash`.
+
+| Task | catalog-only `ours` | forced language skill |
+| --- | --- | --- |
+| Add explicit `extend` and deny warning 79 | PASS | PASS |
+| Replace immutable `HashSet::from_array` | PASS | PASS |
+| **Total** | **2/2** | **2/2** |
+
+The first `extend` attempt exposed a grader defect rather than a product failure: the starter's private tuple constructor raised unrelated `unused_constructor` under global `--deny-warn`, so a correct `extend` edit still failed. Changing the starter to a public constructor isolated warning 79. CI then found that the 2026-07-15 compiler changed behavior without changing the 0.10.4 release number: warning 79 moved into the default deprecated-warning set, and or-pattern defaults now require the `with` clause inside parentheses. The first follow-up prompt also allowed a qualified trait call that preserved runtime behavior but changed the requested dot-call API, so that ambiguous cell was discarded and the prompt now states the API requirement directly. At the current exact build, both catalog-only and forced-skill conditions passed the corrected task with `moon check --deny-warn` and one test. Release-supplement cost was $0.9138 including both discarded prompt/grader cells; the corrected post-drift pair cost $0.1673.
+
 ## What the full run says
 
 - The no-skill baseline passed all 9 executable workspace tasks and invoked `moon` in every one; it failed both knowledge-only capability questions. Toolchain feedback closes a large part of the execution gap, while it cannot repair facts the agent never tests.
-- Version-pinned content mattered at the matched pin: `ours` and forced language content corrected both moved-ground-truth questions. Version-mismatch behavior was not tested because the local toolchain exactly matched the pin.
+- Exact-build content mattered: `ours` and forced language content corrected both moved-ground-truth questions, and the follow-up caught semantic drift between two compiler builds that both report MoonBit 0.10.4. The repository now keys validation to the full moonc build identifier rather than the release number alone.
 - Catalog discovery remained sparse: Haiku-requested and Sonnet-requested `ours` each invoked a MoonBit skill in only 2/11 tasks. Most actionable tasks succeeded without loading a skill because the compiler and CLI exposed enough feedback.
 - No unexplained baseline failure appeared. Both final failures involved stale or incomplete current-language knowledge; with only two failures, the run cannot establish how common that profile is more broadly.
 - Build success was insufficient for the JS FFI task: the runtime grader changed one primary official cell and the Sonnet-requested supplement cell from PASS to FAIL.
@@ -80,6 +92,6 @@ The first forced-content runs also exposed a harness error: injected instruction
 
 Final review added conservative checks after the paid model calls: successful Bash evidence is now linked to its tool result and expected output, command regexes reject extra test scope, recursive source checks exclude injected `.claude` templates, required package files and nonzero hidden-test discovery prevent empty-project passes, resume configuration is fixed in `run.json`, and answer/behavior graders enforce details that the prompts already required. These checks are not present in every original `results.jsonl` record. Preserved artifacts were re-audited without another stochastic model sample: final-text checks were reapplied to the stored answers; every final MBTI and single-test transcript passed the new command-plus-result checks; all six stored Option implementations and all four JS FFI implementations were reconstructed from their Write/Edit traces and executed against their hidden tests; and the migration transcripts preserved the original `twice` implementation, whose hidden behavior test passed after the deterministic migration. The JS runtime audit changed primary official and Sonnet-requested `ours` from PASS to FAIL; no other classification changed. The checked-in unit suite covers the new false-pass cases.
 
-Primary full-matrix cost was $3.7752. The requested-Sonnet supplement cost $2.7506, and all H4, grader-correction, and path-correction runs cost $1.6307, for $8.1565 of checked experimental runs including superseded cells. Raw records, transcripts, stderr, and failed workspaces remain under the gitignored `evals/*/runs/` directories.
+Primary full-matrix cost was $3.7752. The requested-Sonnet supplement cost $2.7506, all H4, grader-correction, and path-correction runs cost $1.6307, and the release-derived supplement cost $0.9138, for $9.0703 of checked content runs including superseded cells. Raw records, transcripts, stderr, and failed workspaces remain under the gitignored `evals/*/runs/` directories.
 
-Limitations: one run per final cell; mixed client model routing as disclosed above; Sonnet requested only for `ours`; the H4 ablation covers one compiler-detectable Rust-habit task and removes the concentrated guide rather than every negative sentence in the skill; Bash network access was not OS-blocked, although transcript inspection found no model-initiated network lookup; and the run platform differs from the original verification platform even though all pinned component versions match.
+Limitations: one run per final cell; mixed client model routing as disclosed above; Sonnet requested only for `ours`; the H4 ablation covers one compiler-detectable Rust-habit task and removes the concentrated guide rather than every negative sentence in the skill; Bash network access was not OS-blocked, although transcript inspection found no model-initiated network lookup; and most primary cells ran on the superseded 2026-07-13 exact build, while the corrected `extend` follow-up ran on the current 2026-07-15 exact build.

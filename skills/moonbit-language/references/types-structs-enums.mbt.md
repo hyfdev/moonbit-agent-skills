@@ -1,6 +1,6 @@
 # Structs, enums, newtypes, and aliases
 
-Every `mbt check` block in this file is compiled and run by the repository's verification suite (`tooling/run_checked_docs.py`). Blocks marked `mbt nocheck` show rejected or deprecated forms and are never compiled.
+Every `mbt check` block in this file is compiled and run by the repository's verification suite (`tooling/run_checked_docs.ts`). Blocks marked `mbt nocheck` show rejected or deprecated forms and are never compiled.
 
 ## Structs
 
@@ -89,6 +89,25 @@ priv enum Chain[T] {
 test "generic enum" {
   let l : Chain[Int] = Link(1, Link(2, End))
   debug_inspect(l, content="Link(1, Link(2, End))")
+}
+```
+
+## Custom constructors for any type
+
+Since 0.10.4, any type may define a constructor named after the type with `fn Type::Type(..)`, not just a struct. The constructor cannot reuse an existing constructor name. This enum example makes `Figure(radius)` choose an existing variant:
+
+```mbt check
+fn Figure::Figure(radius : Double) -> Figure {
+  if radius <= 0 {
+    Dot
+  } else {
+    Disc(radius)
+  }
+}
+
+test "custom constructor on an enum" {
+  assert_true(Figure(0) is Dot)
+  assert_true(Figure(2.0) is Disc(2.0))
 }
 ```
 

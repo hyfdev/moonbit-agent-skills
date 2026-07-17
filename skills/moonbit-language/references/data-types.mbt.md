@@ -1,6 +1,6 @@
 # Data types: numbers, text, and collections
 
-Every `mbt check` block in this file is compiled and run by the repository's verification suite (`tooling/run_checked_docs.py`). Blocks marked `mbt nocheck` show rejected or deprecated forms and are never compiled.
+Every `mbt check` block in this file is compiled and run by the repository's verification suite (`tooling/run_checked_docs.ts`). Blocks marked `mbt nocheck` show rejected or deprecated forms and are never compiled.
 
 ## Numbers
 
@@ -101,6 +101,15 @@ test "data types: string iterates by code point" {
   }
   debug_inspect(pairs, content="[(0, 'a'), (1, '🌙'), (2, 'b')]")
 }
+
+test "data types: 0.10.4 core convenience APIs" {
+  assert_true("abc".all(c => c.is_ascii_lowercase()))
+  assert_true("abc1".any(c => c.is_ascii_digit()))
+  assert_true("moon".contains_code_unit(111))
+  inspect((0 : Int16).lnot(), content="-1")
+  inspect((0x0000 : UInt16).lnot().to_int(), content="65535")
+  json_inspect(Json::empty_object(), content=Json::empty_object())
+}
 ```
 
 Interpolation is `"\{expr}"` (backslash-brace, **not** `${...}`). Multiline strings are `#|` lines — fully raw, so they double as the raw-string form (there is no `r"..."`); `$|` lines process only `\{...}` interpolation. Lines join with `\n`.
@@ -160,7 +169,7 @@ test "panic data types: slicing a string mid-surrogate" {
 
 ## Bytes
 
-`b"..."` is immutable `Bytes` and `b'a'` is a `Byte`; an array literal overloads to `Bytes`. `b[i]` returns a `Byte`; writing `b[0] = ...` does not compile. `b[a:b]` gives a zero-copy `BytesView`, and both pattern-match like arrays.
+`b"..."` is immutable `Bytes` and `b'a'` is a `Byte`; an array literal overloads to `Bytes`. Since 0.10.4, Bytes literals support the same `\{expr}` interpolation as String and encode the rendered text as UTF-8. `b[i]` returns a `Byte`; writing `b[0] = ...` does not compile. `b[a:b]` gives a zero-copy `BytesView`, and both pattern-match like arrays.
 
 ```mbt check
 test "data types: bytes and views" {
@@ -173,6 +182,14 @@ test "data types: bytes and views" {
   let v : BytesView = b"hello"[1:3]
   inspect(v, content="b\"el\"")
   assert_true(b"hello" is [b'h', .. rest] && rest.length() == 4)
+  let answer = 42
+  let interpolated : Bytes = b"value=\{answer}"
+  inspect(interpolated, content="b\"value=42\"")
+  let utf8 : Bytes = b"\{"月🌙"}"
+  assert_eq(utf8, b"月🌙")
+  let buf = Buffer()
+  buf <+ b"value=\{answer}; text=\{"月🌙"}"
+  assert_eq(buf.contents(), b"value=42; text=月🌙")
 }
 ```
 
@@ -183,7 +200,7 @@ b[0] = b'x' // WRONG: "Type Bytes has no method op_set" — Bytes is immutable; 
 
 ## Arrays, views, and FixedArray
 
-`[1, 2, 3]` is a mutable, growable `Array[Int]` with reference semantics: `push` and `a[i] = x` need no `let mut` (that only rebinds the variable). `a.get(i)` returns an `Option`; `a[i]` panics out of bounds. Spread is two dots `..a`. Combinators (`map`, `filter`, `fold`, `search`) are eager and `fold` takes a labeled `init=`. `a[i:j]` gives a zero-copy `ArrayView` that aliases the parent (sees later mutation); `.to_owned()` copies out. `FixedArray` has mutable elements but a fixed length.
+`[1, 2, 3]` is a mutable, growable `Array[Int]` with reference semantics: `push` and `a[i] = x` need no `let mut` (that only rebinds the variable). `a.get(i)` returns an `Option`; `a[i]` panics out of bounds. Spread is two dots `..a`; since 0.10.4, `..if condition { values }` conditionally includes a spread. Combinators (`map`, `filter`, `fold`, `search`) are eager and `fold` takes a labeled `init=`. `a[i:j]` gives a zero-copy `ArrayView` that aliases the parent (sees later mutation); `.to_owned()` copies out. View operators no longer accept negative indices in 0.10.4. `FixedArray` has mutable elements but a fixed length.
 
 ```mbt check
 test "data types: arrays, spread, combinators, and views" {
@@ -193,6 +210,8 @@ test "data types: arrays, spread, combinators, and views" {
   debug_inspect(a, content="[10, 2, 3, 4]")
   debug_inspect(a.get(99), content="None")
   debug_inspect([0, ..a, 3], content="[0, 10, 2, 3, 4, 3]")
+  debug_inspect([0, ..if true { a }, 5], content="[0, 10, 2, 3, 4, 5]")
+  debug_inspect([0, ..if false { a }, 5], content="[0, 5]")
   debug_inspect(a.map(x => x * 2), content="[20, 4, 6, 8]")
   inspect(a.fold(init=0, (acc, x) => acc + x), content="19")
   debug_inspect(a.search(2), content="Some(1)") // index Option (named search)
@@ -208,7 +227,18 @@ test "data types: arrays, spread, combinators, and views" {
 
 ## Maps and sets
 
-`{ "k": v }` is a `Map` literal. `m.get(k)` returns an `Option`; `m[k]` in read position **panics** on a missing key (like Python's `dict[k]`), and `m[k] = v` inserts or updates. Membership is `contains`, not `contains_key`. Iteration and `.keys()` keep insertion order. An empty map is `Map([])` — a bare `{}` now warns (ambiguous among map, block, struct, and JSON). `Set[T]` is in the prelude (no `{1, 2}` literal); it deduplicates and keeps insertion order.
+`{ "k": v }` is a `Map` literal. `m.get(k)` returns an `Option`; `m[k]` in read position **panics** on a missing key (like Python's `dict[k]`), and `m[k] = v` inserts or updates. Membership is `contains`, not `contains_key`. Iteration and `.keys()` keep insertion order. An empty map is `Map([])` — a bare `{}` now warns (ambiguous among map, block, struct, and JSON). Use `Json::empty_object()` for an empty JSON object, `Type::{}` for an empty record value, and `()` (or remove a redundant empty block) when the intended value is Unit. `Set[T]` is in the prelude (no `{1, 2}` literal); construct it as `Set([...])`, which deduplicates and keeps insertion order.
+
+```mbt check
+priv struct EmptyDataRecord {}
+
+test "data types: explicit empty record and Unit" {
+  let record : EmptyDataRecord = EmptyDataRecord::{}
+  ignore(record)
+  let unit : Unit = ()
+  ignore(unit)
+}
+```
 
 ```mbt check
 test "data types: map literal and Option access" {
@@ -227,13 +257,15 @@ test "panic data types: map index on a missing key" {
 }
 
 test "data types: set deduplicates and keeps order" {
-  let s : Set[Int] = Set::from_array([3, 1, 2, 3])
+  let s : Set[Int] = Set([3, 1, 2, 3])
   inspect(s.length(), content="3")
   s.add(10)
   s.remove(1)
   debug_inspect(s.to_array(), content="[3, 2, 10]")
 }
 ```
+
+Do not confuse the mutable prelude `Set` above with the immutable container packages. In 0.10.4, `@immut/hashmap.HashMap`, `@immut/hashset.HashSet`, `@immut/sorted_map.SortedMap`, and `@immut/sorted_set.SortedSet` gained type-named constructors, and their `from_array` methods are deprecated. Import the package in `moon.pkg` and construct, for example, `@hashset.HashSet([1, 2, 1])`. The fixtures `lang-dep-immutable-hashset-from-array` and `lang-immutable-hashset-constructor` compile both sides with warnings denied. The mutable `Set::from_array` is still an alias at this pin, but `Set([...])` is the current constructor style.
 
 ## Tuples and Option
 

@@ -2,6 +2,8 @@
 
 Habits carried over from Rust, TypeScript, and Go, plus outdated MoonBit syntax, that models keep writing in `.mbt` files. Each line reads "wrong habit -> current MoonBit way"; where the compiler rejects the wrong form, the distinctive part of its message is quoted in backticks.
 
+**Documented, not executed as removal diagnostics:** the [0.10.4 release notes](https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release) removed old collection `#alias(T)` APIs and `IterResult`. Do not generate them; use the current type-named collection constructors and `Iter` APIs exposed by the installed core library.
+
 ## Coming from Rust
 
 - `fn main() { ... }` with a parameter list -> `fn main { ... }` — main takes no parens, and only a package whose `moon.pkg` sets `is-main` may define it. Rejected: `Unused parameter list for the main function`.

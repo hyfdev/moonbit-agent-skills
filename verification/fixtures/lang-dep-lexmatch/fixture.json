@@ -1,0 +1,27 @@
+{
+  "id": "lang-dep-lexmatch",
+  "owner_skill": "moonbit-language",
+  "knowledge": "The experimental lexmatch expression is deprecated in MoonBit 0.10.4; migrate supported cases to lexscan.",
+  "expect": "check-fail",
+  "diagnostic_contains": [
+    "lexmatch",
+    "deprecated"
+  ],
+  "fix": "Replace lexmatch with lexscan and manually rewrite Bytes/BytesView or guarded cases that lexscan does not support.",
+  "targets": [
+    "wasm-gc"
+  ],
+  "moon_args": [
+    "--deny-warn"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-07-18",
+    "components": {
+      "moon": "0.1.20260713 (75c7e1f 2026-07-13)",
+      "moonc": "v0.10.4+2cc641edf (2026-07-15)",
+      "moonrun": "moonrun 0.1.20260713 (75c7e1f 2026-07-13)"
+    },
+    "platform": "Linux-x86_64"
+  }
+}

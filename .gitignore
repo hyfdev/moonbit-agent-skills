@@ -1,4 +1,5 @@
 _build/
+node_modules/
 *.pyc
 __pycache__/
 .venv/

@@ -37,6 +37,14 @@ Other verified top-level keys:
 - `source = "src"` — packages then live under `src/`, but import paths do **not** include the prefix; `moon run` still takes the real directory path (`moon run src/cmd/main`, not `cmd/main`).
 - `supported_targets = [ "js", "wasm-gc" ]` — an array at module level (see references/targets-and-conditional-builds.md).
 
+At package level, 0.10.4 also promotes formatter configuration to a top-level declaration:
+
+```
+formatter(ignore: ["generated.mbt", "vendor/"])
+```
+
+**Documented, not executed for ignore matching:** see the [0.10.4 release notes](https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release). The parser accepts this top-level shape; keep formatter configuration out of the older `options()` form.
+
 Registry dependencies go in an `import { }` block; every entry must be pinned `name@version` (workspaces reject unversioned entries):
 
 ```
@@ -76,6 +84,8 @@ pkgtype(kind: "executable")
 ```
 
 Executable packages: both `pkgtype(kind: "executable")` and `options("is-main": true)` are accepted at the pin, and `moon fmt` rewrites the options form **into** `pkgtype` — treat `pkgtype` as canonical. Valid kinds (from the error on an invalid kind): `library`, `executable`, `foreign_library`. Option keys inside `options()` are quoted kebab-case strings (`"is-main"`), unlike moon.mod's snake_case top-level keys.
+
+For a `pkgtype(kind: "foreign_library")` package, `#export_name("symbol")` on a public function selects its generated Wasm/JS/C symbol name. **Documented, not executed end-to-end:** the [0.10.4 release notes](https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release) state that only functions declared in that foreign-library package are exported, not functions from dependencies; native static/dynamic library output was still being polished, so prefer this feature for Wasm/JS at this pin.
 
 ## Legacy JSON → DSL mapping
 

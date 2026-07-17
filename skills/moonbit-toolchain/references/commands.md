@@ -61,6 +61,8 @@ moon run --target native cmd/main
 
 Takes the **filesystem path** of an executable package (with `source = "src"`, that means `moon run src/cmd/main`). Trailing arguments pass straight to the program, no `--` separator; the program sees argv[0] as the built artifact path. Running a library package fails: `` Error: `textutil` is not a main package `` (exit 255).
 
+Since 0.10.4, `moon run` propagates the executed program's exit code. A wrapper or CI step can therefore rely on a nonzero application exit making `moon run` fail, rather than treating successful compilation as command success.
+
 Outside any module, `moon run` runs throwaway code in a temporary project:
 
 ```sh

@@ -92,6 +92,25 @@ test "generic enum" {
 }
 ```
 
+## Custom constructors for any type
+
+Since 0.10.4, any type may define a constructor named after the type with `fn Type::Type(..)`, not just a struct. The constructor cannot reuse an existing constructor name. This enum example makes `Figure(radius)` choose an existing variant:
+
+```mbt check
+fn Figure::Figure(radius : Double) -> Figure {
+  if radius <= 0 {
+    Dot
+  } else {
+    Disc(radius)
+  }
+}
+
+test "custom constructor on an enum" {
+  assert_true(Figure(0) is Dot)
+  assert_true(Figure(2.0) is Disc(2.0))
+}
+```
+
 ## Constant enums
 
 Variants may carry explicit integer values (`North = 0`); later bare variants continue counting. The values affect representation only — there is **no generated `to_int`** (E4015); write your own accessor if you need the number.

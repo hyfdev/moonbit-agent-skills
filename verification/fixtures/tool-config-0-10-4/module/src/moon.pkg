@@ -1,0 +1,3 @@
+pkgtype(kind: "foreign_library")
+
+formatter(ignore: ["generated.mbt", "vendor/"])

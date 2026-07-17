@@ -1,7 +1,6 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
-import { parseArgs } from "node:util";
-import { exitWith, isMain } from "./lib/cli.ts";
+import { exitWith, isMain, parseCliArgs, usageError } from "./lib/cli.ts";
 import { stableJson } from "./lib/json.ts";
 import { currentPlatform } from "./lib/platform.ts";
 import type { CommandRunner } from "./lib/process.ts";
@@ -26,6 +25,13 @@ export interface SnapshotComponent {
   commit: string;
   build_date: string;
   raw: string;
+}
+
+export function normalizeVersionPaths(raw: string, moonHome = process.env.MOON_HOME): string {
+  if (moonHome === undefined || moonHome === "") {
+    return raw;
+  }
+  return raw.replaceAll(moonHome.replace(/[\\/]+$/, ""), "<MOON_HOME>");
 }
 
 export function parseComponent(item: VersionItem): SnapshotComponent {
@@ -57,7 +63,7 @@ export function createSnapshot(
     platform: currentPlatform(runner),
     components,
     verified_targets: [...targets].sort(),
-    raw_version_all: checkedOutput(runner, "moon", ["version", "--all"]),
+    raw_version_all: normalizeVersionPaths(checkedOutput(runner, "moon", ["version", "--all"])),
   };
 }
 
@@ -66,24 +72,31 @@ export function main(
   runner: CommandRunner = runCommand,
   repoRoot = REPO_ROOT,
 ): number {
-  const { values } = parseArgs({
-    args,
-    options: {
-      date: { type: "string" },
-      targets: {
-        type: "string",
-        default: "wasm-gc,wasm,js,native",
+  const usage =
+    "usage: node tooling/snapshot_toolchain.ts --date YYYY-MM-DD [--targets TARGET,...]";
+  const parsed = parseCliArgs(
+    {
+      args,
+      options: {
+        date: { type: "string" },
+        targets: {
+          type: "string",
+          default: "wasm-gc,wasm,js,native",
+        },
       },
+      strict: true,
     },
-    strict: true,
-  });
+    usage,
+  );
+  if (!parsed.ok) {
+    return parsed.exitCode;
+  }
+  const { values } = parsed.result;
   if (values.date === undefined) {
-    console.error("--date is required");
-    return 2;
+    return usageError("--date is required", usage);
   }
   if (!/^\d{4}-\d{2}-\d{2}$/.test(values.date)) {
-    console.error("--date must be YYYY-MM-DD");
-    return 1;
+    return usageError("--date must be YYYY-MM-DD", usage);
   }
 
   const snapshotPath = join(repoRoot, "verification", "toolchains", "current.json");

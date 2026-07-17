@@ -24,8 +24,8 @@ verification/fixtures/<fixture-id>/
 | `owner_skill` | `moonbit-language` or `moonbit-toolchain`. |
 | `knowledge` | The single fact this fixture proves, one sentence. |
 | `habit_from` | For negative fixtures: `rust`, `typescript`, `go`, or `stale-moonbit`. Omit otherwise. |
-| `expect` | `check-fail` (moon check must fail), `check-pass`, `test-pass` (moon test must pass), or `semantic-trap` (compiles, but behaves unlike the foreign-language expectation; proven by a passing test). |
-| `diagnostic_contains` | For `check-fail`: substring(s) that must appear in the compiler output. |
+| `expect` | `check-fail` (moon check must fail), `check-pass`, `test-pass` (moon test must pass), `runtime-fail` (moon test must execute the old form and fail), or `semantic-trap` (compiles, but behaves unlike the foreign-language expectation; proven by a passing test). |
+| `diagnostic_contains` | For `check-fail` or `runtime-fail`: substring(s) that must appear in the compiler or runtime output. |
 | `fix` | One-line statement of the correct MoonBit way. |
 | `targets` | Targets the runner exercises for this fixture (default `["wasm-gc"]`). |
 | `source` | Where the knowledge comes from: `observed` (toolchain behavior), plus optional documentation URL. |

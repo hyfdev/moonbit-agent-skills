@@ -1,0 +1,23 @@
+{
+  "id": "lang-immutable-hashset-constructor",
+  "owner_skill": "moonbit-language",
+  "knowledge": "MoonBit 0.10.4 immutable containers use type-named constructors such as @immut/hashset.HashSet([...]).",
+  "expect": "check-pass",
+  "fix": "n/a",
+  "targets": [
+    "wasm-gc"
+  ],
+  "moon_args": [
+    "--deny-warn"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-07-18",
+    "components": {
+      "moon": "0.1.20260713 (75c7e1f 2026-07-13)",
+      "moonc": "v0.10.4+ade96c819 (2026-07-13)",
+      "moonrun": "moonrun 0.1.20260713 (75c7e1f 2026-07-13)"
+    },
+    "platform": "Linux-x86_64"
+  }
+}

@@ -1,6 +1,6 @@
 {
   "_comment": "Pinned upstream sources this repository's content was checked against. Update alongside verification/toolchains/current.json when re-verifying. Hand-maintained; tooling/check_versions.ts checks internal consistency.",
-  "retrieved": "2026-07-17",
+  "retrieved": "2026-07-18",
   "sources": [
     {
       "id": "moonbit-docs",
@@ -13,8 +13,18 @@
       "id": "moonbit-release-notes",
       "kind": "release-notes",
       "url": "https://www.moonbitlang.com/updates/",
-      "version_label": "through v0.10.4 (2026-07-13)",
-      "notes": "Numbered releases start at 0.8.0 (2026-02-09); monthly updates Vol.01-07 before that."
+      "version_label": "release index retrieved 2026-07-17",
+      "notes": "Discovery index only. Coverage is never inferred from this label; each release requires a pinned Markdown source inventory and coverage file under verification/releases/."
+    },
+    {
+      "id": "moonbit-0.10.4-release-source",
+      "kind": "release-source",
+      "url": "https://github.com/moonbitlang/website",
+      "commit": "a6222f7292ce50f2a08847ef0852b1a8d456a393",
+      "commit_date": "2026-07-13",
+      "path": "updates/2026-07-13-moonbit-0-10-4-release/index.md",
+      "sha256": "2c02657eab65b6f1da12af2933f26c16fd814d165e877a0e5163e5e72478832c",
+      "notes": "Mechanical source for verification/releases/0.10.4/source.json; CI regenerates the inventory from this pinned Markdown before checking coverage decisions."
     },
     {
       "id": "moonbitlang-skills",

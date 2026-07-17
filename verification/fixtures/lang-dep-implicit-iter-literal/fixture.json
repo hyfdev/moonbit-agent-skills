@@ -1,0 +1,27 @@
+{
+  "id": "lang-dep-implicit-iter-literal",
+  "owner_skill": "moonbit-language",
+  "knowledge": "Expected-type overloading of an array-spread literal to Iter is deprecated in MoonBit 0.10.4; use the explicit [| .. |] Iter literal.",
+  "expect": "check-fail",
+  "diagnostic_contains": [
+    "deprecated",
+    "[|"
+  ],
+  "fix": "Replace the overloaded array literal with an explicit [| .. |] Iter literal.",
+  "targets": [
+    "wasm-gc"
+  ],
+  "moon_args": [
+    "--deny-warn"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-07-18",
+    "components": {
+      "moon": "0.1.20260713 (75c7e1f 2026-07-13)",
+      "moonc": "v0.10.4+ade96c819 (2026-07-13)",
+      "moonrun": "moonrun 0.1.20260713 (75c7e1f 2026-07-13)"
+    },
+    "platform": "Linux-x86_64"
+  }
+}

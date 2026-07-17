@@ -60,8 +60,28 @@ impl Greeter for Kiosk with name(self) {
   self.0
 }
 
+extend Robot with Greeter::{greet}
+extend Kiosk with Greeter::{greet}
+
 test "trait defaults and implementations" {
   assert_eq(Robot("r2").greet(), "hi, I am r2")
+  assert_eq(Kiosk("k1").greet(), "hi, I am k1")
+}
+
+pub trait PublicGreeter {
+  public_greet(Self) -> String
+}
+
+pub(all) struct PublicRobot(String)
+
+impl PublicGreeter for PublicRobot with public_greet(self) {
+  "public \{self.0}"
+}
+
+pub extend PublicRobot with PublicGreeter::{public_greet}
+
+test "public extend syntax" {
+  assert_eq(PublicRobot("robot").public_greet(), "public robot")
 }
 ```
 
@@ -72,9 +92,17 @@ priv trait T2 {
 impl T2 with greet(self) { ... } // WRONG: E4167 — a default body requires `= _` in the declaration
 ```
 
-## The dot-call rule
+## Explicit `extend` controls dot-call methods
 
-An `impl Trait for Type` makes the method dot-callable only on types the package **owns**. On foreign types (like `Int` below) the dot call fails (E4015); reach the impl through a constraint, a trait object, or the qualified `Trait::method(value)` form.
+An `impl Trait for Type` establishes trait conformance; it should not be relied on to attach the trait's methods to an owned type. MoonBit 0.10.4 deprecated that implicit attachment. Add `extend Type with Trait::{method}` for each method that should support dot calls, and use `pub extend` when the attached method must be visible outside the package. This explicit list prevents a new upstream default method from silently changing a type's method set.
+
+The migration warning is `implicit_impl_as_method` (79). It is off by default in 0.10.4, so audits must enable it explicitly, preferably together with `--deny-warn`; the repository fixture `lang-dep-implicit-impl-as-method` proves both the deprecated form and the `extend` fix. Methods reached through a type constraint or trait object still support dot calls when they belong directly to that trait. The qualified `Trait::method(value)` form is always explicit.
+
+Library authors who need to preserve a former dot-call method temporarily while steering callers away from it can put `#deprecated("message")` on the corresponding `extend` declaration. The `lang-dep-deprecated-extend` fixture proves that the dot call emits the deprecation while the qualified trait call remains available as the replacement.
+
+At this pin, `extend` is a soft keyword: old code may still use it as an identifier, but doing so warns because it is scheduled to become reserved. Rename such identifiers now.
+
+On a foreign type (like `Int` below), a local `impl` alone does not create a dot-call method (E4015); call it through a constraint, a trait object, or the qualified form.
 
 ```mbt check
 priv trait Describable {
@@ -99,6 +127,8 @@ test "foreign-type impls need constraint, object, or qualified call" {
 
 ```mbt nocheck
 (3).describe() // WRONG: E4015 — Int is not owned by this package, so no dot-call sugar
+// DEPRECATED: relying on `impl Greeter for Robot` alone to make Robot.greet() a method;
+// add `extend Robot with Greeter::{greet}`.
 ```
 
 ## Trait objects and supertraits

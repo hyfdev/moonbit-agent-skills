@@ -43,7 +43,11 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 REPO_ROOT = HERE.parent.parent
 SKILLS_SRC = REPO_ROOT / "skills"
-MOONBIT_SKILLS = {"moonbit-language", "moonbit-toolchain"}
+MOONBIT_SKILLS = {
+    "moonbit-agent-skills-maintainer",
+    "moonbit-language",
+    "moonbit-toolchain",
+}
 
 DISALLOWED_TOOLS = "Bash,Edit,Write,NotebookEdit,WebFetch,WebSearch,Task"
 

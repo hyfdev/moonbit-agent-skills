@@ -39,6 +39,8 @@ moon run cmd/main
 
 (There is no global `-C` flag on `moon` at the pin — change directory instead.)
 
+**Documented, not executed from a nested package:** the [0.10.4 release notes](https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release) say test and pre-build working directories are now the **module root**, even when the package is nested, and pre-build paths are relative to that root. Scripts that assumed the package directory as the current directory must be updated.
+
 ## Script mode: .mbtx
 
 Outside any module, `moon run` executes throwaway code in a temporary project — a one-liner via `-e`, an `.mbtx` (or even bare `.mbt`) file, or stdin via `-`:

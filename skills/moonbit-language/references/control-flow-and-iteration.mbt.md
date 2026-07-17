@@ -210,7 +210,52 @@ test "control flow: a returned closure keeps its own state" {
 
 ## `Iter`
 
-`.iter()` yields a lazy `Iter[T]`: combinators (`map`, `filter`, `take`, `zip`, `flat_map`) evaluate nothing until a consumer (`collect`, `count`, `fold`) runs, and `take(n)` forces only what it needs upstream. `collect()` always returns an `Array` (not polymorphic like Rust) — use `String::from_iter` for text. `arr.iter2()` yields an `Iter2`, consumed as `for i, x in ...`. An `Iter` is **one-shot**: after its first terminal operation it yields nothing more.
+`[| 1, 2, 3 |]` is the explicit `Iter` literal introduced in 0.10.4; spreads and comprehensions work inside `[| .. |]`. Use it when constructing an `Iter` rather than relying on the deprecated expected-type overloading of an array-spread literal. `.iter()` also yields a lazy `Iter[T]`: combinators (`map`, `filter`, `take`, `zip`, `flat_map`) evaluate nothing until a consumer (`collect`, `count`, `fold`) runs, and `take(n)` forces only what it needs upstream. `collect()` always returns an `Array` (not polymorphic like Rust) — use `String::from_iter` for text. `arr.iter2()` yields an `Iter2`, consumed as `for i, x in ...`. An `Iter` is **one-shot**: after its first terminal operation it yields nothing more.
+
+```mbt check
+test "control flow: explicit Iter literals" {
+  let direct : Iter[Int] = [| 1, 2, 3 |]
+  debug_inspect(direct.collect(), content="[1, 2, 3]")
+  let spread = [| 0, ..[1, 2].iter(), 3 |]
+  debug_inspect(spread.collect(), content="[0, 1, 2, 3]")
+}
+```
+
+```mbt check
+test "control flow: Iter literal evaluation order" {
+  let direct_log : Array[Int] = []
+  let direct = [|
+    { direct_log.push(1); 10 },
+    { direct_log.push(2); 20 },
+  |]
+  debug_inspect(direct_log, content="[1, 2]") // plain elements are eager
+  debug_inspect(direct.collect(), content="[10, 20]")
+
+  let spread_log : Array[Int] = []
+  let make_spread = () => {
+    spread_log.push(0)
+    [1, 2].iter().map(x => {
+      spread_log.push(x)
+      x * 10
+    })
+  }
+  let spread = [| ..make_spread() |]
+  debug_inspect(spread_log, content="[0]") // the spread expression is eager
+  debug_inspect(spread.collect(), content="[10, 20]")
+  debug_inspect(spread_log, content="[0, 1, 2]") // its iterator body stays lazy
+
+  let comprehension_log : Array[Int] = []
+  let comprehension = [|
+    for x in [1, 2] => {
+      comprehension_log.push(x)
+      x * 10
+    }
+  |]
+  debug_inspect(comprehension_log, content="[]")
+  debug_inspect(comprehension.collect(), content="[10, 20]")
+  debug_inspect(comprehension_log, content="[1, 2]")
+}
+```
 
 ```mbt check
 test "control flow: Iter is lazy" {

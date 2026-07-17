@@ -198,6 +198,26 @@
       ]
     },
     {
+      "id": "run-propagates-program-exit",
+      "fixture": "empty",
+      "steps": [
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "run",
+            "--target",
+            "native",
+            "-e",
+            "extern \"C\" fn release_exit(code : Int) = \"exit\"\nfn main { release_exit(7) }"
+          ],
+          "expect": {
+            "exit": 7
+          }
+        }
+      ]
+    },
+    {
       "id": "run-library-error",
       "fixture": "template",
       "steps": [

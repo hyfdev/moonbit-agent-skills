@@ -96,4 +96,4 @@ test "bench shout" (b : @bench.T) {
 moon bench textutil
 ```
 
-Output reports `time (mean ± σ)` and `range (min … max)` per bench block. `moon bench` shares `moon test`'s selection flags (positional path, `--target`, `--release`). Omitting the core/bench import still works at the pin but emits a `core_package_not_imported` deprecation warning.
+Output reports `time (mean ± σ)` and `range (min … max)` per bench block. Since 0.10.4, `moon bench` accepts a positional package or file path; it also shares `moon test`'s `--target` and `--release` flags. Omitting the core/bench import still works at the pin but emits a `core_package_not_imported` deprecation warning.

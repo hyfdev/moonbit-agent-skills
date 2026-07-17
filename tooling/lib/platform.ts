@@ -8,8 +8,12 @@ export interface PlatformInfo {
   arch: string;
 }
 
+export function normalizeOsName(os: string): string {
+  return os === "Windows_NT" ? "Windows" : os;
+}
+
 export function currentPlatform(runner: CommandRunner = runCommand): PlatformInfo {
-  const os = type();
+  const os = normalizeOsName(type());
   let osVersion = release();
   if (os === "Darwin") {
     osVersion = checkedOutput(runner, "sw_vers", ["-productVersion"]);
@@ -18,5 +22,5 @@ export function currentPlatform(runner: CommandRunner = runCommand): PlatformInf
 }
 
 export function platformStamp(): string {
-  return `${type()}-${machine()}`;
+  return `${normalizeOsName(type())}-${machine()}`;
 }

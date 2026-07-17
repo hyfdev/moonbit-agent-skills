@@ -62,6 +62,18 @@ The original matrix could not isolate negative knowledge: `forced-language` isol
 
 On `fix-rust-habits`, full `forced-language` and the ablation both passed; `none`, `official`, and `ours` also passed. In the path-corrected pair, the full condition read `cross-language-and-stale-syntax.md`, used 19 turns, and cost $0.1337; the ablation had no such file, used 17 turns, and cost $0.1148. One stochastic run is not an efficiency comparison. **Verdict: H4 is not supported by this experiment.** The compiler made this single task self-correcting, and the ablation does not prove that negative knowledge has no value on silent semantic traps.
 
+## 0.10.4 release-derived supplement
+
+Two deterministic edit tasks were added on 2026-07-18 for guidance introduced by the release audit. The requested model was `claude-haiku-4-5-20251001`; the same mixed client routing disclosed above resolved both that name and `deepseek-v4-flash`.
+
+| Task | catalog-only `ours` | forced language skill |
+| --- | --- | --- |
+| Add explicit `extend` and deny warning 79 | PASS | PASS |
+| Replace immutable `HashSet::from_array` | PASS | PASS |
+| **Total** | **2/2** | **2/2** |
+
+The first `extend` attempt exposed a grader defect rather than a product failure: the starter's private tuple constructor raised unrelated `unused_constructor` under global `--deny-warn`, so a correct `extend` edit still failed. Changing the starter to a public constructor isolated warning 79; direct baseline/fixed POCs then showed the old workspace failing on `implicit_impl_as_method` and the reference edit passing both `moon check` and one test with the exact warning flags. The corrected catalog-only rerun passed, and both forced-skill cells passed. Content-eval cost was $0.5656 including the discarded grader-defect cell; the two valid catalog-only cells cost $0.1743 and the forced pair cost $0.1655.
+
 ## What the full run says
 
 - The no-skill baseline passed all 9 executable workspace tasks and invoked `moon` in every one; it failed both knowledge-only capability questions. Toolchain feedback closes a large part of the execution gap, while it cannot repair facts the agent never tests.
@@ -80,6 +92,6 @@ The first forced-content runs also exposed a harness error: injected instruction
 
 Final review added conservative checks after the paid model calls: successful Bash evidence is now linked to its tool result and expected output, command regexes reject extra test scope, recursive source checks exclude injected `.claude` templates, required package files and nonzero hidden-test discovery prevent empty-project passes, resume configuration is fixed in `run.json`, and answer/behavior graders enforce details that the prompts already required. These checks are not present in every original `results.jsonl` record. Preserved artifacts were re-audited without another stochastic model sample: final-text checks were reapplied to the stored answers; every final MBTI and single-test transcript passed the new command-plus-result checks; all six stored Option implementations and all four JS FFI implementations were reconstructed from their Write/Edit traces and executed against their hidden tests; and the migration transcripts preserved the original `twice` implementation, whose hidden behavior test passed after the deterministic migration. The JS runtime audit changed primary official and Sonnet-requested `ours` from PASS to FAIL; no other classification changed. The checked-in unit suite covers the new false-pass cases.
 
-Primary full-matrix cost was $3.7752. The requested-Sonnet supplement cost $2.7506, and all H4, grader-correction, and path-correction runs cost $1.6307, for $8.1565 of checked experimental runs including superseded cells. Raw records, transcripts, stderr, and failed workspaces remain under the gitignored `evals/*/runs/` directories.
+Primary full-matrix cost was $3.7752. The requested-Sonnet supplement cost $2.7506, all H4, grader-correction, and path-correction runs cost $1.6307, and the release-derived supplement cost $0.5656, for $8.7221 of checked content runs including superseded cells. Raw records, transcripts, stderr, and failed workspaces remain under the gitignored `evals/*/runs/` directories.
 
 Limitations: one run per final cell; mixed client model routing as disclosed above; Sonnet requested only for `ours`; the H4 ablation covers one compiler-detectable Rust-habit task and removes the concentrated guide rather than every negative sentence in the skill; Bash network access was not OS-blocked, although transcript inspection found no model-initiated network lookup; and the run platform differs from the original verification platform even though all pinned component versions match.

@@ -11,19 +11,17 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
-import { parseArgs } from "node:util";
-import { exitWith, isMain } from "./lib/cli.ts";
+import { exitWith, isMain, parseCliArgs, usageError } from "./lib/cli.ts";
 import { platformStamp } from "./lib/platform.ts";
 import type { CommandRunner, CommandResult } from "./lib/process.ts";
 import { checkedOutput, runCommand } from "./lib/process.ts";
 import { REPO_ROOT } from "./lib/repo.ts";
 
-const MOON_MOD_TEMPLATE = 'name = "mbtskills/fixture"\nversion = "0.1.0"\n';
-
 interface FixtureMetadata extends Record<string, unknown> {
   id: string;
   expect: string;
   targets?: string[];
+  moon_args?: unknown;
   diagnostic_contains?: string[];
   verified?: unknown;
 }
@@ -55,7 +53,15 @@ export function materialize(
     return moduleDirectory;
   }
   mkdirSync(moduleDirectory);
-  writeFileSync(join(moduleDirectory, "moon.mod"), MOON_MOD_TEMPLATE, "utf8");
+  const fixtureName = basename(fixtureDirectory)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+  writeFileSync(
+    join(moduleDirectory, "moon.mod"),
+    `name = "mbtskills/${fixtureName || "fixture"}"\nversion = "0.1.0"\n`,
+    "utf8",
+  );
   writeFileSync(join(moduleDirectory, "moon.pkg"), "", "utf8");
   writeFileSync(
     join(moduleDirectory, "lib.mbt"),
@@ -79,6 +85,14 @@ export function checkOne(
   ) as FixtureMetadata;
   const expectation = metadata.expect;
   const targets = metadata.targets ?? ["wasm-gc"];
+  if (
+    metadata.moon_args !== undefined &&
+    (!Array.isArray(metadata.moon_args) ||
+      metadata.moon_args.some((argument) => typeof argument !== "string"))
+  ) {
+    return { ok: false, detail: "moon_args must be an array of strings" };
+  }
+  const moonArgs = (metadata.moon_args ?? []) as string[];
   const problems: string[] = [];
   const temporary = mkdtempSync(join(tmpdir(), "mbtfix-"));
 
@@ -87,18 +101,23 @@ export function checkOne(
     for (const target of targets) {
       let result: CommandResult;
       if (expectation === "check-fail" || expectation === "check-pass") {
-        result = runMoon(["check", "--target", target], moduleDirectory, runner);
-      } else if (expectation === "test-pass" || expectation === "semantic-trap") {
-        result = runMoon(["test", "--target", target], moduleDirectory, runner);
+        result = runMoon(["check", "--target", target, ...moonArgs], moduleDirectory, runner);
+      } else if (
+        expectation === "test-pass" ||
+        expectation === "semantic-trap" ||
+        expectation === "runtime-fail"
+      ) {
+        result = runMoon(["test", "--target", target, ...moonArgs], moduleDirectory, runner);
       } else {
         return { ok: false, detail: `unknown expect ${repr(expectation)}` };
       }
       const output = result.stdout + result.stderr;
       const failed = result.exitCode !== 0;
 
-      if (expectation === "check-fail") {
+      if (expectation === "check-fail" || expectation === "runtime-fail") {
         if (!failed) {
-          problems.push(`[${target}] expected check to fail, it passed`);
+          const command = expectation === "check-fail" ? "check" : "test";
+          problems.push(`[${target}] expected ${command} to fail, it passed`);
         }
       } else if (failed) {
         problems.push(
@@ -118,11 +137,21 @@ export function checkOne(
     if (isFile(fixed)) {
       rmSync(moduleDirectory, { recursive: true, force: true });
       moduleDirectory = materialize(fixtureDirectory, temporary, "fixed.mbt");
+      const fixedSubcommand =
+        expectation === "test-pass" ||
+        expectation === "semantic-trap" ||
+        expectation === "runtime-fail"
+          ? "test"
+          : "check";
       for (const target of targets) {
-        const result = runMoon(["check", "--target", target], moduleDirectory, runner);
+        const result = runMoon(
+          [fixedSubcommand, "--target", target, ...moonArgs],
+          moduleDirectory,
+          runner,
+        );
         if (result.exitCode !== 0) {
           problems.push(
-            `[${target}] fixed.mbt must pass moon check but failed:\n${(result.stdout + result.stderr).slice(0, 800)}`,
+            `[${target}] fixed.mbt must pass moon ${fixedSubcommand} but failed:\n${(result.stdout + result.stderr).slice(0, 800)}`,
           );
         }
       }
@@ -142,19 +171,27 @@ export function main(
   runner: CommandRunner = runCommand,
   repoRoot = REPO_ROOT,
 ): number {
-  const { values, positionals } = parseArgs({
-    args,
-    options: {
-      stamp: { type: "boolean", default: false },
-      date: { type: "string" },
-      verbose: { type: "boolean", short: "v", default: false },
+  const usage =
+    "usage: node tooling/run_fixtures.ts [--stamp --date YYYY-MM-DD] [-v|--verbose] [FIXTURE_ID ...]";
+  const parsed = parseCliArgs(
+    {
+      args,
+      options: {
+        stamp: { type: "boolean", default: false },
+        date: { type: "string" },
+        verbose: { type: "boolean", short: "v", default: false },
+      },
+      allowPositionals: true,
+      strict: true,
     },
-    allowPositionals: true,
-    strict: true,
-  });
+    usage,
+  );
+  if (!parsed.ok) {
+    return parsed.exitCode;
+  }
+  const { values, positionals } = parsed.result;
   if (values.stamp && values.date === undefined) {
-    console.error("--stamp requires --date");
-    return 2;
+    return usageError("--stamp requires --date", usage);
   }
 
   const fixturesDirectory = join(repoRoot, "verification", "fixtures");
@@ -169,13 +206,11 @@ export function main(
     const found = new Set(fixtureDirectories.map((directory) => basename(directory)));
     const missing = [...requested].filter((id) => !found.has(id)).sort();
     if (missing.length > 0) {
-      console.error(`unknown fixture ids: ${reprList(missing)}`);
-      return 2;
+      return usageError(`unknown fixture ids: ${reprList(missing)}`, usage);
     }
   }
   if (fixtureDirectories.length === 0) {
-    console.error("no fixtures found");
-    return 2;
+    return usageError("no fixtures found", usage);
   }
 
   const versions = moonVersions(runner);

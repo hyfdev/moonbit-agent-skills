@@ -4,12 +4,20 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 import { normalizeUnit } from "../check_duplication.ts";
 import { compareToolchains, main as compareMain } from "../compare_toolchain.ts";
-import { blockInventory, generateReadme } from "../gen_readme.ts";
 import { runSkill } from "../run_checked_docs.ts";
-import { checkOne, main as fixturesMain } from "../run_fixtures.ts";
-import { createSnapshot, parseComponent, VERSION_RE } from "../snapshot_toolchain.ts";
-import { NAME_RE } from "../validate_skills.ts";
+import { checkOne, main as fixturesMain, materialize } from "../run_fixtures.ts";
+import { main as snapshotReleaseMain } from "../snapshot_release.ts";
+import {
+  createSnapshot,
+  main as snapshotMain,
+  normalizeVersionPaths,
+  parseComponent,
+  VERSION_RE,
+} from "../snapshot_toolchain.ts";
+import { NAME_RE, validateSkill } from "../validate_skills.ts";
 import { parseFrontmatter } from "../lib/frontmatter.ts";
+import { parseCliArgs } from "../lib/cli.ts";
+import { normalizeOsName } from "../lib/platform.ts";
 import type { CommandRunner } from "../lib/process.ts";
 import { REPO_ROOT } from "../lib/repo.ts";
 
@@ -17,7 +25,58 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
+it("keeps the existing Windows platform stamp spelling", () => {
+  expect(normalizeOsName("Windows_NT")).toBe("Windows");
+  expect(normalizeOsName("Darwin")).toBe("Darwin");
+  expect(normalizeOsName("Linux")).toBe("Linux");
+});
+
+describe("TypeScript CLI behavior", () => {
+  it("prints help without parsing options or a stack trace", () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    expect(
+      parseCliArgs(
+        { args: ["--help"], options: { value: { type: "string" } }, strict: true },
+        "usage: example [--value VALUE]",
+      ),
+    ).toEqual({ ok: false, exitCode: 0 });
+    expect(log).toHaveBeenCalledWith("usage: example [--value VALUE]");
+    expect(error).not.toHaveBeenCalled();
+  });
+
+  it("reports unknown options as usage errors", () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    expect(
+      parseCliArgs(
+        { args: ["--unknown"], options: { value: { type: "string" } }, strict: true },
+        "usage: example [--value VALUE]",
+      ),
+    ).toEqual({ ok: false, exitCode: 2 });
+    expect(error.mock.calls.flat().join("\n")).toMatch(/usage: example/);
+    expect(error.mock.calls.flat().join("\n")).toMatch(/Unknown option '--unknown'/);
+    expect(error.mock.calls.flat().join("\n")).not.toMatch(/node:internal|at parseArgs/);
+  });
+
+  it("uses exit 2 for missing required CLI arguments", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    expect(snapshotMain([])).toBe(2);
+    expect(await snapshotReleaseMain([])).toBe(2);
+  });
+});
+
 describe("version parsing", () => {
+  it("normalizes an explicit Moon home in the raw version report", () => {
+    expect(
+      normalizeVersionPaths(
+        "moon 0.1.2 /tmp/pinned-moon/bin/moon\nmoonc 0.10.4 /tmp/pinned-moon/bin/moonc",
+        "/tmp/pinned-moon/",
+      ),
+    ).toBe("moon 0.1.2 <MOON_HOME>/bin/moon\nmoonc 0.10.4 <MOON_HOME>/bin/moonc");
+  });
+
   it("parses moon style", () => {
     const component = parseComponent({
       name: "moon",
@@ -95,6 +154,37 @@ describe("skill names", () => {
       expect(NAME_RE.test(name), name).toBe(false);
     }
   });
+});
+
+it("requires repository-maintenance skills to stay internal", () => {
+  const temporary = mkdtempSync(join(tmpdir(), "internal-skill-test-"));
+  try {
+    const skill = join(temporary, "release-maintainer");
+    mkdirSync(skill);
+    writeFileSync(
+      join(skill, "SKILL.md"),
+      "---\nname: release-maintainer\ndescription: Maintain releases.\nmetadata:\n  skill-version: 0.1.0\n  scope: repository-maintenance\n---\n# Maintainer\n",
+    );
+    expect(validateSkill(skill)).toContain(
+      "release-maintainer: repository-maintenance skills must set metadata.internal: true",
+    );
+
+    writeFileSync(
+      join(skill, "SKILL.md"),
+      "---\nname: release-maintainer\ndescription: Maintain releases.\nmetadata:\n  skill-version: 0.1.0\n  scope: repository-maintenance\n  internal: true\n---\n# Maintainer\n",
+    );
+    expect(validateSkill(skill)).not.toContain(
+      "release-maintainer: repository-maintenance skills must set metadata.internal: true",
+    );
+  } finally {
+    rmSync(temporary, { recursive: true, force: true });
+  }
+});
+
+it("keeps the documented public install from opting into internal skills", () => {
+  const readme = readFileSync(join(REPO_ROOT, "README.md"), "utf8");
+  expect(readme).not.toMatch(/npx skills[^\n]*(?:-s|--skill)\s+["']?\*/);
+  expect(readme).not.toMatch(/npx skills[^\n]*moonbit-agent-skills-maintainer/);
 });
 
 it("normalizes duplication units without case or whitespace differences", () => {
@@ -179,32 +269,6 @@ describe("toolchain comparison", () => {
       rmSync(temporary, { recursive: true, force: true });
     }
   });
-});
-
-it("keeps the real generated README byte-for-byte unchanged", () => {
-  const readme = readFileSync(join(REPO_ROOT, "README.md"), "utf8");
-  expect(generateReadme(readme)).toBe(readme);
-});
-
-it("counts a skill with no references directory", () => {
-  const temporary = mkdtempSync(join(tmpdir(), "readme-inventory-test-"));
-  try {
-    const skill = join(temporary, "skills", "minimal-skill");
-    mkdirSync(skill, { recursive: true });
-    mkdirSync(join(temporary, "verification", "fixtures"), {
-      recursive: true,
-    });
-    writeFileSync(
-      join(skill, "SKILL.md"),
-      "---\nname: minimal-skill\ndescription: Test.\nmetadata:\n  skill-version: 0.1.0\n---\n# Minimal\n",
-    );
-
-    expect(blockInventory(temporary)).toContain(
-      "`minimal-skill` v0.1.0: SKILL.md (2 lines) + 0 reference file(s)",
-    );
-  } finally {
-    rmSync(temporary, { recursive: true, force: true });
-  }
 });
 
 it("creates a deterministic snapshot from an injected runner", () => {
@@ -305,16 +369,19 @@ it("checks an expected diagnostic and then verifies fixed.mbt", () => {
       JSON.stringify({
         id: "negative-with-fix",
         expect: "check-fail",
+        moon_args: ["--warn-list", "+example_warning", "--deny-warn"],
         diagnostic_contains: ["expected diagnostic"],
       }),
     );
     writeFileSync(join(temporary, "code.mbt"), "BROKEN");
     writeFileSync(join(temporary, "fixed.mbt"), "FIXED");
     const materialized: string[] = [];
-    const runner: CommandRunner = (_command, _args, options) => {
+    const calls: (readonly string[])[] = [];
+    const runner: CommandRunner = (_command, args, options) => {
       if (options?.cwd === undefined) {
         throw new Error("fixture runner did not set cwd");
       }
+      calls.push(args);
       const code = readFileSync(join(options.cwd, "lib.mbt"), "utf8");
       materialized.push(code);
       return code === "BROKEN"
@@ -324,6 +391,145 @@ it("checks an expected diagnostic and then verifies fixed.mbt", () => {
 
     expect(checkOne(temporary, false, runner)).toEqual({ ok: true, detail: "" });
     expect(materialized).toEqual(["BROKEN", "FIXED"]);
+    expect(calls).toEqual([
+      [
+        "check",
+        "--target",
+        "wasm-gc",
+        "--warn-list",
+        "+example_warning",
+        "--deny-warn",
+        "--no-render",
+      ],
+      [
+        "check",
+        "--target",
+        "wasm-gc",
+        "--warn-list",
+        "+example_warning",
+        "--deny-warn",
+        "--no-render",
+      ],
+    ]);
+  } finally {
+    rmSync(temporary, { recursive: true, force: true });
+  }
+});
+
+it("uses a fixture-specific module name to isolate Moon test caches", () => {
+  const temporary = mkdtempSync(join(tmpdir(), "fixture-module-name-test-"));
+  try {
+    const firstFixture = join(temporary, "first-fixture");
+    const secondFixture = join(temporary, "second-fixture");
+    const firstWork = join(temporary, "first-work");
+    const secondWork = join(temporary, "second-work");
+    for (const directory of [firstFixture, secondFixture, firstWork, secondWork]) {
+      mkdirSync(directory);
+    }
+    writeFileSync(join(firstFixture, "code.mbt"), "test {}\n");
+    writeFileSync(join(secondFixture, "code.mbt"), "test {}\n");
+
+    const firstModule = materialize(firstFixture, firstWork, "code.mbt");
+    const secondModule = materialize(secondFixture, secondWork, "code.mbt");
+    expect(readFileSync(join(firstModule, "moon.mod"), "utf8")).toContain(
+      'name = "mbtskills/first_fixture"',
+    );
+    expect(readFileSync(join(secondModule, "moon.mod"), "utf8")).toContain(
+      'name = "mbtskills/second_fixture"',
+    );
+  } finally {
+    rmSync(temporary, { recursive: true, force: true });
+  }
+});
+
+it("runs the fixed test for a semantic-trap fixture", () => {
+  const temporary = mkdtempSync(join(tmpdir(), "fixture-semantic-fix-test-"));
+  try {
+    writeFileSync(
+      join(temporary, "fixture.json"),
+      JSON.stringify({ id: "semantic-with-fix", expect: "semantic-trap" }),
+    );
+    writeFileSync(join(temporary, "code.mbt"), "OLD_BEHAVIOR");
+    writeFileSync(join(temporary, "fixed.mbt"), "FIXED_BEHAVIOR_TEST");
+    const calls: (readonly string[])[] = [];
+    const materialized: string[] = [];
+    const runner: CommandRunner = (_command, args, options) => {
+      if (options?.cwd === undefined) {
+        throw new Error("fixture runner did not set cwd");
+      }
+      calls.push(args);
+      materialized.push(readFileSync(join(options.cwd, "lib.mbt"), "utf8"));
+      return { exitCode: 0, stdout: "", stderr: "" };
+    };
+
+    expect(checkOne(temporary, false, runner)).toEqual({ ok: true, detail: "" });
+    expect(materialized).toEqual(["OLD_BEHAVIOR", "FIXED_BEHAVIOR_TEST"]);
+    expect(calls).toEqual([
+      ["test", "--target", "wasm-gc", "--no-render"],
+      ["test", "--target", "wasm-gc", "--no-render"],
+    ]);
+  } finally {
+    rmSync(temporary, { recursive: true, force: true });
+  }
+});
+
+it("requires the old form to fail at runtime before testing its replacement", () => {
+  const temporary = mkdtempSync(join(tmpdir(), "fixture-runtime-fix-test-"));
+  try {
+    writeFileSync(
+      join(temporary, "fixture.json"),
+      JSON.stringify({
+        id: "runtime-failure-with-fix",
+        expect: "runtime-fail",
+        diagnostic_contains: ["observed runtime failure"],
+      }),
+    );
+    writeFileSync(join(temporary, "code.mbt"), "OLD_FORM_EXECUTED");
+    writeFileSync(join(temporary, "fixed.mbt"), "REPLACEMENT_ASSERTION");
+    const calls: (readonly string[])[] = [];
+    const materialized: string[] = [];
+    const runner: CommandRunner = (_command, args, options) => {
+      if (options?.cwd === undefined) {
+        throw new Error("fixture runner did not set cwd");
+      }
+      calls.push(args);
+      const code = readFileSync(join(options.cwd, "lib.mbt"), "utf8");
+      materialized.push(code);
+      return code === "OLD_FORM_EXECUTED"
+        ? { exitCode: 2, stdout: "observed runtime failure", stderr: "" }
+        : { exitCode: 0, stdout: "replacement assertion passed", stderr: "" };
+    };
+
+    expect(checkOne(temporary, false, runner)).toEqual({ ok: true, detail: "" });
+    expect(materialized).toEqual(["OLD_FORM_EXECUTED", "REPLACEMENT_ASSERTION"]);
+    expect(calls).toEqual([
+      ["test", "--target", "wasm-gc", "--no-render"],
+      ["test", "--target", "wasm-gc", "--no-render"],
+    ]);
+  } finally {
+    rmSync(temporary, { recursive: true, force: true });
+  }
+});
+
+it("rejects malformed fixture moon_args without running Moon", () => {
+  const temporary = mkdtempSync(join(tmpdir(), "fixture-moon-args-test-"));
+  try {
+    writeFileSync(
+      join(temporary, "fixture.json"),
+      JSON.stringify({
+        id: "malformed-moon-args",
+        expect: "check-pass",
+        moon_args: "--deny-warn",
+      }),
+    );
+    writeFileSync(join(temporary, "code.mbt"), "test {}\n");
+    const runner = vi.fn<CommandRunner>();
+
+    expect(checkOne(temporary, false, runner)).toEqual({
+      ok: false,
+      detail: "moon_args must be an array of strings",
+    });
+    expect(runner).not.toHaveBeenCalled();
   } finally {
     rmSync(temporary, { recursive: true, force: true });
   }

@@ -27,3 +27,15 @@ Run date: 2026-07-17 · runner: `run_activation.py` · 35 prompts · skills at c
 - Not yet tested: Claude Code `paths` frontmatter (glob-gated auto-activation on `.mbt`/`moon.pkg` files) — the highest-leverage fix for the workspace-file under-activation pattern, at the cost of being a client-specific extension; description phrasing A/B tests; opus-class models.
 
 Reproduce: `python3 evals/activation/run_activation.py --model <model> --run-name <name>`.
+
+## 2026-07-18 targeted internal-maintainer check
+
+This was a targeted three-prompt addition, not a rerun of the 35-prompt product-skill matrix above. Client: Claude Code CLI 2.1.212; requested model: `claude-haiku-4-5-20251001`; cost: $0.2575. As in the content eval, stream events named `deepseek-v4-flash` while usage also recorded the requested model, so this is a mixed client-routing result rather than an isolated Haiku API run.
+
+| Prompt | Expected | Activated | Exact |
+| --- | --- | --- | --- |
+| Release audit | internal maintainer | none | no |
+| Release update | internal maintainer | internal maintainer | yes |
+| Ordinary `extend` question | language only | language only | yes |
+
+Maintenance auto-activation was 1/2; the missed audit was under-activation, not routing to a product skill. The ordinary `extend` request activated only the language skill, so adding the internal maintainer did not steal that product request. Both maintenance runs reached the runner's turn limit after the activation decision; the activation observations remain usable, but this small check does not establish reliable implicit activation. The maintainer remains explicitly invocable for repository work.

@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 
 import { spawn } from "node:child_process";
-import { access, cp, mkdtemp, mkdir, readFile, rm, stat } from "node:fs/promises";
+import { access, cp, mkdtemp, mkdir, readFile, realpath, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 import { parse as parseShell } from "shell-quote";
 import type { Comment, ControlOperator, GlobPattern } from "shell-quote";
+import { exitWith, isMain, parseCliArgs } from "./lib/cli.ts";
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DEFAULT_MANIFEST = join(REPO_ROOT, "verification", "commands", "manifest.json");
@@ -14,6 +15,8 @@ const DEFAULT_TEMPLATE = join(REPO_ROOT, "verification", "commands", "template")
 const DEFAULT_SKILL = join(REPO_ROOT, "skills", "moonbit-toolchain");
 const DEFAULT_TIMEOUT_MS = 300_000;
 const OUTPUT_PREVIEW_LENGTH = 600;
+const CLI_USAGE =
+  "usage: node tooling/verify_commands.ts [--coverage-only] [--skip-network] [-v|--verbose]";
 
 type JsonRecord = Record<string, unknown>;
 
@@ -237,6 +240,7 @@ function parseStep(value: unknown, context: string): Step {
     if (argv[0] !== "moon" && argv[0] !== "moonrun") {
       fail(`${context}.argv[0] must be "moon" or "moonrun"`);
     }
+    assertMoonLiteralPathsStayInFixture(argv.slice(1), `${context}.argv`);
     return {
       kind,
       argv: argv as ["moon" | "moonrun", ...string[]],
@@ -246,20 +250,8 @@ function parseStep(value: unknown, context: string): Step {
 
   assertOnlyKeys(record, ["kind", "script", "cwd", "expect", "timeout_seconds"], context);
   const script = requiredString(record, "script", context);
-  if (kind === "shell" && shellScriptContainsMoonCommand(script)) {
-    fail(
-      `${context}.script contains a moon or moonrun command; use kind "moon" or "documented-shell"`,
-    );
-  }
-  if (kind === "documented-shell") {
-    if (script.includes("\n")) {
-      fail(`${context}.script must be one physical command line`);
-    }
-    const parsed = parseShellTokens(script);
-    if (!containsMoonCommand(parsed)) {
-      fail(`${context}.script must contain a moon or moonrun command`);
-    }
-  }
+  if (kind === "shell") validateSetupShell(script, context);
+  else validateDocumentedShellStep(script, base.expect, context);
   return { kind, script, ...base };
 }
 
@@ -275,13 +267,7 @@ function parseEntry(value: unknown, index: number): ManifestEntry {
     });
     const reason = requiredString(record, "reason", context);
     for (const [commandIndex, command] of commands.entries()) {
-      if (command.includes("\n")) {
-        fail(`${context}.commands[${commandIndex}] must be one line`);
-      }
-      const tokens = parseShellTokens(command);
-      if (!containsMoonCommand(tokens)) {
-        fail(`${context}.commands[${commandIndex}] must contain moon or moonrun`);
-      }
+      validateDocumentedShell(command, `${context}.commands[${commandIndex}]`);
     }
     return { id, documented_only: true, commands, reason };
   }
@@ -343,8 +329,14 @@ function isComment(token: ShellToken): token is Comment {
   return typeof token === "object" && token !== null && "comment" in token;
 }
 
-function isControlOperator(token: ShellToken): token is ControlOperator {
-  return typeof token === "object" && token !== null && "op" in token && token.op !== "glob";
+function isControlOperator(token: ShellToken | undefined): token is ControlOperator {
+  return (
+    token !== undefined &&
+    typeof token === "object" &&
+    token !== null &&
+    "op" in token &&
+    token.op !== "glob"
+  );
 }
 
 function parseShellTokens(source: string): ShellToken[] {
@@ -359,46 +351,424 @@ function parseShellTokens(source: string): ShellToken[] {
   }
 }
 
-const COMMAND_BOUNDARY_OPERATORS = new Set(["|", "|&", "||", "&&", ";", ";;", "&", "("]);
+const ALLOWED_DOCUMENTED_OPERATORS = new Set<ControlOperator["op"]>(["|", "&&"]);
+const SETUP_SEQUENCE_OPERATORS = new Set<ControlOperator["op"]>([
+  "|",
+  "|&",
+  "||",
+  "&&",
+  ";",
+  ";;",
+  "&",
+  "(",
+  ")",
+]);
+const SETUP_REDIRECTION_OPERATORS = new Set<ControlOperator["op"]>(["<", ">", ">>"]);
+const ALLOWED_SETUP_EXECUTABLES = new Set(["cat", "grep", "mkdir", "printf", "test", "touch"]);
+const ALLOWED_DOCUMENTED_AUXILIARIES = new Set([
+  "cat",
+  "cd",
+  "echo",
+  "false",
+  "grep",
+  "mkdir",
+  "printf",
+  "test",
+  "true",
+]);
+const SHELL_CONTROL_WORDS = new Set([
+  "!",
+  "case",
+  "do",
+  "done",
+  "elif",
+  "else",
+  "esac",
+  "fi",
+  "for",
+  "function",
+  "if",
+  "in",
+  "select",
+  "then",
+  "until",
+  "while",
+  "{",
+  "}",
+]);
+const ASSIGNMENT_RE = /^[A-Za-z_][A-Za-z0-9_]*=/;
+const WINDOWS_ABSOLUTE_PATH_RE = /^(?:[A-Za-z]:[\\/]|\\\\)/;
+const BRACE_EXPANSION_RE = /\{[^{}]*(?:,|\.\.)[^{}]*\}/;
+const MOON_COMMAND_FRAGMENT_RE =
+  /(?:^|[\s`"';&|()])(?:[^\s`"';&|()]*[\\/])?(?:moon|moonrun)(?=$|[\s`"';&|()])/;
 
-function containsMoonCommand(tokens: readonly ShellToken[]): boolean {
-  let commandStart = true;
-  for (const token of tokens) {
-    if (isComment(token)) break;
-    if (typeof token === "string") {
-      if (commandStart && (token === "moon" || token === "moonrun")) {
-        return true;
-      }
-      if (commandStart && /^[A-Za-z_][A-Za-z0-9_]*=/.test(token)) {
-        continue;
-      }
-      commandStart = false;
-      continue;
-    }
-    if (isControlOperator(token) && COMMAND_BOUNDARY_OPERATORS.has(token.op)) {
-      commandStart = true;
-    }
-  }
-  return false;
+function executableName(word: string): string {
+  return word.split(/[\\/]/).at(-1) ?? word;
 }
 
-function shellScriptContainsMoonCommand(script: string): boolean {
-  let heredocEnd: string | undefined;
+function isMoonExecutable(word: string): boolean {
+  const name = executableName(word);
+  return name === "moon" || name === "moonrun";
+}
+
+function stringContainsPotentialMoonCommand(word: string): boolean {
+  return isMoonExecutable(word) || MOON_COMMAND_FRAGMENT_RE.test(word);
+}
+
+function tokensContainPotentialMoonCommand(tokens: readonly ShellToken[]): boolean {
+  return tokens.some(
+    (token) => typeof token === "string" && stringContainsPotentialMoonCommand(token),
+  );
+}
+
+function normalizeLineContinuations(source: string): string {
+  return source.replace(/\\\r?\n/g, "");
+}
+
+interface HeredocState {
+  delimiter: string;
+  stripTabs: boolean;
+}
+
+function commandLinesOutsideHeredocs(script: string, context: string): string[] {
+  const commands: string[] = [];
+  let heredoc: HeredocState | undefined;
   for (const rawLine of script.split(/\r?\n/)) {
-    if (heredocEnd !== undefined) {
-      if (rawLine.trim() === heredocEnd) heredocEnd = undefined;
+    if (heredoc !== undefined) {
+      const candidate = heredoc.stripTabs ? rawLine.replace(/^\t+/, "") : rawLine;
+      if (candidate === heredoc.delimiter) heredoc = undefined;
       continue;
     }
-
-    if (containsMoonCommand(parseShellTokens(rawLine))) return true;
-    const heredoc = /<<-?\s*(['"]?)([A-Za-z_][A-Za-z0-9_]*)\1/.exec(rawLine);
-    if (heredoc) heredocEnd = heredoc[2];
+    const line = rawLine.trim();
+    if (line.length === 0 || line.startsWith("#")) continue;
+    commands.push(line);
+    const heredocs = [
+      ...line.matchAll(/<<(-?)\s*(?:(['"])([A-Za-z_][A-Za-z0-9_]*)\2|([A-Za-z_][A-Za-z0-9_]*))/g),
+    ];
+    if (heredocs.length > 1) fail(`${context}.script may contain only one heredoc`);
+    const match = heredocs[0];
+    if (match !== undefined) {
+      const delimiter = match[3] ?? match[4] ?? "";
+      if (match[2] === undefined) {
+        fail(
+          `${context}.script heredoc delimiter ${delimiter} must be quoted to disable expansion`,
+        );
+      }
+      heredoc = { delimiter, stripTabs: match[1] === "-" };
+    }
   }
-  return false;
+  if (heredoc !== undefined) {
+    fail(`${context}.script has an unterminated heredoc ${heredoc.delimiter}`);
+  }
+  return commands;
+}
+
+function isAbsoluteLiteral(path: string): boolean {
+  return isAbsolute(path) || WINDOWS_ABSOLUTE_PATH_RE.test(path);
+}
+
+function literalPathProblem(word: string): string | undefined {
+  const candidates = [word];
+  const equals = word.indexOf("=");
+  if (equals >= 0) candidates.push(word.slice(equals + 1));
+  for (const candidate of candidates) {
+    if (candidate.startsWith("~")) return "uses home-directory expansion";
+    if (isAbsoluteLiteral(candidate)) return "uses an absolute path";
+    if (candidate.split(/[\\/]/).includes("..")) return "uses parent-directory traversal";
+  }
+  return undefined;
+}
+
+function assertLiteralPathsStayInFixture(
+  words: readonly string[],
+  context: string,
+  ignoredIndexes: ReadonlySet<number> = new Set(),
+): void {
+  for (const [index, word] of words.entries()) {
+    if (ignoredIndexes.has(index)) continue;
+    const problem = literalPathProblem(word);
+    if (problem !== undefined) fail(`${context}[${index}] ${problem}: ${word}`);
+  }
+}
+
+const MOON_SEPARATE_PATH_OPTIONS = new Set(["-C", "--target-dir"]);
+
+function assertMoonLiteralPathsStayInFixture(args: readonly string[], context: string): void {
+  assertLiteralPathsStayInFixture(args, context);
+  for (let index = 0; index < args.length; index += 1) {
+    const argument = args[index] ?? "";
+    let path: string | undefined;
+    if (MOON_SEPARATE_PATH_OPTIONS.has(argument)) {
+      path = args[index + 1];
+      if (path === undefined || path.startsWith("-")) {
+        fail(`${context}[${index}] option ${argument} requires a path`);
+      }
+      index += 1;
+    } else if (argument.startsWith("-C") && argument.length > 2) {
+      path = argument.slice(2);
+    } else if (argument.startsWith("--target-dir=")) {
+      path = argument.slice("--target-dir=".length);
+      if (path.length === 0) {
+        fail(`${context}[${index}] option --target-dir requires a path`);
+      }
+    }
+    if (path !== undefined) {
+      const problem = literalPathProblem(path);
+      if (problem !== undefined) {
+        fail(`${context}[${index}] ${problem}: ${argument}`);
+      }
+    }
+  }
+}
+
+function assertNoShellBraceExpansion(
+  words: readonly string[],
+  context: string,
+  ignoredIndexes: ReadonlySet<number> = new Set(),
+): void {
+  for (const [index, word] of words.entries()) {
+    if (!ignoredIndexes.has(index) && BRACE_EXPANSION_RE.test(word)) {
+      fail(`${context}[${index}] uses brace expansion: ${word}`);
+    }
+  }
+}
+
+function validateSetupShell(script: string, context: string): void {
+  const commands = commandLinesOutsideHeredocs(script, context);
+  if (commands.some((command) => tokensContainPotentialMoonCommand(parseShellTokens(command)))) {
+    fail(
+      `${context}.script contains a possible moon or moonrun command; use kind "moon" or "documented-shell"`,
+    );
+  }
+  if (commands.length !== 1) {
+    fail(`${context}.script must contain one setup command; split multiple commands into steps`);
+  }
+  const tokens = parseShellTokens(commands[0] ?? "");
+  for (const token of tokens) {
+    if (typeof token === "string") {
+      if (token.includes("`")) fail(`${context}.script does not allow command substitution`);
+      continue;
+    }
+    if (isComment(token)) continue;
+    if (!isControlOperator(token)) {
+      fail(`${context}.script does not allow variables, globbing, or dynamic expansion`);
+    }
+    if (SETUP_SEQUENCE_OPERATORS.has(token.op)) {
+      fail(`${context}.script uses ${token.op}; split compound setup commands into steps`);
+    }
+    if (!SETUP_REDIRECTION_OPERATORS.has(token.op)) {
+      fail(`${context}.script uses unsupported shell syntax ${token.op}`);
+    }
+  }
+  const executable = tokens.find((token): token is string => typeof token === "string");
+  if (executable === undefined) fail(`${context}.script must execute a setup command`);
+  if (executable !== executableName(executable) || !ALLOWED_SETUP_EXECUTABLES.has(executable)) {
+    fail(
+      `${context}.script setup executable ${executable} is not allowed; extend the restricted grammar with tests if needed`,
+    );
+  }
+  const words = tokens.filter((token): token is string => typeof token === "string");
+  const executableIndexes = new Set([0]);
+  assertNoShellBraceExpansion(words, `${context}.script word`, executableIndexes);
+  assertLiteralPathsStayInFixture(words, `${context}.script word`, executableIndexes);
+}
+
+function assertDocumentedPhysicalLines(source: string, context: string): void {
+  const lines = source.split(/\r?\n/);
+  if (lines.some((line) => line.trim().length === 0)) {
+    fail(`${context} may not contain blank physical lines`);
+  }
+  for (const [index, rawLine] of lines.entries()) {
+    const hasBackslash = /\\\s*$/.test(rawLine);
+    const line = hasBackslash ? rawLine.replace(/\\\s*$/, "") : rawLine;
+    const tokens = parseShellTokens(line);
+    const last = tokens.at(-1);
+    const continuation = isControlOperator(last) ? last.op : undefined;
+    if (index < lines.length - 1) {
+      if (continuation !== "|" && continuation !== "&&") {
+        fail(`${context} may continue lines only after | or &&`);
+      }
+    } else if (hasBackslash || continuation === "|" || continuation === "&&") {
+      fail(`${context} ends with an incomplete shell continuation`);
+    }
+  }
+}
+
+function skipEnvPrefix(words: readonly string[], start: number, context: string): number {
+  let index = start;
+  while (index < words.length) {
+    const word = words[index] ?? "";
+    if (word === "--") return index + 1;
+    if (ASSIGNMENT_RE.test(word)) {
+      index += 1;
+      continue;
+    }
+    if (word === "-S" || word === "--split-string" || word.startsWith("--split-string=")) {
+      fail(`${context} does not allow env --split-string`);
+    }
+    if (word === "-i" || word === "--ignore-environment") {
+      index += 1;
+      continue;
+    }
+    if (["-u", "--unset"].includes(word)) {
+      if (index + 1 >= words.length) fail(`${context} has an incomplete env option ${word}`);
+      index += 2;
+      continue;
+    }
+    if (word.startsWith("--unset=") && word.length > "--unset=".length) {
+      index += 1;
+      continue;
+    }
+    if (word.startsWith("-")) {
+      fail(`${context} does not allow env option ${word}`);
+    }
+    return index;
+  }
+  return index;
+}
+
+interface EffectiveCommand {
+  executable?: string;
+  executableIndex?: number;
+  wrapperIndexes: Set<number>;
+}
+
+function assertKnownExecutablePath(word: string, name: string, context: string): void {
+  if (word === name || (isAbsoluteLiteral(word) && executableName(word) === name)) return;
+  fail(`${context} does not allow relative wrapper executable path ${word}`);
+}
+
+function effectiveExecutable(words: readonly string[], context: string): EffectiveCommand {
+  let index = 0;
+  while (index < words.length && ASSIGNMENT_RE.test(words[index] ?? "")) index += 1;
+  const wrapperIndexes = new Set<number>();
+
+  for (let wrappers = 0; wrappers <= words.length; wrappers += 1) {
+    const word = words[index];
+    if (word === undefined) return { wrapperIndexes };
+    const name = executableName(word);
+    if (SHELL_CONTROL_WORDS.has(name)) {
+      fail(`${context} does not allow shell control flow (${name})`);
+    }
+    if (name === "env") {
+      assertKnownExecutablePath(word, name, context);
+      wrapperIndexes.add(index);
+      index = skipEnvPrefix(words, index + 1, context);
+      continue;
+    }
+    if (name === "command") {
+      assertKnownExecutablePath(word, name, context);
+      wrapperIndexes.add(index);
+      index += 1;
+      while (words[index]?.startsWith("-")) {
+        const option = words[index] ?? "";
+        if (option === "--") {
+          index += 1;
+          break;
+        }
+        if (/^-[p]*[vV][pvV]*$/.test(option)) return { wrapperIndexes };
+        if (option !== "-p") fail(`${context} does not allow command option ${option}`);
+        index += 1;
+      }
+      continue;
+    }
+    if (name === "time") {
+      assertKnownExecutablePath(word, name, context);
+      wrapperIndexes.add(index);
+      index += 1;
+      while (words[index]?.startsWith("-")) {
+        const option = words[index] ?? "";
+        if (option === "--") {
+          index += 1;
+          break;
+        }
+        if (option !== "-p") fail(`${context} does not allow time option ${option}`);
+        index += 1;
+      }
+      continue;
+    }
+    return { executable: word, executableIndex: index, wrapperIndexes };
+  }
+  fail(`${context} has too many nested command wrappers`);
+}
+
+function analyzeDocumentedShell(source: string, context: string): boolean {
+  assertDocumentedPhysicalLines(source, context);
+  const normalized = normalizeLineContinuations(source);
+  if (/`|\$\(|<[()]|>[()]/.test(normalized)) {
+    fail(`${context} does not allow command or process substitution`);
+  }
+  const tokens = parseShellTokens(normalized);
+  const segments: string[][] = [];
+  let segment: string[] = [];
+  for (const token of tokens) {
+    if (typeof token === "string") {
+      segment.push(token);
+      continue;
+    }
+    if (isComment(token)) fail(`${context} does not allow shell comments`);
+    if (!isControlOperator(token) || !ALLOWED_DOCUMENTED_OPERATORS.has(token.op)) {
+      const syntax = isControlOperator(token) ? token.op : "dynamic expansion";
+      fail(`${context} uses unsupported shell syntax ${syntax}; only | and && are allowed`);
+    }
+    if (segment.length === 0) fail(`${context} has an empty command before ${token.op}`);
+    segments.push(segment);
+    segment = [];
+  }
+  if (segment.length === 0) fail(`${context} ends without a command`);
+  segments.push(segment);
+
+  let executesMoon = false;
+  for (const [index, words] of segments.entries()) {
+    const commandContext = `${context} command ${index + 1}`;
+    const effective = effectiveExecutable(words, commandContext);
+    const ignoredIndexes = new Set(effective.wrapperIndexes);
+    if (effective.executableIndex !== undefined) ignoredIndexes.add(effective.executableIndex);
+    assertNoShellBraceExpansion(words, `${commandContext} word`, ignoredIndexes);
+    assertLiteralPathsStayInFixture(words, `${commandContext} word`, ignoredIndexes);
+
+    const executable = effective.executable;
+    if (executable === undefined) continue;
+    const name = executableName(executable);
+    if (isMoonExecutable(executable)) {
+      assertKnownExecutablePath(executable, name, commandContext);
+      assertMoonLiteralPathsStayInFixture(
+        words.slice((effective.executableIndex ?? -1) + 1),
+        `${commandContext} Moon argument`,
+      );
+      executesMoon = true;
+      continue;
+    }
+    if (executable !== name || !ALLOWED_DOCUMENTED_AUXILIARIES.has(name)) {
+      fail(
+        `${commandContext} executable ${executable} is not allowed by the restricted documented-shell grammar`,
+      );
+    }
+  }
+  return executesMoon;
+}
+
+function validateDocumentedShell(source: string, context: string): void {
+  if (!analyzeDocumentedShell(source, context)) {
+    fail(`${context} must execute a moon or moonrun command`);
+  }
+}
+
+function validateDocumentedShellStep(
+  source: string,
+  expectation: Expectation | undefined,
+  context: string,
+): void {
+  validateDocumentedShell(source, context);
+  if ((expectation?.exit ?? 0) !== 0) {
+    fail(`${context}.expect.exit must be 0 for documented-shell so success proves Moon ran`);
+  }
 }
 
 export function canonicalShellCommand(source: string): string {
-  const tokens = parseShellTokens(source).filter((token) => !isComment(token));
+  const tokens = parseShellTokens(normalizeLineContinuations(source)).filter(
+    (token) => !isComment(token),
+  );
   return JSON.stringify(tokens);
 }
 
@@ -408,6 +778,66 @@ export function canonicalArgv(argv: readonly string[]): string {
 
 function shellFenceFiles(skillRoot: string): string[] {
   return [join(skillRoot, "SKILL.md")];
+}
+
+interface LogicalFenceCommand {
+  lineOffset: number;
+  source: string;
+}
+
+function stripPrompt(line: string): string {
+  const trimmed = line.trim();
+  return trimmed.startsWith("$ ") ? trimmed.slice(2) : trimmed;
+}
+
+function lineContinuesCommand(line: string): boolean {
+  const withoutBackslash = line.replace(/\\\s*$/, "");
+  if (withoutBackslash !== line) return true;
+  const last = parseShellTokens(withoutBackslash).at(-1);
+  return isControlOperator(last) && ["|", "&&", "||"].includes(last.op);
+}
+
+function logicalFenceCommands(block: string, context: string): LogicalFenceCommand[] {
+  const commands: LogicalFenceCommand[] = [];
+  let pending: string[] = [];
+  let pendingLine = 0;
+  for (const [lineOffset, rawLine] of block.split(/\r?\n/).entries()) {
+    const line = stripPrompt(rawLine);
+    if (line.length === 0 || line.startsWith("#")) {
+      if (pending.length > 0) fail(`${context}:${pendingLine} has an incomplete continuation`);
+      continue;
+    }
+    if (pending.length === 0) pendingLine = lineOffset;
+    pending.push(line);
+    if (lineContinuesCommand(line)) continue;
+    commands.push({ lineOffset: pendingLine, source: pending.join("\n") });
+    pending = [];
+  }
+  if (pending.length > 0) fail(`${context}:${pendingLine} has an incomplete continuation`);
+  return commands;
+}
+
+function assertFenceCannotHideMoon(block: string, context: string): void {
+  const visibleLines = block
+    .split(/\r?\n/)
+    .map(stripPrompt)
+    .filter((line) => line.length > 0 && !line.startsWith("#"));
+  const tokens = parseShellTokens(normalizeLineContinuations(visibleLines.join("\n")));
+  if (!tokensContainPotentialMoonCommand(tokens)) return;
+
+  for (const line of visibleLines) {
+    const first = parseShellTokens(line.replace(/\\\s*$/, "")).find(
+      (token): token is string => typeof token === "string",
+    );
+    if (first !== undefined && SHELL_CONTROL_WORDS.has(executableName(first))) {
+      fail(`${context} uses unsupported shell control flow ${first} around a Moon command`);
+    }
+  }
+  for (const token of tokens) {
+    if (isControlOperator(token) && ["|&", "||", ";", ";;", "&", "(", ")"].includes(token.op)) {
+      fail(`${context} uses unsupported shell operator ${token.op} around a Moon command`);
+    }
+  }
 }
 
 export async function collectDocumentedCommands(
@@ -438,17 +868,17 @@ export async function collectDocumentedCommands(
       const block = match[1] ?? "";
       const blockStart = (match.index ?? 0) + match[0].indexOf(block);
       const firstLine = source.slice(0, blockStart).split(/\r?\n/).length;
-      for (const [lineOffset, raw] of block.split(/\r?\n/).entries()) {
-        let line = raw.trim();
-        if (line.startsWith("$ ")) line = line.slice(2);
-        if (line.length === 0 || line.startsWith("#")) continue;
-        const tokens = parseShellTokens(line);
-        if (!containsMoonCommand(tokens)) continue;
+      const file = relative(repoRoot, path);
+      assertFenceCannotHideMoon(block, `${file}:${firstLine}`);
+      for (const command of logicalFenceCommands(block, file)) {
+        if (!analyzeDocumentedShell(command.source, `${file}:${firstLine + command.lineOffset}`)) {
+          continue;
+        }
         commands.push({
-          file: relative(repoRoot, path),
-          line: firstLine + lineOffset,
-          source: line,
-          key: canonicalShellCommand(line),
+          file,
+          line: firstLine + command.lineOffset,
+          source: command.source,
+          key: canonicalShellCommand(command.source),
         });
       }
     }
@@ -471,6 +901,7 @@ export function collectCoveredCommands(manifest: Manifest): Map<string, string[]
   for (const entry of manifest.entries) {
     if (isDocumentedOnly(entry)) {
       for (const command of entry.commands) {
+        validateDocumentedShell(command, `${entry.id} documented-only command`);
         add(canonicalShellCommand(command), entry.id);
       }
       continue;
@@ -479,6 +910,7 @@ export function collectCoveredCommands(manifest: Manifest): Map<string, string[]
       if (step.kind === "moon") {
         add(canonicalArgv(step.argv), entry.id);
       } else if (step.kind === "documented-shell") {
+        validateDocumentedShellStep(step.script, step.expect, `${entry.id} documented-shell step`);
         add(canonicalShellCommand(step.script), entry.id);
       }
     }
@@ -524,6 +956,49 @@ function safePath(root: string, path: string, context: string): string {
   return resolved;
 }
 
+function pathIsWithin(root: string, path: string): boolean {
+  return path === root || path.startsWith(`${root}${sep}`);
+}
+
+async function assertResolvedPathStaysInFixture(
+  root: string,
+  path: string,
+  context: string,
+): Promise<string> {
+  const resolved = safePath(root, path, context);
+  const realRoot = await realpath(root);
+  let existing = resolved;
+  for (;;) {
+    try {
+      const realExisting = await realpath(existing);
+      if (!pathIsWithin(realRoot, realExisting)) {
+        fail(`${context} escapes the fixture root through a symlink: ${path}`);
+      }
+      return resolved;
+    } catch (error) {
+      if (!isMissingPathError(error)) throw error;
+      const parent = dirname(existing);
+      if (parent === existing) throw error;
+      existing = parent;
+    }
+  }
+}
+
+async function safeCwd(root: string, path: string, context: string): Promise<string> {
+  const resolved = await assertResolvedPathStaysInFixture(root, path, context);
+  try {
+    const realCwd = await realpath(resolved);
+    const realRoot = await realpath(root);
+    if (!pathIsWithin(realRoot, realCwd)) {
+      fail(`${context} escapes the fixture root through a symlink: ${path}`);
+    }
+    return realCwd;
+  } catch (error) {
+    if (isMissingPathError(error)) fail(`${context} does not exist: ${path}`);
+    throw error;
+  }
+}
+
 async function pathExists(path: string): Promise<boolean> {
   try {
     await stat(path);
@@ -538,12 +1013,33 @@ function stepLabel(step: Step): string {
   return step.kind === "moon" ? step.argv.join(" ") : step.script;
 }
 
+function killProcessGroup(child: ReturnType<typeof spawn>): void {
+  if (process.platform !== "win32" && child.pid !== undefined) {
+    try {
+      process.kill(-child.pid, "SIGKILL");
+      return;
+    } catch (error) {
+      if (
+        typeof error !== "object" ||
+        error === null ||
+        !("code" in error) ||
+        error.code !== "ESRCH"
+      ) {
+        child.kill("SIGKILL");
+      }
+      return;
+    }
+  }
+  child.kill("SIGKILL");
+}
+
 export const executeStep: StepExecutor = async (
   step,
   { cwd, timeoutMs },
 ): Promise<ProcessResult> => {
   const command = step.kind === "moon" ? step.argv[0] : "bash";
-  const args = step.kind === "moon" ? step.argv.slice(1) : ["-o", "pipefail", "-c", step.script];
+  const args =
+    step.kind === "moon" ? step.argv.slice(1) : ["-e", "-o", "pipefail", "-c", step.script];
 
   return await new Promise<ProcessResult>((resolveResult) => {
     let output = "";
@@ -551,6 +1047,7 @@ export const executeStep: StepExecutor = async (
     let timedOut = false;
     const child = spawn(command, args, {
       cwd,
+      detached: process.platform !== "win32",
       env: process.env,
       stdio: ["ignore", "pipe", "pipe"],
     });
@@ -566,7 +1063,7 @@ export const executeStep: StepExecutor = async (
 
     const timeout = setTimeout(() => {
       timedOut = true;
-      child.kill("SIGKILL");
+      killProcessGroup(child);
     }, timeoutMs);
 
     child.once("error", (error) => {
@@ -628,12 +1125,14 @@ async function expectationProblems(
     }
   }
   for (const path of expectation.paths_exist ?? []) {
-    if (!(await pathExists(safePath(fixtureRoot, path, `${prefix} path`)))) {
+    const resolved = await assertResolvedPathStaysInFixture(fixtureRoot, path, `${prefix} path`);
+    if (!(await pathExists(resolved))) {
       problems.push(`${prefix}: expected path ${path} is missing`);
     }
   }
   for (const path of expectation.paths_absent ?? []) {
-    if (await pathExists(safePath(fixtureRoot, path, `${prefix} path`))) {
+    const resolved = await assertResolvedPathStaysInFixture(fixtureRoot, path, `${prefix} path`);
+    if (await pathExists(resolved)) {
       problems.push(`${prefix}: expected path ${path} to be absent`);
     }
   }
@@ -655,7 +1154,14 @@ export async function runEntry(entry: RunEntry, options: VerifyOptions = {}): Pr
     }
 
     for (const [stepIndex, step] of entry.steps.entries()) {
-      const cwd = safePath(fixtureRoot, step.cwd ?? ".", `${entry.id}: step ${stepIndex + 1} cwd`);
+      if (step.kind === "documented-shell") {
+        validateDocumentedShellStep(step.script, step.expect, `${entry.id}: step ${stepIndex + 1}`);
+      }
+      const cwd = await safeCwd(
+        fixtureRoot,
+        step.cwd ?? ".",
+        `${entry.id}: step ${stepIndex + 1} cwd`,
+      );
       const result = await (options.executor ?? executeStep)(step, {
         cwd,
         timeoutMs: (step.timeout_seconds ?? DEFAULT_TIMEOUT_MS / 1000) * 1000,
@@ -687,25 +1193,37 @@ export async function runManifest(
   return problems;
 }
 
-function parseCliOptions(args: readonly string[]): CliOptions {
-  const options: CliOptions = {
-    coverageOnly: false,
-    skipNetwork: false,
-    verbose: false,
+function parseCliOptions(
+  args: readonly string[],
+): { ok: true; options: CliOptions } | { ok: false; exitCode: number } {
+  const parsed = parseCliArgs(
+    {
+      args,
+      options: {
+        "coverage-only": { type: "boolean", default: false },
+        "skip-network": { type: "boolean", default: false },
+        verbose: { type: "boolean", short: "v", default: false },
+      },
+      strict: true,
+    },
+    CLI_USAGE,
+  );
+  if (!parsed.ok) return parsed;
+  return {
+    ok: true,
+    options: {
+      coverageOnly: parsed.result.values["coverage-only"],
+      skipNetwork: parsed.result.values["skip-network"],
+      verbose: parsed.result.values.verbose,
+    },
   };
-  for (const arg of args) {
-    if (arg === "--") continue;
-    if (arg === "--coverage-only") options.coverageOnly = true;
-    else if (arg === "--skip-network") options.skipNetwork = true;
-    else if (arg === "-v" || arg === "--verbose") options.verbose = true;
-    else fail(`unknown argument: ${arg}`);
-  }
-  return options;
 }
 
 export async function runCli(args = process.argv.slice(2)): Promise<number> {
+  const parsed = parseCliOptions(args);
+  if (!parsed.ok) return parsed.exitCode;
   try {
-    const options = parseCliOptions(args);
+    const options = parsed.options;
     const manifest = await loadManifest();
     const coverage = await verifyCoverage(manifest);
     const problems = [...coverage.problems];
@@ -741,7 +1259,6 @@ export async function runCli(args = process.argv.slice(2)): Promise<number> {
   }
 }
 
-const invokedPath = process.argv[1] ? pathToFileURL(resolve(process.argv[1])).href : undefined;
-if (invokedPath === import.meta.url) {
-  process.exitCode = await runCli();
+if (isMain(import.meta.url)) {
+  exitWith(await runCli());
 }

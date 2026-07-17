@@ -10,8 +10,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
-import { parseArgs } from "node:util";
-import { exitWith, isMain } from "./lib/cli.ts";
+import { exitWith, isMain, parseCliArgs } from "./lib/cli.ts";
 import type { CommandRunner } from "./lib/process.ts";
 import { runCommand } from "./lib/process.ts";
 import { REPO_ROOT } from "./lib/repo.ts";
@@ -86,17 +85,24 @@ export function runSkill(
 }
 
 export function main(args = process.argv.slice(2), repoRoot = REPO_ROOT): number {
-  const { values } = parseArgs({
-    args,
-    options: {
-      skill: { type: "string", multiple: true },
-      targets: {
-        type: "string",
-        default: "wasm-gc,wasm,js,native",
+  const parsed = parseCliArgs(
+    {
+      args,
+      options: {
+        skill: { type: "string", multiple: true },
+        targets: {
+          type: "string",
+          default: "wasm-gc,wasm,js,native",
+        },
       },
+      strict: true,
     },
-    strict: true,
-  });
+    "usage: node tooling/run_checked_docs.ts [--skill NAME ...] [--targets TARGET,...]",
+  );
+  if (!parsed.ok) {
+    return parsed.exitCode;
+  }
+  const { values } = parsed.result;
   const skillsDirectory = join(repoRoot, "skills");
   const skills =
     values.skill ??

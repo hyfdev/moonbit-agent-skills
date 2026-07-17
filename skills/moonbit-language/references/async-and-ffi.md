@@ -27,8 +27,8 @@ An `async fn` *declaration* compiles with only the core standard library; if its
 Declaring async functions is free, but **running** async code — `async test`, `async fn main`, and every concurrency/timer primitive (`@async.sleep`, task groups) — requires the `moonbitlang/async` package to be imported. Without it, `async test` and `async fn main` are Error [4037] ("package moonbitlang/async is not imported"). The core standard library alone cannot execute async code.
 
 ```moonbit
-// verified on native (pass) and js (pass); on wasm-gc this test is SILENTLY SKIPPED
-// (the async runtime does not support wasm) — "Total tests: 0, passed: 0, failed: 0."
+// verified on native (pass) and js (pass); wasm-gc still skips this test because
+// async 0.20.2's experimental WebAssembly support is Wasm1 (`--target wasm`), not wasm-gc
 async test "async sleep and call" {
   @async.sleep(5)
   assert_eq(aid(1), 2)
@@ -36,6 +36,12 @@ async test "async sleep and call" {
 ```
 
 Gotcha: a `moon.pkg` `import { ... } for "test"` block applies only to blackbox `*_test.mbt` files. An `async test` in a regular `.mbt` file needs a plain (unscoped) import block instead.
+
+### `moonbitlang/async` 0.20.2 Wasm1 boundary
+
+**Documented, not executed against the external package:** the [0.10.4 release notes](https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release) add experimental Wasm1 support to `moonbitlang/async` 0.20.2 with the same API signatures and behavior as its native backend. These `.wasm` files currently require the latest `moonrun`; other WebAssembly runtimes are not supported. The artifact is otherwise cross-platform wherever that `moonrun` is available, without rebuilding for each operating system or hardware architecture.
+
+**Documented, not executed against the external package:** this is experimental compatibility, not a backward-compatibility promise for binaries built with an older async package. The Wasm1 backend also does not yet support `@websocket`, `@fs.Watcher`, or `@fs.realpath`; the release describes support for those APIs as future work. Check the installed package documentation before relying on a newer runtime or wider API coverage.
 
 ### Structured concurrency
 

@@ -52,6 +52,10 @@ export function main(): number {
     const metadata = stringMap(parsed.frontmatter, "metadata") ?? {};
     const label = basename(skillDirectory);
 
+    if (!("moonbit-release" in metadata)) {
+      continue;
+    }
+
     for (const [metadataKey, componentName] of Object.entries(COMPONENT_KEY)) {
       if (!(metadataKey in metadata)) {
         continue;

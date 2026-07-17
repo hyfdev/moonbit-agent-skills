@@ -1,0 +1,27 @@
+{
+  "id": "lang-dep-extend-identifier",
+  "owner_skill": "moonbit-language",
+  "knowledge": "extend is a soft keyword in MoonBit 0.10.4; using it as an identifier warns because it will become reserved.",
+  "expect": "check-fail",
+  "diagnostic_contains": [
+    "extend",
+    "keyword"
+  ],
+  "fix": "Rename identifiers named extend.",
+  "targets": [
+    "wasm-gc"
+  ],
+  "moon_args": [
+    "--deny-warn"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-07-18",
+    "components": {
+      "moon": "0.1.20260713 (75c7e1f 2026-07-13)",
+      "moonc": "v0.10.4+ade96c819 (2026-07-13)",
+      "moonrun": "moonrun 0.1.20260713 (75c7e1f 2026-07-13)"
+    },
+    "platform": "Linux-x86_64"
+  }
+}

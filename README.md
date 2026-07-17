@@ -29,7 +29,7 @@ Agent Skills for MoonBit. Help coding agents work with MoonBit and write better 
 - Global install for Claude Code and `.agents`:
 
   ```sh
-  npx skills@latest add hyfdev/moonbit-agent-skills -g -a claude-code -a universal -s "*" --copy -y
+  npx skills@latest add hyfdev/moonbit-agent-skills -g -a claude-code -a universal --copy -y
   ```
 
 - Interactive install:

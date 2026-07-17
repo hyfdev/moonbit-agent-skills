@@ -31,12 +31,10 @@ jobs:
       - name: Skill format (repository rules)
         run: vp run validate-skills
       - name: Skill format (official reference validator, spec view)
-        # SKILL.md carries exactly one client-extension field
-        # (user-invocable: false, honored by Claude Code to keep the skills
-        # out of the manual / menu — auto-trigger only). The open spec's
-        # reference validator allows only spec fields, so it runs against a
-        # copy with that documented extension stripped; per the spec's
-        # lenient-validation guidance, unknown fields are ignored by clients.
+        # Product SKILL.md files use user-invocable: false so Claude Code keeps
+        # them out of the manual / menu. The internal maintainer skill uses the
+        # same client extension with true. The open spec's reference validator
+        # allows only spec fields, so validate a copy with it stripped.
         run: |
           pip install skills-ref
           cp -R skills /tmp/spec-view
@@ -46,6 +44,10 @@ jobs:
         run: vp run check-duplication
       - name: Version consistency
         run: vp run check-versions
+      - name: Pinned release inventories match upstream Markdown
+        run: vp run verify-release-sources
+      - name: Every release item has a closed coverage decision
+        run: vp run check-release-coverage
   # MoonBit distributes install channels (latest / nightly / pre-release),
   # not pinned historical versions (verified 2026-07-17: only channel URLs
   # exist under cli.moonbitlang.com/binaries/). CI therefore cannot

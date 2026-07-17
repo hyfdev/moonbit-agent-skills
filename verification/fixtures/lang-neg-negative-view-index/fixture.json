@@ -1,0 +1,25 @@
+{
+  "id": "lang-neg-negative-view-index",
+  "owner_skill": "moonbit-language",
+  "knowledge": "ArrayView, StringView, and BytesView operators no longer support negative indices in MoonBit 0.10.4; the old forms abort at runtime, so compute a nonnegative index explicitly.",
+  "expect": "runtime-fail",
+  "diagnostic_contains": [
+    "release_last_array_with_negative_index",
+    "release_last_string_with_negative_index",
+    "release_last_bytes_with_negative_index"
+  ],
+  "fix": "Compute the nonnegative index, such as xs.length() - 1, before slicing.",
+  "targets": [
+    "wasm-gc"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-07-18",
+    "components": {
+      "moon": "0.1.20260713 (75c7e1f 2026-07-13)",
+      "moonc": "v0.10.4+ade96c819 (2026-07-13)",
+      "moonrun": "moonrun 0.1.20260713 (75c7e1f 2026-07-13)"
+    },
+    "platform": "Linux-x86_64"
+  }
+}

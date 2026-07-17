@@ -8,16 +8,24 @@ const SKILLS_DIR = join(REPO_ROOT, "skills");
 
 export const NAME_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-const REQUIRED_METADATA_KEYS = new Set([
-  "skill-version",
-  "verified-date",
-  "verified-platform",
-  "verified-targets",
-]);
+const REQUIRED_METADATA_KEYS = new Set(["skill-version"]);
 
 const REQUIRED_COMPONENT_KEYS: Record<string, Set<string>> = {
-  "moonbit-language": new Set(["moonc-version"]),
-  "moonbit-toolchain": new Set(["moon-version", "moonrun-version"]),
+  "moonbit-language": new Set([
+    "moonc-version",
+    "moonbit-release",
+    "verified-date",
+    "verified-platform",
+    "verified-targets",
+  ]),
+  "moonbit-toolchain": new Set([
+    "moon-version",
+    "moonrun-version",
+    "moonbit-release",
+    "verified-date",
+    "verified-platform",
+    "verified-targets",
+  ]),
 };
 
 export function validateSkill(skillDir: string): string[] {
@@ -59,6 +67,15 @@ export function validateSkill(skillDir: string): string[] {
   const missing = [...required].filter((key) => !(key in metadata)).sort();
   if (missing.length > 0) {
     problems.push(`metadata missing version-contract keys: ${reprList(missing)}`);
+  }
+  if (name === "moonbit-agent-skills-maintainer" && metadata.scope !== "repository-maintenance") {
+    problems.push("metadata.scope must be repository-maintenance");
+  }
+  if (metadata.scope === "repository-maintenance" && metadata.internal !== "true") {
+    problems.push("repository-maintenance skills must set metadata.internal: true");
+  }
+  if (REQUIRED_COMPONENT_KEYS[name] !== undefined && "internal" in metadata) {
+    problems.push("product skills must remain public (remove metadata.internal)");
   }
 
   const bodyLines = parsed.body.split("\n").length;

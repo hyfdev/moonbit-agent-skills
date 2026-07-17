@@ -1,0 +1,24 @@
+{
+  "id": "lang-neg-rust-use-import",
+  "owner_skill": "moonbit-language",
+  "knowledge": "`use` is a reserved word and in-file imports do not exist; imports are declared in moon.pkg's `import { ... }` block and used as `@alias.f`.",
+  "habit_from": "rust",
+  "expect": "check-fail",
+  "diagnostic_contains": [
+    "The word `use` is reserved"
+  ],
+  "fix": "Remove the line; add imports to the `import { ... }` block in moon.pkg and call via @alias.f",
+  "targets": [
+    "wasm-gc"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-07-17",
+    "components": {
+      "moon": "0.1.20260713 (75c7e1f 2026-07-13)",
+      "moonc": "v0.10.4+ade96c819 (2026-07-13)",
+      "moonrun": "moonrun 0.1.20260713 (75c7e1f 2026-07-13)"
+    },
+    "platform": "Darwin-arm64"
+  }
+}

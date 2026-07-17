@@ -1,0 +1,8 @@
+_build/
+*.pyc
+__pycache__/
+.venv/
+venv/
+.DS_Store
+evals/**/runs/
+verification/fixtures/**/_build/

@@ -1,0 +1,24 @@
+{
+  "id": "lang-neg-rust-immutable-field-assign",
+  "owner_skill": "moonbit-language",
+  "knowledge": "Struct fields are immutable by default no matter how the value is bound; a field you assign to must be declared `mut count : Int` in the struct itself.",
+  "habit_from": "rust",
+  "expect": "check-fail",
+  "diagnostic_contains": [
+    "The record field count is immutable"
+  ],
+  "fix": "Declare the field as `mut count : Int`",
+  "targets": [
+    "wasm-gc"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-07-17",
+    "components": {
+      "moon": "0.1.20260713 (75c7e1f 2026-07-13)",
+      "moonc": "v0.10.4+ade96c819 (2026-07-13)",
+      "moonrun": "moonrun 0.1.20260713 (75c7e1f 2026-07-13)"
+    },
+    "platform": "Darwin-arm64"
+  }
+}

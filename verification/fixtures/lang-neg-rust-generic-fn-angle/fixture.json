@@ -1,0 +1,24 @@
+{
+  "id": "lang-neg-rust-generic-fn-angle",
+  "owner_skill": "moonbit-language",
+  "knowledge": "Declaring type parameters as `fn first<T>(...)` is rejected; MoonBit attaches them to the fn keyword: `fn[T] first(xs : Array[T]) -> T`.",
+  "habit_from": "rust",
+  "expect": "check-fail",
+  "diagnostic_contains": [
+    "Missing parameters list"
+  ],
+  "fix": "Write `pub fn[T] first(xs : Array[T]) -> T`",
+  "targets": [
+    "wasm-gc"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-07-17",
+    "components": {
+      "moon": "0.1.20260713 (75c7e1f 2026-07-13)",
+      "moonc": "v0.10.4+ade96c819 (2026-07-13)",
+      "moonrun": "moonrun 0.1.20260713 (75c7e1f 2026-07-13)"
+    },
+    "platform": "Darwin-arm64"
+  }
+}

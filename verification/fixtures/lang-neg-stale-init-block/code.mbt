@@ -1,0 +1,4 @@
+///|
+init {
+  println("starting")
+}

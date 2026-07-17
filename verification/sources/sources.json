@@ -1,0 +1,50 @@
+{
+  "_comment": "Pinned upstream sources this repository's content was checked against. Update alongside verification/toolchains/current.json when re-verifying. Hand-maintained; tooling/check_versions.py checks internal consistency.",
+  "retrieved": "2026-07-17",
+  "sources": [
+    {
+      "id": "moonbit-docs",
+      "kind": "documentation",
+      "url": "https://docs.moonbitlang.com/en/latest/",
+      "version_label": "MoonBit v0.10.4 documentation",
+      "notes": "Docs site banner version. Known lag: trait/impl pages still show the pre-v0.10.0 fn-less syntax that the v0.10.0 release notes superseded."
+    },
+    {
+      "id": "moonbit-release-notes",
+      "kind": "release-notes",
+      "url": "https://www.moonbitlang.com/updates/",
+      "version_label": "through v0.10.4 (2026-07-13)",
+      "notes": "Numbered releases start at 0.8.0 (2026-02-09); monthly updates Vol.01-07 before that."
+    },
+    {
+      "id": "moonbitlang-skills",
+      "kind": "repository",
+      "url": "https://github.com/moonbitlang/skills",
+      "commit": "5caf81c57cb2ae45654b8f99c5c8f68c812beb91",
+      "commit_date": "2026-07-06",
+      "notes": "Official skills bundle (9 skills incl. moonbit-agent-guide, moonbit-orientation). Audited for the incremental-value statement in README."
+    },
+    {
+      "id": "moonbitlang-moonbit-agent-guide",
+      "kind": "repository",
+      "url": "https://github.com/moonbitlang/moonbit-agent-guide",
+      "commit": "f957f4a7304d53136d40f70ef4bf4c56e288c828",
+      "commit_date": "2026-07-05",
+      "notes": "Upstream of the skills bundle's moonbit-agent-guide skill; 58 KB monolithic SKILL.md, CI-tested via literate SKILL.mbt.md on nightly+latest channels."
+    },
+    {
+      "id": "moonbit-evolution",
+      "kind": "repository",
+      "url": "https://github.com/moonbitlang/moonbit-evolution",
+      "commit_date": "2025-10-05 (last activity as of retrieval)",
+      "notes": "Proposal statuses lag shipped reality (e.g. 0001 try-catch/noraise marked 'Under review' but shipped 2025-07). Never treat a proposal here as a current capability without toolchain verification."
+    },
+    {
+      "id": "agent-skills-spec",
+      "kind": "specification",
+      "url": "https://agentskills.io/specification",
+      "version_label": "as retrieved 2026-07-17",
+      "notes": "Frontmatter constraints: name <=64 chars lowercase/digits/hyphens matching directory name, no consecutive hyphens; description 1-1024 chars; version lives under metadata; validator: pip install skills-ref, CLI `agentskills validate`."
+    }
+  ]
+}

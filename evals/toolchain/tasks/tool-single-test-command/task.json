@@ -1,0 +1,14 @@
+{
+  "id": "tool-single-test-command",
+  "prompt": "Without editing any files: run only the tests that live in utils/utils_test.mbt (not the root package tests), confirm they pass, and state the exact command you used.",
+  "grade": [
+    {
+      "type": "output_matches",
+      "regex": "moon test[^\\n]*(utils|-f |--file|--filter)"
+    },
+    {
+      "type": "output_not_matches",
+      "regex": "command not found|No such file"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "lang-neg-rust-impl-trait-block",
+  "owner_skill": "moonbit-language",
+  "knowledge": "A Rust-style `impl Trait for Type { fn ... }` block is rejected; MoonBit declares each method as its own top-level item: `impl Show for Point with output(self, logger) { ... }`.",
+  "habit_from": "rust",
+  "expect": "check-fail",
+  "diagnostic_contains": [
+    "Invalid grouped `impl` declarations"
+  ],
+  "fix": "Write `impl Show for Point with output(self, logger) { ... }` as its own top-level item",
+  "targets": [
+    "wasm-gc"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-07-17",
+    "components": {
+      "moon": "0.1.20260713 (75c7e1f 2026-07-13)",
+      "moonc": "v0.10.4+ade96c819 (2026-07-13)",
+      "moonrun": "moonrun 0.1.20260713 (75c7e1f 2026-07-13)"
+    },
+    "platform": "Darwin-arm64"
+  }
+}

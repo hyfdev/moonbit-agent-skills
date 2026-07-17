@@ -1,0 +1,9 @@
+{
+  "id": "lang-defer-exists",
+  "prompt": "Does current MoonBit have a defer statement? Reply with a first line that is exactly YES or NO, then at most three lines of justification (mention scoping behavior if YES).",
+  "grade": [
+    {"type": "first_line_is", "value": "YES"},
+    {"type": "output_not_matches", "regex": "moonbit (does not|doesn't) (have|support) defer"}
+  ],
+  "truth": "defer exists since the 2025-08 update; it is block-scoped, LIFO per block (verified by fixture lang-trap-go-defer-block-scoped)."
+}

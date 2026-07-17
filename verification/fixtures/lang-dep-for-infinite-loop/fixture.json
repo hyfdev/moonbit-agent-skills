@@ -1,0 +1,24 @@
+{
+  "id": "lang-dep-for-infinite-loop",
+  "owner_skill": "moonbit-language",
+  "knowledge": "The bare `for { ... }` infinite loop (also a Go habit) still compiles but is deprecated; write `for ;; { ... }`.",
+  "habit_from": "stale-moonbit",
+  "expect": "check-pass",
+  "diagnostic_contains": [
+    "The syntax `for { ... }` for infinite loop is deprecated"
+  ],
+  "fix": "Write `for ;; { ... }`",
+  "targets": [
+    "wasm-gc"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-07-17",
+    "components": {
+      "moon": "0.1.20260713 (75c7e1f 2026-07-13)",
+      "moonc": "v0.10.4+ade96c819 (2026-07-13)",
+      "moonrun": "moonrun 0.1.20260713 (75c7e1f 2026-07-13)"
+    },
+    "platform": "Darwin-arm64"
+  }
+}

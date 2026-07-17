@@ -1,0 +1,24 @@
+{
+  "id": "lang-neg-rust-match-arm-commas",
+  "owner_skill": "moonbit-language",
+  "knowledge": "Comma-separated match arms are rejected; MoonBit separates arms with newlines (or `;`), one `pattern => expr` per line.",
+  "habit_from": "rust",
+  "expect": "check-fail",
+  "diagnostic_contains": [
+    "Expecting a newline or `;` here, but encountered `,`"
+  ],
+  "fix": "Drop the commas: one `pattern => expr` per line",
+  "targets": [
+    "wasm-gc"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-07-17",
+    "components": {
+      "moon": "0.1.20260713 (75c7e1f 2026-07-13)",
+      "moonc": "v0.10.4+ade96c819 (2026-07-13)",
+      "moonrun": "moonrun 0.1.20260713 (75c7e1f 2026-07-13)"
+    },
+    "platform": "Darwin-arm64"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "lang-trap-int-division",
+  "owner_skill": "moonbit-language",
+  "knowledge": "`7 / 2` is Int division and truncates to 3, not 3.5 as in JavaScript/TypeScript; convert first for float math: `7.0 / 2.0` or `x.to_double() / y.to_double()`.",
+  "habit_from": "typescript",
+  "expect": "semantic-trap",
+  "diagnostic_contains": [],
+  "fix": "Convert first for float math: 7.0 / 2.0 (or x.to_double() / y.to_double())",
+  "targets": [
+    "wasm-gc"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-07-17",
+    "components": {
+      "moon": "0.1.20260713 (75c7e1f 2026-07-13)",
+      "moonc": "v0.10.4+ade96c819 (2026-07-13)",
+      "moonrun": "moonrun 0.1.20260713 (75c7e1f 2026-07-13)"
+    },
+    "platform": "Darwin-arm64"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "id": "tool-mbti-refresh",
+  "prompt": "Generate the public interface files for this module so API changes can be reviewed in diffs, and state the exact command you used.",
+  "grade": [
+    {"type": "file_exists", "path": "pkg.generated.mbti"},
+    {"type": "output_matches", "regex": "moon info"}
+  ]
+}

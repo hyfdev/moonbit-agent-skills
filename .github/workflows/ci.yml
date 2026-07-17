@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  static:
+    name: Static checks (no toolchain)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Tooling unit tests
+        run: python3 -m unittest discover tooling/tests -v
+      - name: Skill format (repository rules)
+        run: python3 tooling/validate_skills.py
+      - name: Skill format (official reference validator)
+        run: |
+          pip install skills-ref
+          for d in skills/*/; do agentskills validate "$d"; done
+      - name: Cross-skill duplication
+        run: python3 tooling/check_duplication.py
+      - name: Version consistency
+        run: python3 tooling/check_versions.py
+      - name: README generated blocks are fresh
+        run: |
+          python3 tooling/gen_readme.py
+          git diff --exit-code
+
+  # MoonBit distributes install channels (latest / nightly / pre-release),
+  # not pinned historical versions (verified 2026-07-17: only channel URLs
+  # exist under cli.moonbitlang.com/binaries/). CI therefore cannot
+  # reinstall the exact snapshot toolchain once upstream moves on. This job
+  # installs the latest channel, reports whether it still matches the
+  # committed snapshot, and runs the full verification suite. A content
+  # failure here means the repository is stale relative to the current
+  # toolchain and must be re-verified and re-stamped.
+  toolchain-latest:
+    name: Verify content (latest channel)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install MoonBit (latest channel)
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+      - name: Compare installed toolchain against the committed snapshot
+        run: |
+          moon version --all
+          python3 - <<'EOF'
+          import json, subprocess
+          snap = {c["name"]: c["version"] for c in json.load(open("verification/toolchains/current.json"))["components"]}
+          got = {i["name"]: i["version"] for i in json.loads(subprocess.run(["moon","version","--all","--json"],capture_output=True,text=True,check=True).stdout)["items"]}
+          drift = {k: (snap[k], got.get(k, "")) for k in snap if snap[k] not in got.get(k, "")}
+          if drift:
+              print("::warning::installed toolchain differs from committed snapshot "
+                    f"(re-verify and re-stamp if content checks fail): {drift}")
+          else:
+              print("installed toolchain matches the committed snapshot")
+          EOF
+      - name: Checked reference documents (all targets)
+        run: python3 tooling/run_checked_docs.py
+      - name: Fixtures behave as declared
+        run: python3 tooling/run_fixtures.py -v
+      - name: Toolchain command examples actually run
+        run: python3 tooling/verify_commands.py
+
+  toolchain-nightly:
+    name: Drift watch (nightly channel, informational)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install MoonBit (nightly channel)
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s -- nightly
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+      - name: Report versions
+        run: moon version --all
+      - name: Checked reference documents
+        run: python3 tooling/run_checked_docs.py
+      - name: Fixtures
+        run: python3 tooling/run_fixtures.py -v
+      - name: Command examples
+        run: python3 tooling/verify_commands.py

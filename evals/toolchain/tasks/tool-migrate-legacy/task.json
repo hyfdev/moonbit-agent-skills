@@ -1,0 +1,11 @@
+{
+  "id": "tool-migrate-legacy",
+  "prompt": "This project still uses the legacy JSON build configuration, which the toolchain has deprecated. Migrate it to the current configuration format. After the migration no JSON build-config files may remain, and moon check plus moon test must pass.",
+  "grade": [
+    {"type": "file_exists", "path": "moon.mod"},
+    {"type": "file_absent", "path": "moon.mod.json"},
+    {"type": "file_absent", "path": "moon.pkg.json"},
+    {"type": "moon", "args": ["check"]},
+    {"type": "moon", "args": ["test"]}
+  ]
+}

@@ -1,0 +1,1172 @@
+{
+  "entries": [
+    {
+      "id": "new-scaffold",
+      "setup": "empty",
+      "run": [
+        "moon new hello --user mbtskills"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "Created mbtskills/hello at hello"
+      ],
+      "expect_paths": [
+        "hello/moon.mod",
+        "hello/moon.pkg",
+        "hello/hello_test.mbt",
+        "hello/hello_wbtest.mbt",
+        "hello/cmd/main/moon.pkg",
+        "hello/AGENTS.md"
+      ],
+      "docs": [
+        "project-layout-and-config.md",
+        "commands.md"
+      ]
+    },
+    {
+      "id": "check-basics",
+      "setup": "template",
+      "run": [
+        "moon check",
+        "moon check textutil",
+        "moon check lib.mbt"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "Finished."
+      ],
+      "docs": [
+        "commands.md",
+        "project-layout-and-config.md"
+      ]
+    },
+    {
+      "id": "check-target-all",
+      "setup": "template",
+      "run": [
+        "moon check --target all"
+      ],
+      "expect_exit": 0,
+      "docs": [
+        "targets-and-conditional-builds.md"
+      ]
+    },
+    {
+      "id": "check-frozen",
+      "setup": "template",
+      "run": [
+        "moon check --frozen"
+      ],
+      "expect_exit": 0,
+      "docs": [
+        "diagnostics-and-recovery.md"
+      ]
+    },
+    {
+      "id": "build-default",
+      "setup": "template",
+      "run": [
+        "moon build"
+      ],
+      "expect_exit": 0,
+      "expect_paths": [
+        "_build/wasm-gc/debug/build/cmd/main/main.wasm"
+      ],
+      "docs": [
+        "commands.md"
+      ]
+    },
+    {
+      "id": "build-target-js",
+      "setup": "template",
+      "run": [
+        "moon build --target js"
+      ],
+      "expect_exit": 0,
+      "expect_paths": [
+        "_build/js/debug/build/cmd/main/main.js",
+        "_build/js/debug/build/cmd/main/main.d.ts"
+      ],
+      "docs": [
+        "commands.md",
+        "targets-and-conditional-builds.md"
+      ]
+    },
+    {
+      "id": "build-target-all",
+      "setup": "template",
+      "run": [
+        "moon build --target all"
+      ],
+      "expect_exit": 0,
+      "expect_paths": [
+        "_build/js/debug/build/cmd/main/main.js",
+        "_build/wasm/debug/build/cmd/main/main.wasm",
+        "_build/wasm-gc/debug/build/cmd/main/main.wasm",
+        "_build/native/debug/build/cmd/main/main.exe"
+      ],
+      "docs": [
+        "targets-and-conditional-builds.md"
+      ]
+    },
+    {
+      "id": "build-release",
+      "setup": "template",
+      "run": [
+        "moon build --release"
+      ],
+      "expect_exit": 0,
+      "expect_paths": [
+        "_build/wasm-gc/release/build/cmd/main/main.wasm"
+      ],
+      "docs": [
+        "commands.md"
+      ]
+    },
+    {
+      "id": "build-llvm-ice",
+      "setup": "template",
+      "run": [
+        "moon build --target llvm"
+      ],
+      "expect_exit": 255,
+      "expect_output_contains": [
+        "LLVM backend is experimental"
+      ],
+      "docs": [
+        "targets-and-conditional-builds.md"
+      ]
+    },
+    {
+      "id": "run-main",
+      "setup": "template",
+      "run": [
+        "moon run cmd/main"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "42"
+      ],
+      "docs": [
+        "commands.md"
+      ]
+    },
+    {
+      "id": "run-args-passthrough",
+      "setup": "template",
+      "run": [
+        "mkdir -p cmd/args",
+        "cat > cmd/args/moon.pkg <<'MBTEOF'\nimport {\n  \"moonbitlang/core/env\",\n}\n\npkgtype(kind: \"executable\")\nMBTEOF",
+        "cat > cmd/args/main.mbt <<'MBTEOF'\n///|\nfn main {\n  for a in @env.args() {\n    println(a)\n  }\n}\nMBTEOF",
+        "moon run cmd/args one two"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "one",
+        "two"
+      ],
+      "docs": [
+        "commands.md"
+      ]
+    },
+    {
+      "id": "run-target-native",
+      "setup": "template",
+      "run": [
+        "moon run --target native cmd/main"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "42"
+      ],
+      "docs": [
+        "commands.md",
+        "targets-and-conditional-builds.md"
+      ]
+    },
+    {
+      "id": "run-library-error",
+      "setup": "template",
+      "run": [
+        "moon run textutil"
+      ],
+      "expect_exit": 255,
+      "expect_output_contains": [
+        "is not a main package"
+      ],
+      "docs": [
+        "commands.md",
+        "diagnostics-and-recovery.md"
+      ]
+    },
+    {
+      "id": "test-all",
+      "setup": "template",
+      "run": [
+        "moon test"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "Total tests: 2, passed: 2, failed: 0."
+      ],
+      "docs": [
+        "commands.md",
+        "testing-workflows.md"
+      ]
+    },
+    {
+      "id": "test-selection",
+      "setup": "template",
+      "run": [
+        "moon test -p textutil",
+        "moon test -p mbtskills/template/textutil",
+        "moon test textutil",
+        "moon test textutil/shout_test.mbt -i 0"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "Total tests: 1, passed: 1"
+      ],
+      "docs": [
+        "testing-workflows.md"
+      ]
+    },
+    {
+      "id": "test-fail-exit-2",
+      "setup": "template",
+      "run": [
+        "cat > fail_test.mbt <<'MBTEOF'\n///|\ntest \"fails on purpose\" {\n  assert_eq(1, 2)\n}\nMBTEOF",
+        "moon test"
+      ],
+      "expect_exit": 2,
+      "expect_output_contains": [
+        "failed: 1"
+      ],
+      "docs": [
+        "testing-workflows.md",
+        "commands.md"
+      ]
+    },
+    {
+      "id": "test-failure-json",
+      "setup": "template",
+      "run": [
+        "cat > fail_test.mbt <<'MBTEOF'\n///|\ntest \"fails on purpose\" {\n  assert_eq(1, 2)\n}\nMBTEOF",
+        "moon test --test-failure-json"
+      ],
+      "expect_exit": 2,
+      "expect_output_contains": [
+        "\"test_name\":\"fails on purpose\""
+      ],
+      "docs": [
+        "testing-workflows.md"
+      ]
+    },
+    {
+      "id": "test-filter",
+      "setup": "template",
+      "run": [
+        "moon test --filter 'shout*'"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "Total tests: 1, passed: 1"
+      ],
+      "docs": [
+        "testing-workflows.md"
+      ]
+    },
+    {
+      "id": "test-outline",
+      "setup": "template",
+      "run": [
+        "moon test --outline"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "name=\"shout uppercases\""
+      ],
+      "docs": [
+        "testing-workflows.md"
+      ]
+    },
+    {
+      "id": "test-snapshot-update",
+      "setup": "template",
+      "run": [
+        "cat > textutil/snap_test.mbt <<'MBTEOF'\n///|\ntest \"snapshot demo\" {\n  inspect(@textutil.shout(\"hi\"))\n}\nMBTEOF",
+        "moon test textutil -u",
+        "grep -F '#|HI' textutil/snap_test.mbt"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "#|HI"
+      ],
+      "docs": [
+        "testing-workflows.md"
+      ]
+    },
+    {
+      "id": "test-doctest-index",
+      "setup": "template",
+      "run": [
+        "cat > textutil/twice.mbt <<'MBTEOF'\n///|\n/// Doubles a string.\n///\n/// ```mbt check\n/// test {\n///   inspect(@textutil.twice(\"ab\"), content=\"abab\")\n/// }\n/// ```\npub fn twice(s : String) -> String {\n  s + s\n}\nMBTEOF",
+        "moon test textutil",
+        "moon test textutil/twice.mbt --doc-index 0"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "Total tests: 1, passed: 1"
+      ],
+      "docs": [
+        "testing-workflows.md"
+      ]
+    },
+    {
+      "id": "test-patch-file",
+      "setup": "template",
+      "run": [
+        "cat > patch.json <<'MBTEOF'\n{\n  \"drops\": [],\n  \"patches\": [\n    {\"name\": \"injected_test.mbt\", \"content\": \"///|\\ntest \\\"from patch\\\" {\\n  inspect(2 + 3, content=\\\"5\\\")\\n}\\n\"}\n  ]\n}\nMBTEOF",
+        "moon test -p mbtskills/template/textutil --patch-file patch.json -v"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "injected_test.mbt"
+      ],
+      "docs": [
+        "testing-workflows.md"
+      ]
+    },
+    {
+      "id": "coverage-analyze",
+      "setup": "template",
+      "run": [
+        "moon coverage analyze"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "uncovered line"
+      ],
+      "docs": [
+        "testing-workflows.md"
+      ]
+    },
+    {
+      "id": "coverage-report",
+      "setup": "template",
+      "run": [
+        "moon test --enable-coverage",
+        "moon coverage report -f summary"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "Total:"
+      ],
+      "docs": [
+        "testing-workflows.md"
+      ]
+    },
+    {
+      "id": "coverage-clean",
+      "setup": "template",
+      "run": [
+        "moon test --enable-coverage",
+        "moon coverage clean"
+      ],
+      "expect_exit": 0,
+      "docs": [
+        "testing-workflows.md"
+      ]
+    },
+    {
+      "id": "bench-textutil",
+      "setup": "template",
+      "run": [
+        "cat > textutil/moon.pkg <<'MBTEOF'\nimport {\n  \"moonbitlang/core/bench\",\n} for \"test\"\nMBTEOF",
+        "cat > textutil/bench_test.mbt <<'MBTEOF'\n///|\ntest \"bench shout\" (b : @bench.T) {\n  b.bench(fn() {\n    b.keep(@textutil.shout(\"moon\"))\n  })\n}\nMBTEOF",
+        "moon bench textutil"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "time (mean"
+      ],
+      "docs": [
+        "testing-workflows.md"
+      ]
+    },
+    {
+      "id": "fmt-canonicalizes",
+      "setup": "template",
+      "run": [
+        "moon fmt",
+        "grep -F 'pkgtype(kind: \"executable\")' cmd/main/moon.pkg"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "pkgtype"
+      ],
+      "docs": [
+        "commands.md",
+        "project-layout-and-config.md"
+      ]
+    },
+    {
+      "id": "fmt-check-after-fmt",
+      "setup": "template",
+      "run": [
+        "moon fmt",
+        "moon fmt --check"
+      ],
+      "expect_exit": 0,
+      "docs": [
+        "commands.md"
+      ]
+    },
+    {
+      "id": "fmt-check-dirty",
+      "setup": "template",
+      "run": [
+        "cat > ugly.mbt <<'MBTEOF'\n///|\npub fn ugly() -> Int { 1 }\nMBTEOF",
+        "moon fmt --check"
+      ],
+      "expect_exit": 255,
+      "docs": [
+        "commands.md"
+      ]
+    },
+    {
+      "id": "fmt-migrates-json",
+      "setup": "empty",
+      "run": [
+        "cat > moon.mod.json <<'MBTEOF'\n{\n  \"name\": \"mbtskills/legacyfmt\",\n  \"version\": \"0.1.0\",\n  \"deps\": {}\n}\nMBTEOF",
+        "cat > moon.pkg.json <<'MBTEOF'\n{}\nMBTEOF",
+        "cat > lib.mbt <<'MBTEOF'\n///|\npub fn add(a : Int, b : Int) -> Int {\n  a + b\n}\nMBTEOF",
+        "moon check",
+        "moon fmt"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "Migrating to moon.mod"
+      ],
+      "expect_paths": [
+        "moon.mod",
+        "moon.pkg"
+      ],
+      "docs": [
+        "project-layout-and-config.md"
+      ]
+    },
+    {
+      "id": "fmt-block-style-gone",
+      "setup": "template",
+      "run": [
+        "moon fmt --block-style"
+      ],
+      "expect_exit": 2,
+      "expect_output_contains": [
+        "unexpected argument"
+      ],
+      "docs": [
+        "commands.md"
+      ]
+    },
+    {
+      "id": "doc-broken-new-dsl",
+      "setup": "template",
+      "run": [
+        "moon doc"
+      ],
+      "expect_exit": 255,
+      "expect_output_contains": [
+        "moon.mod.json",
+        "failed when checking project"
+      ],
+      "docs": [
+        "commands.md"
+      ]
+    },
+    {
+      "id": "doc-legacy-works",
+      "setup": "empty",
+      "run": [
+        "cat > moon.mod.json <<'MBTEOF'\n{\n  \"name\": \"mbtskills/legacydoc\",\n  \"version\": \"0.1.0\",\n  \"deps\": {}\n}\nMBTEOF",
+        "cat > moon.pkg.json <<'MBTEOF'\n{}\nMBTEOF",
+        "cat > lib.mbt <<'MBTEOF'\n///|\npub fn add(a : Int, b : Int) -> Int {\n  a + b\n}\nMBTEOF",
+        "moon doc"
+      ],
+      "expect_exit": 0,
+      "expect_paths": [
+        "_build/doc/mbtskills/legacydoc/members.md"
+      ],
+      "docs": [
+        "commands.md"
+      ]
+    },
+    {
+      "id": "info-mbti",
+      "setup": "template",
+      "run": [
+        "moon info"
+      ],
+      "expect_exit": 0,
+      "expect_paths": [
+        "pkg.generated.mbti",
+        "textutil/pkg.generated.mbti",
+        "cmd/main/pkg.generated.mbti"
+      ],
+      "docs": [
+        "commands.md"
+      ]
+    },
+    {
+      "id": "clean-build-dir",
+      "setup": "template",
+      "run": [
+        "moon build",
+        "moon clean",
+        "test ! -d _build"
+      ],
+      "expect_exit": 0,
+      "docs": [
+        "commands.md",
+        "diagnostics-and-recovery.md"
+      ]
+    },
+    {
+      "id": "version-all",
+      "setup": "empty",
+      "run": [
+        "moon version --all"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "moonc"
+      ],
+      "docs": [
+        "commands.md"
+      ]
+    },
+    {
+      "id": "version-all-json",
+      "setup": "empty",
+      "run": [
+        "moon version --all --json"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "\"name\":\"moonc\""
+      ],
+      "docs": [
+        "diagnostics-and-recovery.md"
+      ]
+    },
+    {
+      "id": "dep-update",
+      "setup": "template",
+      "network": true,
+      "run": [
+        "moon update"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "Registry index updated successfully"
+      ],
+      "docs": [
+        "dependencies-and-registry.md"
+      ]
+    },
+    {
+      "id": "dep-add-remove",
+      "setup": "template",
+      "network": true,
+      "run": [
+        "moon add moonbitlang/x@0.4.46",
+        "moon remove moonbitlang/x"
+      ],
+      "expect_exit": 0,
+      "covers": [
+        "moon add moonbitlang/x"
+      ],
+      "docs": [
+        "dependencies-and-registry.md"
+      ]
+    },
+    {
+      "id": "dep-tree",
+      "setup": "template",
+      "network": true,
+      "run": [
+        "moon add moonbitlang/x@0.4.46",
+        "moon tree"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "moonbitlang/x@0.4.46"
+      ],
+      "docs": [
+        "dependencies-and-registry.md"
+      ]
+    },
+    {
+      "id": "dep-add-bin-trap",
+      "setup": "template",
+      "network": true,
+      "run": [
+        "moon add --bin moonbitlang/x",
+        "moon remove moonbitlang/x"
+      ],
+      "expect_exit": 255,
+      "expect_output_contains": [
+        "could not be found"
+      ],
+      "docs": [
+        "dependencies-and-registry.md"
+      ]
+    },
+    {
+      "id": "package-zip",
+      "setup": "template",
+      "run": [
+        "moon package",
+        "moon package --list"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "lib.mbt"
+      ],
+      "expect_paths": [
+        "_build/publish/mbtskills-template-0.1.0.zip"
+      ],
+      "docs": [
+        "dependencies-and-registry.md"
+      ]
+    },
+    {
+      "id": "conditional-targets",
+      "setup": "template",
+      "run": [
+        "mkdir -p cmd/show",
+        "cat > cmd/show/moon.pkg <<'MBTEOF'\npkgtype(kind: \"executable\")\n\noptions(\n  targets: {\n    \"only_js.mbt\": [ \"js\" ],\n    \"not_js.mbt\": [ \"not\", \"js\" ],\n  },\n)\nMBTEOF",
+        "cat > cmd/show/only_js.mbt <<'MBTEOF'\n///|\npub fn backend_tag() -> String {\n  \"js backend\"\n}\n\n///|\nfn main {\n  println(backend_tag())\n}\nMBTEOF",
+        "cat > cmd/show/not_js.mbt <<'MBTEOF'\n///|\npub fn backend_tag() -> String {\n  \"non-js backend\"\n}\n\n///|\nfn main {\n  println(backend_tag())\n}\nMBTEOF",
+        "moon run cmd/show",
+        "moon run --target js cmd/show"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "js backend"
+      ],
+      "docs": [
+        "targets-and-conditional-builds.md"
+      ]
+    },
+    {
+      "id": "supported-targets-module",
+      "setup": "template",
+      "run": [
+        "printf '\\nsupported_targets = [ \"js\", \"wasm-gc\" ]\\n' >> moon.mod",
+        "moon build --target native"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "no work to do"
+      ],
+      "docs": [
+        "targets-and-conditional-builds.md"
+      ]
+    },
+    {
+      "id": "supported-targets-package-skip",
+      "setup": "template",
+      "run": [
+        "printf 'supported_targets = \"js\"\\n' > textutil/moon.pkg",
+        "moon check"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "Finished."
+      ],
+      "docs": [
+        "targets-and-conditional-builds.md"
+      ]
+    },
+    {
+      "id": "supported-targets-package-direct",
+      "setup": "template",
+      "run": [
+        "printf 'supported_targets = \"js\"\\n' > textutil/moon.pkg",
+        "moon check textutil"
+      ],
+      "expect_exit": 255,
+      "expect_output_contains": [
+        "does not support target backend"
+      ],
+      "docs": [
+        "targets-and-conditional-builds.md"
+      ]
+    },
+    {
+      "id": "preferred-target-js",
+      "setup": "template",
+      "run": [
+        "printf '\\npreferred_target = \"js\"\\n' >> moon.mod",
+        "moon build"
+      ],
+      "expect_exit": 0,
+      "expect_paths": [
+        "_build/js/debug/build/cmd/main/main.js"
+      ],
+      "docs": [
+        "targets-and-conditional-builds.md",
+        "project-layout-and-config.md"
+      ]
+    },
+    {
+      "id": "mod-options-form",
+      "setup": "empty",
+      "run": [
+        "cat > moon.mod <<'MBTEOF'\nname = \"mbtskills/optform\"\nversion = \"0.1.0\"\n\noptions(\n  \"preferred-target\": \"js\",\n)\nMBTEOF",
+        "touch moon.pkg",
+        "cat > lib.mbt <<'MBTEOF'\n///|\npub fn add(a : Int, b : Int) -> Int {\n  a + b\n}\nMBTEOF",
+        "moon build"
+      ],
+      "expect_exit": 0,
+      "expect_paths": [
+        "_build/js"
+      ],
+      "docs": [
+        "project-layout-and-config.md",
+        "targets-and-conditional-builds.md"
+      ]
+    },
+    {
+      "id": "link-exports",
+      "setup": "empty",
+      "run": [
+        "cat > moon.mod <<'MBTEOF'\nname = \"mbtskills/jslink\"\nversion = \"0.1.0\"\nMBTEOF",
+        "cat > moon.pkg <<'MBTEOF'\noptions(\n  link: {\n    \"js\": { \"exports\": [ \"add\" ], \"format\": \"esm\" },\n    \"wasm\": { \"exports\": [ \"add\" ], \"heap-start-address\": 65536 },\n  },\n)\nMBTEOF",
+        "cat > lib.mbt <<'MBTEOF'\n///|\npub fn add(a : Int, b : Int) -> Int {\n  a + b\n}\nMBTEOF",
+        "moon build --target js",
+        "moon build --target wasm",
+        "grep -o 'export {.*}' _build/js/debug/build/jslink.js"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "as add"
+      ],
+      "expect_paths": [
+        "_build/js/debug/build/jslink.js",
+        "_build/wasm/debug/build/jslink.wasm"
+      ],
+      "docs": [
+        "targets-and-conditional-builds.md"
+      ]
+    },
+    {
+      "id": "native-stub",
+      "setup": "empty",
+      "run": [
+        "cat > moon.mod <<'MBTEOF'\nname = \"mbtskills/stubdemo\"\nversion = \"0.1.0\"\nMBTEOF",
+        "cat > moon.pkg <<'MBTEOF'\noptions(\n  \"native-stub\": [ \"stub.c\" ],\n)\nMBTEOF",
+        "cat > stub.c <<'MBTEOF'\nint stub_forty_two(void) { return 42; }\nMBTEOF",
+        "cat > lib.mbt <<'MBTEOF'\n///|\nextern \"C\" fn stub_forty_two() -> Int = \"stub_forty_two\"\n\n///|\npub fn from_c() -> Int {\n  stub_forty_two()\n}\nMBTEOF",
+        "cat > stub_test.mbt <<'MBTEOF'\n///|\ntest \"native stub\" {\n  assert_eq(@stubdemo.from_c(), 42)\n}\nMBTEOF",
+        "moon test --target native"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "Total tests: 1, passed: 1"
+      ],
+      "docs": [
+        "targets-and-conditional-builds.md"
+      ]
+    },
+    {
+      "id": "prebuild-rule",
+      "setup": "empty",
+      "run": [
+        "cat > moon.mod <<'MBTEOF'\nname = \"mbtskills/prebuild\"\nversion = \"0.1.0\"\nMBTEOF",
+        "cat > moon.pkg <<'MBTEOF'\nrule(\n  name: \"embed_text\",\n  command: \":embed -i $input -o $output --name greeting_text\",\n)\n\ndev_build(\n  rule: \"embed_text\",\n  input: \"greeting.txt\",\n  output: \"greeting.mbt\",\n)\nMBTEOF",
+        "cat > greeting.txt <<'MBTEOF'\nhello embedded\nMBTEOF",
+        "cat > lib.mbt <<'MBTEOF'\n///|\npub fn use_it() -> String {\n  greeting_text\n}\nMBTEOF",
+        "moon check"
+      ],
+      "expect_exit": 0,
+      "expect_paths": [
+        "greeting.mbt"
+      ],
+      "docs": [
+        "workspaces-and-scripts.md"
+      ]
+    },
+    {
+      "id": "ide-peek-def",
+      "setup": "template",
+      "run": [
+        "moon ide peek-def add"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "Found 1 symbols",
+        "pub fn add"
+      ],
+      "docs": [
+        "moon-ide.md"
+      ]
+    },
+    {
+      "id": "ide-outline",
+      "setup": "template",
+      "run": [
+        "moon ide outline textutil/shout.mbt",
+        "moon ide outline textutil"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "pub fn shout"
+      ],
+      "docs": [
+        "moon-ide.md"
+      ]
+    },
+    {
+      "id": "ide-doc-queries",
+      "setup": "template",
+      "run": [
+        "moon ide doc 'String::*upper*'",
+        "moon ide doc '@textutil'"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "package \"mbtskills/template/textutil\""
+      ],
+      "docs": [
+        "moon-ide.md"
+      ]
+    },
+    {
+      "id": "ide-find-references",
+      "setup": "template",
+      "run": [
+        "moon ide find-references shout"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "references for symbol 'shout'"
+      ],
+      "docs": [
+        "moon-ide.md"
+      ]
+    },
+    {
+      "id": "ide-symbols-analyze",
+      "setup": "template",
+      "run": [
+        "moon ide gen-symbols",
+        "moon ide analyze"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "usage:"
+      ],
+      "expect_paths": [
+        "symbols.jsonl"
+      ],
+      "docs": [
+        "moon-ide.md"
+      ]
+    },
+    {
+      "id": "ide-hover",
+      "setup": "template",
+      "run": [
+        "moon ide hover --loc cmd/main/main.mbt:3:16",
+        "moon ide hover --loc cmd/main/main.mbt:3:16 --output-json"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "\"range\""
+      ],
+      "docs": [
+        "moon-ide.md"
+      ]
+    },
+    {
+      "id": "ide-rename-apply",
+      "setup": "template",
+      "run": [
+        "moon ide rename shout yell --loc textutil/shout.mbt:2",
+        "moon ide rename shout yell --loc textutil/shout.mbt:2 --apply",
+        "grep -F 'pub fn yell' textutil/shout.mbt"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "pub fn yell"
+      ],
+      "docs": [
+        "moon-ide.md"
+      ]
+    },
+    {
+      "id": "work-flow",
+      "setup": "empty",
+      "run": [
+        "mkdir -p base app/cmd/main",
+        "cat > base/moon.mod <<'MBTEOF'\nname = \"mbtskills/base\"\nversion = \"0.9.0\"\nMBTEOF",
+        "touch base/moon.pkg",
+        "cat > base/base.mbt <<'MBTEOF'\n///|\npub fn greet() -> String {\n  \"hello from base\"\n}\nMBTEOF",
+        "cat > app/moon.mod <<'MBTEOF'\nname = \"mbtskills/app\"\nversion = \"0.1.0\"\n\nimport {\n  \"mbtskills/base@0.2.0\",\n}\nMBTEOF",
+        "touch app/moon.pkg",
+        "cat > app/cmd/main/moon.pkg <<'MBTEOF'\nimport {\n  \"mbtskills/base\" @base,\n}\n\npkgtype(kind: \"executable\")\nMBTEOF",
+        "cat > app/cmd/main/main.mbt <<'MBTEOF'\n///|\nfn main {\n  println(@base.greet())\n}\nMBTEOF",
+        "moon work init",
+        "moon work use base app",
+        "moon check",
+        "moon work sync"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "app/moon.mod"
+      ],
+      "docs": [
+        "workspaces-and-scripts.md"
+      ]
+    },
+    {
+      "id": "work-member-run",
+      "setup": "empty",
+      "run": [
+        "mkdir -p base app/cmd/main",
+        "cat > base/moon.mod <<'MBTEOF'\nname = \"mbtskills/base\"\nversion = \"0.9.0\"\nMBTEOF",
+        "touch base/moon.pkg",
+        "cat > base/base.mbt <<'MBTEOF'\n///|\npub fn greet() -> String {\n  \"hello from base\"\n}\nMBTEOF",
+        "cat > app/moon.mod <<'MBTEOF'\nname = \"mbtskills/app\"\nversion = \"0.1.0\"\n\nimport {\n  \"mbtskills/base@0.2.0\",\n}\nMBTEOF",
+        "touch app/moon.pkg",
+        "cat > app/cmd/main/moon.pkg <<'MBTEOF'\nimport {\n  \"mbtskills/base\" @base,\n}\n\npkgtype(kind: \"executable\")\nMBTEOF",
+        "cat > app/cmd/main/main.mbt <<'MBTEOF'\n///|\nfn main {\n  println(@base.greet())\n}\nMBTEOF",
+        "moon work init",
+        "moon work use base app",
+        "cd app && moon run cmd/main"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "hello from base"
+      ],
+      "docs": [
+        "workspaces-and-scripts.md"
+      ]
+    },
+    {
+      "id": "script-modes",
+      "setup": "empty",
+      "run": [
+        "moon run -e 'fn main { println(\"one-liner\") }'",
+        "printf 'fn main { println(\"from stdin\") }' | moon run -",
+        "cat > hello.mbtx <<'MBTEOF'\nfn main {\n  println(\"from script: \\{1 + 2}\")\n}\nMBTEOF",
+        "moon run hello.mbtx"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "from script: 3"
+      ],
+      "docs": [
+        "workspaces-and-scripts.md",
+        "commands.md"
+      ]
+    },
+    {
+      "id": "script-pinned-import",
+      "setup": "empty",
+      "network": true,
+      "run": [
+        "cat > pinned.mbtx <<'MBTEOF'\nimport {\n  \"moonbitlang/x@0.4.46/stack\",\n}\n\nfn main {\n  let s : @stack.Stack[Int] = @stack.new()\n  s.push(42)\n  println(s.peek())\n}\nMBTEOF",
+        "moon run pinned.mbtx"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "Some(42)"
+      ],
+      "docs": [
+        "workspaces-and-scripts.md"
+      ]
+    },
+    {
+      "id": "diag-render-modes",
+      "setup": "template",
+      "run": [
+        "cat > warn.mbt <<'MBTEOF'\n///|\nfn unused_helper() -> Int {\n  42\n}\nMBTEOF",
+        "moon check",
+        "moon check --no-render",
+        "moon check --output-json"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "\"$message_type\":\"diagnostic\""
+      ],
+      "docs": [
+        "diagnostics-and-recovery.md"
+      ]
+    },
+    {
+      "id": "diag-deny-warn",
+      "setup": "template",
+      "run": [
+        "cat > warn.mbt <<'MBTEOF'\n///|\nfn unused_helper() -> Int {\n  42\n}\nMBTEOF",
+        "moon check --deny-warn"
+      ],
+      "expect_exit": 255,
+      "expect_output_contains": [
+        "0 warnings, 1 errors"
+      ],
+      "docs": [
+        "diagnostics-and-recovery.md"
+      ]
+    },
+    {
+      "id": "diag-warn-list",
+      "setup": "template",
+      "run": [
+        "cat > ann.mbt <<'MBTEOF'\n///|\npub fn annotated() -> Int {\n  let o : Option[Int] = Option::Some(1)\n  o.unwrap_or(0)\n}\nMBTEOF",
+        "moon check --warn-list +unnecessary_annotation"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "[0073]"
+      ],
+      "docs": [
+        "diagnostics-and-recovery.md"
+      ]
+    },
+    {
+      "id": "diag-explain",
+      "setup": "template",
+      "run": [
+        "moon explain --diagnostic 4020",
+        "moon explain --attribute deprecated"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "deprecated"
+      ],
+      "docs": [
+        "diagnostics-and-recovery.md"
+      ]
+    },
+    {
+      "id": "err-missing-import",
+      "setup": "template",
+      "run": [
+        "cat > textutil/moon.pkg <<'MBTEOF'\nimport {\n  \"someuser/notreal/pkg\",\n}\nMBTEOF",
+        "moon check"
+      ],
+      "expect_exit": 255,
+      "expect_output_contains": [
+        "Cannot find import"
+      ],
+      "docs": [
+        "diagnostics-and-recovery.md"
+      ]
+    },
+    {
+      "id": "err-import-cycle",
+      "setup": "template",
+      "run": [
+        "cat > moon.pkg <<'MBTEOF'\nimport {\n  \"mbtskills/template/textutil\",\n}\nMBTEOF",
+        "cat > textutil/moon.pkg <<'MBTEOF'\nimport {\n  \"mbtskills/template\",\n}\nMBTEOF",
+        "moon check"
+      ],
+      "expect_exit": 255,
+      "expect_output_contains": [
+        "Import loop detected"
+      ],
+      "docs": [
+        "diagnostics-and-recovery.md"
+      ]
+    },
+    {
+      "id": "err-ghost-silent",
+      "setup": "template",
+      "run": [
+        "mkdir ghost",
+        "printf 'this is not moonbit ]]]\\n' > ghost/broken.mbt",
+        "moon check"
+      ],
+      "expect_exit": 0,
+      "expect_output_contains": [
+        "Finished."
+      ],
+      "docs": [
+        "diagnostics-and-recovery.md",
+        "project-layout-and-config.md"
+      ]
+    },
+    {
+      "id": "err-malformed-pkg",
+      "setup": "template",
+      "run": [
+        "cat > textutil/moon.pkg <<'MBTEOF'\noptions(\n  \"is-main\" true,\n)\nMBTEOF",
+        "moon check"
+      ],
+      "expect_exit": 255,
+      "expect_output_contains": [
+        "Parsing error"
+      ],
+      "docs": [
+        "diagnostics-and-recovery.md"
+      ]
+    },
+    {
+      "id": "registry-publish",
+      "setup": "template",
+      "run": [],
+      "covers": [
+        "moon publish",
+        "moon publish --dry-run"
+      ],
+      "covers_only": true,
+      "reason": "Publishes to (and authenticates against) the mooncakes registry. Verified manually at the pin that even --dry-run contacts the server after the local pipeline (403 user-mismatch response proves the round-trip); never run in CI.",
+      "docs": [
+        "dependencies-and-registry.md"
+      ]
+    },
+    {
+      "id": "registry-login",
+      "setup": "template",
+      "run": [],
+      "covers": [
+        "moon login"
+      ],
+      "covers_only": true,
+      "reason": "Account-level command: stores registry credentials in the global moon home; must not run in CI.",
+      "docs": [
+        "dependencies-and-registry.md"
+      ]
+    },
+    {
+      "id": "registry-register",
+      "setup": "template",
+      "run": [],
+      "covers": [
+        "moon register"
+      ],
+      "covers_only": true,
+      "reason": "Creates a mooncakes.io account (remote, irreversible); must not run in CI.",
+      "docs": [
+        "dependencies-and-registry.md"
+      ]
+    },
+    {
+      "id": "install-global",
+      "setup": "template",
+      "run": [],
+      "covers": [
+        "moon install username/module"
+      ],
+      "covers_only": true,
+      "reason": "Installs a binary globally into the toolchain home, outside the CI working directory; networky and not sandboxed by the temp workdir.",
+      "docs": [
+        "dependencies-and-registry.md"
+      ]
+    }
+  ]
+}

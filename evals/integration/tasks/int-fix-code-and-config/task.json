@@ -1,0 +1,8 @@
+{
+  "id": "int-fix-code-and-config",
+  "prompt": "moon test fails in this project for more than one reason. Find and fix everything so moon check and moon test pass. The helpers package should provide the is_even function the root package uses.",
+  "grade": [
+    {"type": "moon", "args": ["check"]},
+    {"type": "moon", "args": ["test"]}
+  ]
+}

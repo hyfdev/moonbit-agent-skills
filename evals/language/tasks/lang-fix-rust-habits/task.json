@@ -1,0 +1,8 @@
+{
+  "id": "lang-fix-rust-habits",
+  "prompt": "This lib.mbt was written by someone coming from Rust and does not compile. Fix it so moon check and moon test pass, preserving the intended behavior.",
+  "grade": [
+    {"type": "moon", "args": ["check"]},
+    {"type": "moon", "args": ["test"]}
+  ]
+}

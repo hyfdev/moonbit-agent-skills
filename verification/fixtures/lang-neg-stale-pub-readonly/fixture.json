@@ -1,0 +1,24 @@
+{
+  "id": "lang-neg-stale-pub-readonly",
+  "owner_skill": "moonbit-language",
+  "knowledge": "Old MoonBit's `pub(readonly)` visibility is rejected; plain `pub` already means readonly outside the package, and `pub(all)` additionally allows external construction.",
+  "habit_from": "stale-moonbit",
+  "expect": "check-fail",
+  "diagnostic_contains": [
+    "The pub(readonly) modifier is not supported here"
+  ],
+  "fix": "Write `pub struct P { ... }` (readonly is the default meaning of pub)",
+  "targets": [
+    "wasm-gc"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-07-17",
+    "components": {
+      "moon": "0.1.20260713 (75c7e1f 2026-07-13)",
+      "moonc": "v0.10.4+ade96c819 (2026-07-13)",
+      "moonrun": "moonrun 0.1.20260713 (75c7e1f 2026-07-13)"
+    },
+    "platform": "Darwin-arm64"
+  }
+}

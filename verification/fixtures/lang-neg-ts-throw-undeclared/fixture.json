@@ -1,0 +1,24 @@
+{
+  "id": "lang-neg-ts-throw-undeclared",
+  "owner_skill": "moonbit-language",
+  "knowledge": "MoonBit errors are checked, so `raise` in a function whose signature declares no error is rejected; declare it: `fn f(x : Int) -> Int raise MyError`.",
+  "habit_from": "typescript",
+  "expect": "check-fail",
+  "diagnostic_contains": [
+    "raise can only be used inside a function with error types"
+  ],
+  "fix": "Declare it: `pub fn f(x : Int) -> Int raise MyError`",
+  "targets": [
+    "wasm-gc"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-07-17",
+    "components": {
+      "moon": "0.1.20260713 (75c7e1f 2026-07-13)",
+      "moonc": "v0.10.4+ade96c819 (2026-07-13)",
+      "moonrun": "moonrun 0.1.20260713 (75c7e1f 2026-07-13)"
+    },
+    "platform": "Darwin-arm64"
+  }
+}

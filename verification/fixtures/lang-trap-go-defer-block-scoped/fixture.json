@@ -1,0 +1,22 @@
+{
+  "id": "lang-trap-go-defer-block-scoped",
+  "owner_skill": "moonbit-language",
+  "knowledge": "`defer` exists in MoonBit but runs at the end of the enclosing block, not at function return as in Go; defers within one block run LIFO at that block's end.",
+  "habit_from": "go",
+  "expect": "semantic-trap",
+  "diagnostic_contains": [],
+  "fix": "Know the scoping: place defer in the block whose exit should trigger it; defers in one block run LIFO at that block's end",
+  "targets": [
+    "wasm-gc"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-07-17",
+    "components": {
+      "moon": "0.1.20260713 (75c7e1f 2026-07-13)",
+      "moonc": "v0.10.4+ade96c819 (2026-07-13)",
+      "moonrun": "moonrun 0.1.20260713 (75c7e1f 2026-07-13)"
+    },
+    "platform": "Darwin-arm64"
+  }
+}

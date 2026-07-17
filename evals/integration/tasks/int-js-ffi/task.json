@@ -1,0 +1,10 @@
+{
+  "id": "int-js-ffi",
+  "prompt": "Expose JavaScript's Date.now() to MoonBit in this project: write the FFI declaration and a public wrapper function now_ms, and set the project up so that building for the js target succeeds. It is fine for other targets to be unsupported, but say so explicitly if you restrict them.",
+  "grade": [
+    {"type": "moon", "args": ["check", "--target", "js"]},
+    {"type": "moon", "args": ["build", "--target", "js"]},
+    {"type": "any_file_contains", "glob": "**/*.mbt", "regex": "extern \"js\""},
+    {"type": "any_file_contains", "glob": "**/*.mbt", "regex": "pub fn now_ms"}
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "lang-neg-stale-triple-eq",
+  "owner_skill": "moonbit-language",
+  "knowledge": "`===` no longer parses (it was identity comparison in old MoonBit and is equality in TypeScript); use `physical_equal(a, b)` for identity and `==` for structural equality.",
+  "habit_from": "stale-moonbit",
+  "expect": "check-fail",
+  "diagnostic_contains": [
+    "unexpected token `=`"
+  ],
+  "fix": "Use `physical_equal(a, b)` for identity, `==` for structural equality",
+  "targets": [
+    "wasm-gc"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-07-17",
+    "components": {
+      "moon": "0.1.20260713 (75c7e1f 2026-07-13)",
+      "moonc": "v0.10.4+ade96c819 (2026-07-13)",
+      "moonrun": "moonrun 0.1.20260713 (75c7e1f 2026-07-13)"
+    },
+    "platform": "Darwin-arm64"
+  }
+}

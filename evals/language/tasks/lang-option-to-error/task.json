@@ -1,0 +1,10 @@
+{
+  "id": "lang-option-to-error",
+  "prompt": "Refactor parse_port to use MoonBit's checked error handling (a dedicated error type that the function raises on invalid input) instead of returning an Option. Update the tests accordingly; moon test must pass.",
+  "grade": [
+    {"type": "moon", "args": ["check"]},
+    {"type": "moon", "args": ["test"]},
+    {"type": "any_file_contains", "glob": "*.mbt", "regex": "suberror"},
+    {"type": "any_file_contains", "glob": "*.mbt", "regex": "raise"}
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "id": "tool-new-package",
+  "prompt": "Add a new package named mathx to this module, containing a public function `square(x : Int) -> Int` with a test. The whole module must pass moon check and moon test.",
+  "grade": [
+    {"type": "file_exists", "path": "mathx/moon.pkg"},
+    {"type": "moon", "args": ["check"]},
+    {"type": "moon", "args": ["test"]}
+  ]
+}

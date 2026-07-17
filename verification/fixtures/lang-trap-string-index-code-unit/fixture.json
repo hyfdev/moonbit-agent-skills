@@ -1,0 +1,22 @@
+{
+  "id": "lang-trap-string-index-code-unit",
+  "owner_skill": "moonbit-language",
+  "knowledge": "`s[i]` yields the UTF-16 code unit as a number (UInt16), not a one-character string as in JS/TS; use `s.get_char(i)`, which returns `Char?`.",
+  "habit_from": "typescript",
+  "expect": "semantic-trap",
+  "diagnostic_contains": [],
+  "fix": "Use s.get_char(i) which returns Char? (e.g. `s.get_char(0) is Some('a')`), or compare s[i] against a char LITERAL",
+  "targets": [
+    "wasm-gc"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-07-17",
+    "components": {
+      "moon": "0.1.20260713 (75c7e1f 2026-07-13)",
+      "moonc": "v0.10.4+ade96c819 (2026-07-13)",
+      "moonrun": "moonrun 0.1.20260713 (75c7e1f 2026-07-13)"
+    },
+    "platform": "Darwin-arm64"
+  }
+}

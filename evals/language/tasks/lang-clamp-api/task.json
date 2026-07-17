@@ -1,0 +1,9 @@
+{
+  "id": "lang-clamp-api",
+  "prompt": "Add a public function `clamp` to this package that clamps an Int into an inclusive [lo, hi] range, plus tests covering below/inside/above. Everything must pass with the project's own toolchain.",
+  "grade": [
+    {"type": "moon", "args": ["check"]},
+    {"type": "moon", "args": ["test"]},
+    {"type": "any_file_contains", "glob": "*.mbt", "regex": "pub fn.*clamp"}
+  ]
+}

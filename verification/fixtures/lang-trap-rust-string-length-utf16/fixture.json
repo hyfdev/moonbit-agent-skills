@@ -1,0 +1,22 @@
+{
+  "id": "lang-trap-rust-string-length-utf16",
+  "owner_skill": "moonbit-language",
+  "knowledge": "`String::length()` counts UTF-16 code units (like JavaScript .length), not bytes as in Rust and not characters; use `s.char_length()` for the number of Unicode characters.",
+  "habit_from": "rust",
+  "expect": "semantic-trap",
+  "diagnostic_contains": [],
+  "fix": "Use s.char_length() for the number of Unicode characters",
+  "targets": [
+    "wasm-gc"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-07-17",
+    "components": {
+      "moon": "0.1.20260713 (75c7e1f 2026-07-13)",
+      "moonc": "v0.10.4+ade96c819 (2026-07-13)",
+      "moonrun": "moonrun 0.1.20260713 (75c7e1f 2026-07-13)"
+    },
+    "platform": "Darwin-arm64"
+  }
+}

@@ -1,0 +1,82 @@
+# Targets and conditional builds
+
+All verified at the pin on macOS arm64 (native backend uses the system C compiler).
+
+## Target selection
+
+```sh
+moon build --target js
+moon build --target all
+moon check --target all
+moon run --target native cmd/main
+```
+
+- `--target` values: `wasm`, `wasm-gc` (default), `js`, `native`, `llvm`, `all`. It exists on check/build/run/test/bench.
+- `all` = wasm + wasm-gc + js + native. It does **not** include llvm.
+- **`llvm` is listed but crashes on the stable toolchain**: it prints `Warning: LLVM backend is experimental and only supported on nightly moonbit toolchain for now`, then dies with an internal-compiler-error banner (a required prelude file ships only on nightly). Exit 255.
+- Per-target artifact paths and names: see the table in references/commands.md (`_build/<target>/<debug|release>/build/...`; native executables are `*.exe` even on macOS; js builds also emit `.d.ts` files).
+
+## Default target: preferred_target
+
+`preferred_target = "js"` in moon.mod (or `options("preferred-target": "js")` — both spellings parse, see references/project-layout-and-config.md) changes what a bare `moon build`/`moon run`/`moon test` targets. Verified: with `js`, artifacts appear only under `_build/js/`.
+
+## Restricting targets: supported_targets
+
+Two different shapes at the two levels (verified):
+
+- **Module level** (moon.mod): an array — `supported_targets = [ "js", "wasm-gc" ]`. Building an unsupported target is **silently skipped**: `moon build --target native` prints `Finished. moon: no work to do` and exits 0. Nothing fails — watch for this in CI matrices.
+- **Package level** (moon.pkg): a top-level key, preferably with a string *expression* — `supported_targets = "js"`, `"js+wasm-gc"`, or `"all-native"` (`+` adds, `-` subtracts from `all`). An array (`supported_targets = [ "js" ]`) also parses and enforces identically — it is what JSON migration emits. Effects differ by how the package is reached (all verified):
+  - Whole-module `moon check`/`moon build` on an unsupported backend **silently skips** the package (exit 0, fewer tasks) — same trap as the module level.
+  - Naming the package directly (`moon check textutil`) errors: `Package '...' does not support target backend 'wasm-gc'. Supported backends: [js]` (exit 255).
+  - Importing it from a package that is built for an unsupported backend errors with `Selected backend 'wasm-gc' is incompatible with the dependency graph. '...' requires '...' which supports [js]` plus the dependency path — the restriction propagates to importers.
+- The older package-level `options("supported-targets": [ ... ])` spelling still parses but emits two deprecation warnings (exact wording not transcribed here; run it to see them). Note `moon fmt` canonicalizes it to `options(supported_targets: [...])` rather than the expression form.
+
+## Per-file conditional compilation
+
+`options(targets: { "file.mbt": [ <cond> ] })` in moon.pkg maps individual files to build conditions. Conditions are backend names (`"wasm"`, `"wasm-gc"`, `"js"`, `"native"`), build modes (`"debug"`, `"release"`), and prefix operators in nested arrays: `["not", "js"]`, `["and", ...]`, `["or", ...]` — e.g. `["or", ["and", "wasm", "release"], ["and", "js", "debug"]]`.
+
+```
+pkgtype(kind: "executable")
+
+options(
+  targets: {
+    "only_js.mbt": [ "js" ],
+    "not_js.mbt": [ "not", "js" ],
+  },
+)
+```
+
+Verified end-to-end: two files each defining the same function (and even the same `fn main`) coexist because only one is ever in a given build; `moon run --target js` picks the js file, every other backend gets the other, and `moon check --target all` passes across all four backends.
+
+```sh
+moon run --target js cmd/show
+moon run cmd/show
+```
+
+## Link options per backend
+
+`options(link: { "<backend>": { ... } })` in moon.pkg. Giving a *library* package link options makes `moon build` produce a linked artifact for it. Verified fields:
+
+```
+options(
+  link: {
+    "js": { "exports": [ "add" ], "format": "esm" },
+    "wasm": { "exports": [ "add" ], "heap-start-address": 65536 },
+    "native": { "cc-flags": "-O2" },
+  },
+)
+```
+
+- js: `exports` + `format: "esm"` verified — the built `.js` ends with an ES-module `export { <mangled> as add }` line.
+- wasm: `exports` + `heap-start-address` accepted and a linked `.wasm` is produced.
+- native: `cc-flags` accepted (also `cc`, `cc-link-flags` per docs — those two documented, not executed here: https://docs.moonbitlang.com/en/latest/toolchain/).
+
+## Native stubs (C files)
+
+`options("native-stub": [ "stub.c" ])` in moon.pkg compiles and links the listed C files into the package on the native backend — verified end-to-end with a C function called through an `extern "C"` declaration (declaration syntax belongs to the moonbit-language skill) and `moon test --target native`:
+
+```sh
+moon test --target native
+```
+
+Remember `extern "C"` code makes the package js-incompatible (E4156 on a js build) — pair native stubs with `supported_targets` or per-file `targets:` conditions.

@@ -1,0 +1,39 @@
+{
+  "_generated_by": "tooling/snapshot_toolchain.py (do not edit by hand)",
+  "components": [
+    {
+      "build_date": "2026-07-13",
+      "commit": "75c7e1f",
+      "name": "moon",
+      "raw": "0.1.20260713 (75c7e1f 2026-07-13)",
+      "version": "0.1.20260713"
+    },
+    {
+      "build_date": "2026-07-13",
+      "commit": "",
+      "name": "moonc",
+      "raw": "v0.10.4+ade96c819 (2026-07-13)",
+      "version": "0.10.4+ade96c819"
+    },
+    {
+      "build_date": "2026-07-13",
+      "commit": "75c7e1f",
+      "name": "moonrun",
+      "raw": "moonrun 0.1.20260713 (75c7e1f 2026-07-13)",
+      "version": "0.1.20260713"
+    }
+  ],
+  "platform": {
+    "arch": "arm64",
+    "os": "Darwin",
+    "os_version": "26.5.1"
+  },
+  "raw_version_all": "moon 0.1.20260713 (75c7e1f 2026-07-13) ~/.moon/bin/moon\nmoonc v0.10.4+ade96c819 (2026-07-13) ~/.moon/bin/moonc\nmoonrun 0.1.20260713 (75c7e1f 2026-07-13) ~/.moon/bin/moonrun\n\nFeature flags enabled: rr_moon_mod,rr_moon_pkg",
+  "verification_date": "2026-07-17",
+  "verified_targets": [
+    "js",
+    "native",
+    "wasm",
+    "wasm-gc"
+  ]
+}

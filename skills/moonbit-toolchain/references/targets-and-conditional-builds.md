@@ -13,7 +13,7 @@ moon run --target native cmd/main
 
 - `--target` values: `wasm`, `wasm-gc` (default), `js`, `native`, `llvm`, `all`. It exists on check/build/run/test/bench.
 - `all` = wasm + wasm-gc + js + native. It does **not** include llvm.
-- **`llvm` is listed but crashes on the stable toolchain**: it prints `Warning: LLVM backend is experimental and only supported on nightly moonbit toolchain for now`, then dies with an internal-compiler-error banner (a required prelude file ships only on nightly). Exit 255.
+- **`llvm` depends on the install channel** (both outcomes verified 2026-07-17): on the stable/latest channel it prints `Warning: LLVM backend is experimental and only supported on nightly moonbit toolchain for now`, then dies with an internal-compiler-error banner (exit 255 — a required prelude file ships only on nightly); on the nightly channel the same command builds successfully, keeping the experimental warning.
 - Per-target artifact paths and names: see the table in references/commands.md (`_build/<target>/<debug|release>/build/...`; native executables are `*.exe` even on macOS; js builds also emit `.d.ts` files).
 
 ## Default target: preferred_target

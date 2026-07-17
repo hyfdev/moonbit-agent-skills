@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 import { normalizeUnit } from "../check_duplication.ts";
 import { compareToolchains, main as compareMain } from "../compare_toolchain.ts";
-import { generateReadme } from "../gen_readme.ts";
+import { blockInventory, generateReadme } from "../gen_readme.ts";
 import { runSkill } from "../run_checked_docs.ts";
 import { checkOne, main as fixturesMain } from "../run_fixtures.ts";
 import { createSnapshot, parseComponent, VERSION_RE } from "../snapshot_toolchain.ts";
@@ -123,6 +123,22 @@ describe("toolchain comparison", () => {
     ).toEqual({ moonc: ["0.10.4", "v0.10.5 (2026-07-18)"] });
   });
 
+  it("does not confuse a version with a longer version that shares its prefix", () => {
+    expect(
+      compareToolchains(
+        { components: [{ name: "moon", version: "0.1.2" }] },
+        {
+          items: [
+            {
+              name: "moon",
+              version: "0.1.20 (abcdef0 2026-07-18)",
+            },
+          ],
+        },
+      ),
+    ).toEqual({ moon: ["0.1.2", "0.1.20 (abcdef0 2026-07-18)"] });
+  });
+
   it("runs with an injected command runner instead of a real moon binary", () => {
     const temporary = mkdtempSync(join(tmpdir(), "compare-toolchain-test-"));
     try {
@@ -168,6 +184,27 @@ describe("toolchain comparison", () => {
 it("keeps the real generated README byte-for-byte unchanged", () => {
   const readme = readFileSync(join(REPO_ROOT, "README.md"), "utf8");
   expect(generateReadme(readme)).toBe(readme);
+});
+
+it("counts a skill with no references directory", () => {
+  const temporary = mkdtempSync(join(tmpdir(), "readme-inventory-test-"));
+  try {
+    const skill = join(temporary, "skills", "minimal-skill");
+    mkdirSync(skill, { recursive: true });
+    mkdirSync(join(temporary, "verification", "fixtures"), {
+      recursive: true,
+    });
+    writeFileSync(
+      join(skill, "SKILL.md"),
+      "---\nname: minimal-skill\ndescription: Test.\nmetadata:\n  skill-version: 0.1.0\n---\n# Minimal\n",
+    );
+
+    expect(blockInventory(temporary)).toContain(
+      "`minimal-skill` v0.1.0: SKILL.md (2 lines) + 0 reference file(s)",
+    );
+  } finally {
+    rmSync(temporary, { recursive: true, force: true });
+  }
 });
 
 it("creates a deterministic snapshot from an injected runner", () => {

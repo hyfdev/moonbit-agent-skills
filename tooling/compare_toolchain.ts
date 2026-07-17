@@ -4,6 +4,7 @@ import { exitWith, isMain } from "./lib/cli.ts";
 import type { CommandRunner } from "./lib/process.ts";
 import { checkedOutput, runCommand } from "./lib/process.ts";
 import { REPO_ROOT } from "./lib/repo.ts";
+import { parseComponent } from "./snapshot_toolchain.ts";
 
 interface Snapshot {
   components: Array<{ name: string; version: string }>;
@@ -16,13 +17,23 @@ interface InstalledVersions {
 export type Drift = Record<string, [expected: string, installed: string]>;
 
 export function compareToolchains(snapshot: Snapshot, installed: InstalledVersions): Drift {
-  const actual = new Map(installed.items.map((item) => [item.name, item.version]));
+  const actual = new Map(installed.items.map((item) => [item.name, item]));
   return Object.fromEntries(
     snapshot.components
-      .filter((component) => !(actual.get(component.name) ?? "").includes(component.version))
+      .filter((component) => {
+        const item = actual.get(component.name);
+        if (item === undefined) {
+          return true;
+        }
+        try {
+          return parseComponent(item).version !== component.version;
+        } catch {
+          return true;
+        }
+      })
       .map((component) => [
         component.name,
-        [component.version, actual.get(component.name) ?? ""] as [string, string],
+        [component.version, actual.get(component.name)?.version ?? ""] as [string, string],
       ]),
   );
 }

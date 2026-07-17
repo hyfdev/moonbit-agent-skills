@@ -61,12 +61,13 @@ export function blockInventory(repoRoot = REPO_ROOT): string {
       continue;
     }
     const parsed = parseFrontmatter(readFileSync(skillMd, "utf8"));
-    const references = readdirSync(join(skillDirectory, "references"), {
-      withFileTypes: true,
-    })
-      .filter((entry) => entry.isFile() && !entry.name.startsWith("."))
-      .map((entry) => entry.name)
-      .sort();
+    const referencesDirectory = join(skillDirectory, "references");
+    const references = isDirectory(referencesDirectory)
+      ? readdirSync(referencesDirectory, { withFileTypes: true })
+          .filter((entry) => entry.isFile() && !entry.name.startsWith("."))
+          .map((entry) => entry.name)
+          .sort()
+      : [];
     const bodyLines = parsed.body.split("\n").length;
     const skillName = skillDirectory.split(/[\\/]/).at(-1);
     const version = stringMap(parsed.frontmatter, "metadata")?.["skill-version"] ?? "?";
@@ -146,6 +147,10 @@ function directories(parent: string): string[] {
 
 function isFile(path: string): boolean {
   return existsSync(path) && statSync(path).isFile();
+}
+
+function isDirectory(path: string): boolean {
+  return existsSync(path) && statSync(path).isDirectory();
 }
 
 function escapeRegExp(value: string): string {

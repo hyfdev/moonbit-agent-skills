@@ -1,10 +1,22 @@
 {
   "id": "int-js-ffi",
   "prompt": "Expose JavaScript's Date.now() to MoonBit in this project: write the FFI declaration and a public wrapper function now_ms, and set the project up so that building for the js target succeeds. It is fine for other targets to be unsupported, but say so explicitly if you restrict them.",
+  "grader_note": "2026-07-17: preserve the recognized package, require the declaration to reference Date.now, and run a nonzero hidden JS-target test that compares now_ms() with an independent grader Date.now binding; build-only and separate source regexes allowed non-callable or unrelated wrappers to pass.",
   "grade": [
+    {"type": "file_exists", "path": "moon.mod"},
+    {"type": "file_exists", "path": "moon.pkg"},
     {"type": "moon", "args": ["check", "--target", "js"]},
     {"type": "moon", "args": ["build", "--target", "js"]},
     {"type": "any_file_contains", "glob": "**/*.mbt", "regex": "extern \"js\""},
-    {"type": "any_file_contains", "glob": "**/*.mbt", "regex": "pub fn now_ms"}
+    {"type": "any_file_contains", "glob": "**/*.mbt", "regex": "Date\\.now"},
+    {"type": "any_file_contains", "glob": "**/*.mbt", "regex": "pub fn now_ms"},
+    {
+      "type": "moon",
+      "args": ["test", "--target", "js"],
+      "min_tests": 1,
+      "temp_files": {
+        "zz_eval_now_ms_test.mbt": "///|\nextern \"js\" fn grader_date_now() -> Int64 = \"() => BigInt(Date.now())\"\n\n///|\ntest \"grader now_ms delegates to Date.now\" {\n  let delta = now_ms() - grader_date_now()\n  assert_true(delta >= -1000L && delta <= 1000L)\n}\n"
+      }
+    }
   ]
 }

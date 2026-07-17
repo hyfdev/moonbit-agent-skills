@@ -1,9 +1,31 @@
 {
   "id": "tool-new-package",
   "prompt": "Add a new package named mathx to this module, containing a public function `square(x : Int) -> Int` with a test. The whole module must pass moon check and moon test.",
+  "grader_note": "2026-07-17: preserve the root package and behavior, verify square source plus named or unnamed test syntax, and require nonzero hidden tests in both packages; an empty or replacement-only module previously passed. The first full run exposed and fixed an over-strict test regex that accepted only named tests.",
   "grade": [
+    {"type": "file_exists", "path": "moon.mod"},
+    {"type": "file_exists", "path": "moon.pkg"},
+    {"type": "file_contains", "path": "lib.mbt", "regex": "pub fn\\s+hello"},
     {"type": "file_exists", "path": "mathx/moon.pkg"},
+    {"type": "any_file_contains", "glob": "mathx/*.mbt", "regex": "pub fn\\s+square"},
+    {"type": "any_file_contains", "glob": "mathx/*.mbt", "regex": "\\btest\\s*(?:\"|\\{)"},
     {"type": "moon", "args": ["check"]},
-    {"type": "moon", "args": ["test"]}
+    {"type": "moon", "args": ["test"]},
+    {
+      "type": "moon",
+      "args": ["test"],
+      "min_tests": 1,
+      "temp_files": {
+        "mathx/zz_eval_square_test.mbt": "///|\ntest \"grader square behavior\" {\n  assert_eq(square(7), 49)\n}\n"
+      }
+    },
+    {
+      "type": "moon",
+      "args": ["test"],
+      "min_tests": 1,
+      "temp_files": {
+        "zz_eval_root_test.mbt": "///|\ntest \"grader preserves root package\" {\n  assert_eq(hello(), \"hello\")\n}\n"
+      }
+    }
   ]
 }

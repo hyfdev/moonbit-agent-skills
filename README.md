@@ -60,7 +60,7 @@ MoonBit's compiler already gives coding agents clear, useful feedback, allowing 
 
 ### Why can't I invoke or see these skills manually?
 
-This is intentional. Once installed, the skills activate automatically from the current context. Claude Code hides them from the `/` menu with `user-invocable: false`; Codex enables automatic activation through `agents/openai.yaml` with `allow_implicit_invocation: true`.
+Manual invocation is deliberately disabled. This keeps the skills out of manual menus while allowing them to activate automatically from context. The setting is included with the skills, so no configuration is required after installation.
 
 ### How does this compare to the official MoonBit skills?
 

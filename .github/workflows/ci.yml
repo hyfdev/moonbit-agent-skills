@@ -20,10 +20,18 @@ jobs:
         run: python3 -m unittest discover tooling/tests -v
       - name: Skill format (repository rules)
         run: python3 tooling/validate_skills.py
-      - name: Skill format (official reference validator)
+      - name: Skill format (official reference validator, spec view)
+        # SKILL.md carries exactly one client-extension field
+        # (user-invocable: false, honored by Claude Code to keep the skills
+        # out of the manual / menu — auto-trigger only). The open spec's
+        # reference validator allows only spec fields, so it runs against a
+        # copy with that documented extension stripped; per the spec's
+        # lenient-validation guidance, unknown fields are ignored by clients.
         run: |
           pip install skills-ref
-          for d in skills/*/; do agentskills validate "$d"; done
+          cp -R skills /tmp/spec-view
+          sed -i '/^user-invocable:/d' /tmp/spec-view/*/SKILL.md
+          for d in /tmp/spec-view/*/; do agentskills validate "$d"; done
       - name: Cross-skill duplication
         run: python3 tooling/check_duplication.py
       - name: Version consistency

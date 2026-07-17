@@ -2,6 +2,7 @@
 name: moonbit-language
 description: Verified knowledge of the MoonBit programming language, pinned to an exact moonc version - syntax, structs, enums, pattern matching, traits, generics, visibility, checked errors and raise, async, tests, FFI declarations. Use when reading, writing, explaining, reviewing, or fixing MoonBit code in .mbt or .mbt.md files, fixing MoonBit type, pattern, visibility, or error-handling diagnostics, designing MoonBit APIs, judging whether a MoonBit language feature currently exists, or translating Rust, TypeScript, or Go habits into MoonBit. Language semantics only - for moon commands, moon.mod or moon.pkg configuration, dependencies, targets, or project setup use moonbit-toolchain; load both for tasks that touch code and project configuration together.
 license: MIT
+user-invocable: false
 compatibility: Verified only against moonc v0.10.4+ade96c819 (MoonBit v0.10.4, 2026-07-13). Needs the moon CLI for verification steps.
 metadata:
   skill-version: "0.1.0"

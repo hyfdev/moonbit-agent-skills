@@ -39,4 +39,6 @@ include the summary numbers in the PR description.
   or DEPRECATED, with the diagnostic when the compiler rejects it.
 - Skill frontmatter follows the Agent Skills spec (agentskills.io):
   lowercase hyphenated `name` equal to the directory, `description` ≤ 1024
-  chars covering what + when + trigger keywords, versions under `metadata`.
+  chars covering what + when + trigger keywords, versions under `metadata`. The single allowed client-extension field is
+  `user-invocable: false` (kept out of the spec-view CI validation by a
+  documented strip step); do not add others.

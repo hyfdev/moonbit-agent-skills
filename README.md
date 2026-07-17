@@ -24,7 +24,7 @@ cp -R moonbit-agent-skills/skills/moonbit-language ~/.claude/skills/
 cp -R moonbit-agent-skills/skills/moonbit-toolchain ~/.claude/skills/
 ```
 
-Other clients: use their skill directory (`~/.agents/skills/`, `~/.codex/skills/`, project-level `.claude/skills/`, ...). The skills follow the open Agent Skills spec and carry no client-specific fields.
+Other clients: use their skill directory (`~/.agents/skills/`, `~/.codex/skills/`, project-level `.claude/skills/`, ...). The skills follow the open Agent Skills spec plus exactly one documented client extension: `user-invocable: false`, which tells Claude Code to keep them out of the manual `/` menu so they are reachable only through automatic activation (verified to not affect auto-triggering). Clients that don't know the field ignore it.
 
 ## Use
 

@@ -5,6 +5,7 @@
   "scripts": {
     "check-duplication": "node tooling/check_duplication.ts",
     "check-versions": "node tooling/check_versions.ts",
+    "compare-toolchain": "node tooling/compare_toolchain.ts",
     "gen-readme": "node tooling/gen_readme.ts",
     "run-checked-docs": "node tooling/run_checked_docs.ts",
     "run-fixtures": "node tooling/run_fixtures.ts",

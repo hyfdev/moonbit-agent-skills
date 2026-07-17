@@ -159,6 +159,15 @@ def validate_skill(skill_dir: Path) -> list[str]:
             if rel not in referenced and rel not in body:
                 problems.append(f"{rel} exists but SKILL.md never mentions it")
 
+    # Codex activation sidecar: every skill ships agents/openai.yaml with
+    # implicit invocation enabled, mirroring the frontmatter surface (this
+    # was missed in the initial build; enforced since).
+    sidecar = skill_dir / "agents" / "openai.yaml"
+    if not sidecar.is_file():
+        problems.append("missing agents/openai.yaml (Codex activation sidecar)")
+    elif "allow_implicit_invocation: true" not in sidecar.read_text():
+        problems.append("agents/openai.yaml must set allow_implicit_invocation: true")
+
     for f in skill_dir.rglob("*"):
         if f.is_file() and f.suffix in (".md", ".mbt", ".sh", ".py"):
             if re.search(r"(?<![\w@])/(?:Users|home|private/tmp)/", f.read_text()):

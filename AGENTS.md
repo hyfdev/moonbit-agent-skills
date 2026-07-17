@@ -10,6 +10,7 @@ This repository publishes two Agent Skills (`skills/moonbit-language`, `skills/m
 4. **Proposals are not features.** Anything sourced from moonbit-evolution or a release-note "planned" section must be labeled proposal, never shown as current syntax.
 5. **README numbers are generated.** Edit prose freely, but data inside `<!-- BEGIN GENERATED -->` blocks only via `python3 tooling/gen_readme.py`.
 6. **Skill descriptions are an interface.** If you touch a frontmatter `description`, re-run the activation eval (`evals/activation/run_activation.py`) or state explicitly that routing is unrevalidated.
+7. **Each skill has per-client activation surfaces — keep all of them in sync.** A skill ships three: the frontmatter `description` (open-spec catalog, all clients), `user-invocable: false` (Claude Code extension, hides the manual `/` entry), and `agents/openai.yaml` (Codex: display name, short description, default prompt, `allow_implicit_invocation: true`). This third surface was missed in the initial build and added late — when renaming a skill, changing its scope/description, or adding a new skill, update the Codex sidecar in the same change (`tooling/validate_skills.py` enforces its presence).
 
 ## Local check sequence (mirror of CI)
 

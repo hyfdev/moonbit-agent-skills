@@ -39,7 +39,11 @@ cp -R moonbit-agent-skills/skills/moonbit-language ~/.claude/skills/
 cp -R moonbit-agent-skills/skills/moonbit-toolchain ~/.claude/skills/
 ```
 
-Other clients: use their skill directory (`~/.agents/skills/`, `~/.codex/skills/`, project-level `.claude/skills/`, ...). The skills follow the open Agent Skills spec plus exactly one documented client extension: `user-invocable: false`, which tells Claude Code to keep them out of the manual `/` menu so they are reachable only through automatic activation (verified to not affect auto-triggering). Clients that don't know the field ignore it.
+### Client support
+
+- **First-class, tested or explicitly targeted**: Claude Code, Codex, and any client implementing the open [Agent Skills specification](https://agentskills.io/specification). Activation evals in this repo ran on Claude Code; Codex gets explicit metadata (`agents/openai.yaml` with `allow_implicit_invocation: true`) so both skills may auto-activate there too.
+- **Other mature skill-aware agents**: generally fine — the files are spec-clean (directory layout, frontmatter, progressive disclosure), so any client following the spec's lenient-validation guidance loads them; use its skill directory (`~/.agents/skills/`, project `.claude/skills/`, ...).
+- **One client-specific field, on purpose**: `user-invocable: false` is a *Claude Code extension* (not part of the open spec, not read by Codex). On Claude Code it hides the skills from the manual `/` menu so they are reachable only through automatic activation (verified to not affect auto-triggering). Every other client ignores the unknown field harmlessly; on Codex the same auto-activation intent is carried by the `allow_implicit_invocation` policy instead.
 
 ## Use
 

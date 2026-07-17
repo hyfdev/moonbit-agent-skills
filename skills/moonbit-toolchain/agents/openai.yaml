@@ -1,0 +1,7 @@
+interface:
+  display_name: "MoonBit Toolchain"
+  short_description: "Version-pinned, machine-verified moon toolchain operation"
+  default_prompt: "Use $moonbit-toolchain when operating MoonBit projects: moon commands, moon.mod / moon.pkg configuration, dependencies, targets, testing workflows, workspaces, publishing."
+
+policy:
+  allow_implicit_invocation: true

@@ -93,12 +93,12 @@
     },
     {
       "source_ids": ["language-1-p4"],
-      "summary": "Implicit impl-to-method attachment is deprecated and warning 79 must be enabled explicitly in 0.10.4.",
+      "summary": "Implicit impl-to-method attachment is deprecated and is a default warning at the pinned post-release compiler build.",
       "change": "deprecation",
-      "agent_behavior": "Audit with --warn-list +implicit_impl_as_method --deny-warn, add explicit extend declarations for intended dot methods, and mark compatibility-only extend declarations deprecated when steering callers to qualified calls.",
+      "agent_behavior": "Audit with --deny-warn, add explicit extend declarations for intended dot methods, and mark compatibility-only extend declarations deprecated when steering callers to qualified calls.",
       "claims": [
         {
-          "text": "Warning 79 detects implicit impl-to-method attachment when explicitly enabled and denied.",
+          "text": "The pinned 2026-07-15 compiler detects implicit impl-to-method attachment with the default warning set and --deny-warn.",
           "evidence_roles": ["deprecated-form"]
         },
         {
@@ -110,7 +110,7 @@
           "evidence_roles": ["deprecated-extend-form", "deprecated-extend-replacement"]
         },
         {
-          "text": "The language skill causes an agent to enable warning 79 and apply the explicit migration.",
+          "text": "The language skill causes an agent to deny warnings and apply the explicit migration.",
           "evidence_roles": ["agent-behavior"]
         }
       ],
@@ -120,7 +120,7 @@
         {
           "kind": "fixture",
           "path": "verification/fixtures/lang-dep-implicit-impl-as-method/fixture.json",
-          "marker": "+implicit_impl_as_method",
+          "marker": "implicitly promoted",
           "role": "deprecated-form"
         },
         {
@@ -132,7 +132,7 @@
         {
           "kind": "content-eval",
           "path": "evals/language/tasks/lang-explicit-extend/task.json",
-          "marker": "+implicit_impl_as_method",
+          "marker": "moon check --deny-warn",
           "role": "agent-behavior"
         },
         {
@@ -212,7 +212,7 @@
       ],
       "summary": "Or-patterns may supply defaults with with, including parenthesized defaults for multiple binders.",
       "change": "new-feature",
-      "agent_behavior": "Use Pattern(x) | Other with x = default to merge arms that differ only by a missing binder.",
+      "agent_behavior": "Use Pattern(x) | (Other with x = default) to merge arms that differ only by a missing binder.",
       "claims": [
         {
           "text": "with supplies a default for one binder missing from an or-pattern branch.",
@@ -229,7 +229,7 @@
         {
           "kind": "checked-doc",
           "path": "skills/moonbit-language/references/pattern-matching.mbt.md",
-          "marker": "Some(n) | None with n = 0",
+          "marker": "Some(n) | (None with n = 0)",
           "role": "single-binder"
         },
         {

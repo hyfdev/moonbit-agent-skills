@@ -9,11 +9,11 @@
       "version": "0.1.20260713"
     },
     {
-      "build_date": "2026-07-13",
+      "build_date": "2026-07-15",
       "commit": "",
       "name": "moonc",
-      "raw": "v0.10.4+ade96c819 (2026-07-13)",
-      "version": "0.10.4+ade96c819"
+      "raw": "v0.10.4+2cc641edf (2026-07-15)",
+      "version": "0.10.4+2cc641edf"
     },
     {
       "build_date": "2026-07-13",
@@ -28,7 +28,7 @@
     "os": "Linux",
     "os_version": "6.18.25-x64v3-xanmod1"
   },
-  "raw_version_all": "moon 0.1.20260713 (75c7e1f 2026-07-13) <MOON_HOME>/bin/moon\nmoonc v0.10.4+ade96c819 (2026-07-13) <MOON_HOME>/bin/moonc\nmoonrun 0.1.20260713 (75c7e1f 2026-07-13) <MOON_HOME>/bin/moonrun\n\nFeature flags enabled: rr_moon_mod,rr_moon_pkg",
+  "raw_version_all": "moon 0.1.20260713 (75c7e1f 2026-07-13) <MOON_HOME>/bin/moon\nmoonc v0.10.4+2cc641edf (2026-07-15) <MOON_HOME>/bin/moonc\nmoonrun 0.1.20260713 (75c7e1f 2026-07-13) <MOON_HOME>/bin/moonrun\n\nFeature flags enabled: rr_moon_mod,rr_moon_pkg",
   "verification_date": "2026-07-18",
   "verified_targets": [
     "js",

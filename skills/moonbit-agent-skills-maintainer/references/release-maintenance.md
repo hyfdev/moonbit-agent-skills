@@ -18,7 +18,7 @@ The command fetches the file from the pinned commit, hashes the complete Markdow
 
 ## Coverage decision schema
 
-A decision may group closely related source IDs, but each source ID may occur in only one decision. Keep independently actionable changes separate; for example, explicit `extend`, warning 79 being off by default, the soft-keyword transition, and supertrait dot-call migration should not be collapsed into one vague entry. Every actionable decision must enumerate its individual claims and link each claim to the exact evidence roles that prove it. A single executable marker elsewhere in a broad decision does not verify its other claims.
+A decision may group closely related source IDs, but each source ID may occur in only one decision. Keep independently actionable changes separate; for example, explicit `extend`, warning 79's default status at the pinned build, the soft-keyword transition, and supertrait dot-call migration should not be collapsed into one vague entry. Every actionable decision must enumerate its individual claims and link each claim to the exact evidence roles that prove it. A single executable marker elsewhere in a broad decision does not verify its other claims.
 
 ```json
 {

@@ -28,7 +28,7 @@ test "match arms: guards, or-patterns, ranges" {
 }
 ```
 
-Since 0.10.4, an or-pattern may provide defaults with `with` for branches that do not bind every variable. This keeps shared handling in one arm. Use parentheses when supplying defaults for multiple variables: `A(a, b) | B with (a = 0, b = 0) => ...`.
+Since 0.10.4, an or-pattern may provide defaults with `with` for branches that do not bind every variable. This keeps shared handling in one arm. Enclose the entire branch carrying defaults in parentheses; separate multiple assignments with commas: `A(a, b) | (B with a = 0, b = 0) => ...`.
 
 ```mbt check
 enum ReleasePair {
@@ -38,7 +38,7 @@ enum ReleasePair {
 
 fn sum_release_pair(value : ReleasePair) -> Int {
   match value {
-    Pair(a, b) | NoPair with (a = 0, b = 0) => a + b
+    Pair(a, b) | (NoPair with a = 0, b = 0) => a + b
   }
 }
 
@@ -52,7 +52,7 @@ test "or-pattern defaults with multiple binders" {
 test "or-pattern defaults with with" {
   fn value_or_zero(value : Int?) -> Int {
     match value {
-      Some(n) | None with n = 0 => n
+      Some(n) | (None with n = 0) => n
     }
   }
 

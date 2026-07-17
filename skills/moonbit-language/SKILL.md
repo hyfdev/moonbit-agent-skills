@@ -3,10 +3,10 @@ name: moonbit-language
 description: Verified knowledge of the MoonBit programming language, pinned to an exact moonc version - syntax, structs, enums, pattern matching, traits, generics, visibility, checked errors and raise, async, tests, FFI declarations. Use when reading, writing, explaining, reviewing, or fixing MoonBit code in .mbt or .mbt.md files, fixing MoonBit type, pattern, visibility, or error-handling diagnostics, designing MoonBit APIs, judging whether a MoonBit language feature currently exists, or translating Rust, TypeScript, or Go habits into MoonBit. Language semantics only - for moon commands, moon.mod or moon.pkg configuration, dependencies, targets, or project setup use moonbit-toolchain; load both for tasks that touch code and project configuration together.
 license: MIT
 user-invocable: false
-compatibility: Verified only against moonc v0.10.4+ade96c819 (MoonBit v0.10.4, 2026-07-13). Needs the moon CLI for verification steps.
+compatibility: Verified only against moonc v0.10.4+2cc641edf (MoonBit v0.10.4, 2026-07-15). Needs the moon CLI for verification steps.
 metadata:
   skill-version: "0.2.0"
-  moonc-version: "0.10.4+ade96c819"
+  moonc-version: "0.10.4+2cc641edf"
   moonbit-release: "0.10.4"
   verified-date: "2026-07-18"
   verified-platform: "Linux-x86_64"
@@ -18,7 +18,7 @@ metadata:
 
 ## Verification contract
 
-Everything in this skill was verified by compiling and running real code against **moonc v0.10.4+ade96c819** (MoonBit release 0.10.4, build 2026-07-13) on Linux x86_64, targets wasm-gc, wasm, js, native, on **2026-07-18**. MoonBit is pre-1.0 and changes fast; there is no language version separate from the compiler — language behavior is keyed to the moonc version.
+Everything in this skill was verified by compiling and running real code against **moonc v0.10.4+2cc641edf** (MoonBit release 0.10.4, build 2026-07-15) on Linux x86_64, targets wasm-gc, wasm, js, native, on **2026-07-18**. MoonBit is pre-1.0 and changes fast; there is no language version separate from the compiler — language behavior is keyed to the moonc version.
 
 **Before relying on this skill, run `moon version --all`.** If the local moonc differs from the pin above:
 

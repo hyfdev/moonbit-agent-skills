@@ -26,13 +26,13 @@ Probe agents also ran internal adversarial review rounds on their own findings f
 ## Phase 3 — Authoring under verification constraints
 
 - One style-canon reference was written first (`declarations-and-functions.mbt.md`) and every other reference was required to match it.
-- Hard authoring rules (enforced by tooling, not convention): every language example lives in an `mbt check` fence and is executed by `tooling/run_checked_docs.py` on all four targets; wrong/deprecated forms only in `mbt nocheck` with the diagnostic; negative knowledge becomes fixtures under `verification/fixtures/` with expected diagnostics; every documented `moon` command line must be covered by `verification/commands/manifest.json`, which `tooling/verify_commands.py` actually executes; facts that cannot be executed are labeled "documented, not executed" with the URL.
+- Hard authoring rules (enforced by tooling, not convention): every language example lives in an `mbt check` fence and is executed by `tooling/run_checked_docs.ts` on all four targets; wrong/deprecated forms only in `mbt nocheck` with the diagnostic; negative knowledge becomes fixtures under `verification/fixtures/` with expected diagnostics; every documented `moon` command line must be covered by `verification/commands/manifest.json`, which `tooling/verify_commands.ts` actually executes; facts that cannot be executed are labeled "documented, not executed" with the URL.
 - Namespace discipline: all references compile together into one package, so files prefix their top-level names and prefer declarations inside test blocks.
 - Each authoring batch got one adversarial review round by a fresh reviewer, fixes, and one confirmation round — before integration.
 
 ## Phase 4 — The version contract
 
-`tooling/snapshot_toolchain.py --date …` writes the canonical snapshot; skill frontmatter, SKILL.md prose, and fixture stamps must agree with it (`tooling/check_versions.py`). Fixtures are stamped by `tooling/run_fixtures.py --stamp`. Nothing hand-writes a version string. The re-pin procedure for a new MoonBit release is in CONTRIBUTING.md.
+`vp run snapshot-toolchain -- --date …` writes the canonical snapshot; skill frontmatter, SKILL.md prose, and fixture stamps must agree with it (`tooling/check_versions.ts`). Fixtures are stamped by `vp run run-fixtures -- --stamp`. Nothing hand-writes a version string. The re-pin procedure for a new MoonBit release is in CONTRIBUTING.md.
 
 ## Phase 5 — Activation as a tested interface
 

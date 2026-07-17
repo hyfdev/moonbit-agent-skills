@@ -1,5 +1,5 @@
 {
-  "_comment": "Pinned upstream sources this repository's content was checked against. Update alongside verification/toolchains/current.json when re-verifying. Hand-maintained; tooling/check_versions.py checks internal consistency.",
+  "_comment": "Pinned upstream sources this repository's content was checked against. Update alongside verification/toolchains/current.json when re-verifying. Hand-maintained; tooling/check_versions.ts checks internal consistency.",
   "retrieved": "2026-07-17",
   "sources": [
     {

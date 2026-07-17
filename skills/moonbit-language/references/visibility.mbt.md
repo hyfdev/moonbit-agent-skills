@@ -1,6 +1,6 @@
 # Visibility
 
-Every `mbt check` block in this file is compiled and run by the repository's verification suite (`tooling/run_checked_docs.py`). Blocks marked `mbt nocheck` show rejected or deprecated forms and are never compiled. Cross-package rules cannot run inside one package, so the allowed/rejected matrix below is enforced by the two-package fixture `lang-visibility-cross-package` in this repository's verification suite.
+Every `mbt check` block in this file is compiled and run by the repository's verification suite (`tooling/run_checked_docs.ts`). Blocks marked `mbt nocheck` show rejected or deprecated forms and are never compiled. Cross-package rules cannot run inside one package, so the allowed/rejected matrix below is enforced by the two-package fixture `lang-visibility-cross-package` in this repository's verification suite.
 
 ## Functions
 

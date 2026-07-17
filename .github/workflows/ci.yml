@@ -13,13 +13,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version: "24"
+          cache: true
+      - name: Install TypeScript tooling
+        run: vp install --frozen-lockfile
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Tooling unit tests
-        run: python3 -m unittest discover tooling/tests -v
+      - name: TypeScript checks
+        run: vp check
+      - name: TypeScript tooling unit tests
+        run: vp test
+      - name: Content eval unit tests
+        run: python3 -m unittest discover evals/tests -v
       - name: Skill format (repository rules)
-        run: python3 tooling/validate_skills.py
+        run: vp run validate-skills
       - name: Skill format (official reference validator, spec view)
         # SKILL.md carries exactly one client-extension field
         # (user-invocable: false, honored by Claude Code to keep the skills
@@ -33,9 +43,9 @@ jobs:
           sed -i '/^user-invocable:/d' /tmp/spec-view/*/SKILL.md
           for d in /tmp/spec-view/*/; do agentskills validate "$d"; done
       - name: Cross-skill duplication
-        run: python3 tooling/check_duplication.py
+        run: vp run check-duplication
       - name: Version consistency
-        run: python3 tooling/check_versions.py
+        run: vp run check-versions
   # MoonBit distributes install channels (latest / nightly / pre-release),
   # not pinned historical versions (verified 2026-07-17: only channel URLs
   # exist under cli.moonbitlang.com/binaries/). CI therefore cannot
@@ -49,6 +59,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version: "24"
+          cache: true
+      - name: Install TypeScript tooling
+        run: vp install --frozen-lockfile
       - name: Install MoonBit (latest channel)
         run: |
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
@@ -56,23 +72,13 @@ jobs:
       - name: Compare installed toolchain against the committed snapshot
         run: |
           moon version --all
-          python3 - <<'EOF'
-          import json, subprocess
-          snap = {c["name"]: c["version"] for c in json.load(open("verification/toolchains/current.json"))["components"]}
-          got = {i["name"]: i["version"] for i in json.loads(subprocess.run(["moon","version","--all","--json"],capture_output=True,text=True,check=True).stdout)["items"]}
-          drift = {k: (snap[k], got.get(k, "")) for k in snap if snap[k] not in got.get(k, "")}
-          if drift:
-              print("::warning::installed toolchain differs from committed snapshot "
-                    f"(re-verify and re-stamp if content checks fail): {drift}")
-          else:
-              print("installed toolchain matches the committed snapshot")
-          EOF
+          vp run compare-toolchain
       - name: Checked reference documents (all targets)
-        run: python3 tooling/run_checked_docs.py
+        run: vp run run-checked-docs
       - name: Fixtures behave as declared
-        run: python3 tooling/run_fixtures.py -v
+        run: vp run run-fixtures -- --verbose
       - name: Toolchain command examples actually run
-        run: python3 tooling/verify_commands.py
+        run: vp run verify-commands
 
   toolchain-nightly:
     name: Drift watch (nightly channel, informational)
@@ -80,6 +86,12 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
+      - uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version: "24"
+          cache: true
+      - name: Install TypeScript tooling
+        run: vp install --frozen-lockfile
       - name: Install MoonBit (nightly channel)
         run: |
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s -- nightly
@@ -87,8 +99,8 @@ jobs:
       - name: Report versions
         run: moon version --all
       - name: Checked reference documents
-        run: python3 tooling/run_checked_docs.py
+        run: vp run run-checked-docs
       - name: Fixtures
-        run: python3 tooling/run_fixtures.py -v
+        run: vp run run-fixtures -- --verbose
       - name: Command examples
-        run: python3 tooling/verify_commands.py
+        run: vp run verify-commands

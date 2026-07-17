@@ -1,0 +1,31 @@
+{
+  "name": "moonbit-agent-skills-tooling",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check-duplication": "node tooling/check_duplication.ts",
+    "check-versions": "node tooling/check_versions.ts",
+    "gen-readme": "node tooling/gen_readme.ts",
+    "run-checked-docs": "node tooling/run_checked_docs.ts",
+    "run-fixtures": "node tooling/run_fixtures.ts",
+    "snapshot-toolchain": "node tooling/snapshot_toolchain.ts",
+    "validate-skills": "node tooling/validate_skills.ts",
+    "verify-commands": "node tooling/verify_commands.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "typescript": "^7.0.2",
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "11.13.1",
+      "onFail": "download"
+    }
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

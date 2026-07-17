@@ -1,98 +1,71 @@
 # moonbit-agent-skills
 
-Two independently installable [Agent Skills](https://agentskills.io) that give AI coding agents **version-pinned, machine-verified** knowledge of MoonBit:
+Agent Skills for MoonBit. Help coding agents work with MoonBit and write better MoonBit code.
 
-- **`moonbit-language`** — the MoonBit language: syntax, types, pattern matching, traits, visibility, checked errors, async, tests, FFI declarations.
-- **`moonbit-toolchain`** — operating MoonBit projects: `moon.mod` / `moon.pkg`, moon commands, testing workflows, dependencies, targets, workspaces, publishing, `moon ide`.
+- Up to date with the latest MoonBit release — **[v0.10.4](https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release)**
+- Backed by evaluation across multiple AI models
+- Automatic activation based on context
 
-MoonBit is young and evolves fast, so model pretraining about it is thin, stale, or silently wrong. These skills exist to raise the reliability floor: current syntax instead of remembered syntax, real command behavior instead of plausible flags, and an explicit "verify against your local toolchain" contract instead of confident guessing.
+## Contents
 
-<!-- BEGIN GENERATED: status -->
-- Verified toolchain: `moon 0.1.20260713` · `moonc v0.10.4+ade96c819` · `moonrun 0.1.20260713`
-- Verification date: 2026-07-17 on Darwin arm64
-- Verified targets: js, native, wasm, wasm-gc
-<!-- END GENERATED: status -->
+- [Skills](#skills)
+- [Install](#install)
+- [How to use](#how-to-use)
+- [FAQ](#faq)
+- [License](#license)
+
+## Skills
+
+| Skill | Role | Scope |
+| --- | --- | --- |
+| [moonbit-language](skills/moonbit-language/SKILL.md) | Language reference | Understanding, writing, and fixing MoonBit code: syntax, types, patterns, traits, errors, async, tests, and FFI. |
+| [moonbit-toolchain](skills/moonbit-toolchain/SKILL.md) | Toolchain reference | Creating and operating MoonBit projects: `moon` commands, `moon.mod` / `moon.pkg`, dependencies, targets, testing, workspaces, publishing, and IDE queries. |
 
 ## Install
 
-Recommended — the [`skills`](https://skills.sh) CLI installs straight from this repo into your agent's skill directory:
+> [!WARNING]
+> When automatically activated, a skill may detect that its guidance conflicts with actual MoonBit behavior and propose filing an issue here. Nothing is submitted without your explicit approval; approved reports improve the skills for everyone.
 
-```sh
-# Claude Code
-npx skills@latest add hyfdev/moonbit-agent-skills -g --agent claude-code --skill "*" --copy -y
+- Global install for Claude Code and `.agents`:
 
-# Codex, or the portable cross-agent directory
-npx skills@latest add hyfdev/moonbit-agent-skills -g --agent codex --skill "*" --copy -y
-npx skills@latest add hyfdev/moonbit-agent-skills -g --agent universal --skill "*" --copy -y
+  ```sh
+  npx skills@latest add hyfdev/moonbit-agent-skills -g -a claude-code -a universal -s "*" --copy -y
+  ```
 
-# list what's here / install one skill only
-npx skills@latest add hyfdev/moonbit-agent-skills --list
-npx skills@latest add hyfdev/moonbit-agent-skills -g --agent claude-code --skill moonbit-language --copy -y
-```
+- Interactive install:
 
-Manual fallback — copy the two skill directories yourself:
+  ```sh
+  npx skills@latest add hyfdev/moonbit-agent-skills
+  ```
 
-```sh
-git clone https://github.com/hyfdev/moonbit-agent-skills
-mkdir -p ~/.claude/skills
-cp -R moonbit-agent-skills/skills/moonbit-language ~/.claude/skills/
-cp -R moonbit-agent-skills/skills/moonbit-toolchain ~/.claude/skills/
-```
+<details>
+<summary>Manual installation</summary>
 
-### Client support
+Clone or download this repository, then copy either or both skill directories into your agent's skill directory:
 
-- **First-class, tested or explicitly targeted**: Claude Code, Codex, and any client implementing the open [Agent Skills specification](https://agentskills.io/specification). Activation evals in this repo ran on Claude Code; Codex gets explicit metadata (`agents/openai.yaml` with `allow_implicit_invocation: true`) so both skills may auto-activate there too.
-- **Other mature skill-aware agents**: generally fine — the files are spec-clean (directory layout, frontmatter, progressive disclosure), so any client following the spec's lenient-validation guidance loads them; use its skill directory (`~/.agents/skills/`, project `.claude/skills/`, ...).
-- **One client-specific field, on purpose**: `user-invocable: false` is a *Claude Code extension* (not part of the open spec, not read by Codex). On Claude Code it hides the skills from the manual `/` menu so they are reachable only through automatic activation (verified to not affect auto-triggering). Every other client ignores the unknown field harmlessly; on Codex the same auto-activation intent is carried by the `allow_implicit_invocation` policy instead.
+- `skills/moonbit-language`
+- `skills/moonbit-toolchain`
 
-## Use
+</details>
 
-After installing, just ask normally. You never need to know or type a skill name — the skills describe their own triggers and the agent activates them (individually or together) from your request:
+## How to use
 
-- "Fix the type errors in this MoonBit package."
-- "Why does this MoonBit match expression fail to compile?"
-- "How do error types and raise work?"
-- "Add a package to this project and run only its tests."
-- "Configure this project to build for JS and native."
-- "Is this moon.pkg configuration correct?"
+Use your coding agent as usual—no special prompts or manual invocation required.
 
-If your client only supports manually invoked skills, that is a client capability limit — the skills still work when invoked manually, but automatic activation is the designed and tested path.
+## FAQ
 
-## When the skills are wrong: consented error reporting
+### How do these skills complement the MoonBit compiler?
 
-These skills ship a self-report protocol (`references/reporting-errors.md` in each skill). If the real toolchain contradicts something a skill states, the agent is instructed to:
+MoonBit's compiler already gives coding agents clear, useful feedback, allowing them to correct many mistakes on their own. These skills add current language and toolchain knowledge for the remaining gaps that compiler feedback alone cannot cover.
 
-1. reproduce the contradiction with a **freshly written, generic** minimal snippet — never your project code, paths, or names;
-2. draft an issue containing only that repro plus toolchain versions and OS/arch;
-3. show you the complete issue text and ask for your explicit go-ahead before filing it to this repository's issue tracker.
+### Why can't I invoke or see these skills manually?
 
-**Nothing is ever filed without your confirmation.** If you decline — or the agent simply can't ask you — the draft is saved locally instead and filing is skipped. Reports arrive as [skill-error issues](https://github.com/hyfdev/moonbit-agent-skills/issues) and drive re-verification.
+This is intentional. Once installed, the skills activate automatically from the current context. Claude Code hides them from the `/` menu with `user-invocable: false`; Codex enables automatic activation through `agents/openai.yaml` with `allow_implicit_invocation: true`.
 
-## Why not just the official MoonBit guides?
+### How does this compare to the official MoonBit skills?
 
-The official [moonbitlang/skills](https://github.com/moonbitlang/skills) bundle (which includes the [moonbit-agent-guide](https://github.com/moonbitlang/moonbit-agent-guide)) is good, and this repository deliberately does not duplicate its specialized skills (C bindings, OCaml migration, proofs, refactoring). Audited at commit `5caf81c` (2026-07-06), the gaps this repository fills are:
-
-1. **A version contract.** The official skills float on nightly/latest with no statement of what they were verified against. Here, every claim is pinned to exact `moon`/`moonc` versions, with a committed snapshot, per-fixture stamps, and machine-checked consistency — plus explicit instructions to the agent for when local versions differ.
-2. **Language / toolchain separation.** One 58 KB monolithic guide becomes two small, independently versioned, independently activatable skills with an explicit ownership boundary and a duplication check.
-3. **Verified negative knowledge.** The official guides teach correct MoonBit; agents also need to know what is *wrong now* — Rust/TS/Go habits and stale MoonBit that the compiler rejects (or worse, silently accepts with different meaning). This repo ships fixtures proving each rejection/trap, including deprecated syntax the official language-fundamentals reference still teaches (e.g. `loop`, fn-less trait signatures).
-4. **Activation evals.** Frontmatter descriptions are treated as a tested interface: prompt sets measure trigger recall, false positives on confusables (moonrepo, moon phases, generic wasm questions), language/toolchain routing, and multi-skill activation — without ever naming skills in prompts.
-5. **Everything executable is executed in CI** — reference examples (all `mbt check` blocks, all pinned targets), fixtures, and every documented `moon` command line (coverage-checked manifest), with a drift-watch lane on the nightly toolchain channel (runs on push/PR and a weekly schedule). Two documents (async/FFI notes and part of the cross-language list) are hand-verified at the pin rather than re-executed by CI; they say so inline.
-
-## Repository map
-
-<!-- BEGIN GENERATED: inventory -->
-- `moonbit-language` v0.1.0: SKILL.md (47 lines) + 13 reference file(s)
-- `moonbit-toolchain` v0.1.0: SKILL.md (44 lines) + 9 reference file(s)
-- Verification fixtures: 35
-- Activation eval prompts: 35 (combined 5, language-only 10, negative 10, toolchain-only 10)
-<!-- END GENERATED: inventory -->
-
-- `skills/` — the two installable skills.
-- `verification/` — toolchain snapshot, pinned upstream sources, fixtures (positive, negative, semantic-trap), command manifest + template project.
-- `evals/` — activation and content evals with deterministic graders; see `evals/README.md` and checked-in `RESULTS.md` snapshots.
-- `tooling/` — validators, verification runners, README generator, and their tests (mirrored in `.github/workflows/ci.yml`).
-- `research/` — the research note (LLM reliability in a low-coverage language), the production methodology (`research/methodology.md` — how to re-run and audit every phase), and the raw probe evidence the skills were authored from (`research/probes/`).
+The official [MoonBit skills](https://github.com/moonbitlang/skills) focus on specialized workflows such as C bindings, OCaml migration, formal verification, and refactoring. This repository is a community-maintained, general-purpose reference for everyday MoonBit coding and project work. It also keeps fast-changing language guidance current—for example, the official guide still presents deprecated functional `loop` as current. We will explore contributing verified updates back to the official repository.
 
 ## License
 
-MIT — see LICENSE.
+[MIT](LICENSE)

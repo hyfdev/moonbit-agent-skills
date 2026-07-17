@@ -36,11 +36,6 @@ jobs:
         run: python3 tooling/check_duplication.py
       - name: Version consistency
         run: python3 tooling/check_versions.py
-      - name: README generated blocks are fresh
-        run: |
-          python3 tooling/gen_readme.py
-          git diff --exit-code
-
   # MoonBit distributes install channels (latest / nightly / pre-release),
   # not pinned historical versions (verified 2026-07-17: only channel URLs
   # exist under cli.moonbitlang.com/binaries/). CI therefore cannot

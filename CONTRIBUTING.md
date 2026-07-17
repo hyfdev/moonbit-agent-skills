@@ -26,8 +26,7 @@ include the summary numbers in the PR description.
 4. `python3 tooling/run_fixtures.py --stamp --date $(date +%F)`
 5. Update both skills' frontmatter `metadata` pins and compatibility lines,
    bump their `skill-version`, and run `python3 tooling/check_versions.py`.
-6. `python3 tooling/gen_readme.py`
-7. Record notable behavior changes in the relevant reference files with the
+6. Record notable behavior changes in the relevant reference files with the
    version boundary ("changed in vX.Y").
 
 ## Style

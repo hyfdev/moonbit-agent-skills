@@ -4,7 +4,7 @@
   "claim_id": "language.loop.deprecated-replacement",
   "primary_metric": "exact-status-and-migration",
   "prompt": "In current MoonBit, is the functional `loop (x, y) { ... }` construct current and recommended, or deprecated? Reply with a first line that is exactly CURRENT or DEPRECATED, then name the replacement in one line.",
-  "grader_note": "2026-07-17: first_line_is now checks equality rather than prefix matching; the named replacement must include both the current multi-binding for form and break, rather than passing for a generic mention of for; output must not claim the deprecated-but-still-accepted construct has been removed.",
+  "grader_note": "2026-07-18: first_line_is checks equality; the named replacement must include either the multi-binding/state-binder name or a concrete two-binding `for name = value, name = value` form, plus break. A generic mention of for is insufficient, and the output must not claim the deprecated-but-still-accepted construct has been removed.",
   "grade": [
     {
       "type": "first_line_is",
@@ -12,7 +12,7 @@
     },
     {
       "type": "output_matches",
-      "regex": "(?:^|\\n)(?![^\\r\\n]*(?:\\bdo\\s+not\\b|\\bdon't\\b|\\bavoid\\b|\\bunsupported\\b|\\bnot\\s+supported\\b|\\bcannot\\b|\\bcan't\\b))(?=[^\\r\\n]*\\bfor\\b)(?=[^\\r\\n]*(?:multi(?:-|\\s)binding|multiple\\s+bindings?|state\\s+binders?|for\\s*\\([^\\r\\n)]*,))(?=[^\\r\\n]*\\bbreak\\b)[^\\r\\n]+"
+      "regex": "(?:^|\\n)(?![^\\r\\n]*(?:\\bdo\\s+not\\b|\\bdon't\\b|\\bavoid\\b|\\bunsupported\\b|\\bnot\\s+supported\\b|\\bcannot\\b|\\bcan't\\b))(?=[^\\r\\n]*\\bfor\\b)(?=[^\\r\\n]*(?:multi(?:-|\\s)binding|multiple\\s+bindings?|state\\s+binders?|for\\s+[A-Za-z_][A-Za-z0-9_]*\\s*=\\s*[^,\\r\\n]+,\\s*[A-Za-z_][A-Za-z0-9_]*\\s*=))(?=[^\\r\\n]*\\bbreak\\b)[^\\r\\n]+"
     },
     {
       "type": "output_not_matches",

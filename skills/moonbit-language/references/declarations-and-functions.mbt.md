@@ -2,6 +2,20 @@
 
 Every `mbt check` block in this file is compiled and run by the repository's verification suite (`tooling/run_checked_docs.ts`). Blocks marked `mbt nocheck` show rejected or deprecated forms and are never compiled.
 
+## Official topic map
+
+Search these exact official documentation topic names to route a question into this reference. A listed name is a discoverability route; the verification labels in the surrounding reference still determine whether its claim was executed or is documentation-only.
+
+- Program structure and entry points: Introduction; Expressions and Statements; Variable Binding; Program entrance; `init` and `main`
+- Naming and keyword status: Naming conventions; Keywords; Reserved Keywords
+- Fundamentals entry: Fundamentals
+- Functions, arguments, aliases, and recursion: Functions; Top-Level Functions; Local Functions; Function Applications; Partial Applications; Labelled arguments; Optional arguments; Optional arguments without default values; Autofill arguments; Function alias
+- Special syntax overview and pipelines: Special Syntax; Pipelines; Cascade Operator
+- TODO placeholder: TODO syntax
+- Methods and aliases: Method and Trait; Method system; Local method; Alias methods as functions
+- Comments and doc comments: Comments and Documentation; Comments; Doc Comments
+- Callsite autofill attribute: Callsite Attribute
+
 ## Program structure
 
 - The entry point is `fn main { ... }` — **no parameter list**. `fn main() { ... }` is a hard error (E3003), not a style issue.
@@ -14,9 +28,32 @@ fn main() { ... }   // WRONG: E3003 — write `fn main { ... }`
 init { ... }        // WRONG: parse error — write `fn init { ... }`
 ```
 
+## Comments and documentation
+
+Use `//` for an ordinary comment. Use `///` immediately before a top-level `fn`, `let`, `enum`, `struct`, or `type` for a Markdown Doc Comment; every line of a multi-line doc comment starts with `///`. A bare `///|` is an empty doc-comment line commonly used to separate top-level blocks, and `moon fmt` inserts it as a boundary.
+
+An `mbt check` fence inside a doc comment is a document test. `moon check` compiles it and `moon test` runs it; wrap its contents in `test { ... }` when assertions are needed. Document tests currently run as blackbox tests, so they cannot access private definitions. Use `mbt nocheck` or another language identifier for illustrative code that must not be compiled. Literate `.mbt.md` files and the full fence matrix are in tests-and-checked-docs.mbt.md.
+
+```mbt check
+/// Return one more than `n`.
+///
+/// ```mbt check
+/// test {
+///   assert_eq(decl_documented_increment(1), 2)
+/// }
+/// ```
+pub fn decl_documented_increment(n : Int) -> Int {
+  n + 1 // an ordinary implementation comment
+}
+```
+
 ## Names and keywords
 
-Value and function identifiers begin lowercase; types, enum constructors, and constants begin uppercase. MoonBit also has soft or reserved-for-future words that may still parse as identifiers while warning. In particular, `extend` is transitioning into syntax: rename an identifier called `extend` and use it only for explicit trait-method attachment. The `lang-dep-extend-identifier` fixture proves the warning and replacement.
+Value and function identifiers begin with lowercase `a-z`; types, enum constructors, and constants begin with uppercase `A-Z`. Both forms may continue with letters, digits, underscores, and non-ASCII Unicode characters. Use `snake_case` for values/functions and `PascalCase` or `SCREAMING_SNAKE_CASE` for types/constants.
+
+Keywords are syntax and cannot be identifiers at this pin: `as`, `else`, `extern`, `fn`, `fnalias`, `if`, `let`, `const`, `match`, `using`, `mut`, `type`, `typealias`, `struct`, `enum`, `extenum`, `trait`, `traitalias`, `derive`, `while`, `break`, `continue`, `import`, `return`, `throw`, `raise`, `try`, `catch`, `pub`, `priv`, `proof_assert`, `proof_let`, `readonly`, `true`, `false`, `_`, `test`, `loop`, `for`, `in`, `impl`, `with`, `guard`, `async`, `is`, `suberror`, `and`, `letrec`, `enumview`, `noraise`, `defer`, `lexmatch`, `lexscan`, `where`, `declare`, and `nobreak`.
+
+Reserved Keywords still parse in some identifier positions but warn because they may become syntax. The pinned official list includes `module`, `move`, `ref`, `static`, `super`, `unsafe`, `use`, `await`, `dyn`, `abstract`, `do`, `final`, `macro`, `override`, `typeof`, `virtual`, `yield`, `local`, `method`, `alias`, `assert`, `package`, `recur`, `isnot`, `define`, `downcast`, `inherit`, `member`, `namespace`, `upcast`, `void`, `lazy`, `include`, `mixin`, `protected`, `sealed`, `constructor`, `atomic`, `volatile`, `anyframe`, `anytype`, `asm`, `comptime`, `errdefer`, `export`, `opaque`, `orelse`, `resume`, `threadlocal`, `unreachable`, `dynclass`, `dynobj`, `dynrec`, `var`, `finally`, `noasync`, `assume`, and `extend`. The compiler is authoritative if that list drifts. In particular, rename an identifier called `extend` and use it only for explicit trait-method attachment; the `lang-dep-extend-identifier` fixture proves the warning and replacement with warnings denied.
 
 ## Top-level bindings
 

@@ -2,6 +2,36 @@
 
 Every `mbt check` block in this file is compiled and run by the repository's verification suite (`tooling/run_checked_docs.ts`). Blocks marked `mbt nocheck` show rejected or deprecated forms and are never compiled.
 
+## Official topic map
+
+Search these exact official documentation topic names to route a question into this reference. A listed name is a discoverability route; the verification labels in the surrounding reference still determine whether its claim was executed or is documentation-only.
+
+- Built-in data and overloaded literals: Built-in Data Structures; Unit; Boolean; Number; String; Char; Byte(s); Choosing a Byte Container; Tuple; Ref; Option and Result; Array; ArrayView; Map; Json; Overloaded Literals; Escape Sequences in Overloaded Literals
+- Spread operator: Spread Operator
+- Lexical conventions and literals: Lexical Conventions; Common Lexical Classes; String Literals; Interpolation; Multiline String Literals; Bytes Literals; Character Literals; Byte Literals
+
+## Core values, mutable cells, and failure containers
+
+`Unit` is a real type with one value, `()`, used when no meaningful result is returned. `Boolean` values have type `Bool`, are `true` or `false`, and use `!value` (or `not(value)`) for negation. A `Ref[T]` is a mutable cell: construct it with `Ref(value)` and read or assign its `.val` field. `Option[T]` (`T?`) represents a missing-or-present value; `Result[T, E]` represents `Ok(T)` or `Err(E)`. Checked language errors and conversions between errors, Option and Result are covered in errors-and-error-handling.mbt.md.
+
+```mbt check
+test "core values, Bool, Ref, Option, Result, and Json" {
+  let unit : Unit = ()
+  ignore(unit)
+  let enabled : Bool = !false
+  assert_true(enabled)
+  let cell : Ref[Int] = Ref(1)
+  cell.val = cell.val + 1
+  assert_eq(cell.val, 2)
+  let maybe : Int? = Some(3)
+  assert_true(maybe is Some(3))
+  let result : Result[Int, String] = Ok(4)
+  assert_true(result is Ok(4))
+  let object : Json = { "ok": true }
+  json_inspect(object, content={ "ok": true })
+}
+```
+
 ## Numbers
 
 Literal suffixes pin the type: `L` = Int64, `U` = UInt, `UL` = UInt64, `F` = Float, `N` = BigInt. An unsuffixed integer literal is `Int`; an unsuffixed decimal literal is `Double`. A plain literal also **overloads** to whatever the context expects — `42` fits Int64/UInt/Byte/BigInt, an integer literal fits a `Double`, and `3.14` fits a `Float`. `1_000_000` digit separators and `0x`/`0o`/`0b` radix prefixes work. BigInt is built in with arbitrary precision.
@@ -135,6 +165,21 @@ test "data types: interpolation and multiline strings" {
 }
 ```
 
+### Lexical and escape details
+
+String and Char literals accept simple escapes such as `\n`, `\r`, `\t`, `\b`, `\f`, `\\`, `\"`, `\'`, and `\/`, plus Unicode escapes `\u5154` and `\u{1F600}`. Byte and Bytes literals accept the simple escapes and one-byte `\xHH` / `\oDDD` escapes; Unicode escapes are invalid there. An unescaped Byte literal is ASCII, while non-ASCII text inside a Bytes literal contributes its UTF-8 bytes. There is no multiline Bytes literal.
+
+Interpolation expressions are nonempty and may nest ordinary literals, but they cannot contain a newline, `//` comment, attribute, or multiline string. Raw `#|` lines never interpolate; `$|` lines recognize `\{...}` but otherwise keep their text literal. A Character literal contains exactly one Unicode scalar value; a Byte literal contains one ASCII character or byte escape.
+
+```mbt check
+test "literal escape families" {
+  assert_eq("\f\/".length(), 2)
+  assert_eq(b"\x41\o102", b"AB")
+  assert_eq(b"月", b"\xe6\x9c\x88")
+  assert_eq('\u{1F600}'.to_int(), 0x1F600)
+}
+```
+
 Common methods: `has_prefix` (not the deprecated `starts_with`), `trim` with a labeled `chars?`, `contains`, `find` (returns the code-unit index as `Int?`). `s[a:b]` slices by UTF-16 index into a zero-copy `StringView`; `.to_owned()` copies it out. Slicing an invalid boundary **panics**. Build strings with `StringBuilder`; `<+` streams an interpolated template into a builder, and `<?` does the same through an `Option[writer]`, skipping `None`.
 
 ```mbt check
@@ -170,6 +215,17 @@ test "panic data types: slicing a string mid-surrogate" {
 ## Bytes
 
 `b"..."` is immutable `Bytes` and `b'a'` is a `Byte`; an array literal overloads to `Bytes`. Since 0.10.4, Bytes literals support the same `\{expr}` interpolation as String and encode the rendered text as UTF-8. `b[i]` returns a `Byte`; writing `b[0] = ...` does not compile. `b[a:b]` gives a zero-copy `BytesView`, and both pattern-match like arrays.
+
+Choosing a Byte Container depends on ownership, mutability, and size changes:
+
+| Need | Type |
+| --- | --- |
+| Owned immutable bytes | `Bytes` |
+| Borrowed immutable slice without copying | `BytesView` |
+| Owned mutable, growable storage | `Array[Byte]` |
+| Owned mutable, fixed-size storage | `FixedArray[Byte]` |
+| Borrowed readonly or mutable array slice | `ArrayView[Byte]` / `MutArrayView[Byte]` |
+| Incremental byte builder | `Buffer` (the official API is in `moonbitlang/core/buffer`) |
 
 ```mbt check
 test "data types: bytes and views" {

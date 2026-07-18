@@ -13,7 +13,7 @@ Every knowledge change must ship with its proof:
 | A toolchain command or flag | The command line in a ```sh fence plus a `verification/commands/manifest.json` entry that actually executes it (CI enforces coverage) |
 | A fact you cannot execute here (docs-only) | An explicit `documented` label plus the source URL in the text |
 
-The proof table checks accuracy. Completeness has a separate gate: `verification/language-surface/source.json` mechanically inventories the pinned official language toctree, included pages, and headings; its `coverage.json` routes every topic to exact product content or records a concrete boundary. Official documentation is an input to investigate, not executable truth. Run an unsuppressed minimal POC before recommending syntax—the official local-type example currently passes only because its package disables the deprecation warning.
+The proof table checks accuracy. Completeness has a separate gate: `verification/language-surface/source.json` recursively inventories the pinned official root/nested toctrees, pinned glob expansions, included pages, and headings; each item has a section-body fingerprint. Its schema-v2 `coverage.json` routes every topic to exact product content or records a concrete boundary and the fingerprint that was reviewed. Official documentation is an input to investigate, not executable truth. Run an unsuppressed minimal POC before recommending syntax—the official local-type example currently passes only because its package disables the deprecation warning.
 
 Run the full local check sequence from AGENTS.md before opening a PR. If a
 change touches a skill `description`, also re-run the activation eval and

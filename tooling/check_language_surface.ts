@@ -15,6 +15,7 @@ interface LanguageSurfaceCoverage {
 
 interface RouteDecision {
   source_ids?: unknown;
+  reviewed?: unknown;
   summary?: unknown;
   disposition?: unknown;
   owner_skill?: unknown;
@@ -46,8 +47,8 @@ export function validateLanguageSurfaceInventory(
   const fail = (message: string): void => {
     problems.push(`${label}: ${message}`);
   };
-  if (inventory.schema_version !== 1) {
-    fail("schema_version must be 1");
+  if (inventory.schema_version !== 2) {
+    fail("schema_version must be 2");
   }
   if (inventory.generated_by !== "tooling/snapshot_language_surface.ts") {
     fail("generated_by must be tooling/snapshot_language_surface.ts");
@@ -89,7 +90,7 @@ export function validateLanguageSurfaceInventory(
       fail(`duplicate document id ${repr(id)}`);
     }
     documentIds.add(id);
-    if (!/^next\/language\/[a-z0-9][a-z0-9/_-]*\.md$/.test(path)) {
+    if (!/^next\/language\/[A-Za-z0-9][A-Za-z0-9/_-]*\.md$/.test(path)) {
       fail(`${id || "document"}: invalid source path ${repr(path)}`);
     }
     if (documentPaths.has(path)) {
@@ -136,6 +137,9 @@ export function validateLanguageSurfaceInventory(
     if (stringValue(item.text) === "") {
       fail(`${id || "item"}: text must be non-empty`);
     }
+    if (!/^[0-9a-f]{64}$/.test(stringValue(item.fingerprint))) {
+      fail(`${id || "item"}: fingerprint must be a SHA-256 digest`);
+    }
     if (item.kind === "document") {
       documentRoots.set(documentId, (documentRoots.get(documentId) ?? 0) + 1);
       if (item.level !== 1 || item.id !== documentId || item.parent !== undefined) {
@@ -165,8 +169,8 @@ export function validateLanguageSurfaceCoverage(
   const fail = (message: string): void => {
     problems.push(`coverage.json: ${message}`);
   };
-  if (coverage.schema_version !== 1) {
-    fail("schema_version must be 1");
+  if (coverage.schema_version !== 2) {
+    fail("schema_version must be 2");
   }
   if (coverage.source_inventory !== "source.json") {
     fail("source_inventory must be source.json");
@@ -175,7 +179,8 @@ export function validateLanguageSurfaceCoverage(
     fail("routes must be an array");
     return problems;
   }
-  const sourceIds = new Set(inventory.items.map((item) => item.id));
+  const sourceItems = new Map(inventory.items.map((item) => [item.id, item]));
+  const sourceIds = new Set(sourceItems.keys());
   const seen = new Set<string>();
   for (const [index, rawDecision] of coverage.routes.entries()) {
     if (!isRecord(rawDecision)) {
@@ -197,6 +202,21 @@ export function validateLanguageSurfaceCoverage(
         fail(`${label}: duplicate source_id ${repr(id)}`);
       }
       seen.add(id);
+    }
+    if (!isRecord(decision.reviewed)) {
+      fail(`${label}: reviewed must map every source_id to its current fingerprint`);
+    } else {
+      const reviewedIds = Object.keys(decision.reviewed).sort();
+      const expectedIds = [...decisionIds].sort();
+      if (JSON.stringify(reviewedIds) !== JSON.stringify(expectedIds)) {
+        fail(`${label}: reviewed keys must exactly equal source_ids`);
+      }
+      for (const id of decisionIds) {
+        const expected = sourceItems.get(id)?.fingerprint;
+        if (decision.reviewed[id] !== expected) {
+          fail(`${label}: ${id} fingerprint changed; review and update this decision`);
+        }
+      }
     }
     if (stringValue(decision.summary) === "") {
       fail(`${label}: summary must be a non-empty string`);
@@ -236,7 +256,7 @@ export function validateLanguageSurfaceCoverage(
       ),
     );
     if (!isRecord(decision.content) || stringValue(decision.content.marker) === "") {
-      fail(`${label}: routed items require content.marker`);
+      fail(`${label}: routed items require content.marker and content.terms`);
       continue;
     }
     const reference = stringValue(decision.route.reference);
@@ -245,11 +265,26 @@ export function validateLanguageSurfaceCoverage(
       continue;
     }
     const marker = stringValue(decision.content.marker);
-    const occurrences = readFileSync(referencePath, "utf8").split(marker).length - 1;
+    const referenceContent = readFileSync(referencePath, "utf8");
+    const occurrences = referenceContent.split(marker).length - 1;
     if (occurrences !== 1) {
       fail(
         `${label}: content.marker must occur exactly once in ${reference}; found ${occurrences}`,
       );
+    }
+    const terms = stringArray(decision.content.terms);
+    const expectedTerms = decisionIds.map((id) => sourceItems.get(id)?.text ?? "");
+    if (
+      terms === undefined ||
+      JSON.stringify([...terms].sort()) !== JSON.stringify([...expectedTerms].sort())
+    ) {
+      fail(`${label}: content.terms must exactly list the official topic text for every source_id`);
+      continue;
+    }
+    for (const term of terms) {
+      if (!referenceContent.includes(term)) {
+        fail(`${label}: official topic term ${repr(term)} is absent from ${reference}`);
+      }
     }
   }
   for (const id of sourceIds) {

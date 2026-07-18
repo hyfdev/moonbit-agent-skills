@@ -1,0 +1,27 @@
+{
+  "id": "tool-internal-package-denied",
+  "owner_skill": "moonbit-toolchain",
+  "knowledge": "A package outside a/b/c cannot import a package under a/b/c/internal/... even within the same module.",
+  "expect": "check-fail",
+  "fix": "Move the caller under a/b/c or expose the API from a non-internal package",
+  "targets": [
+    "wasm-gc"
+  ],
+  "moon_args": [
+    "--deny-warn"
+  ],
+  "diagnostic_contains": [
+    "Cannot import internal package",
+    "due to internal visibility rules"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-07-18",
+    "components": {
+      "moon": "0.1.20260713 (75c7e1f 2026-07-13)",
+      "moonc": "v0.10.4+2cc641edf (2026-07-15)",
+      "moonrun": "moonrun 0.1.20260713 (75c7e1f 2026-07-13)"
+    },
+    "platform": "Linux-x86_64"
+  }
+}

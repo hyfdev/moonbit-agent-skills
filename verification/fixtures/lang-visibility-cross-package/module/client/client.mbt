@@ -11,13 +11,21 @@
 //   pub(readonly) struct S { x : Int }     -> E4002 The pub(readonly) modifier is not supported here
 
 ///|
-priv struct Mine {
+pub struct Mine {
   v : Int
 }
 
 ///|
-impl @vis.OpenTrait for Mine with f(self) {
+pub impl @vis.OpenTrait for Mine with f(self) {
   self.v
+}
+
+///|
+pub extend Mine with @vis.OpenTrait::{f}
+
+///|
+pub fn make_mine(value : Int) -> Mine {
+  { v: value }
 }
 
 ///|

@@ -2,6 +2,12 @@
 
 Every `mbt check` block in this file is compiled and run by the repository's verification suite (`tooling/run_checked_docs.ts`). Blocks marked `mbt nocheck` show rejected or deprecated forms and are never compiled. Attributes are written `#name(...)` on the line above a declaration; run `moon explain --attribute <name>` for the authoritative per-attribute reference.
 
+## Official topic map
+
+Search these exact official documentation topic names to route a question into this reference. A listed name is a discoverability route; the verification labels in the surrounding reference still determine whether its claim was executed or is documentation-only.
+
+- Language attributes: Deprecated Attribute; Alert Attribute; Alias Attribute; `label_migration` Attribute; Visibility Attribute; Internal Attribute; Doc Hidden Attribute; Warnings Attribute; Must Implement One Attribute; Inline Attribute; `as_free_fn` Attribute; Skip Attribute; Coverage Skip Attribute; Configuration attribute; Module attribute; Attribute
+
 ## The catalog
 
 `moon explain --attribute` lists these attribute names. The FFI attributes (`#external`, `#borrow`, `#owned`) are covered in the async-and-ffi reference.
@@ -17,7 +23,26 @@ Every `mbt check` block in this file is compiled and run by the repository's ver
 | `#inline`, `#inline(never)` | inlining hints |
 | `#coverage.skip` | exclude from coverage accounting |
 | `#external`, `#borrow`, `#owned` | FFI (see async-and-ffi) |
-| `#as_free_fn`, `#callsite`, `#doc`, `#internal`, `#label_migration`, `#module`, `#must_implement_one`, `#visibility` | documented; see `moon explain --attribute` |
+| `#as_free_fn` | expose a method as a free function, optionally with a distinct name, visibility, or deprecation |
+| `#callsite` | fill supported location values at the callsite |
+| `#doc(hidden)` | keep a public declaration out of generated API documentation |
+| `#internal` | warn when an internal API is used from another module |
+| `#label_migration` | stage optional/labelled-argument changes with callsite warnings |
+| `#module` | name the JavaScript module that supplies an `extern "js"` binding |
+| `#must_implement_one` | require a trait implementation to replace at least one default method |
+| `#visibility` | warn about uses that a planned `readonly` or `abstract` change will invalidate |
+
+## Migration, exposure, and trait-contract attributes
+
+**Documented, not executed:** the forms below come from the pinned official [attribute reference](https://docs.moonbitlang.com/en/latest/language/attributes.html). They affect cross-package/module callers, generated docs, JavaScript linking, or intentionally rejected implementations, so re-run a minimal cross-boundary example before relying on them under another compiler version.
+
+- `#label_migration(param, fill=true|false, msg="...")` stages adding or removing an optional argument. `allow_positional=true` temporarily accepts a labelled parameter positionally with a warning; `alias=new_name` accepts a renamed label during migration.
+- `#visibility(change_to="readonly"|"abstract", "message")` marks a fully visible type that will become less visible. It warns at external construction/mutation sites for `readonly`, and additionally at external pattern/field access sites for `abstract`.
+- `#internal(category, "message")` marks a function, type, or trait as module-internal. Cross-module use emits the corresponding alert category; it does not make the item inaccessible.
+- `#doc(hidden)` hides a still-public declaration from generated documentation.
+- `#must_implement_one` on a trait requires each implementation to replace at least one default method. `#must_implement_one(f, g)` narrows that requirement to the named group, and multiple attributes can require several groups independently.
+- `#as_free_fn` makes a method available as a free function. `#as_free_fn(dec, visibility="pub", deprecated="...")` selects its free-function name, visibility, and separate migration warning.
+- `#module("math-utils")` on an `extern "js"` declaration binds its foreign symbol through that CommonJS/ESM module rather than the ambient JavaScript scope.
 
 ## `#cfg`: conditional compilation
 

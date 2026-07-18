@@ -2,6 +2,14 @@
 
 Every `mbt check` block in this file is compiled and run by the repository's verification suite (`tooling/run_checked_docs.ts`). Blocks marked `mbt nocheck` show rejected or deprecated forms and are never compiled. This file is itself a literate `.mbt.md` document — the last section explains what that means.
 
+## Official topic map
+
+Search these exact official documentation topic names to route a question into this reference. A listed name is a discoverability route; the verification labels in the surrounding reference still determine whether its claim was executed or is documentation-only.
+
+- Top-level test syntax: `test`
+- Tests and snapshots: Writing Tests; Test Blocks; Snapshot Tests; Snapshotting `Show`; Snapshotting `JSON`; Snapshotting Anything; BlackBox Tests and WhiteBox Tests
+- Literate checked documentation: Literate `.mbt.md` Files
+
 ## Test blocks and assertions
 
 A test is `test "name" { ... }`; the name is optional, so a bare `test { ... }` is valid too. The built-in assertions are `assert_eq`, `assert_not_eq`, `assert_true`, `assert_false`, and `fail("msg")`. Every assertion **raises** on failure, so test bodies are allowed to raise — no `raise` annotation is needed on a `test` block.

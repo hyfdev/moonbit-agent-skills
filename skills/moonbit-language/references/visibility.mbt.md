@@ -2,6 +2,12 @@
 
 Every `mbt check` block in this file is compiled and run by the repository's verification suite (`tooling/run_checked_docs.ts`). Blocks marked `mbt nocheck` show rejected or deprecated forms and are never compiled. Cross-package rules cannot run inside one package, so the allowed/rejected matrix below is enforced by the two-package fixture `lang-visibility-cross-package` in this repository's verification suite.
 
+## Official topic map
+
+Search these exact official documentation topic names to route a question into this reference. A listed name is a discoverability route; the verification labels in the surrounding reference still determine whether its claim was executed or is documentation-only.
+
+- Prelude, using, visibility, and cross-package semantics: Prelude and builtin names; Using; Access Control; Functions; Aliases; Types; Traits; Trait Implementations
+
 ## Functions
 
 A plain `fn` is package-private; `pub fn` is callable from other packages. Inside the declaring package, everything below is fully accessible — the fence proves all forms compile and work locally.
@@ -95,6 +101,16 @@ Unqualified names resolve in the current package and the prelude; compiler-known
 // In a package whose moon.pkg imports the dependency as @origin:
 pub using @origin {increment, trait Service, type Handle}
 ```
+
+## Aliases
+
+Function and method aliases follow the original declaration's visibility unless `#alias(..., visibility="pub"|"priv")` overrides it. A Type alias and a source-level `using` declaration are package-private by default; prefix either with `pub` to expose or re-export it. The attribute syntax and deprecation options are in attributes.mbt.md.
+
+## Trait Implementations
+
+An implementation has its own cross-package visibility. Use `pub impl Trait for Type ...` when downstream packages must treat the type as implementing that trait; a plain `impl` is visible only inside the defining package. `pub extend` separately controls whether downstream code receives the selected dot-call methods—public conformance and public dot-call attachment are related but distinct decisions.
+
+Coherence limits where declarations may live: a regular method belongs in the type's package; a method written for a foreign or builtin type is a package-local method. A trait implementation may be declared only by the package that owns the type or the package that owns the trait. This prevents a third package from changing the meaning of an existing type/trait pair.
 
 ## Traits: `pub` is sealed, `pub(open)` is implementable
 

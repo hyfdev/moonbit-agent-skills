@@ -42,17 +42,17 @@ Each row is both a capability map and a search route. Load only the rows relevan
 
 | Need or search terms | Reference |
 | --- | --- |
-| Program structure; `fn main`; `fn init`; labelled arguments; optional arguments and forwarding; autofill / `#callsite`; `declare fn`; function aliases / `#alias`; deprecated `fnalias`; `letrec`; lambdas; partial application; pipelines `\|>` and `<\|`; methods; cascades; TODO placeholder `...` | references/declarations-and-functions.mbt.md |
-| Structs; struct update; enums; mutable enum fields; `extenum`; custom constructors; tuple structs; aliases; opaque types; derives; local type definitions are deprecated | references/types-structs-enums.mbt.md |
+| Program structure; `fn main`; `fn init`; naming conventions; Keywords and Reserved Keywords; `//` comments; `///` Doc Comments and doc tests; labelled arguments; optional arguments and forwarding; autofill / `#callsite`; `declare fn`; function aliases / `#alias`; deprecated `fnalias`; `letrec`; lambdas; partial application; pipelines `\|>` and `<\|`; methods; cascades; TODO placeholder `...` | references/declarations-and-functions.mbt.md |
+| Structs; struct update; enums; mutable enum fields; `extenum`; custom constructors; tuple structs; aliases; opaque types; derives; `Eq` / `Compare` / `Default`; JSON Enum styles; Deriving `Option`; Container, Case, and Field arguments; local type definitions are deprecated | references/types-structs-enums.mbt.md |
 | `match`; guards; array, string, map, bitstring, and `Json` patterns; regex literal and `=~`; or-pattern defaults with `with`; `lexscan`; deprecated `lexmatch` | references/pattern-matching.mbt.md |
-| Traits; generics; impls; explicit `extend` and `pub extend`; `implicit_impl_as_method`; supertrait dot-call migration; operators; trait objects | references/traits-and-generics.mbt.md |
-| `pub`; `pub(all)`; `pub(open)`; `priv`; source-level `using`; cross-package access and re-export | references/visibility.mbt.md |
+| Traits; generics; impls; explicit `extend` and `pub extend`; `implicit_impl_as_method`; supertrait dot-call migration; Builtin traits; Deriving builtin traits; operators; trait objects | references/traits-and-generics.mbt.md |
+| `pub`; `pub(all)`; `pub(open)`; `priv`; alias visibility; `pub impl`; source-level `using`; cross-package access and re-export | references/visibility.mbt.md |
 | Error types; `raise`; `try` / `catch` / `noraise`; `Option`; `Result`; deprecated `!Error`, bang calls, and `try?` | references/errors-and-error-handling.mbt.md |
-| Numbers; strings; bytes and interpolation; arrays, maps, views; conditional spread; ambiguous `{}`; immutable `Type(array)` / deprecated `from_array`; negative view indices; removed collection aliases and `IterResult`; `Json::empty_object`, String predicates, `Int16` / `UInt16` `lnot` | references/data-types.mbt.md |
+| `Unit`; `Bool`; `Ref`; `Option`; `Result`; `Json`; Numbers and overloaded literals; strings, bytes, escapes, interpolation, and Choosing a Byte Container; arrays, maps, views; conditional spread; ambiguous `{}`; immutable `Type(array)` / deprecated `from_array`; negative view indices; removed collection aliases and `IterResult`; `Json::empty_object`, String predicates, `Int16` / `UInt16` `lnot` | references/data-types.mbt.md |
 | `if`; `while`; `for`; list comprehensions; `Iter` and `[\| ... \|]`; deprecated implicit array-to-Iter and `loop`; labels; closures; `defer` | references/control-flow-and-iteration.mbt.md |
 | `test`; snapshots; `inspect`; blackbox and whitebox tests; doc tests; `.mbt.md` | references/tests-and-checked-docs.mbt.md |
-| `async`; task groups; cancellation; Wasm1 runtime boundary; `extern "js"`, `extern "wasm"`, `extern "C"`; exported functions; FFI ownership and callbacks | references/async-and-ffi.md |
-| Attributes including `#cfg`, `#deprecated`, `#alias`, `#as_free_fn`, `#callsite`, `#warnings`; deprecated `@` warning switch and `--deny-warn`; derives | references/attributes.mbt.md |
+| `async`; task groups; cancellation and cleanup; JavaScript Promise bridge; native/JS/Wasm1 runtime boundaries; `extern "js"`, `extern "wasm"`, `extern "C"`; stable FFI Types; constant enum ABI values; exported functions; FFI ownership and callbacks | references/async-and-ffi.md |
+| Attributes including `#cfg`, `#deprecated`, `#alias`, `#as_free_fn`, `#callsite`, `#doc(hidden)`, `#internal`, `#label_migration`, `#module`, `#must_implement_one`, `#visibility`, `#warnings`; deprecated `@` warning switch and `--deny-warn`; derives | references/attributes.mbt.md |
 | Rust, TypeScript, Go, and stale MoonBit forms; silent interpolation, `defer`, integer division, and indexing traps | references/cross-language-and-stale-syntax.md |
 | Skill guidance contradicts the compiler; minimal reproduction and privacy-scrubbed issue draft | references/reporting-errors.md |
 

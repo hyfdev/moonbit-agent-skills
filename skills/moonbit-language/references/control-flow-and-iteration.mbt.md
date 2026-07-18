@@ -2,6 +2,12 @@
 
 Every `mbt check` block in this file is compiled and run by the repository's verification suite (`tooling/run_checked_docs.ts`). Blocks marked `mbt nocheck` show rejected or deprecated forms and are never compiled.
 
+## Official topic map
+
+Search these exact official documentation topic names to route a question into this reference. A listed name is a discoverability route; the verification labels in the surrounding reference still determine whether its claim was executed or is documentation-only.
+
+- Control structures and iteration: Control Structures; Conditional Expressions; Match Expression; Guard Statement; Guard statement and is expression; While loop; For Loop; `for .. in` loop; Range expression in `for .. in` loop; List comprehension; Labelled Continue/Break; `defer` expression; Iterator
+
 ## `if` and `match` are expressions
 
 Both yield a value. An `if` without `else` is `Unit`-typed. (Full pattern syntax lives in pattern-matching.mbt.md.)

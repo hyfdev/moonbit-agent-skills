@@ -12,6 +12,7 @@ import {
   extractLanguageDocuments,
   extractLanguageIncludes,
   extractLanguageItems,
+  extractNestedLanguageDocuments,
   LANGUAGE_INDEX_PATH,
   RAW_DOCS_REPOSITORY,
   type LanguageSurfaceInventory,
@@ -79,6 +80,7 @@ describe("official language surface snapshot", () => {
         kind: "document",
         level: 1,
         text: "Introduction",
+        fingerprint: expect.stringMatching(/^[0-9a-f]{64}$/),
       },
       {
         id: "document-introduction-functions",
@@ -87,6 +89,7 @@ describe("official language surface snapshot", () => {
         level: 2,
         parent: "document-introduction",
         text: "Functions",
+        fingerprint: expect.stringMatching(/^[0-9a-f]{64}$/),
       },
       {
         id: "document-introduction-labelled-arguments",
@@ -95,11 +98,65 @@ describe("official language surface snapshot", () => {
         level: 3,
         parent: "document-introduction-functions",
         text: "Labelled arguments",
+        fingerprint: expect.stringMatching(/^[0-9a-f]{64}$/),
       },
     ]);
   });
 
-  it("pins every direct and included file with a content-derived item ID", () => {
+  it("recursively follows nested toctrees and expands pinned glob entries", () => {
+    const catalog = `# Catalog
+
+\`\`\`{toctree}
+errors/index
+\`\`\`
+`;
+    const errors = `# Errors
+
+\`\`\`{toctree}
+:glob:
+E*
+\`\`\`
+`;
+    const documents = new Map([
+      ["next/language/catalog.md", catalog],
+      ["next/language/errors/index.md", errors],
+      ["next/language/errors/E0001.md", "# E0001\n"],
+      ["next/language/errors/E0002.md", "# E0002\n"],
+    ]);
+
+    expect(
+      extractNestedLanguageDocuments("next/language/errors/index.md", errors, [
+        ...documents.keys(),
+      ]),
+    ).toEqual(["next/language/errors/E0001.md", "next/language/errors/E0002.md"]);
+    expect(
+      createLanguageSurfaceInventory(
+        "# Language\n\n```{toctree}\ncatalog\n```\n",
+        documents,
+        "c".repeat(40),
+      ).documents.map((document) => document.path),
+    ).toEqual([
+      "next/language/errors/E0001.md",
+      "next/language/errors/E0002.md",
+      "next/language/errors/index.md",
+      "next/language/catalog.md",
+    ]);
+  });
+
+  it("keeps item IDs stable but changes fingerprints when section bodies change", () => {
+    const before = minimalInventory("\nThe original function guidance.\n");
+    const after = minimalInventory("\nUpdated function guidance.\n");
+
+    expect(after.items.map((item) => item.id)).toEqual(before.items.map((item) => item.id));
+    expect(after.items.map((item) => item.fingerprint)).not.toEqual(
+      before.items.map((item) => item.fingerprint),
+    );
+    expect(after.items.find((item) => item.id.endsWith("-functions"))?.fingerprint).not.toBe(
+      before.items.find((item) => item.id.endsWith("-functions"))?.fingerprint,
+    );
+  });
+
+  it("pins every reachable file and fingerprints each item body", () => {
     const inventory = sampleInventory();
     expect(inventory.documents.map((document) => document.path)).toEqual([
       "next/language/introduction.md",
@@ -113,12 +170,13 @@ describe("official language surface snapshot", () => {
     expect(validateLanguageSurfaceInventory(inventory, "source.json")).toEqual([]);
   });
 
-  it("accepts the committed 33-document, 227-item inventory", () => {
+  it("accepts the committed 324-document, 1,070-item recursive inventory", () => {
     const inventory = JSON.parse(
       readFileSync(join(REPO_ROOT, "verification/language-surface/source.json"), "utf8"),
     ) as LanguageSurfaceInventory;
-    expect(inventory.documents).toHaveLength(33);
-    expect(inventory.items).toHaveLength(227);
+    expect(inventory.schema_version).toBe(2);
+    expect(inventory.documents).toHaveLength(324);
+    expect(inventory.items).toHaveLength(1070);
     expect(validateLanguageSurfaceInventory(inventory, "source.json")).toEqual([]);
   });
 });
@@ -136,6 +194,39 @@ describe("language surface closure and routes", () => {
     );
     expect(validateLanguageSurfaceCoverage(coverage, inventory, root)).toContain(
       "coverage.json: missing route for source item 'document-introduction-optional-arguments'",
+    );
+  });
+
+  it("rejects a route whose reviewed fingerprint predates a body change", () => {
+    const root = minimalRoutedRepository();
+    const coverage = JSON.parse(
+      readFileSync(join(root, "verification/language-surface/coverage.json"), "utf8"),
+    );
+    const problems = validateLanguageSurfaceCoverage(
+      coverage,
+      minimalInventory("\nChanged guidance without a new heading.\n"),
+      root,
+    );
+
+    expect(problems.join("\n")).toMatch(
+      /document-introduction(?:-functions)? fingerprint changed; review and update this decision/,
+    );
+  });
+
+  it("does not let a generic route stand in for a distinct official topic", () => {
+    const root = minimalRoutedRepository();
+    const inventory = minimalInventory("\n### Enum styles\n");
+    const coveragePath = join(root, "verification/language-surface/coverage.json");
+    const coverage = JSON.parse(readFileSync(coveragePath, "utf8"));
+    const decision = coverage.routes[0];
+    decision.source_ids = inventory.items.map((item) => item.id);
+    decision.reviewed = Object.fromEntries(
+      inventory.items.map((item) => [item.id, item.fingerprint]),
+    );
+    decision.content.terms = inventory.items.map((item) => item.text);
+
+    expect(validateLanguageSurfaceCoverage(coverage, inventory, root).join("\n")).toContain(
+      "official topic term 'Enum styles' is absent from references/functions.mbt.md",
     );
   });
 
@@ -223,15 +314,20 @@ function minimalRoutedRepository(): string {
     join(skill, "SKILL.md"),
     "# Skill\n\n## Feature index\n\n- Functions → references/functions.mbt.md\n",
   );
-  writeFileSync(join(skill, "references/functions.mbt.md"), "# Functions\n");
+  writeFileSync(
+    join(skill, "references/functions.mbt.md"),
+    "# Functions\n\nOfficial topic names: Introduction, Functions.\n",
+  );
+  const inventory = minimalInventory();
   writeFileSync(
     join(verification, "coverage.json"),
     JSON.stringify({
-      schema_version: 1,
+      schema_version: 2,
       source_inventory: "source.json",
       routes: [
         {
           source_ids: ["document-introduction", "document-introduction-functions"],
+          reviewed: Object.fromEntries(inventory.items.map((item) => [item.id, item.fingerprint])),
           summary: "Functions",
           disposition: "routed",
           owner_skill: "moonbit-language",
@@ -240,7 +336,7 @@ function minimalRoutedRepository(): string {
             reference: "references/functions.mbt.md",
             terms: ["Functions"],
           },
-          content: { marker: "# Functions" },
+          content: { marker: "# Functions", terms: ["Introduction", "Functions"] },
         },
       ],
     }),

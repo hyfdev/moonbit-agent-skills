@@ -42,7 +42,7 @@ Every command and configuration shape in this skill was executed for real agains
 
 Load only what the task needs:
 
-- Module/package layout; `moon.mod` / `moon.pkg`; deprecated `moon.mod.json` / `moon.pkg.json`; `source`; formatter; `pkgtype`; `#export_name`; virtual packages with `options("virtual")`, `implement`, and `overrides` → references/project-layout-and-config.md
+- Module/package layout and Internal Packages; `moon.mod` / `moon.pkg`; deprecated `moon.mod.json` / `moon.pkg.json`; `source`; formatter; `pkgtype`; `#export_name`; virtual packages with `options("virtual")`, `implement`, and `overrides` → references/project-layout-and-config.md
 - Everyday `moon new`, `check`, `build`, `run`, `test`, `fmt`, `info`, `doc`, and `clean`; executed-program exit code → references/commands.md
 - Test path filtering, snapshots, doc tests, coverage, `moon bench PATH`, and raw benchmark statistics → references/testing-workflows.md
 - Dependencies, mooncakes registry, publishing, and packaging → references/dependencies-and-registry.md

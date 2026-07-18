@@ -1,11 +1,12 @@
 import { createHash } from "node:crypto";
-import { readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { join, matchesGlob, posix } from "node:path";
 import { exitWith, isMain, parseCliArgs, usageError } from "./lib/cli.ts";
 import { stableJson } from "./lib/json.ts";
 
 export const DOCS_REPOSITORY = "https://github.com/moonbitlang/moonbit-docs";
 export const RAW_DOCS_REPOSITORY = "https://raw.githubusercontent.com/moonbitlang/moonbit-docs";
+export const DOCS_TREE_API = "https://api.github.com/repos/moonbitlang/moonbit-docs/git/trees";
 export const LANGUAGE_INDEX_PATH = "next/language/index.md";
 
 export interface LanguageSurfaceDocument {
@@ -22,10 +23,11 @@ export interface LanguageSurfaceItem {
   level: number;
   parent?: string;
   text: string;
+  fingerprint: string;
 }
 
 export interface LanguageSurfaceInventory {
-  schema_version: 1;
+  schema_version: 2;
   generated_by: "tooling/snapshot_language_surface.ts";
   source: {
     repository: typeof DOCS_REPOSITORY;
@@ -103,19 +105,96 @@ export function extractLanguageIncludes(markdown: string): string[] {
   return includes;
 }
 
+export function extractNestedLanguageDocuments(
+  sourcePath: string,
+  markdown: string,
+  availablePaths?: readonly string[],
+): string[] {
+  const documents: string[] = [];
+  let inToctree = false;
+  let glob = false;
+  let entries: string[] = [];
+  const finish = (): void => {
+    for (const entry of entries) {
+      if (!/^[A-Za-z0-9][A-Za-z0-9_./*-]*$/.test(entry) || entry.includes("..")) {
+        throw new Error(`${sourcePath}: unsupported nested toctree entry ${JSON.stringify(entry)}`);
+      }
+      const suffix = entry.endsWith(".md") ? entry : `${entry}.md`;
+      const resolved = posix.normalize(posix.join(posix.dirname(sourcePath), suffix));
+      if (!resolved.startsWith("next/language/") || resolved.includes("/../")) {
+        throw new Error(`${sourcePath}: unsafe nested toctree entry ${JSON.stringify(entry)}`);
+      }
+      const matches = glob
+        ? (
+            availablePaths ??
+            (() => {
+              throw new Error(
+                `${sourcePath}: glob toctree requires the pinned repository file list`,
+              );
+            })()
+          ).filter((path) => matchesGlob(path, resolved))
+        : [resolved];
+      if (matches.length === 0) {
+        throw new Error(
+          `${sourcePath}: nested toctree entry ${JSON.stringify(entry)} matched no files`,
+        );
+      }
+      for (const path of matches.sort()) {
+        if (!documents.includes(path)) {
+          documents.push(path);
+        }
+      }
+    }
+    entries = [];
+    glob = false;
+  };
+
+  for (const line of markdown.split(/\r?\n/)) {
+    if (line.trim() === "```{toctree}") {
+      if (inToctree) {
+        throw new Error(`${sourcePath}: nested toctree fence inside a toctree`);
+      }
+      inToctree = true;
+      continue;
+    }
+    if (inToctree && line.trim() === "```") {
+      finish();
+      inToctree = false;
+      continue;
+    }
+    if (!inToctree) {
+      continue;
+    }
+    const entry = line.trim();
+    if (entry === ":glob:") {
+      glob = true;
+    } else if (entry !== "" && !entry.startsWith(":")) {
+      entries.push(entry);
+    }
+  }
+  if (inToctree) {
+    throw new Error(`${sourcePath}: unclosed nested toctree`);
+  }
+  return documents;
+}
+
 export function extractLanguageItems(path: string, markdown: string): LanguageSurfaceItem[] {
   const slug = path
     .replace(/^next\/language\//, "")
     .replace(/\.md$/, "")
-    .replaceAll("/", "-");
+    .replaceAll("/", "-")
+    .toLowerCase();
   const documentId = `document-${slug}`;
   const items: LanguageSurfaceItem[] = [];
   const headingIds = new Map<string, number>();
   const parents = new Map<number, string>();
+  const itemLineIndexes: number[] = [];
+  const headingLines: Array<{ line: number; level: number }> = [];
   let inFence = false;
   let title = "";
+  const lines = markdown.split(/\r?\n/);
 
-  for (const line of markdown.split(/\r?\n/)) {
+  for (const [lineIndex, line] of lines.entries()) {
     if (line.trimStart().startsWith("```")) {
       inFence = !inFence;
       continue;
@@ -129,6 +208,7 @@ export function extractLanguageItems(path: string, markdown: string): LanguageSu
     }
     const level = match[1].length;
     const text = match[2].trim();
+    headingLines.push({ line: lineIndex, level });
     if (level === 1) {
       if (title !== "") {
         throw new Error(`${path} has more than one level-one heading`);
@@ -148,7 +228,16 @@ export function extractLanguageItems(path: string, markdown: string): LanguageSu
       [...parents.entries()]
         .filter(([parentLevel]) => parentLevel < level)
         .sort(([left], [right]) => right - left)[0]?.[1] ?? documentId;
-    items.push({ id, document_id: documentId, kind: "heading", level, parent, text });
+    items.push({
+      id,
+      document_id: documentId,
+      kind: "heading",
+      level,
+      parent,
+      text,
+      fingerprint: "",
+    });
+    itemLineIndexes.push(lineIndex);
     parents.set(level, id);
     for (const parentLevel of parents.keys()) {
       if (parentLevel > level) {
@@ -162,8 +251,22 @@ export function extractLanguageItems(path: string, markdown: string): LanguageSu
   if (title === "") {
     throw new Error(`${path} has no level-one heading`);
   }
+  for (const [index, item] of items.entries()) {
+    const start = itemLineIndexes[index];
+    const end =
+      headingLines.find((heading) => heading.line > start && heading.level <= item.level)?.line ??
+      lines.length;
+    item.fingerprint = sha256(`${lines.slice(start, end).join("\n").trimEnd()}\n`);
+  }
   return [
-    { id: documentId, document_id: documentId, kind: "document", level: 1, text: title },
+    {
+      id: documentId,
+      document_id: documentId,
+      kind: "document",
+      level: 1,
+      text: title,
+      fingerprint: sha256(markdown),
+    },
     ...items,
   ];
 }
@@ -187,7 +290,8 @@ export function createLanguageSurfaceInventory(
     const id = `document-${path
       .replace(/^next\/language\//, "")
       .replace(/\.md$/, "")
-      .replaceAll("/", "-")}`;
+      .replaceAll("/", "-")
+      .toLowerCase()}`;
     documents.push({
       id,
       path,
@@ -201,7 +305,7 @@ export function createLanguageSurfaceInventory(
     throw new Error("language surface generated duplicate item IDs");
   }
   return {
-    schema_version: 1,
+    schema_version: 2,
     generated_by: "tooling/snapshot_language_surface.ts",
     source: {
       repository: DOCS_REPOSITORY,
@@ -222,16 +326,23 @@ export async function fetchLanguageSurface(
   const indexMarkdown = await fetchPinned(LANGUAGE_INDEX_PATH, commit, fetcher);
   const markdownByPath = new Map<string, string>();
   const pending = [...extractLanguageDocuments(indexMarkdown)];
+  let availablePaths: string[] | undefined;
   while (pending.length > 0) {
-    const batch = pending.splice(0).filter((path) => !markdownByPath.has(path));
+    const batch = pending.splice(0, 32).filter((path) => !markdownByPath.has(path));
     const entries = await Promise.all(
       batch.map(async (path) => [path, await fetchPinned(path, commit, fetcher)] as const),
     );
     for (const [path, markdown] of entries) {
       markdownByPath.set(path, markdown);
-      for (const included of extractLanguageIncludes(markdown)) {
-        if (!markdownByPath.has(included) && !pending.includes(included)) {
-          pending.push(included);
+      if (markdown.includes("```{toctree}") && markdown.includes(":glob:")) {
+        availablePaths ??= await fetchPinnedRepositoryPaths(commit, fetcher);
+      }
+      for (const discovered of [
+        ...extractLanguageIncludes(markdown),
+        ...extractNestedLanguageDocuments(path, markdown, availablePaths),
+      ]) {
+        if (!markdownByPath.has(discovered) && !pending.includes(discovered)) {
+          pending.push(discovered);
         }
       }
     }
@@ -272,6 +383,7 @@ export async function main(args = process.argv.slice(2)): Promise<number> {
     const root = values["source-root"];
     indexMarkdown = readFileSync(join(root, LANGUAGE_INDEX_PATH), "utf8");
     markdownByPath = new Map();
+    const availablePaths = localLanguageMarkdownPaths(root);
     const pending = [...extractLanguageDocuments(indexMarkdown)];
     while (pending.length > 0) {
       const path = pending.shift() as string;
@@ -280,7 +392,10 @@ export async function main(args = process.argv.slice(2)): Promise<number> {
       }
       const markdown = readFileSync(join(root, path), "utf8");
       markdownByPath.set(path, markdown);
-      pending.push(...extractLanguageIncludes(markdown));
+      pending.push(
+        ...extractLanguageIncludes(markdown),
+        ...extractNestedLanguageDocuments(path, markdown, availablePaths),
+      );
     }
   } else {
     ({ indexMarkdown, markdownByPath } = await fetchLanguageSurface(values.commit));
@@ -323,6 +438,7 @@ function resolveDocumentOrder(
 ): string[] {
   const ordered: string[] = [];
   const visiting = new Set<string>();
+  const availablePaths = [...markdownByPath.keys()];
   const visit = (path: string): void => {
     if (ordered.includes(path)) {
       return;
@@ -335,8 +451,11 @@ function resolveDocumentOrder(
       throw new Error(`missing language document ${path}`);
     }
     visiting.add(path);
-    for (const included of extractLanguageIncludes(markdown)) {
-      visit(included);
+    for (const discovered of [
+      ...extractLanguageIncludes(markdown),
+      ...extractNestedLanguageDocuments(path, markdown, availablePaths),
+    ]) {
+      visit(discovered);
     }
     visiting.delete(path);
     ordered.push(path);
@@ -363,6 +482,47 @@ async function fetchPinned(path: string, commit: string, fetcher: typeof fetch):
     throw new Error(`failed to fetch pinned MoonBit docs: HTTP ${response.status} ${url}`);
   }
   return response.text();
+}
+
+async function fetchPinnedRepositoryPaths(
+  commit: string,
+  fetcher: typeof fetch,
+): Promise<string[]> {
+  const url = `${DOCS_TREE_API}/${commit}?recursive=1`;
+  const response = await fetcher(url);
+  if (!response.ok) {
+    throw new Error(`failed to fetch pinned MoonBit docs tree: HTTP ${response.status} ${url}`);
+  }
+  const body = (await response.json()) as {
+    truncated?: boolean;
+    tree?: Array<{ path?: string; type?: string }>;
+  };
+  if (body.truncated === true || !Array.isArray(body.tree)) {
+    throw new Error("pinned MoonBit docs tree is missing or truncated");
+  }
+  return body.tree
+    .filter((entry) => entry.type === "blob")
+    .map((entry) => entry.path ?? "")
+    .filter((path) => path.startsWith("next/language/") && path.endsWith(".md"))
+    .sort();
+}
+
+function localLanguageMarkdownPaths(root: string): string[] {
+  const base = join(root, "next", "language");
+  const paths: string[] = [];
+  const visit = (directory: string, relativeDirectory: string): void => {
+    for (const entry of readdirSync(directory).sort()) {
+      const path = join(directory, entry);
+      const relativePath = relativeDirectory === "" ? entry : `${relativeDirectory}/${entry}`;
+      if (statSync(path).isDirectory()) {
+        visit(path, relativePath);
+      } else if (entry.endsWith(".md")) {
+        paths.push(`next/language/${relativePath}`);
+      }
+    }
+  };
+  visit(base, "");
+  return paths;
 }
 
 if (isMain(import.meta.url)) {

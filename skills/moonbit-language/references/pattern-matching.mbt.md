@@ -2,6 +2,13 @@
 
 Every `mbt check` block in this file is compiled and run by the repository's verification suite (`tooling/run_checked_docs.ts`). Blocks marked `mbt nocheck` show rejected or deprecated forms and are never compiled.
 
+## Official topic map
+
+Search these exact official documentation topic names to route a question into this reference. A listed name is a discoverability route; the verification labels in the surrounding reference still determine whether its claim was executed or is documentation-only.
+
+- Pattern matching forms: Pattern Matching; Simple Patterns; Array Pattern; Bitstring Pattern; Range Pattern; Map Pattern; Json Pattern; Default bindings in or-patterns; Guard condition
+- is, regex, lexscan, and lexmatch: is Expression; Regex Literal Expression; Regex Match Expression; Lexscan; Lexmatch (deprecated)
+
 ## match basics
 
 Arms are `Pattern => expression`, separated by newlines — a Rust-style trailing comma is a hard error (E3800). Guards are `x if cond =>`, or-patterns are `1 | 2 | 3`, and integer ranges match with `4..=9` (inclusive end) or `10..<100` (exclusive end).

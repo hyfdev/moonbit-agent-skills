@@ -2,12 +2,23 @@
 
 Everything below was executed against the pinned toolchain (moon 0.1.20260713 / moonc v0.10.4). The current config format is the `moon.mod` / `moon.pkg` DSL; `moon.mod.json` / `moon.pkg.json` are the deprecated JSON predecessors, which still parse at the pin.
 
+## Official topic map
+
+Use these exact headings from the official language documentation to recognize project-operation questions handled here. A heading establishes routing only; the surrounding reference states which behavior was executed and which remains documentation-only.
+
+- Package and module operation: Managing Projects with Packages; Packages and modules; Internal Packages
+- Virtual packages: Virtual Packages; Defining a virtual package; Implementing a virtual package; Using a virtual package; Overriding a virtual package
+
 ## Module and package model
 
 - A **module** is a directory with a `moon.mod` file (or legacy `moon.mod.json`). It is the unit of versioning and publishing, named `user/name`.
 - A **package** is any directory inside the module that contains a `moon.pkg` file. An empty zero-byte `moon.pkg` is enough — presence alone marks the directory as a package. Packages are the unit of compilation and import.
 - The module root is itself a package when it has a `moon.pkg`; other packages import it by the bare module name (`"user/name"`). Subpackages are imported as `"user/name/sub/dir"`.
 - **Trap — silent invisibility:** a directory *without* `moon.pkg` is not a package. Its `.mbt` files are never compiled, and no command emits any diagnostic about them (`moon check` stays green). When code seems ignored, check for a missing `moon.pkg` first.
+
+### Internal Packages
+
+A package below `a/b/c/internal/...` can be imported only by `a/b/c` and packages below that path. A package elsewhere in the same module is still rejected; `internal` is a path boundary, not a module-wide visibility flag and not the language-level `#internal` alert attribute. The `tool-internal-package-access` and `tool-internal-package-denied` fixtures prove both sides of this boundary with warnings denied.
 
 ## What `moon new` generates
 

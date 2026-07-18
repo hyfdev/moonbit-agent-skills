@@ -904,14 +904,35 @@ it("executes the TypeScript content runner directly with Node 24", () => {
   expect(result.stdout).toContain("1 task(s) valid");
 });
 
-it("loads a frozen experiment manifest without duplicating CLI configuration", () => {
+it("rejects more than two direct content repetitions", () => {
+  const result = spawnSync(
+    process.execPath,
+    [
+      RUNNER,
+      "--area",
+      "language",
+      "--ids",
+      "lang-explicit-extend",
+      "--condition",
+      "ours",
+      "--repetitions",
+      "3",
+      "--dry-run",
+    ],
+    { encoding: "utf8" },
+  );
+  expect(result.status).toBe(2);
+  expect(result.stderr).toContain("--repetitions must be 1 or 2");
+});
+
+it("rejects replay of a frozen historical K3 experiment", () => {
   const result = spawnSync(
     process.execPath,
     [RUNNER, "--experiment", "evals/experiments/extend-route-kimi-k3.json", "--dry-run"],
     { cwd: REPO_ROOT, encoding: "utf8" },
   );
-  expect(result.status, result.stderr).toBe(0);
-  expect(result.stdout).toContain("4 task(s) valid");
+  expect(result.status).toBe(2);
+  expect(result.stderr).toContain("repetitions must be 1 or 2");
 });
 
 it("accepts a runtime-only API budget alongside a frozen experiment", () => {

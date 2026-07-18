@@ -25,8 +25,7 @@ node evals/activation/run_activation.ts --client claude-code --model haiku --mod
 # Subscription content comparison with paired AB/BA ordering across tasks.
 node evals/run_content.ts --area language --condition baseline --condition ours --client kimi-code --model kimi-code/k3 --repetitions 1 --max-turns 50 --run-name language-kimi-k1
 
-# Replay a checked-in frozen historical experiment. Existing K3 manifests preserve old evidence; new experiments default to one repetition and must not exceed two.
-node evals/run_content.ts --experiment evals/experiments/extend-route-kimi-k3.json
+# New experiment manifests use one or two repetitions. Historical K3 manifests and result summaries remain evidence, but the runners intentionally reject replaying them.
 
 # Prove canonical solutions pass and plausible wrong solutions fail before any model calls.
 node evals/validate_graders.ts

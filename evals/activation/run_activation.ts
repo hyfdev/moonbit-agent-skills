@@ -48,6 +48,7 @@ import {
   type AgentClient,
   type ParsedAgentStream,
 } from "../lib/agent_cli.ts";
+import { MAX_EVAL_REPETITIONS } from "../lib/eval_policy.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(HERE, "../..");
@@ -316,8 +317,12 @@ export function parseCliArgs(argv: string[]): CliOptions {
     throw new Error("--repetitions must be a positive integer");
   }
   const repetitions = Number.parseInt(values.repetitions, 10);
-  if (!Number.isSafeInteger(repetitions) || repetitions < 1) {
-    throw new Error("--repetitions must be a positive integer");
+  if (
+    !Number.isSafeInteger(repetitions) ||
+    repetitions < 1 ||
+    repetitions > MAX_EVAL_REPETITIONS
+  ) {
+    throw new Error(`--repetitions must be 1 or ${MAX_EVAL_REPETITIONS}`);
   }
   const paidBudgetUsd =
     values["paid-budget-usd"] === undefined

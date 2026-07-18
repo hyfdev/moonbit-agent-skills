@@ -16,6 +16,7 @@ import {
   loadExistingResults,
   loadPrompts,
   materializePrompt,
+  parseCliArgs,
   parseActivationStream,
   prepareActivationInputs,
   scoreActivation,
@@ -32,6 +33,15 @@ const ENVIRONMENT = {
   platform: "linux-test-x64",
   model_environment: {},
 };
+
+it("limits activation repetitions to two", () => {
+  expect(
+    parseCliArgs(["--client", "kimi-code", "--repetitions", "2", "--dry-run"]).repetitions,
+  ).toBe(2);
+  expect(() => parseCliArgs(["--client", "kimi-code", "--repetitions", "3", "--dry-run"])).toThrow(
+    "--repetitions must be 1 or 2",
+  );
+});
 
 function result(overrides: Partial<ActivationResult> = {}): ActivationResult {
   return {

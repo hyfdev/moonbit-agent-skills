@@ -52,6 +52,7 @@ import {
   type ToolResultRecord as NormalizedToolResultRecord,
   type ToolUseRecord as NormalizedToolUseRecord,
 } from "./lib/agent_cli.ts";
+import { MAX_EVAL_REPETITIONS } from "./lib/eval_policy.ts";
 import { pairedSummary, type PairableResult } from "./lib/paired_stats.ts";
 
 const DESCRIPTION =
@@ -1691,7 +1692,7 @@ function loadContentExperiment(pathValue: string): {
     experiment.conditions.length < 2 ||
     !Array.isArray(experiment.task_ids) ||
     experiment.task_ids.length === 0 ||
-    !Number.isInteger(experiment.repetitions) ||
+    !Number.isSafeInteger(experiment.repetitions) ||
     experiment.repetitions < 1 ||
     !Number.isInteger(experiment.max_turns) ||
     experiment.max_turns < 1 ||
@@ -1702,6 +1703,11 @@ function loadContentExperiment(pathValue: string): {
     experiment.minimum_valuable_difference > 1
   ) {
     throw new Error(pathValue + ": invalid content experiment manifest");
+  }
+  if (experiment.repetitions > MAX_EVAL_REPETITIONS) {
+    throw new Error(
+      `${pathValue}: repetitions must be 1 or ${MAX_EVAL_REPETITIONS}; historical K3 manifests are evidence only`,
+    );
   }
   if (new Set(experiment.conditions).size !== experiment.conditions.length) {
     throw new Error(pathValue + ": duplicate experiment conditions");
@@ -1871,9 +1877,15 @@ function parseCli(argv: string[]): { options?: CliOptions; exitCode?: number } {
     typeof repetitionsValue === "string" ? repetitionsValue : "",
     10,
   );
-  if (!Number.isInteger(repetitions) || repetitions < 1) {
+  if (
+    !Number.isSafeInteger(repetitions) ||
+    repetitions < 1 ||
+    repetitions > MAX_EVAL_REPETITIONS
+  ) {
     console.error(USAGE);
-    console.error("error: --repetitions must be a positive integer");
+    console.error(
+      `error: --repetitions must be 1 or ${MAX_EVAL_REPETITIONS}`,
+    );
     return { exitCode: 2 };
   }
   const paidBudgetValue = parsed.values["paid-budget-usd"];

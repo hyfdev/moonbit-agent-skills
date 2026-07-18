@@ -37,12 +37,12 @@ This workflow exists because testing only written claims cannot detect omitted k
 
 Report findings and user value, not a diary of commands. PR descriptions must contain:
 
-- an eval summary that gives every distinct user task its own concrete row, states the number of distinct tasks, identifies the observed model, compares exact result counts under explicitly named conditions, and says the primary finding in one sentence; always show final task success, while activation and reference reads remain secondary evidence;
+- an eval summary that gives every distinct user task its own concrete row, states the number of distinct tasks, identifies the observed model, compares percentages under explicitly named conditions, and says the primary finding in one sentence; always show final task success, while activation and reference reads remain secondary evidence;
 - a release coverage table with counts for verified, documented, out of scope, and not actionable;
 - a language-surface table with official documents, headings, routed topics, and explicit boundaries when that inventory changed;
 - a test table with the exact suites, cases, targets, and results;
 - a short list of corrected wrong recommendations and newly prevented failure modes.
 
-Detailed eval evidence may follow the summary, but internal task IDs, claim IDs, condition names, repetitions, cells, grader details, token breakdowns, and statistics must not replace the user-facing result. Never label a comparison only as `Baseline`, count cells as tasks, or hide a task-success tie or regression behind a process metric.
+Detailed eval evidence may follow the summary, but exact counts, internal task IDs, claim IDs, condition names, repetitions, cells, grader details, token breakdowns, and statistics must not replace the user-facing result. Never label a comparison only as `Baseline`, count cells as tasks, or hide a task-success tie or regression behind a process metric.
 
 An audit is complete when every relevant upstream source item has a decision and every claimed gap points to exact repository evidence. An update is complete only when both completeness gates, repository tests, targeted content evals, and both reviews are finished.

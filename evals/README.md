@@ -57,13 +57,13 @@ Distinct tasks: 2
 
 | Task | Model | No skills | With current skills |
 | --- | --- | ---: | ---: |
-| Expose one implemented trait method as a public dot-call API with `extend` | `deepseek-v4-pro` | 0 | **1** |
-| Expose one default trait method as a public dot-call API with `extend` | `deepseek-v4-pro` | 1 | **1** |
+| Expose one implemented trait method as a public dot-call API with `extend` | `deepseek-v4-pro` | 0% | **100%** |
+| Expose one default trait method as a public dot-call API with `extend` | `deepseek-v4-pro` | 100% | **100%** |
 
-With current skills, the agent completed 2/2 tasks, compared with 1/2 without skills.
+With current skills, task success was 100%, compared with 50% without skills.
 ```
 
-Give every distinct task its own row and use a plain description of what the agent had to do, not an internal task ID or metric name. For a different comparison, replace `No skills` with the exact condition a reader can understand, such as `Historical skill` or `Without the extend route`; never use the ambiguous label `Baseline`. Small samples use exact counts, optionally followed by percentages. State the number of distinct tasks separately and never present condition cells or repetitions as task coverage. Final task success is mandatory, including ties and regressions. Activation, reference-read, duration, and token results may appear afterward as secondary evidence. Put condition IDs, claim IDs, per-repetition rows, invalid cells, grader contracts, execution signatures, uncertainty analysis, and other audit data in the technical section.
+Give every distinct task its own row and use a plain description of what the agent had to do, not an internal task ID or metric name. For a different comparison, replace `No skills` with the exact condition a reader can understand, such as `Historical skill` or `Without the extend route`; never use the ambiguous label `Baseline`. Use percentages in this table and state the number of distinct tasks separately. Never present condition cells or repetitions as task coverage. Final task success is mandatory, including ties and regressions. Activation, reference-read, duration, and token results may appear afterward as secondary evidence. Put exact counts, condition IDs, claim IDs, per-repetition rows, invalid cells, grader contracts, execution signatures, uncertainty analysis, and other audit data in the technical section.
 
 ## `activation/prompts.jsonl` schema
 

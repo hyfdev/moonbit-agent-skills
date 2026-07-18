@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * Activation eval: can an agent that only sees the skill catalog decide,
- * per natural request, whether to load moonbit-language, moonbit-toolchain,
- * both, the maintainer skill, or neither?
+ * Activation eval with two explicitly different measurements:
+ * - routing: prompted catalog classification, not automatic activation;
+ * - end-to-end: natural-request observation before the first domain action.
  *
  * Usage:
  *   node evals/activation/run_activation.ts --model claude-haiku-4-5-20251001 \
@@ -12,11 +12,12 @@
  * Results land in evals/activation/runs/<run-name>/ (gitignored):
  *   run.json       immutable run configuration and environment disclosure
  *   results.jsonl  one line per prompt with activated set, verdict, and usage
- *   summary.json   aggregated routing metrics, resolved models, and cost
+ *   summary.json   labeled classification/activation metrics, resolved models, and cost
  *   transcripts/   raw Claude stream-json and stderr per prompt
  */
 
 import { spawn } from "node:child_process";
+import { createHash } from "node:crypto";
 import {
   appendFileSync,
   cpSync,
@@ -26,11 +27,12 @@ import {
   readFileSync,
   readdirSync,
   rmSync,
+  statSync,
   writeFileSync,
 } from "node:fs";
 import { arch, platform, release, tmpdir } from "node:os";
 import { dirname, isAbsolute, join, relative, resolve } from "node:path";
-import { parseArgs } from "node:util";
+import { isDeepStrictEqual, parseArgs } from "node:util";
 import { fileURLToPath } from "node:url";
 import {
   buildAgentInvocation,
@@ -40,6 +42,7 @@ import {
   parseAgentStream,
   parseClaudeStream,
   type AgentClient,
+  type ParsedAgentStream,
 } from "../lib/agent_cli.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -70,10 +73,15 @@ const MODEL_ENVIRONMENT_NAMES = [
   "CLAUDE_CODE_EFFORT_LEVEL",
 ] as const;
 
-interface PromptExpectation {
+export interface PromptExpectation {
   required?: string[];
   forbidden?: string[];
 }
+
+export type ActivationMode = "routing" | "end-to-end";
+export type ActivationMeasurement =
+  | "prompted-routing-classification"
+  | "natural-end-to-end-activation-observation";
 
 export interface ActivationPrompt {
   id: string;
@@ -85,17 +93,26 @@ export interface ActivationPrompt {
 }
 
 interface ToolUse {
+  id?: string;
   name: string;
   input: Record<string, unknown>;
   assistant_turn?: number;
   event_index?: number;
 }
 
+interface SkillCall extends ToolUse {
+  skill: string;
+  succeeded: boolean;
+}
+
 export interface ParsedActivationStream {
   activatedAll: string[];
+  activatedSucceeded: string[];
+  activatedFailed: string[];
   finalText: string;
   modelUsage: Record<string, unknown>;
   numTurns: number | null;
+  skillCalls: SkillCall[];
   toolUses: ToolUse[];
   usage: Record<string, unknown>;
   emittedModels?: string[];
@@ -115,6 +132,9 @@ export interface ActivationResult {
   moonbit_named: boolean;
   activated: string[];
   activated_all: string[];
+  activated_attempted?: string[];
+  activated_succeeded?: string[];
+  activated_failed?: string[];
   expected: PromptExpectation;
   verdict: ActivationVerdict;
   usage: Record<string, unknown>;
@@ -128,7 +148,8 @@ export interface ActivationResult {
   final_text: string;
   tool_uses: ToolUse[];
   client?: AgentClient;
-  mode?: "routing" | "end-to-end";
+  mode?: ActivationMode;
+  measurement?: ActivationMeasurement;
   repetition?: number;
   emitted_models?: string[];
   first_skill_call_index?: number | null;
@@ -148,6 +169,7 @@ interface EnvironmentDisclosure {
 }
 
 export interface ActivationSummary {
+  measurement: ActivationMeasurement;
   model: string;
   max_turns: number;
   environment: EnvironmentDisclosure;
@@ -172,7 +194,7 @@ interface CliOptions {
   ids?: Set<string>;
   maxTurns: number;
   model: string;
-  mode: "routing" | "end-to-end";
+  mode: ActivationMode;
   paidBudgetUsd?: number;
   repetitions: number;
   resume: boolean;
@@ -188,14 +210,34 @@ interface CommandResult {
 }
 
 interface RunConfig {
-  runner: "activation" | "activation-v2";
+  runner: "activation" | "activation-v2" | "activation-v3";
   client?: AgentClient;
   model: string;
-  mode?: "routing" | "end-to-end";
+  mode?: ActivationMode;
+  measurement?: ActivationMeasurement;
   max_turns: number;
   repetitions?: number;
   paid_budget_usd?: number | null;
   environment: EnvironmentDisclosure;
+  input_snapshot?: ActivationInputManifest;
+  runner_files?: Record<string, string>;
+}
+
+export interface ActivationInputManifest {
+  prompts: {
+    ids: string[];
+    sha256: string;
+  };
+  skills: {
+    aggregate_sha256: string;
+    files: Record<string, string>;
+  };
+}
+
+export interface PreparedActivationInputs {
+  manifest: ActivationInputManifest;
+  prompts: ActivationPrompt[];
+  skillsDirectory: string;
 }
 
 const USAGE =
@@ -361,22 +403,255 @@ export function loadPrompts(path: string): ActivationPrompt[] {
   return prompts;
 }
 
-export function parseActivationStream(stdout: string): ParsedActivationStream {
-  const normalized = parseClaudeStream(stdout);
+function isFile(path: string): boolean {
+  try {
+    return statSync(path).isFile();
+  } catch {
+    return false;
+  }
+}
+
+function isDirectory(path: string): boolean {
+  try {
+    return statSync(path).isDirectory();
+  } catch {
+    return false;
+  }
+}
+
+function fileDigest(path: string): string {
+  return createHash("sha256").update(readFileSync(path)).digest("hex");
+}
+
+function walkFiles(root: string): string[] {
+  const files: string[] = [];
+  const visit = (directory: string): void => {
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      const path = join(directory, entry.name);
+      if (entry.isDirectory()) {
+        visit(path);
+      } else if (entry.isFile() || (entry.isSymbolicLink() && isFile(path))) {
+        files.push(path);
+      }
+    }
+  };
+  visit(root);
+  return files.sort();
+}
+
+function installableSkillDirectories(root: string): string[] {
+  return readdirSync(root, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && isFile(join(root, entry.name, "SKILL.md")))
+    .map((entry) => entry.name)
+    .sort();
+}
+
+function installedSkillFiles(root: string): Record<string, string> {
+  return Object.fromEntries(
+    installableSkillDirectories(root).flatMap((skill) =>
+      walkFiles(join(root, skill)).map((path) => [relative(root, path), fileDigest(path)]),
+    ),
+  );
+}
+
+function canonicalPrompts(prompts: ActivationPrompt[]): string {
+  return (
+    prompts
+      .map((prompt) =>
+        JSON.stringify({
+          id: prompt.id,
+          category: prompt.category,
+          moonbit_named: prompt.moonbit_named,
+          prompt: prompt.prompt,
+          workspace: prompt.workspace,
+          expected: {
+            required: prompt.expected.required ?? [],
+            forbidden: prompt.expected.forbidden ?? [],
+          },
+        }),
+      )
+      .join("\n") + "\n"
+  );
+}
+
+function aggregateDigest(files: Record<string, string>): string {
+  return createHash("sha256").update(JSON.stringify(files)).digest("hex");
+}
+
+export function prepareActivationInputs(
+  runDirectory: string,
+  selectedPrompts: ActivationPrompt[],
+  skillsSource = SKILLS_SRC,
+): PreparedActivationInputs {
+  const snapshotRoot = join(runDirectory, "_cache", "activation-inputs");
+  const promptsPath = join(snapshotRoot, "prompts.jsonl");
+  const skillsDirectory = join(snapshotRoot, "skills");
+  const expectedPromptText = canonicalPrompts(selectedPrompts);
+  const expectedSkillFiles = installedSkillFiles(skillsSource);
+  if (Object.keys(expectedSkillFiles).length === 0) {
+    throw new Error("activation input snapshot has no installable skills");
+  }
+
+  const hasPromptSnapshot = isFile(promptsPath);
+  const hasSkillSnapshot = isDirectory(skillsDirectory);
+  if (hasPromptSnapshot !== hasSkillSnapshot) {
+    throw new Error("activation input snapshot is incomplete; use a fresh --run-name");
+  }
+  if (!hasPromptSnapshot) {
+    mkdirSync(snapshotRoot, { recursive: true });
+    writeFileSync(promptsPath, expectedPromptText);
+    mkdirSync(skillsDirectory);
+    for (const skill of installableSkillDirectories(skillsSource)) {
+      cpSync(join(skillsSource, skill), join(skillsDirectory, skill), { recursive: true });
+    }
+  }
+
+  const actualPromptText = readFileSync(promptsPath, "utf8");
+  if (actualPromptText !== expectedPromptText) {
+    throw new Error("selected prompts differ from the frozen activation snapshot; use a fresh --run-name");
+  }
+  const actualSkillFiles = installedSkillFiles(skillsDirectory);
+  if (!isDeepStrictEqual(actualSkillFiles, expectedSkillFiles)) {
+    throw new Error("installed skills differ from the frozen activation snapshot; use a fresh --run-name");
+  }
+  const frozenPrompts = loadPrompts(promptsPath);
+  if (canonicalPrompts(frozenPrompts) !== expectedPromptText) {
+    throw new Error("frozen activation prompts did not round-trip; use a fresh --run-name");
+  }
   return {
-    activatedAll: normalized.activated_skills,
+    manifest: {
+      prompts: {
+        ids: frozenPrompts.map((prompt) => prompt.id),
+        sha256: createHash("sha256").update(actualPromptText).digest("hex"),
+      },
+      skills: {
+        aggregate_sha256: aggregateDigest(actualSkillFiles),
+        files: actualSkillFiles,
+      },
+    },
+    prompts: frozenPrompts,
+    skillsDirectory,
+  };
+}
+
+export function measurementForMode(mode: ActivationMode): ActivationMeasurement {
+  return mode === "routing"
+    ? "prompted-routing-classification"
+    : "natural-end-to-end-activation-observation";
+}
+
+function uniqueSorted(values: string[]): string[] {
+  return [...new Set(values.filter((value) => value !== ""))].sort();
+}
+
+function parsedActivationView(normalized: ParsedAgentStream): ParsedActivationStream {
+  const resultsByUse = new Map(
+    normalized.tool_results.map((result) => [result.tool_use_id, result]),
+  );
+  const toolUses: ToolUse[] = normalized.tool_uses.map((use) => ({
+    id: use.id,
+    name: use.name,
+    input: isRecord(use.input) ? use.input : {},
+    assistant_turn: use.assistant_turn,
+    event_index: use.event_index,
+  }));
+  const skillCalls: SkillCall[] = toolUses
+    .filter((use) => use.name === "Skill" && typeof use.input.skill === "string")
+    .map((use) => ({
+      ...use,
+      skill: use.input.skill as string,
+      succeeded:
+        use.id !== undefined &&
+        resultsByUse.has(use.id) &&
+        resultsByUse.get(use.id)?.is_error === false,
+    }));
+  return {
+    activatedAll: uniqueSorted(skillCalls.map((call) => call.skill)),
+    activatedSucceeded: uniqueSorted(
+      skillCalls.filter((call) => call.succeeded).map((call) => call.skill),
+    ),
+    activatedFailed: uniqueSorted(
+      skillCalls.filter((call) => !call.succeeded).map((call) => call.skill),
+    ),
     finalText: normalized.final_text,
     modelUsage: normalized.model_usage,
     numTurns: normalized.num_turns,
-    toolUses: normalized.tool_uses.map((use) => ({
-      name: use.name,
-      input: isRecord(use.input) ? use.input : {},
-      assistant_turn: use.assistant_turn,
-      event_index: use.event_index,
-    })),
+    skillCalls,
+    toolUses,
     usage: normalized.usage,
     emittedModels: normalized.emitted_models,
     sessionId: normalized.session_id,
+  };
+}
+
+export function parseActivationStream(stdout: string): ParsedActivationStream {
+  return parsedActivationView(parseClaudeStream(stdout));
+}
+
+export interface ActivationDecision {
+  activated: string[];
+  activatedAttempted: string[];
+  activatedSucceeded: string[];
+  activatedFailed: string[];
+  activatedBeforeDomainAction: string[];
+  firstSkillCallIndex: number | null;
+  firstDomainActionIndex: number | null;
+  verdict: ActivationVerdict;
+}
+
+export function scoreActivation(
+  parsed: ParsedActivationStream,
+  expected: PromptExpectation,
+  mode: ActivationMode,
+): ActivationDecision {
+  const required = new Set(expected.required ?? []);
+  const forbidden = new Set(expected.forbidden ?? []);
+  const activatedMoonbit = new Set(
+    parsed.activatedSucceeded.filter((skill) => MOONBIT_SKILLS.has(skill)),
+  );
+  const firstDomainActionIndex = parsed.toolUses.findIndex((use) => ACTION_TOOLS.has(use.name));
+  const firstDomainAction =
+    firstDomainActionIndex === -1 ? undefined : parsed.toolUses[firstDomainActionIndex];
+  const successfulBeforeDomainAction = new Set(
+    parsed.skillCalls
+      .filter((call) => call.succeeded && MOONBIT_SKILLS.has(call.skill))
+      .filter((call) => {
+        if (firstDomainAction === undefined) return true;
+        return (
+          typeof call.assistant_turn === "number" &&
+          typeof firstDomainAction.assistant_turn === "number" &&
+          call.assistant_turn < firstDomainAction.assistant_turn
+        );
+      })
+      .map((call) => call.skill),
+  );
+  const recallOk = [...required].every((skill) => activatedMoonbit.has(skill));
+  const timelyRecallOk = [...required].every((skill) =>
+    successfulBeforeDomainAction.has(skill),
+  );
+  const noForbidden = [...forbidden].every((skill) => !activatedMoonbit.has(skill));
+  const protocolViolation =
+    parsed.toolUses.some((use) => NETWORK_OR_DELEGATION_TOOLS.includes(use.name)) ||
+    (mode === "routing" && firstDomainActionIndex !== -1);
+  const exact =
+    activatedMoonbit.size === required.size &&
+    [...activatedMoonbit].every((skill) => required.has(skill)) &&
+    !protocolViolation;
+  const firstSkillCallIndex = parsed.toolUses.findIndex((use) => use.name === "Skill");
+  return {
+    activated: [...activatedMoonbit].sort(),
+    activatedAttempted: parsed.activatedAll,
+    activatedSucceeded: parsed.activatedSucceeded,
+    activatedFailed: parsed.activatedFailed,
+    activatedBeforeDomainAction: [...successfulBeforeDomainAction].sort(),
+    firstSkillCallIndex: firstSkillCallIndex === -1 ? null : firstSkillCallIndex,
+    firstDomainActionIndex: firstDomainActionIndex === -1 ? null : firstDomainActionIndex,
+    verdict: {
+      recall_ok: recallOk,
+      timely_recall_ok: timelyRecallOk,
+      no_forbidden: noForbidden,
+      exact,
+    },
   };
 }
 
@@ -393,6 +668,7 @@ export function summarize(
   model: string,
   maxTurns: number,
   environment: EnvironmentDisclosure,
+  mode: ActivationMode = "routing",
 ): ActivationSummary {
   const byCategory = new Map<string, ActivationResult[]>();
   for (const result of results) {
@@ -417,6 +693,7 @@ export function summarize(
     routingExactAccuracy[category] = rate(items, (result) => result.verdict.exact);
   }
   return {
+    measurement: measurementForMode(mode),
     model,
     max_turns: maxTurns,
     environment,
@@ -512,14 +789,15 @@ function safeWorkspacePath(project: string, path: string): string {
   return destination;
 }
 
-export function materializePrompt(project: string, prompt: ActivationPrompt): void {
+export function materializePrompt(
+  project: string,
+  prompt: ActivationPrompt,
+  skillsSource = SKILLS_SRC,
+): void {
   const skillsDestination = join(project, ".claude", "skills");
   mkdirSync(skillsDestination, { recursive: true });
-  const skillDirectories = readdirSync(SKILLS_SRC, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory() && existsSync(join(SKILLS_SRC, entry.name, "SKILL.md")))
-    .sort((left, right) => left.name.localeCompare(right.name));
-  for (const skillDirectory of skillDirectories) {
-    cpSync(join(SKILLS_SRC, skillDirectory.name), join(skillsDestination, skillDirectory.name), {
+  for (const skill of installableSkillDirectories(skillsSource)) {
+    cpSync(join(skillsSource, skill), join(skillsDestination, skill), {
       recursive: true,
     });
   }
@@ -536,16 +814,17 @@ async function runOne(
   maxTurns: number,
   runDirectory: string,
   client: AgentClient = "claude-code",
-  mode: "routing" | "end-to-end" = "routing",
+  mode: ActivationMode = "routing",
   maxBudgetUsd?: number,
   repetition = 0,
+  frozenSkillsSource = SKILLS_SRC,
 ): Promise<ActivationResult> {
   const temporaryRoot = mkdtempSync(join(tmpdir(), "mbtact-"));
   const project = join(temporaryRoot, "project");
   mkdirSync(project);
   let commandResult: CommandResult;
   try {
-    materializePrompt(project, prompt);
+    materializePrompt(project, prompt, frozenSkillsSource);
     const skillsDirectory = join(project, ".claude", "skills");
     const claudeConfigDirectory = join(temporaryRoot, "claude-config");
     mkdirSync(claudeConfigDirectory);
@@ -586,47 +865,8 @@ async function runOne(
 
   const normalized = parseAgentStream(client, commandResult.stdout);
   if (client === "kimi-code") enrichKimiStream(normalized);
-  const parsed: ParsedActivationStream = {
-    activatedAll: normalized.activated_skills,
-    finalText: normalized.final_text,
-    modelUsage: normalized.model_usage,
-    numTurns: normalized.num_turns,
-    toolUses: normalized.tool_uses.map((use) => ({
-      name: use.name,
-      input: isRecord(use.input) ? use.input : {},
-      assistant_turn: use.assistant_turn,
-      event_index: use.event_index,
-    })),
-    usage: normalized.usage,
-    emittedModels: normalized.emitted_models,
-    sessionId: normalized.session_id,
-  };
-  const required = new Set(prompt.expected.required ?? []);
-  const forbidden = new Set(prompt.expected.forbidden ?? []);
-  const activatedMoonbit = new Set(
-    parsed.activatedAll.filter((skill) => MOONBIT_SKILLS.has(skill)),
-  );
-  const firstDomainActionIndex = parsed.toolUses.findIndex((use) => ACTION_TOOLS.has(use.name));
-  const domainBoundary = firstDomainActionIndex === -1 ? parsed.toolUses.length : firstDomainActionIndex;
-  const activatedBeforeDomainAction = new Set(
-    parsed.toolUses
-      .slice(0, domainBoundary)
-      .filter((use) => use.name === "Skill")
-      .map((use) => use.input.skill)
-      .filter((skill): skill is string => typeof skill === "string" && MOONBIT_SKILLS.has(skill)),
-  );
-  const recallOk = [...required].every((skill) => activatedMoonbit.has(skill));
-  const timelyRecallOk = [...required].every((skill) =>
-    activatedBeforeDomainAction.has(skill),
-  );
-  const noForbidden = [...forbidden].every((skill) => !activatedMoonbit.has(skill));
-  const protocolViolation = parsed.toolUses.some((use) =>
-    NETWORK_OR_DELEGATION_TOOLS.includes(use.name),
-  ) || (mode === "routing" && firstDomainActionIndex !== -1);
-  const exact =
-    activatedMoonbit.size === required.size &&
-    [...activatedMoonbit].every((skill) => required.has(skill)) &&
-    !protocolViolation;
+  const parsed = parsedActivationView(normalized);
+  const decision = scoreActivation(parsed, prompt.expected, mode);
 
   const transcriptsDirectory = join(runDirectory, "transcripts");
   mkdirSync(transcriptsDirectory, { recursive: true });
@@ -640,15 +880,13 @@ async function runOne(
     id: prompt.id,
     category: prompt.category,
     moonbit_named: prompt.moonbit_named ?? true,
-    activated: [...activatedMoonbit].sort(),
-    activated_all: parsed.activatedAll,
+    activated: decision.activated,
+    activated_all: decision.activatedAttempted,
+    activated_attempted: decision.activatedAttempted,
+    activated_succeeded: decision.activatedSucceeded,
+    activated_failed: decision.activatedFailed,
     expected: prompt.expected,
-    verdict: {
-      recall_ok: recallOk,
-      timely_recall_ok: timelyRecallOk,
-      no_forbidden: noForbidden,
-      exact,
-    },
+    verdict: decision.verdict,
     usage: parsed.usage,
     model_usage: parsed.modelUsage,
     num_turns: parsed.numTurns,
@@ -668,14 +906,12 @@ async function runOne(
     tool_uses: parsed.toolUses,
     client,
     mode,
+    measurement: measurementForMode(mode),
     repetition,
     emitted_models: normalized.emitted_models,
-    first_skill_call_index: parsed.toolUses.findIndex((use) => use.name === "Skill") === -1
-      ? null
-      : parsed.toolUses.findIndex((use) => use.name === "Skill"),
-    first_domain_action_index:
-      firstDomainActionIndex === -1 ? null : firstDomainActionIndex,
-    activated_before_domain_action: [...activatedBeforeDomainAction].sort(),
+    first_skill_call_index: decision.firstSkillCallIndex,
+    first_domain_action_index: decision.firstDomainActionIndex,
+    activated_before_domain_action: decision.activatedBeforeDomainAction,
     duration_ms: commandResult.durationMs ?? 0,
   };
   return result;
@@ -795,15 +1031,31 @@ export async function main(argv = process.argv.slice(2)): Promise<number> {
   if (existsSync(resultsPath) && !options.resume) {
     throw new Error(`${resultsPath} already exists; use a fresh --run-name or --resume`);
   }
+  if (
+    existsSync(resultsPath) &&
+    !isFile(join(runDirectory, "_cache", "activation-inputs", "prompts.jsonl"))
+  ) {
+    throw new Error(
+      "cannot safely resume results without frozen activation inputs; use a fresh --run-name",
+    );
+  }
+  const preparedInputs = prepareActivationInputs(runDirectory, prompts);
+  prompts = preparedInputs.prompts;
   const config: RunConfig = {
-    runner: "activation-v2",
+    runner: "activation-v3",
     client: options.client,
     model: options.model,
     mode: options.mode,
+    measurement: measurementForMode(options.mode),
     max_turns: options.maxTurns,
     repetitions: options.repetitions,
     paid_budget_usd: options.paidBudgetUsd ?? null,
     environment,
+    input_snapshot: preparedInputs.manifest,
+    runner_files: {
+      "evals/activation/run_activation.ts": fileDigest(fileURLToPath(import.meta.url)),
+      "evals/lib/agent_cli.ts": fileDigest(join(REPO_ROOT, "evals", "lib", "agent_cli.ts")),
+    },
   };
   ensureRunManifest(runDirectory, config, existsSync(resultsPath));
 
@@ -847,6 +1099,7 @@ export async function main(argv = process.argv.slice(2)): Promise<number> {
         options.mode,
         remainingBudget,
         repetition,
+        preparedInputs.skillsDirectory,
       );
       results.push(result);
       appendFileSync(resultsPath, `${JSON.stringify(result)}\n`);
@@ -854,14 +1107,14 @@ export async function main(argv = process.argv.slice(2)): Promise<number> {
       if (typeof cost === "number") spentUsd += cost;
       const status = result.verdict.exact ? "OK " : "MISS";
       console.log(
-        `    ${status} activated=${JSON.stringify(result.activated)} timely=${JSON.stringify(result.activated_before_domain_action ?? [])}`,
+        `    ${status} succeeded=${JSON.stringify(result.activated_succeeded ?? result.activated)} failed=${JSON.stringify(result.activated_failed ?? [])} timely=${JSON.stringify(result.activated_before_domain_action ?? [])}`,
       );
     }
   }
 
   const summary = {
-    ...summarize(results, options.model, options.maxTurns, environment),
-    runner: "activation-v2",
+    ...summarize(results, options.model, options.maxTurns, environment, options.mode),
+    runner: "activation-v3",
     client: options.client,
     mode: options.mode,
     repetitions: options.repetitions,

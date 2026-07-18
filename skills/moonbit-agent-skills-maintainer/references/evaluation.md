@@ -69,8 +69,8 @@ Two or three repetitions are enough to screen for large effects and regressions,
 
 Maintain two activation measurements:
 
-- **Routing-only:** present the controlled catalog and stop at the first routing decision. Measure required skill recall, forbidden activation, exact set, and whether the decision precedes any domain action.
-- **End-to-end:** run the natural task with normal tools. Measure final hidden behavior separately and record whether skill/reference use occurred before the first edit, write, shell command, or final answer.
+- **Prompted routing/classification:** present the controlled catalog, explicitly request only the routing decision, and stop there. Measure required skill recall, forbidden activation, exact set, and whether the decision precedes any domain action. This proves catalog classification under instruction, not automatic activation on a natural request.
+- **End-to-end:** run the natural task with normal tools. Measure final hidden behavior separately and record whether a successfully loaded skill/reference occurred in an earlier assistant turn than the first edit, write, shell command, or final answer. Use this mode for claims about automatic activation.
 
 Use realistic near-boundary prompts: FFI declaration versus JS link configuration, a source-level `using` declaration versus package imports, a test block versus selecting a test command, and a task that legitimately needs both product skills. Negative prompts about unrelated languages or moon phases are only sanity checks; they do not test the product boundary well.
 

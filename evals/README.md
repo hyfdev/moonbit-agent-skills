@@ -2,7 +2,7 @@
 
 Three separate questions get three separate eval families:
 
-1. **Activation** (`activation/`) — two distinct modes: `routing` asks for only the initial catalog decision and rejects domain actions; `end-to-end` sends the natural request and measures whether required skills loaded before the first Bash/Edit/Write. No source prompt names a skill; the runner rejects prompts that do.
+1. **Activation** (`activation/`) — two distinct modes: `routing` explicitly instructs the agent to make only a catalog classification and rejects domain actions; it measures prompted routing, not automatic activation. `end-to-end` sends the natural request and measures whether required skills loaded successfully before the first Bash/Edit/Write in an earlier assistant turn. No source prompt names a skill; the runner rejects prompts that do.
 2. **Content** (`language/`, `toolchain/`, `integration/`) — once knowledge is available, does the agent finish MoonBit tasks correctly? Conditions compare no skills, the pinned official `moonbitlang/skills` bundle, a pinned historical `baseline`, this repository's catalog-only skills, and force-injected single skills. `forced-language-no-cross-language` is a targeted H4 ablation: it removes the concentrated cross-language rule, route, and reference while retaining the rest of the forced language skill.
 3. **Error reporting** (`reporting/`) — when the installed guidance conflicts with observed behavior, does the agent verify the conflict, fix the task, display a complete privacy-scrubbed issue draft and template link, and stop without invoking GitHub? The same scenarios run with and without the skill.
 
@@ -16,10 +16,10 @@ node evals/activation/run_activation.ts --dry-run
 node evals/run_content.ts --area language --condition none --dry-run
 node evals/reporting/run_reporting.ts --dry-run
 
-# Routing-only activation eval on the subscription client.
+# Prompted routing/classification eval on the subscription client.
 node evals/activation/run_activation.ts --client kimi-code --model kimi-code/k3 --mode routing --repetitions 3 --run-name routing-kimi-k3
 
-# Independent paid routing check; the total budget is mandatory.
+# Independent paid prompted-routing check; the total budget is mandatory.
 node evals/activation/run_activation.ts --client claude-code --model haiku --mode routing --repetitions 1 --paid-budget-usd 3 --run-name routing-deepseek-flash
 
 # Subscription content comparison with paired AB/BA repetitions.
@@ -44,7 +44,7 @@ node evals/reporting/run_reporting.ts --model claude-haiku-4-5-20251001 --run-na
 node evals/reporting/run_reporting.ts --regrade-run reporting-manual-only
 ```
 
-For activation and content, use a fresh `--run-name` for a new measurement. A pre-existing `results.jsonl` is rejected unless `--resume` is given; resume skips completed prompt/task, repetition, and condition cells and recomputes the summary. These runners write `run.json` before the first task and refuse to resume when conditions, repetitions, selected task files, environment, provider, budget, or skill snapshots changed. Content alternates AB/BA condition order and reports paired task outcomes; pairs with different or unobserved actual models are excluded. Paid Claude runs require an explicit total `--paid-budget-usd`, and the remaining amount is passed to each child process. Kimi subscription runs record tokens, duration, and observed model but leave USD unavailable. Paid content runs require committed, clean `skills/`; current and historical skills are materialized once from Git trees into the run cache, and the manifest records commit IDs, tree IDs, every included path, and SHA-256. Purpose-built ablations are also materialized and hashed before the first model call, including their transformation description and every derived file. Reporting runs are smaller one-shot comparisons: always use a fresh name; the runner rejects an existing directory and does not support resume. `--regrade-run` only reapplies the checked-in deterministic scorer to preserved artifacts and makes no model call.
+For activation and content, use a fresh `--run-name` for a new measurement. A pre-existing `results.jsonl` is rejected unless `--resume` is given; resume skips completed prompt/task, repetition, and condition cells and recomputes the summary. These runners write `run.json` before the first task and refuse to resume when conditions, repetitions, selected inputs, environment, provider, budget, runner/parser files, or skill snapshots changed. Activation freezes the selected prompts and every installed skill before its first model call, materializes every cell from that snapshot, and scores only Skill calls with successful tool results. Content alternates AB/BA condition order and reports paired task outcomes; pairs with different or unobserved actual models are excluded. Paid Claude runs require an explicit total `--paid-budget-usd`, and the remaining amount is passed to each child process. Kimi subscription runs record tokens, duration, and observed model but leave USD unavailable. Paid content runs require committed, clean `skills/`; current and historical skills are materialized once from Git trees into the run cache, and the manifest records commit IDs, tree IDs, every included path, and SHA-256. Purpose-built ablations are also materialized and hashed before the first model call, including their transformation description and every derived file. Reporting runs are smaller one-shot comparisons: always use a fresh name; the runner rejects an existing directory and does not support resume. `--regrade-run` only reapplies the checked-in deterministic scorer to preserved artifacts and makes no model call.
 
 Results are written to `*/runs/<run-name>/` and gitignored. Activation and content use `run.json`, `results.jsonl`, `summary.json`, `transcripts/`, and, for content failures, `failed-workspaces/`. Reporting stores per-scenario answers, sanitized workspace snapshots, detected GitHub command attempts, transcripts, and deterministic grading under `iteration-1/`, plus a top-level `summary.json`. Checked-in results live in the corresponding `RESULTS.md` snapshots with date, client/model disclosure, corrections, and cost.
 
@@ -62,7 +62,7 @@ One JSON object per line:
 | `expected.required` | skills that must activate |
 | `expected.forbidden` | skills that must not activate |
 
-Grading: `recall_ok` means all required skills activated; `no_forbidden` means nothing forbidden activated; `exact` means the activated set equals the required set.
+Grading uses successful Skill tool results, not attempted calls. `recall_ok` means every required skill loaded successfully; `no_forbidden` means no forbidden skill loaded successfully; `exact` means the successful MoonBit skill set equals the required set. Each result retains attempted, succeeded, and failed skill sets separately.
 
 ## Content task schema (`<area>/tasks/<id>/task.json`)
 

@@ -1,5 +1,7 @@
 # Activation eval — checked-in snapshot
 
+Protocol note for new runs: the current runner labels `mode=routing` as `prompted-routing-classification`. It explicitly asks the agent to classify and load applicable skills, so it must not be reported as automatic activation; that claim requires `mode=end-to-end` on the natural request. Each historical section below retains the protocol description under which it was recorded.
+
 Run date: 2026-07-17 · runner: `run_activation.ts` · 35 prompts · skills at commit of this snapshot · client: Claude Code CLI 2.1.212, catalog-only discovery (prompts never name skills; the runner rejects prompts that do). Raw per-prompt records live in gitignored `runs/`; these tables are the durable summary.
 
 | Metric | haiku-4.5 | sonnet-5 |

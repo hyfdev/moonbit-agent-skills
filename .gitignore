@@ -1,9 +1,5 @@
 _build/
 node_modules/
-*.pyc
-__pycache__/
-.venv/
-venv/
 .DS_Store
 evals/**/runs/
 verification/fixtures/**/_build/

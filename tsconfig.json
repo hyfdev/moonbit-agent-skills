@@ -15,5 +15,5 @@
     "verbatimModuleSyntax": true,
     "skipLibCheck": true
   },
-  "include": ["tooling/**/*.ts", "vite.config.ts"]
+  "include": ["evals/**/*.ts", "skills/**/*.ts", "tooling/**/*.ts", "vite.config.ts"]
 }

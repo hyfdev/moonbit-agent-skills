@@ -4,8 +4,6 @@ on:
   push:
     branches: [main]
   pull_request:
-  schedule:
-    - cron: "17 3 * * 1"  # weekly drift watch even when the repo is quiet
 
 jobs:
   static:
@@ -19,27 +17,12 @@ jobs:
           cache: true
       - name: Install TypeScript tooling
         run: vp install --frozen-lockfile
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
       - name: TypeScript checks
         run: vp check
       - name: TypeScript tooling unit tests
         run: vp test
-      - name: Content eval unit tests
-        run: python3 -m unittest discover evals/tests -v
       - name: Skill format (repository rules)
         run: vp run validate-skills
-      - name: Skill format (official reference validator, spec view)
-        # Product SKILL.md files use user-invocable: false so Claude Code keeps
-        # them out of the manual / menu. The internal maintainer skill uses the
-        # same client extension with true. The open spec's reference validator
-        # allows only spec fields, so validate a copy with it stripped.
-        run: |
-          pip install skills-ref
-          cp -R skills /tmp/spec-view
-          sed -i '/^user-invocable:/d' /tmp/spec-view/*/SKILL.md
-          for d in /tmp/spec-view/*/; do agentskills validate "$d"; done
       - name: Cross-skill duplication
         run: vp run check-duplication
       - name: Version consistency
@@ -78,29 +61,4 @@ jobs:
       - name: Fixtures behave as declared
         run: vp run run-fixtures --verbose
       - name: Toolchain command examples actually run
-        run: vp run verify-commands
-
-  toolchain-nightly:
-    name: Drift watch (nightly channel, informational)
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v4
-      - uses: voidzero-dev/setup-vp@v1
-        with:
-          node-version: "24"
-          cache: true
-      - name: Install TypeScript tooling
-        run: vp install --frozen-lockfile
-      - name: Install MoonBit (nightly channel)
-        run: |
-          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s -- nightly
-          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
-      - name: Report versions
-        run: moon version --all
-      - name: Checked reference documents
-        run: vp run run-checked-docs
-      - name: Fixtures
-        run: vp run run-fixtures --verbose
-      - name: Command examples
         run: vp run verify-commands

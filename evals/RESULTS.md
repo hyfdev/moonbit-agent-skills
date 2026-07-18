@@ -1,6 +1,6 @@
 # Content eval — full matrix
 
-Run date: 2026-07-17 · runner: `run_content.py` · client: Claude Code CLI 2.1.212 · requested full-matrix model: `claude-haiku-4-5-20251001` · turn budget: 50 per cell · deterministic grading with an exact MoonBit toolchain build. The full matrix ran on Linux x86_64 with moonc `v0.10.4+ade96c819` (2026-07-13). A release-drift follow-up ran with the current snapshot, moonc `v0.10.4+2cc641edf` (2026-07-15). The official condition used `moonbitlang/skills@5caf81c57cb2ae45654b8f99c5c8f68c812beb91`.
+Run date: 2026-07-17 · runner: `run_content.ts` · client: Claude Code CLI 2.1.212 · requested full-matrix model: `claude-haiku-4-5-20251001` · turn budget: 50 per cell · deterministic grading with an exact MoonBit toolchain build. The full matrix ran on Linux x86_64 with moonc `v0.10.4+ade96c819` (2026-07-13). A release-drift follow-up ran with the current snapshot, moonc `v0.10.4+2cc641edf` (2026-07-15). The official condition used `moonbitlang/skills@5caf81c57cb2ae45654b8f99c5c8f68c812beb91`.
 
 The current client environment uses a mixed model stack: stream events name `deepseek-v4-flash`, while `modelUsage` also records the requested Haiku or Sonnet model. The labels below therefore describe requested Claude Code conditions, not isolated single-model API calls. This affects model attribution, not the deterministic pass/fail checks.
 

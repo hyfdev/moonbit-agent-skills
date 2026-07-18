@@ -4,15 +4,16 @@ This repository publishes two MoonBit product skills (`skills/moonbit-language`,
 
 ## Rules
 
-1. **No unverified content.** A fact enters a skill only with a runnable proof: an `mbt check` block in a `.mbt.md` reference (executed by `tooling/run_checked_docs.ts`), a fixture under `verification/fixtures/` (executed by `tooling/run_fixtures.ts`), or a command-manifest entry (executed by `tooling/verify_commands.ts`). If you cannot verify it, label it `documented` (with source URL) or leave it out.
-2. **One owner per fact.** Language semantics belong to moonbit-language; project operation belongs to moonbit-toolchain. Cross-links are one line; never copy explanations across skills (`tooling/check_duplication.ts` enforces this).
-3. **Versions come from the snapshot.** Never hand-edit version strings. Re-pin with `vp run snapshot-toolchain --date YYYY-MM-DD`, re-run all verification, re-stamp fixtures (`vp run run-fixtures --stamp --date ...`), and update skill frontmatter to match; `tooling/check_versions.ts` cross-checks all of it.
-4. **Proposals are not features.** Anything sourced from moonbit-evolution or a release-note "planned" section must be labeled proposal, never shown as current syntax.
-5. **Skill descriptions are an interface.** If you touch a frontmatter `description`, re-run the activation eval (`evals/activation/run_activation.py`) or state explicitly that routing is unrevalidated.
-6. **Each installable skill has per-client activation surfaces — keep all of them in sync.** A product skill ships three: the frontmatter `description` (open-spec catalog, all clients), `user-invocable: false` (Claude Code extension, hides the manual `/` entry), and `agents/openai.yaml` (Codex: display name, short description, default prompt, `allow_implicit_invocation: true`). When renaming a product skill, changing its scope/description, or adding a new product skill, update the Codex sidecar in the same change (`tooling/validate_skills.ts` enforces its presence).
-7. **A release inventory comes before release judgment.** For any MoonBit release audit or re-pin, use the internal `moonbit-agent-skills-maintainer` workflow: generate `verification/releases/<release>/source.json` from a pinned `moonbitlang/website` Markdown commit, then close every source ID in `coverage.json`. Never hand-author or filter the source inventory. `tooling/verify_release_sources.ts` checks it against upstream and `tooling/check_release_coverage.ts` blocks missing, duplicate, unsupported, or unproved decisions.
-8. **Deprecations prove both sides.** Enable warnings that are off by default, add `--deny-warn`, prove the old form is caught, and prove the replacement passes under the same warning settings.
-9. **Repository-maintenance skills stay internal.** Set `metadata.internal: true` so default listing, interactive selection, and installs without an explicit skill selector omit them. Do not use `--skill "*"` in public install instructions because an explicit selector opts into internal skills. The two product skills are the only public install surface.
+1. **Repository tooling is TypeScript.** Repository-owned executable tooling, validators, generators, eval runners, and tests must be TypeScript run directly by Node.js 24. Do not add Python or shell implementations. Shell is allowed only for documented command examples and CI `run` blocks that invoke external tools.
+2. **No unverified content.** A fact enters a skill only with a runnable proof: an `mbt check` block in a `.mbt.md` reference (executed by `tooling/run_checked_docs.ts`), a fixture under `verification/fixtures/` (executed by `tooling/run_fixtures.ts`), or a command-manifest entry (executed by `tooling/verify_commands.ts`). If you cannot verify it, label it `documented` (with source URL) or leave it out.
+3. **One owner per fact.** Language semantics belong to moonbit-language; project operation belongs to moonbit-toolchain. Cross-links are one line; never copy explanations across skills (`tooling/check_duplication.ts` enforces this).
+4. **Versions come from the snapshot.** Never hand-edit version strings. Re-pin with `vp run snapshot-toolchain --date YYYY-MM-DD`, re-run all verification, re-stamp fixtures (`vp run run-fixtures --stamp --date ...`), and update skill frontmatter to match; `tooling/check_versions.ts` cross-checks all of it.
+5. **Proposals are not features.** Anything sourced from moonbit-evolution or a release-note "planned" section must be labeled proposal, never shown as current syntax.
+6. **Skill descriptions are an interface.** If you touch a frontmatter `description`, re-run the activation eval (`evals/activation/run_activation.ts`) or state explicitly that routing is unrevalidated.
+7. **Each installable skill has per-client activation surfaces — keep all of them in sync.** A product skill ships three: the frontmatter `description` (open-spec catalog, all clients), `user-invocable: false` (Claude Code extension, hides the manual `/` entry), and `agents/openai.yaml` (Codex: display name, short description, default prompt, `allow_implicit_invocation: true`). When renaming a product skill, changing its scope/description, or adding a new product skill, update the Codex sidecar in the same change (`tooling/validate_skills.ts` enforces its presence).
+8. **A release inventory comes before release judgment.** For any MoonBit release audit or re-pin, use the internal `moonbit-agent-skills-maintainer` workflow: generate `verification/releases/<release>/source.json` from a pinned `moonbitlang/website` Markdown commit, then close every source ID in `coverage.json`. Never hand-author or filter the source inventory. `tooling/verify_release_sources.ts` checks it against upstream and `tooling/check_release_coverage.ts` blocks missing, duplicate, unsupported, or unproved decisions.
+9. **Deprecations prove both sides.** Enable warnings that are off by default, add `--deny-warn`, prove the old form is caught, and prove the replacement passes under the same warning settings.
+10. **Repository-maintenance skills stay internal.** Set `metadata.internal: true` so default listing, interactive selection, and installs without an explicit skill selector omit them. Do not use `--skill "*"` in public install instructions because an explicit selector opts into internal skills. The two product skills are the only public install surface.
 
 ## Local check sequence (mirror of CI)
 
@@ -20,7 +21,6 @@ This repository publishes two MoonBit product skills (`skills/moonbit-language`,
 vp install
 vp check
 vp test
-python3 -m unittest discover evals/tests -v
 vp run validate-skills
 vp run check-duplication
 vp run check-versions

@@ -3,9 +3,9 @@ name: moonbit-language
 description: Verified knowledge of the MoonBit programming language, pinned to an exact moonc version - syntax, structs, enums, pattern matching, traits, generics, visibility, checked errors and raise, async, tests, FFI declarations. Use when reading, writing, explaining, reviewing, or fixing MoonBit code in .mbt or .mbt.md files, fixing MoonBit type, pattern, visibility, or error-handling diagnostics, designing MoonBit APIs, judging whether a MoonBit language feature currently exists, or translating Rust, TypeScript, or Go habits into MoonBit. Language semantics only - for moon commands, moon.mod or moon.pkg configuration, dependencies, targets, or project setup use moonbit-toolchain; load both for tasks that touch code and project configuration together.
 license: MIT
 user-invocable: false
-compatibility: Verified only against moonc v0.10.4+2cc641edf (MoonBit v0.10.4, 2026-07-15). Needs the moon CLI for verification steps.
+compatibility: Verified only against moonc v0.10.4+2cc641edf (MoonBit v0.10.4, 2026-07-15). Needs the moon CLI for verification steps and Node.js 24+ for the bundled helper script.
 metadata:
-  skill-version: "0.2.0"
+  skill-version: "0.2.1"
   moonc-version: "0.10.4+2cc641edf"
   moonbit-release: "0.10.4"
   verified-date: "2026-07-18"
@@ -23,7 +23,7 @@ Everything in this skill was verified by compiling and running real code against
 **Before relying on this skill, run `moon version --all`.** If the local moonc differs from the pin above:
 
 1. Treat every claim here as a hypothesis, not a fact.
-2. For any load-bearing construct, run a minimal experiment first: put the snippet in a scratch file and run `moon check /tmp/probe.mbt` or a `test { }` block via `moon test /tmp/probe.mbt.md` (both work standalone, no project needed) — or pipe it through scripts/verify_snippet.sh, which does exactly that.
+2. For any load-bearing construct, run a minimal experiment first: put the snippet in a scratch file and run `moon check /tmp/probe.mbt` or a `test { }` block via `moon test /tmp/probe.mbt.md` (both work standalone, no project needed) — or pipe it through `node scripts/verify_snippet.ts`, which does exactly that.
 3. Check the release notes at https://www.moonbitlang.com/updates/ for changes between 0.10.4 and the local version.
 4. Say explicitly in your answer which version you verified against and where versions differed.
 
@@ -34,7 +34,7 @@ Everything in this skill was verified by compiling and running real code against
 - **Distinguish status.** Label knowledge as: verified (ran here), documented (official docs, not run), proposal (moonbit-evolution — NEVER present as shipped; that repo's own status fields lag), or unknown. The docs themselves lag in places (e.g. trait pages still show pre-0.10.0 fn-less signatures).
 - **Cross-language habits are the main failure mode.** When input code looks like Rust, TypeScript, or Go, check references/cross-language-and-stale-syntax.md before "fixing" it into another language's idiom. Watch the silent traps: `"${x}"` is literal text (interpolation is `\{x}`), `defer` is block-scoped, and unnecessary `let mut` is a hard error.
 
-- **If the toolchain contradicts this skill, that is a bug in the skill.** Reproduce it with a fresh minimal snippet, draft a privacy-scrubbed report (never the user's code, paths, or names), show the user the full text, and file it to https://github.com/hyfdev/moonbit-agent-skills/issues ONLY after their explicit confirmation — if you cannot get that confirmation, save the draft locally and do not file. Exact protocol: references/reporting-errors.md
+- **If the toolchain contradicts this skill, complete the reporting protocol before the final response rather than merely mentioning the mismatch.** Reproduce it with a fresh minimal snippet, prepare a privacy-scrubbed public issue draft, show the user its exact title and body, and provide the issue-template link. Stop there: never submit the issue or invoke GitHub from this skill workflow, even if the user gave blanket or draft-specific permission. A later request for the host agent to send it is a separate outbound action governed by that client's own approval controls. Never edit the installed skill copy or write the draft into the user's repository. Exact protocol: references/reporting-errors.md
 
 ## Reference routing
 

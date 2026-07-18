@@ -55,15 +55,16 @@ Use your coding agent as usual—no special prompts or manual invocation require
 
 ## Evaluation
 
-We test whether an agent finds the right MoonBit guidance before acting and whether its result passes objective checks, rather than asking another AI to judge the answer.
+Performance of AI coding agents with the current skills compared to matched baselines.
 
-| User benefit | Measured result | Why it matters |
-| --- | --- | --- |
-| More likely to use the right reference before acting | **92% with the current skill vs 25% with the previous version** | Verified, current MoonBit guidance is more likely to inform the work |
-| New `extend` syntax is easier to discover | **83% with a direct `extend` entry in the skill vs 33% without it** | Recently added syntax is less likely to remain buried in documentation |
-| Validated across different AI models | Targeted tasks passed **12/12 on Kimi K3** and **2/2 on DeepSeek Flash** | The same verified guidance works across agent backends |
+| Model | Metric | Baseline | With current skills |
+| --- | --- | ---: | ---: |
+| Kimi K3 | Relevant reference found before action | 25% | **92%** |
+| Kimi K3 | `extend` reference found before action | 33% | **83%** |
+| Kimi K3 | `extend` task success | 100% | **100%** |
+| DeepSeek Flash | `extend` task success | 100% | **100%** |
 
-These results show that the skill makes verified guidance much easier to find. Most targeted tasks passed in both versions, so the benchmark does not support a general accuracy claim yet. See the [full content results](evals/RESULTS.md) and [activation results](evals/activation/RESULTS.md).
+Results use objective graders and preserve failed runs. See the [full content results](evals/RESULTS.md) and [activation results](evals/activation/RESULTS.md).
 
 ## FAQ
 

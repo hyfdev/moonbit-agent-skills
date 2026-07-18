@@ -46,6 +46,25 @@ For new content measurements, count distinct user cases rather than condition ce
 
 Results are written to `*/runs/<run-name>/` and gitignored. Activation and content use `run.json`, `results.jsonl`, `summary.json`, `transcripts/`, and, for content failures, `failed-workspaces/`. Reporting stores per-scenario answers, sanitized workspace snapshots, detected GitHub command attempts, transcripts, and deterministic grading under `iteration-1/`, plus top-level `run.json` and `summary.json`. Persisted artifacts retain normalized token counters, duration, requested and observed model/client identity, and errors. Monetary fields and runtime caps are removed from structured records, transcripts, and stderr. Checked-in `RESULTS.md` snapshots use the same token-only reporting policy.
 
+## Reporting results
+
+Every new or updated checked-in eval report starts with a short result that readers can understand without knowing the harness. A detailed technical analysis may follow, but it never replaces this section.
+
+```md
+## Results
+
+Distinct tasks: 2
+
+| Task | Model | No skills | With current skills |
+| --- | --- | ---: | ---: |
+| Expose one implemented trait method as a public dot-call API with `extend` | `deepseek-v4-pro` | 0 | **1** |
+| Expose one default trait method as a public dot-call API with `extend` | `deepseek-v4-pro` | 1 | **1** |
+
+With current skills, the agent completed 2/2 tasks, compared with 1/2 without skills.
+```
+
+Give every distinct task its own row and use a plain description of what the agent had to do, not an internal task ID or metric name. For a different comparison, replace `No skills` with the exact condition a reader can understand, such as `Historical skill` or `Without the extend route`; never use the ambiguous label `Baseline`. Small samples use exact counts, optionally followed by percentages. State the number of distinct tasks separately and never present condition cells or repetitions as task coverage. Final task success is mandatory, including ties and regressions. Activation, reference-read, duration, and token results may appear afterward as secondary evidence. Put condition IDs, claim IDs, per-repetition rows, invalid cells, grader contracts, execution signatures, uncertainty analysis, and other audit data in the technical section.
+
 ## `activation/prompts.jsonl` schema
 
 One JSON object per line:

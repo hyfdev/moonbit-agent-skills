@@ -65,7 +65,7 @@ Use the task as the unit of inference:
 
 Assertions within one scenario are correlated checks, not independent samples. Report a reporting suite with three scenarios as `n=3`, even when it contains twenty-nine assertions.
 
-One repetition per condition is the default. Add one final repetition only for a task whose first pair shows a condition difference, a valid task failure, or instability already established by prior evidence. Two repetitions per task and condition are the hard maximum: never run a third repetition, never repeat unaffected tasks, and do not add repetitions merely because every condition passed or the first pass found no effect. A transport-invalid cell may be resumed to complete its original pair; that is recovery, not an extra repetition.
+One repetition per condition is the default. Add one final DeepSeek Pro repetition only when the current-skill cell fails or the pair is unstable. Two repetitions per task and condition are the hard maximum: never run a third repetition, never repeat unaffected tasks, and do not add repetitions merely because the comparison condition fails, every condition passes, or the first pass finds no effect. A transport-invalid cell may be resumed to complete its original pair; that is recovery, not an extra repetition.
 
 Two repetitions can screen for large effects and regressions; they cannot establish a small general improvement. Predeclare the smallest difference worth acting on. If the interval crosses zero or no task favors current, say that the result did not establish improvement.
 
@@ -78,7 +78,7 @@ Maintain two activation measurements:
 
 Use realistic near-boundary prompts: FFI declaration versus JS link configuration, a source-level `using` declaration versus package imports, a test block versus selecting a test command, and a task that legitimately needs both product skills. Negative prompts about unrelated languages or moon phases are only sanity checks; they do not test the product boundary well.
 
-Keep a held-out prompt set when tuning descriptions. Run old and new descriptions in the same batch, with the same catalog and actual model. Start with one paired repetition and add at most one second repetition only for prompts with a routing difference, valid failure, or known instability. A one-off historical snapshot is observation, not attribution.
+Keep a held-out prompt set when tuning descriptions. Run old and new descriptions in the same batch, with the same catalog and actual model. Start with one paired repetition and add at most one second repetition only when the current description fails or the pair is unstable. A one-off historical snapshot is observation, not attribution.
 
 ## Budget and stopping rules
 
@@ -88,10 +88,10 @@ Use this sequence:
 
 1. Run all deterministic verification and grader contracts for free.
 2. Map the changed files and claims to the smallest affected task set. Historical results show regression history but are not a causal baseline; rerun both conditions for each selected task in the same batch.
-3. Use Kimi/K3 once per condition. Stop when valid pairs agree and no task has a predeclared instability signal; universal PASS is a result, not a reason to repeat the matrix.
-4. Add a second and final repetition only to signaled tasks. Do not promote an unaffected task or the entire matrix to a second repetition.
-5. Before looking at Claude results, freeze a small cross-check subset and its stopping rule.
-6. Run Claude/DeepSeek Flash on that subset; use Pro only for predeclared disagreements or unstable cells.
+3. Run one paired `none` versus `ours` pass through Claude Code's `sonnet` alias and require the emitted assistant model to be `deepseek-v4-pro`; reject Flash or an unobserved execution model.
+4. Add a second and final DeepSeek Pro repetition only to a task whose current-skill cell fails or whose first pair is unstable. Do not repeat an unaffected task or the entire matrix.
+5. If the current-skill cell fails again, freeze the same task, conditions, and stopping rule, then run one Kimi/K3 fallback pair. Report it separately rather than pooling providers.
+6. Stop when the declared pairs are complete. Universal PASS is a result, not a reason to expand the matrix.
 
 For an ordinary iteration, predeclare at most 12 model cells and an estimated wall time of at most 45 minutes. Derive the estimate from the latest matching local run; if no comparable timing exists, run one task pair as a pilot and re-plan before expanding. If either limit is exceeded, split the experiment and run the highest-risk claims first. A full matrix is reserved for establishing the first baseline, a change spanning multiple task groups, or a release checkpoint, and even then it starts with one repetition rather than a full repeated matrix.
 
@@ -99,4 +99,6 @@ Do not add model evals to CI. Parser, schema, statistics, and grader-contract te
 
 ## Completion report
 
-State what the experiment can and cannot support. Include tables for task-level outcomes, activation metrics, observed execution signatures, repetitions, invalid pairs, signature-mismatch pairs, normalized token usage and duration, errors, and grader-contract results. Lead with current-only versus baseline/ablation-only tasks. List non-discriminating tasks removed from the primary score and any grader defect that invalidated earlier cells.
+Write two layers. The first is a user-facing result that stands on its own: state the number of distinct tasks, give every distinct task its own row with a plain name describing what the agent had to accomplish, identify the observed model, show exact result counts for the two explicitly named conditions side by side, and summarize the primary finding in one sentence. Use `No skills`, `Historical skill`, or a specific label such as `Without the extend route`, never the ambiguous word `Baseline`. Always include final task success, including ties and regressions; activation and reference-read results are secondary evidence. Never call repetitions or condition cells tasks.
+
+The second layer is the technical record. State what the experiment can and cannot support. Include tables for task-level outcomes, activation metrics, observed execution signatures, repetitions, invalid pairs, signature-mismatch pairs, normalized token usage and duration, errors, and grader-contract results. Lead with current-only versus comparison-only tasks. List non-discriminating tasks removed from the primary score and any grader defect that invalidated earlier cells. Internal task IDs, claim IDs, condition names, repetition rows, cell counts, grader details, and statistical analysis belong here rather than in the user-facing result.

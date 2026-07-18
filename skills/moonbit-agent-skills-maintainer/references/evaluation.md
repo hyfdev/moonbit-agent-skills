@@ -51,7 +51,9 @@ Pin and hash every condition before the first call. Record the task hash, skill 
 
 ## Pair and repeat
 
-Run every task under both conditions with the same client and observed model. Alternate AB/BA order across task and repetition. Never compare an `ours`-only strong-model supplement with a baseline from another model.
+Run every task under both conditions with the same client and observed execution signature: emitted model, model alias, provider, and thinking effort. Alternate AB/BA order across task and repetition. Never compare an `ours`-only strong-model supplement with a baseline from another execution signature.
+
+Store analysis eligibility on every cell. Exclude wall timeouts and client or transport failures before pairing. Keep a normal result that reaches the predeclared turn limit as an eligible task failure; excluding it would bias the comparison toward agents that fail to finish. Report invalid pairs and execution-signature mismatches separately.
 
 Use the task as the unit of inference:
 
@@ -92,4 +94,4 @@ Do not add model evals to CI. Parser, schema, statistics, and grader-contract te
 
 ## Completion report
 
-State what the experiment can and cannot support. Include tables for task-level outcomes, activation metrics, observed models, repetitions, excluded pairs, token/cost usage, and grader-contract results. Lead with current-only versus baseline/ablation-only tasks. List non-discriminating tasks removed from the primary score and any grader defect that invalidated earlier cells.
+State what the experiment can and cannot support. Include tables for task-level outcomes, activation metrics, observed execution signatures, repetitions, invalid pairs, signature-mismatch pairs, token/cost usage, and grader-contract results. Lead with current-only versus baseline/ablation-only tasks. List non-discriminating tasks removed from the primary score and any grader defect that invalidated earlier cells.

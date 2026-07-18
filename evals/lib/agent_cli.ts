@@ -5,6 +5,18 @@ import { join } from "node:path";
 export type AgentClient = "claude-code" | "kimi-code";
 export type JsonRecord = Record<string, unknown>;
 
+export type AnalysisEligibilityReason =
+  | "completed"
+  | "predeclared_turn_limit"
+  | "wall_timeout"
+  | "transport_failure"
+  | "client_failure";
+
+export interface AnalysisEligibility {
+  eligible: boolean;
+  reason: AnalysisEligibilityReason;
+}
+
 export interface ToolUseRecord {
   id: string;
   name: string;
@@ -455,4 +467,33 @@ export function clientRunSucceeded(
     parsed.result_subtype === "success" &&
     parsed.result_is_error !== true
   );
+}
+
+export function analysisEligibility(
+  client: AgentClient,
+  parsed: ParsedAgentStream,
+  exitCode: number | null,
+  timedOut: boolean,
+  maxTurns: number,
+): AnalysisEligibility {
+  if (timedOut) {
+    return { eligible: false, reason: "wall_timeout" };
+  }
+  if (
+    client === "claude-code" &&
+    exitCode === 1 &&
+    parsed.result_count === 1 &&
+    parsed.result_subtype === "error_max_turns" &&
+    parsed.result_is_error === true &&
+    parsed.num_turns >= maxTurns
+  ) {
+    return { eligible: true, reason: "predeclared_turn_limit" };
+  }
+  if (exitCode === null) {
+    return { eligible: false, reason: "transport_failure" };
+  }
+  if (!clientRunSucceeded(client, parsed, exitCode, false)) {
+    return { eligible: false, reason: "client_failure" };
+  }
+  return { eligible: true, reason: "completed" };
 }

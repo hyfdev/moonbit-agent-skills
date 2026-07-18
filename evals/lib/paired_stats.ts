@@ -1,9 +1,15 @@
+import type { AnalysisEligibility } from "./agent_cli.ts";
+
 export interface PairableResult {
   id: string;
   condition: string;
   repetition: number;
   passed: boolean;
+  analysis_eligibility: AnalysisEligibility;
   emitted_models: string[];
+  model_aliases: string[];
+  providers: string[];
+  thinking_efforts: string[];
   duration_ms?: number | null;
   usage?: Record<string, unknown>;
 }
@@ -14,6 +20,10 @@ export interface PairedSummary {
   complete_pairs: number;
   eligible_pairs: number;
   missing_pairs: number;
+  invalid_pairs: number;
+  invalid_pair_reasons: Record<string, number>;
+  signature_mismatch_pairs: number;
+  signature_mismatch_fields: Record<string, number>;
   model_mismatch_pairs: number;
   both_passed: number;
   left_only: number;
@@ -59,9 +69,35 @@ function numberField(record: Record<string, unknown> | undefined, key: string): 
   return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
-function modelsKey(result: PairableResult): string | null {
-  const models = [...new Set(result.emitted_models)].sort();
-  return models.length === 0 ? null : JSON.stringify(models);
+const SIGNATURE_FIELDS = [
+  "emitted_models",
+  "model_aliases",
+  "providers",
+  "thinking_efforts",
+] as const;
+
+type SignatureField = (typeof SIGNATURE_FIELDS)[number];
+
+function normalizedSignatureField(result: PairableResult, field: SignatureField): string[] {
+  return [...new Set(result[field])].sort();
+}
+
+function mismatchedSignatureFields(
+  left: PairableResult,
+  right: PairableResult,
+): SignatureField[] {
+  return SIGNATURE_FIELDS.filter((field) => {
+    const leftValues = normalizedSignatureField(left, field);
+    const rightValues = normalizedSignatureField(right, field);
+    if (field === "emitted_models" && (leftValues.length === 0 || rightValues.length === 0)) {
+      return true;
+    }
+    return JSON.stringify(leftValues) !== JSON.stringify(rightValues);
+  });
+}
+
+function increment(record: Record<string, number>, key: string): void {
+  record[key] = (record[key] ?? 0) + 1;
 }
 
 function binomialLowerTail(k: number, n: number): number {
@@ -124,6 +160,10 @@ export function pairedSummary(
   let completePairs = 0;
   let eligiblePairs = 0;
   let missingPairs = 0;
+  let invalidPairs = 0;
+  const invalidPairReasons: Record<string, number> = {};
+  let signatureMismatchPairs = 0;
+  const signatureMismatchFields: Record<string, number> = {};
   let modelMismatchPairs = 0;
   let bothPassed = 0;
   let leftOnly = 0;
@@ -140,10 +180,24 @@ export function pairedSummary(
       continue;
     }
     completePairs += 1;
-    const leftModels = modelsKey(left);
-    const rightModels = modelsKey(right);
-    if (leftModels === null || rightModels === null || leftModels !== rightModels) {
-      modelMismatchPairs += 1;
+    if (!left.analysis_eligibility.eligible || !right.analysis_eligibility.eligible) {
+      invalidPairs += 1;
+      const reasons = [
+        !left.analysis_eligibility.eligible
+          ? leftCondition + ":" + left.analysis_eligibility.reason
+          : null,
+        !right.analysis_eligibility.eligible
+          ? rightCondition + ":" + right.analysis_eligibility.reason
+          : null,
+      ].filter((reason): reason is string => reason !== null);
+      increment(invalidPairReasons, reasons.join("+"));
+      continue;
+    }
+    const mismatchedFields = mismatchedSignatureFields(left, right);
+    if (mismatchedFields.length > 0) {
+      signatureMismatchPairs += 1;
+      for (const field of mismatchedFields) increment(signatureMismatchFields, field);
+      if (mismatchedFields.includes("emitted_models")) modelMismatchPairs += 1;
       continue;
     }
     eligiblePairs += 1;
@@ -202,6 +256,10 @@ export function pairedSummary(
     complete_pairs: completePairs,
     eligible_pairs: eligiblePairs,
     missing_pairs: missingPairs,
+    invalid_pairs: invalidPairs,
+    invalid_pair_reasons: invalidPairReasons,
+    signature_mismatch_pairs: signatureMismatchPairs,
+    signature_mismatch_fields: signatureMismatchFields,
     model_mismatch_pairs: modelMismatchPairs,
     both_passed: bothPassed,
     left_only: leftOnly,

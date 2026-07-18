@@ -78,9 +78,9 @@ Parse and preserve these fields separately:
 | `user` | matching tool results and error status |
 | `result` | subtype, error status, turns, usage, `total_cost_usd`, `modelUsage`, permission denials |
 
-On this machine, `system/init.model` and `modelUsage` can retain a requested Claude name while every assistant event names `deepseek-v4-flash`. Treat `assistant.message.model` as the observed execution model, retain all fields for audit, and exclude a baseline/current pair when their observed model sets differ.
+On this machine, `system/init.model` and `modelUsage` can retain a requested Claude name while every assistant event names `deepseek-v4-flash`. Treat `assistant.message.model` as the observed execution model and retain all fields for audit. Before pairing cells, normalize and compare the complete observed execution signature: emitted model, model alias, provider, and thinking effort. The emitted-model set must be non-empty. An optional dimension that the client omits in both cells matches as two empty sets; one-sided missing data does not match.
 
-Normal completion requires process exit 0, exactly one result event, `subtype=success`, `is_error=false`, no forbidden tool call, and deterministic task graders passing. A turn-limit result exits 1 with `subtype=error_max_turns` but still contains billable usage, which must count against the total experiment budget.
+Normal completion requires process exit 0, exactly one result event, `subtype=success`, `is_error=false`, no forbidden tool call, and deterministic task graders passing. Every content cell stores a structured analysis-eligibility result. Exclude wall timeouts and client or transport failures from outcome comparisons. A normal result at the predeclared turn limit exits 1 with `subtype=error_max_turns`; retain it as an eligible task failure and count its billable usage against the experiment budget.
 
 The 2026-07-18 smoke command used no tools, requested `haiku`, resolved to `deepseek-v4-flash`, returned `OK` in one turn, and cost `$0.005615`. This is an environment check, not a model benchmark.
 

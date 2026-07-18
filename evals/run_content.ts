@@ -32,6 +32,7 @@ import {
 import { isDeepStrictEqual, parseArgs } from "node:util";
 import { fileURLToPath } from "node:url";
 import {
+  analysisEligibility,
   buildAgentInvocation,
   clientExecutable,
   clientRunSucceeded,
@@ -39,6 +40,8 @@ import {
   parseAgentStream,
   parseClaudeStream,
   type AgentClient,
+  type AnalysisEligibility,
+  type AnalysisEligibilityReason,
   type BashResult as NormalizedBashResult,
   type JsonRecord as AgentJsonRecord,
   type ParsedAgentStream,
@@ -246,6 +249,57 @@ function stringArray(value: unknown): string[] {
     throw new Error("expected an array of strings");
   }
   return value as string[];
+}
+
+function observedStrings(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string")
+    : [];
+}
+
+const ANALYSIS_ELIGIBILITY_REASONS = new Set<AnalysisEligibilityReason>([
+  "completed",
+  "predeclared_turn_limit",
+  "wall_timeout",
+  "transport_failure",
+  "client_failure",
+]);
+
+export function resultAnalysisEligibility(result: JsonRecord): AnalysisEligibility {
+  const stored = asRecord(result.analysis_eligibility);
+  if (
+    typeof stored.eligible === "boolean" &&
+    typeof stored.reason === "string" &&
+    ANALYSIS_ELIGIBILITY_REASONS.has(stored.reason as AnalysisEligibilityReason)
+  ) {
+    return {
+      eligible: stored.eligible,
+      reason: stored.reason as AnalysisEligibilityReason,
+    };
+  }
+  if (result.timed_out === true) {
+    return { eligible: false, reason: "wall_timeout" };
+  }
+  const clientExit = (Array.isArray(result.checks) ? result.checks : [])
+    .map(asRecord)
+    .find((check) => asRecord(check.check).type === "client_exit");
+  if (clientExit?.ok === true) {
+    return { eligible: true, reason: "completed" };
+  }
+  if (result.exit_code === 1 && typeof clientExit?.detail === "string") {
+    const turnCounts = clientExit.detail.match(/observed_steps=(\d+); step_limit=(\d+)/);
+    if (
+      clientExit.detail.includes("result_subtype=error_max_turns") &&
+      turnCounts !== null &&
+      Number(turnCounts[1]) >= Number(turnCounts[2])
+    ) {
+      return { eligible: true, reason: "predeclared_turn_limit" };
+    }
+  }
+  if (result.exit_code === null) {
+    return { eligible: false, reason: "transport_failure" };
+  }
+  return { eligible: false, reason: "client_failure" };
 }
 
 function booleanText(value: boolean): string {
@@ -1392,6 +1446,13 @@ export function runTask(
         String(maxTurns),
     });
     const passed = checks.every((check) => check.ok);
+    const cellAnalysisEligibility = analysisEligibility(
+      client,
+      parsed,
+      processResult.exitCode,
+      processResult.timedOut,
+      maxTurns,
+    );
     let failedWorkspace: string | null = null;
     if (!passed) {
       const failedDirectory = join(runDir, "failed-workspaces", artifactStem);
@@ -1410,6 +1471,7 @@ export function runTask(
       condition,
       client,
       passed,
+      analysis_eligibility: cellAnalysisEligibility,
       checks,
       activated_skills: parsed.activated_skills,
       successful_skills: parsed.successful_skills,
@@ -1919,7 +1981,7 @@ export function main(argv = process.argv.slice(2)): number {
     );
   }
   const runConfig = {
-    runner: "content-paired-v2",
+    runner: "content-paired-v3",
     area: options.area,
     client: options.client,
     conditions: options.conditions,
@@ -2111,11 +2173,11 @@ export function main(argv = process.argv.slice(2)): number {
     condition: stringValue(result.condition),
     repetition: typeof result.repetition === "number" ? result.repetition : 0,
     passed: result.passed === true,
-    emitted_models: Array.isArray(result.emitted_models)
-      ? result.emitted_models.filter(
-          (model): model is string => typeof model === "string",
-        )
-      : [],
+    analysis_eligibility: resultAnalysisEligibility(result),
+    emitted_models: observedStrings(result.emitted_models),
+    model_aliases: observedStrings(result.model_aliases),
+    providers: observedStrings(result.providers),
+    thinking_efforts: observedStrings(result.thinking_efforts),
     duration_ms: typeof result.duration_ms === "number" ? result.duration_ms : null,
     usage: asRecord(result.usage),
   }));
@@ -2134,7 +2196,7 @@ export function main(argv = process.argv.slice(2)): number {
   const experimentManifest = asRecord(asRecord(options.experiment).manifest);
   const taskGroups = asRecord(experimentManifest.task_groups);
   const summary = {
-    runner: "content-paired-v2",
+    runner: "content-paired-v3",
     area: options.area,
     client: options.client,
     model: options.model,

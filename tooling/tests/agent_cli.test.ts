@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vite-plus/test";
 import {
+  analysisEligibility,
   buildAgentInvocation,
   clientRunSucceeded,
   enrichKimiStream,
@@ -116,6 +117,55 @@ describe("agent CLI stream normalization", () => {
     expect(parsed.final_text).toBe("recovered");
     expect(parsed.num_turns).toBe(2);
     expect(clientRunSucceeded("kimi-code", parsed, 0, false)).toBe(true);
+  });
+});
+
+describe("content-analysis eligibility", () => {
+  it("keeps a normal predeclared turn-limit result as an eligible task failure", () => {
+    const parsed = parseClaudeStream(
+      JSON.stringify({
+        type: "result",
+        subtype: "error_max_turns",
+        is_error: true,
+        num_turns: 12,
+      }),
+    );
+
+    expect(analysisEligibility("claude-code", parsed, 1, false, 12)).toEqual({
+      eligible: true,
+      reason: "predeclared_turn_limit",
+    });
+    expect(analysisEligibility("claude-code", parsed, 1, false, 13)).toEqual({
+      eligible: false,
+      reason: "client_failure",
+    });
+  });
+
+  it("excludes wall timeouts, transport failures, and client failures", () => {
+    const successful = parseClaudeStream(
+      JSON.stringify({
+        type: "result",
+        subtype: "success",
+        is_error: false,
+        num_turns: 1,
+      }),
+    );
+    const missingKimiSession = parseKimiStream(
+      JSON.stringify({ role: "assistant", content: "done" }),
+    );
+
+    expect(analysisEligibility("claude-code", successful, 0, true, 12)).toEqual({
+      eligible: false,
+      reason: "wall_timeout",
+    });
+    expect(analysisEligibility("claude-code", successful, null, false, 12)).toEqual({
+      eligible: false,
+      reason: "transport_failure",
+    });
+    expect(analysisEligibility("kimi-code", missingKimiSession, 0, false, 12)).toEqual({
+      eligible: false,
+      reason: "client_failure",
+    });
   });
 });
 

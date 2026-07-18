@@ -3,7 +3,7 @@
 Agent Skills for MoonBit. Help coding agents work with MoonBit and write better MoonBit code.
 
 - Up to date with the latest MoonBit release — **[v0.10.4](https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release)**
-- Backed by evaluation across multiple AI models
+- Backed by [evaluation](#evaluation) across multiple AI models
 - Automatic activation based on context
 
 ## Contents
@@ -11,6 +11,7 @@ Agent Skills for MoonBit. Help coding agents work with MoonBit and write better 
 - [Skills](#skills)
 - [Install](#install)
 - [How to use](#how-to-use)
+- [Evaluation](#evaluation)
 - [FAQ](#faq)
 - [License](#license)
 
@@ -51,6 +52,19 @@ Clone or download this repository, then copy either or both skill directories in
 ## How to use
 
 Use your coding agent as usual—no special prompts or manual invocation required.
+
+## Evaluation
+
+Model runs use deterministic MoonBit graders and preserved failures rather than an LLM judge or selective reruns.
+
+| Model | Evaluation | Result |
+| --- | --- | --- |
+| Kimi K3 | 48-cell high-risk language matrix | Historical skill 24/24; current skill 23/24; target reference read before action improved from 3/12 to 11/12 |
+| Kimi K3 | 24-cell `extend` route ablation | Both conditions 12/12; target reference read before action improved from 2/6 to 5/6 |
+| DeepSeek Flash | 4-cell `extend` cross-check | Both conditions 2/2 |
+| Kimi K3 | 4-prompt prompted-routing smoke | 4/4 exact, with required skills selected before any domain action |
+
+The measured benefit is better reference discovery, not a claimed blanket improvement in final correctness. See the [full content results](evals/RESULTS.md) and [activation results](evals/activation/RESULTS.md).
 
 ## FAQ
 

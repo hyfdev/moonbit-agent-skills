@@ -116,6 +116,9 @@ export interface ContentTask {
   id: string;
   prompt: string;
   grade: JsonRecord[];
+  claim_id?: string;
+  risk_class?: string;
+  primary_metric?: string;
   discovery?: {
     skill?: string;
     reference?: string;
@@ -152,6 +155,12 @@ export interface PreparedSkillSnapshots {
   };
 }
 
+export interface DerivedConditionSnapshot {
+  transformation: string;
+  files: Record<string, string>;
+  aggregate_sha256: string;
+}
+
 export interface DiscoveryEvidence {
   requested_skill: string | null;
   requested_reference: string | null;
@@ -185,6 +194,7 @@ interface ContentExperiment {
   model: string;
   conditions: string[];
   task_ids: string[];
+  task_groups?: Record<string, string[]>;
   repetitions: number;
   max_turns: number;
   paid_budget_usd: number | null;
@@ -393,7 +403,7 @@ export function installTopLevelExtendAblation(
   content = replaceExactlyOnce(
     content,
     "| Traits; generics; impls; explicit `extend` and `pub extend`; `implicit_impl_as_method`; supertrait dot-call migration; Builtin traits; Deriving builtin traits; operators; trait objects | references/traits-and-generics.mbt.md |\n",
-    "",
+    "| Traits; generics; impls; Builtin traits; Deriving builtin traits; operators; trait objects | references/traits-and-generics.mbt.md |\n",
   );
   content = replaceExactlyOnce(
     content,
@@ -525,6 +535,45 @@ export function snapshotFiles(root: string): Record<string, string> {
       .filter((path) => !ignoredSnapshotPath(path))
       .map((path) => [path, fileDigest(join(root, path))]),
   );
+}
+
+export function prepareDerivedConditionSnapshots(
+  cacheDirectory: string,
+  conditions: string[],
+  skillSources: SkillSources,
+): Record<string, DerivedConditionSnapshot> {
+  const root = join(cacheDirectory, "derived-condition-snapshots");
+  mkdirSync(root, { recursive: true });
+  const snapshots: Record<string, DerivedConditionSnapshot> = {};
+  for (const condition of conditions) {
+    let transformation: string | undefined;
+    const destination = join(root, condition);
+    if (condition === "ours-no-top-level-extend") {
+      transformation =
+        "Remove only explicit extend terms and the direct migration rule from moonbit-language/SKILL.md; preserve the traits/generics route and every reference byte-for-byte.";
+      if (!existsSync(destination)) {
+        mkdirExclusive(destination);
+        installTopLevelExtendAblation(destination, skillSources.current);
+      }
+    } else if (condition === "forced-language-no-cross-language") {
+      transformation =
+        "Remove the concentrated cross-language route, rule, and reference from the forced moonbit-language skill.";
+      if (!existsSync(destination)) {
+        mkdirExclusive(destination);
+        installLanguageAblation(destination, skillSources.current);
+      }
+    }
+    if (transformation === undefined) continue;
+    const files = snapshotFiles(destination);
+    snapshots[condition] = {
+      transformation,
+      files,
+      aggregate_sha256: createHash("sha256")
+        .update(JSON.stringify(files))
+        .digest("hex"),
+    };
+  }
+  return snapshots;
 }
 
 function checkedRawOutput(
@@ -838,6 +887,25 @@ function matchesRecursiveGlob(path: string, pattern: string): boolean {
   return matchesGlob(path, pattern) || matchesGlob(path, "**/" + pattern);
 }
 
+function normalizedAnswerLines(finalText: string): string[] {
+  const nonemptyLines = finalText
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line !== "");
+  const first = nonemptyLines[0] ?? "";
+  const answerLines =
+    /^```(?:text|json|moonbit)?$/i.test(first) && nonemptyLines.length > 1
+      ? nonemptyLines.slice(1)
+      : nonemptyLines;
+  if (answerLines.length === 0) return [];
+  const normalized = [...answerLines];
+  const inlineCode = normalized[0].match(/^`([^`\r\n]+)`$/);
+  if (inlineCode !== null) normalized[0] = inlineCode[1].trim();
+  const bold = normalized[0].match(/^\*\*([^*\r\n]+)\*\*$/);
+  if (bold !== null) normalized[0] = bold[1].trim();
+  return normalized;
+}
+
 export function grade(
   check: JsonRecord,
   project: string,
@@ -1004,6 +1072,25 @@ export function grade(
         booleanText(ok),
     };
   }
+  if (kind === "no_file_contains") {
+    const pattern = stringValue(check.glob);
+    const expression = regex(check.regex, "is");
+    const hits = walkFiles(project)
+      .map((path) => relative(project, path))
+      .filter((path) => !ignoredSnapshotPath(path))
+      .filter((path) => matchesRecursiveGlob(path, pattern))
+      .filter((path) => expression.test(readFileSync(join(project, path), "utf8")));
+    return {
+      ok: hits.length === 0,
+      detail:
+        "no_file_contains " +
+        pattern +
+        " !~ /" +
+        stringValue(check.regex) +
+        "/ -> hits=" +
+        quotedList(hits),
+    };
+  }
   if (kind === "output_matches") {
     const ok = regex(check.regex, "is").test(finalText);
     return {
@@ -1053,15 +1140,43 @@ export function grade(
     };
   }
   if (kind === "first_line_is") {
-    const first = finalText
-      .split(/\r?\n/)
-      .map((line) => line.trim())
-      .find((line) => line !== "") ?? "";
+    const rawFirst =
+      finalText
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .find((line) => line !== "") ?? "";
+    const first = normalizedAnswerLines(finalText)[0] ?? "";
     const expected = stringValue(check.value);
     const ok = first.toUpperCase() === expected.toUpperCase();
     return {
       ok,
-      detail: "first_line_is " + expected + " -> got " + JSON.stringify(first.slice(0, 40)),
+      detail:
+        "first_line_is " +
+        expected +
+        " -> got " +
+        JSON.stringify(rawFirst.slice(0, 40)) +
+        (first === rawFirst ? "" : "; normalized=" + JSON.stringify(first.slice(0, 40))),
+    };
+  }
+  if (kind === "first_line_json_is") {
+    const first = normalizedAnswerLines(finalText)[0] ?? "";
+    let actual: unknown;
+    let parseError: string | null = null;
+    try {
+      actual = JSON.parse(first);
+    } catch (error) {
+      parseError = (error as Error).message;
+    }
+    const ok = parseError === null && isDeepStrictEqual(actual, check.value);
+    return {
+      ok,
+      detail:
+        "first_line_json_is " +
+        JSON.stringify(check.value) +
+        " -> " +
+        (parseError === null
+          ? JSON.stringify(actual)
+          : "parse error: " + parseError + "; got " + JSON.stringify(first.slice(0, 80))),
     };
   }
   throw new Error("unknown check type " + JSON.stringify(kind));
@@ -1127,7 +1242,25 @@ export function discoveryEvidence(
 }
 
 function loadTask(taskDirectory: string): ContentTask {
-  return JSON.parse(readFileSync(join(taskDirectory, "task.json"), "utf8")) as ContentTask;
+  const task = JSON.parse(
+    readFileSync(join(taskDirectory, "task.json"), "utf8"),
+  ) as ContentTask;
+  if (
+    task.id !== basename(taskDirectory) ||
+    typeof task.prompt !== "string" ||
+    !Array.isArray(task.grade)
+  ) {
+    throw new Error(join(taskDirectory, "task.json") + ": invalid content task");
+  }
+  const metadata = [task.claim_id, task.risk_class, task.primary_metric];
+  const present = metadata.filter((value) => typeof value === "string" && value !== "").length;
+  if (present !== 0 && present !== metadata.length) {
+    throw new Error(
+      join(taskDirectory, "task.json") +
+        ": claim_id, risk_class, and primary_metric must be provided together",
+    );
+  }
+  return task;
 }
 
 function failedWorkspaceFilter(root: string, sourcePath: string): boolean {
@@ -1257,6 +1390,9 @@ export function runTask(
 
     resultArtifact = {
       id: task.id,
+      claim_id: task.claim_id ?? null,
+      risk_class: task.risk_class ?? null,
+      primary_metric: task.primary_metric ?? null,
       condition,
       client,
       passed,
@@ -1454,6 +1590,31 @@ function loadContentExperiment(pathValue: string): {
   }
   if (new Set(experiment.task_ids).size !== experiment.task_ids.length) {
     throw new Error(pathValue + ": duplicate experiment task ids");
+  }
+  if (experiment.task_groups !== undefined) {
+    const entries = Object.entries(experiment.task_groups);
+    if (
+      entries.length === 0 ||
+      entries.some(
+        ([name, ids]) =>
+          !/^[a-zA-Z0-9._-]+$/.test(name) ||
+          !Array.isArray(ids) ||
+          ids.length === 0 ||
+          ids.some((id) => typeof id !== "string"),
+      )
+    ) {
+      throw new Error(pathValue + ": invalid experiment task_groups");
+    }
+    const grouped = entries.flatMap(([, ids]) => ids);
+    if (
+      new Set(grouped).size !== grouped.length ||
+      grouped.length !== experiment.task_ids.length ||
+      [...grouped].sort().join("\n") !== [...experiment.task_ids].sort().join("\n")
+    ) {
+      throw new Error(
+        pathValue + ": task_groups must partition task_ids exactly once",
+      );
+    }
   }
   if (
     experiment.client === "claude-code" &&
@@ -1670,10 +1831,26 @@ export function main(argv = process.argv.slice(2)): number {
   if (taskDirectories.length === 0) {
     throw new Error("no tasks selected");
   }
+  const taskDefinitions = Object.fromEntries(
+    taskDirectories.map((directory) => {
+      const task = loadTask(directory);
+      return [task.id, task];
+    }),
+  );
+  if (
+    options.experiment !== undefined &&
+    Object.values(taskDefinitions).some(
+      (task) =>
+        task.claim_id === undefined ||
+        task.risk_class === undefined ||
+        task.primary_metric === undefined,
+    )
+  ) {
+    throw new Error(
+      "experiment tasks require claim_id, risk_class, and primary_metric",
+    );
+  }
   if (options.dryRun) {
-    for (const directory of taskDirectories) {
-      loadTask(directory);
-    }
     console.log(String(taskDirectories.length) + " task(s) valid");
     return 0;
   }
@@ -1715,6 +1892,11 @@ export function main(argv = process.argv.slice(2)): number {
     ? prepareSkillSnapshots(cacheDirectory)
     : undefined;
   const skillSources = preparedSkills?.sources ?? { current: SKILLS_SRC };
+  const derivedConditionSnapshots = prepareDerivedConditionSnapshots(
+    cacheDirectory,
+    options.conditions,
+    skillSources,
+  );
 
   const resultsPath = join(runDirectory, "results.jsonl");
   if (existsSync(resultsPath) && !options.resume) {
@@ -1732,6 +1914,16 @@ export function main(argv = process.argv.slice(2)): number {
     tasks: Object.fromEntries(
       taskDirectories.map((directory) => [basename(directory), snapshotFiles(directory)]),
     ),
+    task_metadata: Object.fromEntries(
+      Object.entries(taskDefinitions).map(([id, task]) => [
+        id,
+        {
+          claim_id: task.claim_id ?? null,
+          risk_class: task.risk_class ?? null,
+          primary_metric: task.primary_metric ?? null,
+        },
+      ]),
+    ),
     model: options.model,
     max_turns: options.maxTurns,
     paid_budget_usd: options.paidBudgetUsd ?? null,
@@ -1739,6 +1931,7 @@ export function main(argv = process.argv.slice(2)): number {
     environment,
     catalog_isolation: isolation,
     skill_snapshots: preparedSkills?.manifest ?? null,
+    derived_condition_snapshots: derivedConditionSnapshots,
     runner_files: {
       "evals/run_content.ts": fileDigest(fileURLToPath(import.meta.url)),
       "evals/lib/agent_cli.ts": fileDigest(join(HERE, "lib", "agent_cli.ts")),
@@ -1899,6 +2092,33 @@ export function main(argv = process.argv.slice(2)): number {
         ];
       }),
   );
+  const pairableResults = results.map((result): PairableResult => ({
+    id: stringValue(result.id),
+    condition: stringValue(result.condition),
+    repetition: typeof result.repetition === "number" ? result.repetition : 0,
+    passed: result.passed === true,
+    emitted_models: Array.isArray(result.emitted_models)
+      ? result.emitted_models.filter(
+          (model): model is string => typeof model === "string",
+        )
+      : [],
+    duration_ms: typeof result.duration_ms === "number" ? result.duration_ms : null,
+    usage: asRecord(result.usage),
+  }));
+  const pairedComparisons = (taskIds?: Set<string>): ReturnType<typeof pairedSummary>[] =>
+    options.conditions.flatMap((left, leftIndex) =>
+      options.conditions.slice(leftIndex + 1).map((right) =>
+        pairedSummary(
+          taskIds === undefined
+            ? pairableResults
+            : pairableResults.filter((result) => taskIds.has(result.id)),
+          left,
+          right,
+        ),
+      ),
+    );
+  const experimentManifest = asRecord(asRecord(options.experiment).manifest);
+  const taskGroups = asRecord(experimentManifest.task_groups);
   const summary = {
     runner: "content-paired-v2",
     area: options.area,
@@ -1911,28 +2131,12 @@ export function main(argv = process.argv.slice(2)): number {
     emitted_models: emittedModels,
     pass_rate_by_condition: passRateByCondition,
     discovery_by_condition: discoveryByCondition,
-    paired_comparisons: options.conditions.flatMap((left, leftIndex) =>
-      options.conditions.slice(leftIndex + 1).map((right) =>
-        pairedSummary(
-          results.map((result): PairableResult => ({
-            id: stringValue(result.id),
-            condition: stringValue(result.condition),
-            repetition:
-              typeof result.repetition === "number" ? result.repetition : 0,
-            passed: result.passed === true,
-            emitted_models: Array.isArray(result.emitted_models)
-              ? result.emitted_models.filter(
-                  (model): model is string => typeof model === "string",
-                )
-              : [],
-            duration_ms:
-              typeof result.duration_ms === "number" ? result.duration_ms : null,
-            usage: asRecord(result.usage),
-          })),
-          left,
-          right,
-        ),
-      ),
+    paired_comparisons: pairedComparisons(),
+    paired_comparisons_by_task_group: Object.fromEntries(
+      Object.entries(taskGroups).map(([name, ids]) => [
+        name,
+        pairedComparisons(new Set(stringArray(ids))),
+      ]),
     ),
     usage: {
       input_tokens: totalInputTokens,

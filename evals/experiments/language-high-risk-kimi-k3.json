@@ -20,6 +20,22 @@
     "lang-discover-selected-trait-method",
     "lang-discover-default-trait-method"
   ],
+  "task_groups": {
+    "silent_semantics_and_api": [
+      "lang-defer-block-order",
+      "lang-json-flat-labelled",
+      "lang-discover-selected-trait-method",
+      "lang-discover-default-trait-method"
+    ],
+    "current_facts": [
+      "lang-defer-exists",
+      "lang-loop-status"
+    ],
+    "warning_migrations": [
+      "lang-explicit-extend",
+      "lang-immutable-constructor-migration"
+    ]
+  },
   "repetitions": 3,
   "max_turns": 50,
   "paid_budget_usd": null,

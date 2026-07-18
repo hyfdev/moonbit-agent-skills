@@ -1,5 +1,8 @@
 {
   "id": "lang-discover-selected-trait-method",
+  "risk_class": "silent-api-surface",
+  "claim_id": "language.traits.selected-public-extend-discovery",
+  "primary_metric": "downstream-selected-dot-call",
   "prompt": "`Robot` already implements `Greeter`, and the library currently exposes a qualified wrapper. Change the public API so callers in another package can also write `robot.greet()`. Only `greet` should become a dot-call method; do not duplicate its body as a standalone `Robot` method or change the trait implementation. I do not know MoonBit's name for this feature—find the current syntax. Keep the existing qualified API and make checks/tests pass with warnings denied.",
   "grader_note": "2026-07-18: discoverability regression whose clean starter avoids compiler diagnostics that reveal the declaration name; hidden cross-package tests require both the selected dot-call method and the existing qualified wrapper.",
   "discovery": {
@@ -8,19 +11,13 @@
   },
   "grade": [
     {
-      "type": "file_contains",
-      "path": "lib.mbt",
-      "regex": "(?:^|\\n)pub\\s+extend\\s+Robot\\s+with\\s+Greeter::\\{\\s*greet\\s*,?\\s*\\}\\s*(?:\\n|$)"
+      "type": "any_file_contains",
+      "glob": "*.mbt",
+      "regex": "(?:^|\\n)[ \\t]*pub[ \\t]+extend[ \\t]+Robot[ \\t]+with[ \\t]+Greeter::\\{[ \\t]*greet[ \\t]*,?[ \\t]*\\}[ \\t]*(?://[^\\n]*)?(?:\\n|$)"
     },
     {
-      "type": "file_match_count",
-      "path": "lib.mbt",
-      "regex": "(?:^|\\n)pub\\s+extend\\s+Robot\\s+with\\s+Greeter::\\{",
-      "exact": 1
-    },
-    {
-      "type": "file_not_contains",
-      "path": "lib.mbt",
+      "type": "no_file_contains",
+      "glob": "*.mbt",
       "regex": "(?:^|\\n)\\s*(?:pub\\s+)?fn\\s+Robot::greet\\s*\\("
     },
     {

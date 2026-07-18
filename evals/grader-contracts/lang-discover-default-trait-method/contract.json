@@ -1,0 +1,39 @@
+{
+  "area": "language",
+  "task": "lang-discover-default-trait-method",
+  "cases": [
+    {
+      "name": "correct-default-only-public-extend",
+      "expected": "pass",
+      "files": {
+        "extension.mbt": "pub extend Item with Describer::{describe}\n"
+      },
+      "final_text": "Exposed only the default describe operation and preserved the qualified API."
+    },
+    {
+      "name": "standalone-default-method-copy",
+      "expected": "fail",
+      "files": {
+        "extension.mbt": "// pub extend Item with Describer::{describe}\n\npub fn Item::describe(self : Item) -> String {\n  \"item \\{self.0}\"\n}\n"
+      },
+      "final_text": "Added a public describe method.",
+      "must_fail_check_types": [
+        "any_file_contains",
+        "no_file_contains"
+      ]
+    },
+    {
+      "name": "extends-required-method-too",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "pub trait Describer {\n  name(Self) -> String\n  describe(Self) -> String = _\n}\n\nimpl Describer with describe(self) {\n  \"item \\{self.name()}\"\n}\n\npub(all) struct Item(String)\n\nimpl Describer for Item with name(self) {\n  self.0\n}\n\npub extend Item with Describer::{name, describe}\n\npub fn describe_qualified(item : Item) -> String {\n  Describer::describe(item)\n}\n"
+      },
+      "final_text": "Exposed the trait methods as dot-call methods.",
+      "must_fail_check_types": [
+        "any_file_contains",
+        "no_file_contains",
+        "moon"
+      ]
+    }
+  ]
+}

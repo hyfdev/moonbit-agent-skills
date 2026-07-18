@@ -1,0 +1,37 @@
+{
+  "area": "language",
+  "task": "lang-defer-block-order",
+  "cases": [
+    {
+      "name": "correct-inner-block-and-outer-lifo-order",
+      "expected": "pass",
+      "final_text": "body-1,inner-body,deferred-inner,body-2,deferred-second,deferred-first\nThe inner defer runs when its block exits; each block drains defers in LIFO order."
+    },
+    {
+      "name": "treats-all-defers-as-function-scoped",
+      "expected": "fail",
+      "final_text": "body-1,inner-body,body-2,deferred-second,deferred-inner,deferred-first\nAll defers wait until the function returns, then run in last-in-first-out order.",
+      "must_fail_check_types": [
+        "first_line_is",
+        "output_matches"
+      ]
+    },
+    {
+      "name": "uses-fifo-within-each-scope",
+      "expected": "fail",
+      "final_text": "body-1,inner-body,deferred-inner,body-2,deferred-first,deferred-second\nThe inner operation runs at its scope exit, then outer operations run in registration order.",
+      "must_fail_check_types": [
+        "first_line_is",
+        "output_matches"
+      ]
+    },
+    {
+      "name": "correct-sequence-with-extra-first-line-candidate",
+      "expected": "fail",
+      "final_text": "body-1,inner-body,deferred-inner,body-2,deferred-second,deferred-first OR body-1,inner-body,body-2,deferred-inner,deferred-second,deferred-first\nEach block drains its defers in LIFO order.",
+      "must_fail_check_types": [
+        "first_line_is"
+      ]
+    }
+  ]
+}

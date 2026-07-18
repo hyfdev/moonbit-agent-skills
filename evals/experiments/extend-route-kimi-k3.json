@@ -16,6 +16,16 @@
     "lang-json-flat-labelled",
     "lang-defer-block-order"
   ],
+  "task_groups": {
+    "extend_primary": [
+      "lang-discover-selected-trait-method",
+      "lang-discover-default-trait-method"
+    ],
+    "regression_controls": [
+      "lang-json-flat-labelled",
+      "lang-defer-block-order"
+    ]
+  },
   "repetitions": 3,
   "max_turns": 30,
   "paid_budget_usd": null,

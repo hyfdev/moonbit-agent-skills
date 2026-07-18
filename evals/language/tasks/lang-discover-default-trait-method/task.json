@@ -1,5 +1,8 @@
 {
   "id": "lang-discover-default-trait-method",
+  "risk_class": "silent-api-surface",
+  "claim_id": "language.traits.default-public-extend-discovery",
+  "primary_metric": "downstream-default-dot-call-with-required-method-hidden",
   "prompt": "`Item` implements the required part of `Describer`; the reusable `describe` body remains on the trait. Expose only that default operation as a public dot-call method for downstream packages, so callers can write `item.describe()`, while `name` stays trait-qualified. I do not know what MoonBit calls the declaration; find the current syntax. Keep the default body, the public `describe_qualified` wrapper, and its existing consumer test unchanged, then pass checks/tests with warnings denied.",
   "grader_note": "2026-07-18: discoverability regression whose clean starter exposes only qualified calls; hidden tests require the public default method while an independent E4015 check proves the required method stays trait-qualified. The prompt explicitly preserves the qualified wrapper because an earlier discarded cell removed it despite a hidden wrapper check.",
   "discovery": {
@@ -8,25 +11,19 @@
   },
   "grade": [
     {
-      "type": "file_contains",
-      "path": "lib.mbt",
-      "regex": "(?:^|\\n)pub\\s+extend\\s+Item\\s+with\\s+Describer::\\{\\s*describe\\s*,?\\s*\\}\\s*(?:\\n|$)"
+      "type": "any_file_contains",
+      "glob": "*.mbt",
+      "regex": "(?:^|\\n)[ \\t]*pub[ \\t]+extend[ \\t]+Item[ \\t]+with[ \\t]+Describer::\\{[ \\t]*describe[ \\t]*,?[ \\t]*\\}[ \\t]*(?://[^\\n]*)?(?:\\n|$)"
     },
     {
-      "type": "file_match_count",
-      "path": "lib.mbt",
-      "regex": "(?:^|\\n)pub\\s+extend\\s+Item\\s+with\\s+Describer::\\{",
-      "exact": 1
-    },
-    {
-      "type": "file_not_contains",
-      "path": "lib.mbt",
+      "type": "no_file_contains",
+      "glob": "*.mbt",
       "regex": "(?:^|\\n)\\s*(?:pub\\s+)?fn\\s+Item::(?:describe|name)\\s*\\("
     },
     {
-      "type": "file_not_contains",
-      "path": "lib.mbt",
-      "regex": "pub\\s+extend\\s+Item\\s+with\\s+Describer::\\{[^}]*\\bname\\b"
+      "type": "no_file_contains",
+      "glob": "*.mbt",
+      "regex": "(?:^|\\n)[ \\t]*pub[ \\t]+extend[ \\t]+Item[ \\t]+with[ \\t]+Describer::\\{[^}]*\\bname\\b"
     },
     {
       "type": "file_contains",

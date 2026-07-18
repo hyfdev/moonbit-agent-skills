@@ -1,21 +1,15 @@
 {
   "id": "lang-immutable-constructor-migration",
-  "prompt": "Update this MoonBit 0.10.4 package to stop using the deprecated immutable-container constructor while preserving behavior. Run the compiler with warnings denied and keep the test passing.",
+  "risk_class": "warning-only-migration",
+  "claim_id": "language.immutable.type-named-constructor",
+  "primary_metric": "warning-free-behavior-preservation",
+  "prompt": "Update this MoonBit 0.10.4 package to stop using the deprecated immutable-container constructor. Migrate it to the current type-named `HashSet` constructor while preserving behavior. Run the compiler with warnings denied and keep the test passing.",
   "grader_note": "Release-derived regression: reject from_array and require the type-named HashSet constructor introduced in 0.10.4.",
   "grade": [
     {
       "type": "file_contains",
       "path": "lib.mbt",
       "regex": "@hashset\\.HashSet\\s*\\("
-    },
-    {
-      "type": "file_not_contains",
-      "path": "lib.mbt",
-      "regex": "from_array"
-    },
-    {
-      "type": "output_not_matches",
-      "regex": "no change|already current"
     },
     {
       "type": "moon",

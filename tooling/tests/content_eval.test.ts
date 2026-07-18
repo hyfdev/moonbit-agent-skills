@@ -23,6 +23,7 @@ import {
   materializeGitSkills,
   parseStream,
   preflight,
+  prepareDerivedConditionSnapshots,
   snapshotFiles,
   type CommandResult,
   type CommandRunner,
@@ -116,6 +117,25 @@ describe("content eval grading", () => {
       const check = { type: "first_line_is", value: "YES" };
       expect(grade(check, project, "YES\nwhy", [], {}).ok).toBe(true);
       expect(grade(check, project, "YESBUT\nwhy", [], {}).ok).toBe(false);
+    });
+  });
+
+  it("compares JSON structurally on the first answer line", () => {
+    temporary("content-grade-", (project) => {
+      const check = {
+        type: "first_line_json_is",
+        value: ["Axes", { x: -1, y: 1 }],
+      };
+      expect(grade(check, project, '`["Axes", {"y":1, "x":-1}]`\nwhy', [], {}).ok).toBe(true);
+      expect(
+        grade(
+          check,
+          project,
+          '{"Axes":{"x":-1,"y":1}}\nAnother option is ["Axes",{"x":-1,"y":1}].',
+          [],
+          {},
+        ).ok,
+      ).toBe(false);
     });
   });
 
@@ -256,6 +276,27 @@ describe("content eval grading", () => {
     });
   });
 
+  it("checks forbidden source across project files but ignores injected skills", () => {
+    temporary("content-grade-", (project) => {
+      const check = {
+        type: "no_file_contains",
+        glob: "*.mbt",
+        regex: "fn\\s+Robot::greet",
+      };
+      mkdirSync(join(project, "nested"));
+      writeFileSync(join(project, "nested", "extension.mbt"), "fn safe() -> Unit {}\n");
+      const template = join(project, ".claude", "skills", "example.mbt");
+      mkdirSync(dirname(template), { recursive: true });
+      writeFileSync(template, "fn Robot::greet(self : Robot) -> String { self.name }\n");
+      expect(grade(check, project, "", [], {}).ok).toBe(true);
+      writeFileSync(
+        join(project, "nested", "extension.mbt"),
+        "fn Robot::greet(self : Robot) -> String { self.name }\n",
+      );
+      expect(grade(check, project, "", [], {}).ok).toBe(false);
+    });
+  });
+
   it("detects edits, deletions, and additions to initial files", () => {
     temporary("content-grade-", (project) => {
       const source = join(project, "source.mbt");
@@ -294,6 +335,16 @@ describe("content eval grading", () => {
       expect(allPass("DEPRECATED\nUse a for loop with break.")).toBe(false);
       expect(allPass("DEPRECATED\nUse the multi-binding for form with break.")).toBe(true);
       expect(allPass("DEPRECATED\nReplace with for state binders and explicit break.")).toBe(true);
+    });
+  });
+
+  it("accepts harmless Markdown around an exact first-line answer", () => {
+    temporary("content-grade-", (project) => {
+      const check = { type: "first_line_is", value: "YES" };
+      expect(grade(check, project, "`YES`\nExplanation.", [], {}).ok).toBe(true);
+      expect(grade(check, project, "**YES**\nExplanation.", [], {}).ok).toBe(true);
+      expect(grade(check, project, "```text\nYES\n```", [], {}).ok).toBe(true);
+      expect(grade(check, project, "YESBUT\nExplanation.", [], {}).ok).toBe(false);
     });
   });
 
@@ -381,7 +432,9 @@ describe("content eval conditions", () => {
       const skill = readFileSync(join(installed, "SKILL.md"), "utf8");
       expect(skill).not.toContain("explicit extend/pub extend");
       expect(skill).not.toContain("Trait implementations do not automatically create dot-call");
-      expect(skill).not.toContain("| Traits; generics; impls;");
+      expect(skill).toContain(
+        "| Traits; generics; impls; Builtin traits; Deriving builtin traits; operators; trait objects | references/traits-and-generics.mbt.md |",
+      );
       expect(
         readFileSync(join(installed, "references", "traits-and-generics.mbt.md"), "utf8"),
       ).toBe(
@@ -391,6 +444,24 @@ describe("content eval conditions", () => {
         ),
       );
       expect(existsSync(join(skills, "moonbit-toolchain", "SKILL.md"))).toBe(true);
+    });
+  });
+
+  it("pins every file in a derived ablation before model calls", () => {
+    temporary("content-condition-snapshot-", (root) => {
+      const snapshots = prepareDerivedConditionSnapshots(root, ["ours-no-top-level-extend"], {
+        current: join(REPO_ROOT, "skills"),
+      });
+      const snapshot = snapshots["ours-no-top-level-extend"];
+      expect(snapshot.aggregate_sha256).toMatch(/^[0-9a-f]{64}$/);
+      expect(snapshot.files).toHaveProperty(
+        "moonbit-language/references/traits-and-generics.mbt.md",
+      );
+      expect(
+        prepareDerivedConditionSnapshots(root, ["ours-no-top-level-extend"], {
+          current: join(REPO_ROOT, "skills"),
+        }),
+      ).toEqual(snapshots);
     });
   });
 });

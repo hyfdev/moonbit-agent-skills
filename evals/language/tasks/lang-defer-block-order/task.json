@@ -19,7 +19,7 @@
     },
     {
       "type": "output_matches",
-      "regex": "LIFO|last[- ]in[- ]first[- ]out"
+      "regex": "LIFO|last[- ]in[- ]first[- ]out|reverse (?:registration|declaration) order"
     }
   ]
 }

@@ -1,0 +1,50 @@
+{
+  "area": "language",
+  "task": "lang-explicit-extend",
+  "cases": [
+    {
+      "name": "correct-explicit-selected-extend",
+      "expected": "pass",
+      "files": {
+        "extension.mbt": "extend Robot with Greeter::{greet}\n"
+      },
+      "final_text": "Added the explicit selected extend and preserved robot.greet()."
+    },
+    {
+      "name": "replaces-dot-call-with-qualified-call",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "pub(open) trait Greeter {\n  greet(Self) -> String\n}\n\npub(all) struct Robot(String)\n\nimpl Greeter for Robot with greet(self) {\n  \"hello \\{self.0}\"\n}\n\npub fn greet_robot(robot : Robot) -> String {\n  Greeter::greet(robot)\n}\n",
+        "extension.mbt": "// extend Robot with Greeter::{greet}\n"
+      },
+      "final_text": "Removed the deprecated dot call by using the qualified trait operation.",
+      "must_fail_check_types": [
+        "any_file_contains"
+      ]
+    },
+    {
+      "name": "keeps-deprecated-implicit-dot-call",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "pub(open) trait Greeter {\n  greet(Self) -> String\n}\n\npub(all) struct Robot(String)\n\nimpl Greeter for Robot with greet(self) {\n  \"hello \\{self.0}\"\n}\n\npub fn greet_robot(robot : Robot) -> String {\n  robot.greet()\n}\n"
+      },
+      "final_text": "No source change is needed because the dot call still compiles.",
+      "must_fail_check_types": [
+        "any_file_contains",
+        "moon"
+      ]
+    },
+    {
+      "name": "duplicates-body-as-standalone-method",
+      "expected": "fail",
+      "files": {
+        "extension.mbt": "// extend Robot with Greeter::{greet}\n\nfn Robot::greet(self : Robot) -> String {\n  \"hello \\{self.0}\"\n}\n"
+      },
+      "final_text": "Added a standalone Robot method to preserve robot.greet().",
+      "must_fail_check_types": [
+        "any_file_contains",
+        "no_file_contains"
+      ]
+    }
+  ]
+}

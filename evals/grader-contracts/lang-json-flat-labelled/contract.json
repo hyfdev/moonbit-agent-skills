@@ -1,0 +1,32 @@
+{
+  "area": "language",
+  "task": "lang-json-flat-labelled",
+  "cases": [
+    {
+      "name": "correct-tag-and-labelled-payload-object",
+      "expected": "pass",
+      "final_text": "[\"Axes\",{\"x\":-1,\"y\":1}]\nFlat style keeps labelled fields together in an object payload."
+    },
+    {
+      "name": "flattens-labelled-fields-positionally",
+      "expected": "fail",
+      "final_text": "[\"Axes\",-1,1]\nFlat style places every payload value after the tag.",
+      "must_fail_check_types": [
+        "first_line_json_is"
+      ]
+    },
+    {
+      "name": "uses-externally-tagged-object",
+      "expected": "fail",
+      "final_text": "{\"Axes\":{\"x\":-1,\"y\":1}}\nThe constructor name is the object key.",
+      "must_fail_check_types": [
+        "first_line_json_is"
+      ]
+    },
+    {
+      "name": "wrong-first-line-then-lists-correct-alternative",
+      "expected": "fail",
+      "final_text": "{\"Axes\":{\"x\":-1,\"y\":1}}\nAnother possible layout is [\"Axes\",{\"x\":-1,\"y\":1}]."
+    }
+  ]
+}

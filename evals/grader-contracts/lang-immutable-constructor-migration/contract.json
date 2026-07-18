@@ -14,7 +14,7 @@
       "name": "hard-coded-visible-answer",
       "expected": "fail",
       "files": {
-        "lib.mbt": "// Looks like @hashset.HashSet( but never constructs one.\npub fn unique_count(_values : ArrayView[Int]) -> Int {\n  3\n}\n"
+        "lib.mbt": "pub fn unique_count(values : ArrayView[Int]) -> Int {\n  ignore(@hashset.HashSet(values))\n  3\n}\n"
       },
       "final_text": "Updated.",
       "must_fail_check_types": ["moon"]

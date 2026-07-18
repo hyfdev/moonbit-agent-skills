@@ -29,6 +29,8 @@ Prefer tasks such as JSON layout, block-scoped `defer`, downstream `pub extend`,
 
 Each primary task records a stable claim ID, risk class, primary metric, task files, and grader files. Do not expose the answer through the prompt, starter comments, compiler diagnostic, filename, or test name unless the experiment explicitly measures application rather than discovery.
 
+When one experiment mixes primary tasks with regression controls or distinct risk classes, declare task groups in the frozen manifest and report each group separately. Never let easy controls dilute or inflate the effect estimate for the primary claim.
+
 ## Prove the grader before model calls
 
 For every primary task:

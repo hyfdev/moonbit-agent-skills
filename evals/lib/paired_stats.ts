@@ -26,6 +26,17 @@ export interface PairedSummary {
   mean_task_pass_rate_difference: number | null;
   task_cluster_bootstrap_95_ci: [number, number] | null;
   exact_task_sign_p: number | null;
+  task_outcomes: Array<{
+    id: string;
+    eligible_pairs: number;
+    left_passed: number;
+    right_passed: number;
+    both_passed: number;
+    left_only: number;
+    right_only: number;
+    both_failed: number;
+    pass_rate_difference: number;
+  }>;
   both_pass_efficiency: {
     pairs: number;
     median_duration_ms: Record<string, number | null>;
@@ -151,11 +162,24 @@ export function pairedSummary(
     }
   }
 
-  const taskDifferences = [...taskCells.values()].map((pairs) => {
-    const leftRate = pairs.filter(([left]) => left.passed).length / pairs.length;
-    const rightRate = pairs.filter(([, right]) => right.passed).length / pairs.length;
-    return leftRate - rightRate;
-  });
+  const taskOutcomes = [...taskCells.entries()]
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([id, pairs]) => {
+      const leftPassed = pairs.filter(([left]) => left.passed).length;
+      const rightPassed = pairs.filter(([, right]) => right.passed).length;
+      return {
+        id,
+        eligible_pairs: pairs.length,
+        left_passed: leftPassed,
+        right_passed: rightPassed,
+        both_passed: pairs.filter(([left, right]) => left.passed && right.passed).length,
+        left_only: pairs.filter(([left, right]) => left.passed && !right.passed).length,
+        right_only: pairs.filter(([left, right]) => !left.passed && right.passed).length,
+        both_failed: pairs.filter(([left, right]) => !left.passed && !right.passed).length,
+        pass_rate_difference: leftPassed / pairs.length - rightPassed / pairs.length,
+      };
+    });
+  const taskDifferences = taskOutcomes.map((task) => task.pass_rate_difference);
   const tasksLeftBetter = taskDifferences.filter((difference) => difference > 0).length;
   const tasksRightBetter = taskDifferences.filter((difference) => difference < 0).length;
   const tasksTied = taskDifferences.filter((difference) => difference === 0).length;
@@ -190,6 +214,7 @@ export function pairedSummary(
     mean_task_pass_rate_difference: meanDifference,
     task_cluster_bootstrap_95_ci: taskClusterBootstrap(taskDifferences),
     exact_task_sign_p: exactTwoSidedSignP(tasksLeftBetter, tasksRightBetter),
+    task_outcomes: taskOutcomes,
     both_pass_efficiency: {
       pairs: bothPass.length,
       median_duration_ms: {

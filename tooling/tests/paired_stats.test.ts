@@ -54,6 +54,33 @@ describe("paired eval statistics", () => {
       tasks_right_better: 1,
       tasks_tied: 1,
       exact_task_sign_p: 1,
+      task_outcomes: [
+        {
+          id: "task-a",
+          eligible_pairs: 2,
+          left_passed: 2,
+          right_passed: 1,
+          left_only: 1,
+          right_only: 0,
+          pass_rate_difference: 0.5,
+        },
+        {
+          id: "task-b",
+          eligible_pairs: 2,
+          left_passed: 0,
+          right_passed: 2,
+          left_only: 0,
+          right_only: 2,
+          pass_rate_difference: -1,
+        },
+        {
+          id: "task-c",
+          eligible_pairs: 1,
+          left_passed: 1,
+          right_passed: 1,
+          pass_rate_difference: 0,
+        },
+      ],
       both_pass_efficiency: {
         pairs: 2,
         median_duration_ms: { current: 10, ablation: 20 },

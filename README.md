@@ -57,12 +57,14 @@ Use your coding agent as usual—no special prompts or manual invocation require
 
 Performance of AI coding agents with the current skills compared to matched baselines.
 
-| Model | Metric | Baseline | With current skills |
+MoonBit v0.10.4 introduced `extend` for explicitly exposing trait methods as dot-call APIs.
+
+| Model | Evaluation | Baseline | With current skills |
 | --- | --- | ---: | ---: |
-| Kimi K3 | Relevant reference found before action | 25% | **92%** |
-| Kimi K3 | `extend` reference found before action | 33% | **83%** |
-| Kimi K3 | `extend` task success | 100% | **100%** |
-| DeepSeek Flash | `extend` task success | 100% | **100%** |
+| Kimi K3 | Read the relevant MoonBit reference before changing code | 25% | **92%** |
+| Kimi K3 | Find the current syntax for public trait method dot calls | 33% | **83%** |
+| Kimi K3 | Expose trait methods as public dot calls with `extend` | 100% | **100%** |
+| DeepSeek Flash | Expose trait methods as public dot calls with `extend` | 100% | **100%** |
 
 Results use objective graders and preserve failed runs. See the [full content results](evals/RESULTS.md) and [activation results](evals/activation/RESULTS.md).
 

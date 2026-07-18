@@ -3,6 +3,7 @@ import { basename, join, resolve, sep } from "node:path";
 import { exitWith, isMain } from "./lib/cli.ts";
 import { parseFrontmatter, stringMap } from "./lib/frontmatter.ts";
 import { REPO_ROOT } from "./lib/repo.ts";
+import { validateSkillRoute, type SkillRoute } from "./lib/skill_route.ts";
 
 const DISPOSITIONS = new Set(["verified", "documented", "out-of-scope", "not-actionable"]);
 const EXECUTABLE_EVIDENCE = new Set(["checked-doc", "fixture", "command", "content-eval"]);
@@ -53,6 +54,7 @@ interface Decision {
   reason?: unknown;
   claims?: unknown;
   evidence?: unknown;
+  discoverability?: unknown;
 }
 
 interface Claim {
@@ -365,6 +367,32 @@ function validateDecision(
   }
   if (!nonEmptyString(decision.agent_behavior)) {
     fail(`${prefix}: ${disposition} decisions require agent_behavior`);
+  }
+  if (checkLiveEvidence) {
+    if (!isRecord(decision.discoverability)) {
+      fail(`${prefix}: current actionable decisions require discoverability`);
+    } else {
+      const route = decision.discoverability as SkillRoute;
+      for (const problem of validateSkillRoute(
+        route,
+        ownerSkill,
+        repoRoot,
+        `${prefix}: discoverability`,
+      )) {
+        fail(problem);
+      }
+      const terms = Array.isArray(route.terms)
+        ? route.terms.filter((term): term is string => typeof term === "string")
+        : [];
+      const behaviorText = `${stringValue(decision.summary)}\n${stringValue(decision.agent_behavior)}`;
+      for (const term of terms) {
+        if (!behaviorText.includes(term)) {
+          fail(
+            `${prefix}: discoverability term ${repr(term)} must occur in summary or agent_behavior`,
+          );
+        }
+      }
+    }
   }
   if (!Array.isArray(decision.evidence) || decision.evidence.length === 0) {
     fail(`${prefix}: ${disposition} decisions require evidence`);

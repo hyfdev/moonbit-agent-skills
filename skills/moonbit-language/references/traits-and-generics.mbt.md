@@ -2,6 +2,13 @@
 
 Every `mbt check` block in this file is compiled and run by the repository's verification suite (`tooling/run_checked_docs.ts`). Blocks marked `mbt nocheck` show rejected or deprecated forms and are never compiled.
 
+## Official topic map
+
+Search these exact official documentation topic names to route a question into this reference. A listed name is a discoverability route; the verification labels in the surrounding reference still determine whether its claim was executed or is documentation-only.
+
+- Generics: Generics
+- Operators and traits: Operator Overloading; Trait system; Extending traits; Implementing traits; Attaching trait methods with `extend`; Using traits; Invoke trait methods directly; Trait objects; Builtin traits; Deriving builtin traits
+
 ## Type parameters come before the name
 
 Generics are `fn[T] name(...)`, constraints use `:` and `+` — `fn[T : Show + Eq]`. Generic methods put the brackets first too: `fn[T] Crate::of(...)`.
@@ -182,6 +189,22 @@ test "static trait methods" {
   assert_eq(z, Volt(0))
 }
 ```
+
+## Builtin traits
+
+The common builtin contracts are:
+
+- `Eq`: equality through `==` / `!=`.
+- `Compare : Eq`: three-way `compare`, which also supplies `<`, `<=`, `>`, and `>=`.
+- `Hash`: feeds values into a `Hasher`, allowing them to serve as hash-map/set keys.
+- `Show`: user-facing output through `output` / `to_string`; it is distinct from structural debugging.
+- `Debug`: structural diagnostic rendering used by `debug_inspect` and `to_repr`.
+- `Default`: the static `default() -> Self` constructor.
+- `Add`, `Sub`, `Mul`, `Div`, `Mod`, `Neg`, the bitwise traits, and shift traits: operator semantics.
+
+### Deriving builtin traits
+
+`derive(...)` generates implementations when the type and all required fields support the requested trait. The current useful set includes `Eq`, `Compare`, `Hash`, `Debug`, `Default`, `ToJson`, `FromJson`, and `Arbitrary`. Do not write `derive(Show)` for diagnostics; it is deprecated at this pin, and `Debug` is the replacement. The exact field/case order, enum-default restriction, JSON styles, Option representation, and container/case/field arguments live in types-structs-enums.mbt.md.
 
 ## Operator overloading
 

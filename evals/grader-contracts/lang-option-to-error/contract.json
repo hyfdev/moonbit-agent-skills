@@ -1,0 +1,32 @@
+{
+  "area": "language",
+  "task": "lang-option-to-error",
+  "cases": [
+    {
+      "name": "correct-checked-error-and-boundaries",
+      "expected": "pass",
+      "files": {
+        "lib.mbt": "pub(all) suberror PortError {\n  Invalid\n}\n\npub fn parse_port(s : String) -> Int raise PortError {\n  if s == \"\" {\n    raise PortError::Invalid\n  }\n  let mut n = 0\n  for c in s {\n    if c is ('0'..='9') {\n      n = n * 10 + (c.to_int() - 48)\n    } else {\n      raise PortError::Invalid\n    }\n  }\n  if n > 0 && n <= 65535 {\n    n\n  } else {\n    raise PortError::Invalid\n  }\n}\n",
+        "lib_test.mbt": "test \"valid port\" {\n  assert_eq(@ports.parse_port(\"8080\"), 8080)\n}\n\ntest \"invalid port\" {\n  try @ports.parse_port(\"80x0\") catch {\n    @ports.PortError::Invalid => ()\n  } noraise {\n    _ => fail(\"expected error\")\n  }\n}\n"
+      }
+    },
+    {
+      "name": "hard-coded-visible-cases",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "pub(all) suberror PortError {\n  Invalid\n}\n\npub fn parse_port(s : String) -> Int raise PortError {\n  if s == \"8080\" { 8080 } else { raise PortError::Invalid }\n}\n",
+        "lib_test.mbt": "test \"valid port\" { assert_eq(@ports.parse_port(\"8080\"), 8080) }\n\ntest \"invalid port\" {\n  try @ports.parse_port(\"80x0\") catch { @ports.PortError::Invalid => () } noraise { _ => fail(\"expected error\") }\n}\n"
+      },
+      "must_fail_check_types": ["moon"]
+    },
+    {
+      "name": "parses-digits-but-omits-range",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "pub(all) suberror PortError {\n  Invalid\n}\n\npub fn parse_port(s : String) -> Int raise PortError {\n  let mut n = 0\n  for c in s {\n    if c is ('0'..='9') { n = n * 10 + (c.to_int() - 48) } else { raise PortError::Invalid }\n  }\n  n\n}\n",
+        "lib_test.mbt": "test \"valid port\" { assert_eq(@ports.parse_port(\"8080\"), 8080) }\n\ntest \"invalid port\" {\n  try @ports.parse_port(\"80x0\") catch { @ports.PortError::Invalid => () } noraise { _ => fail(\"expected error\") }\n}\n"
+      },
+      "must_fail_check_types": ["moon"]
+    }
+  ]
+}

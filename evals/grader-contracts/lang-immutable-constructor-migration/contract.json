@@ -1,0 +1,32 @@
+{
+  "area": "language",
+  "task": "lang-immutable-constructor-migration",
+  "cases": [
+    {
+      "name": "correct-type-named-constructor",
+      "expected": "pass",
+      "files": {
+        "lib.mbt": "pub fn unique_count(values : ArrayView[Int]) -> Int {\n  @hashset.HashSet(values).length()\n}\n"
+      },
+      "final_text": "Replaced the deprecated constructor and preserved behavior."
+    },
+    {
+      "name": "hard-coded-visible-answer",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "pub fn unique_count(values : ArrayView[Int]) -> Int {\n  ignore(@hashset.HashSet(values))\n  3\n}\n"
+      },
+      "final_text": "Updated.",
+      "must_fail_check_types": ["moon"]
+    },
+    {
+      "name": "ignores-input-with-real-constructor",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "pub fn unique_count(_values : ArrayView[Int]) -> Int {\n  @hashset.HashSet([1, 2, 3]).length()\n}\n"
+      },
+      "final_text": "Updated.",
+      "must_fail_check_types": ["moon"]
+    }
+  ]
+}

@@ -1,12 +1,25 @@
 {
   "id": "lang-explicit-extend",
+  "risk_class": "warning-only-migration",
+  "claim_id": "language.traits.explicit-extend-migration",
+  "primary_metric": "warning-free-dot-call-preservation",
   "prompt": "This MoonBit 0.10.4 package relies on deprecated implicit attachment of a trait implementation as a dot-call method. Migrate it to the explicit current API while preserving the existing `robot.greet()` dot-call API; add the declaration that makes that call explicit rather than replacing the call with a qualified trait invocation. Verify with `moon check --deny-warn` and keep all tests passing.",
-  "grader_note": "Release-derived regression: preserve the public dot-call surface with an explicit extend declaration and deny the default deprecation warning.",
+  "grader_note": "Release-derived regression: preserve the existing dot-call site with an explicit extend declaration and deny the default deprecation warning.",
   "grade": [
     {
-      "type": "file_contains",
-      "path": "lib.mbt",
-      "regex": "extend\\s+Robot\\s+with\\s+Greeter::\\{[^}]*greet"
+      "type": "any_file_contains",
+      "glob": "*.mbt",
+      "regex": "(?:^|\\n)[ \\t]*(?:pub[ \\t]+)?extend[ \\t]+Robot[ \\t]+with[ \\t]+Greeter::\\{[ \\t]*greet[ \\t]*,?[ \\t]*\\}[ \\t]*(?://[^\\n]*)?(?:\\n|$)"
+    },
+    {
+      "type": "any_file_contains",
+      "glob": "*.mbt",
+      "regex": "(?:^|\\n)[ \\t]*robot\\.greet[ \\t]*\\([ \\t]*\\)[ \\t]*(?://[^\\n]*)?(?:\\n|$)"
+    },
+    {
+      "type": "no_file_contains",
+      "glob": "*.mbt",
+      "regex": "(?:^|\\n)[ \\t]*(?:pub[ \\t]+)?fn[ \\t]+Robot::greet[ \\t]*\\("
     },
     {
       "type": "moon",

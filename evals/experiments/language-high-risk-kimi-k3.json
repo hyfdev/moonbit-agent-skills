@@ -1,0 +1,44 @@
+{
+  "schema_version": 2,
+  "id": "language-high-risk-kimi-k3",
+  "runner": "content",
+  "stage": "exploratory",
+  "area": "language",
+  "client": "kimi-code",
+  "model": "kimi-code/k3",
+  "conditions": [
+    "baseline",
+    "ours"
+  ],
+  "task_ids": [
+    "lang-defer-exists",
+    "lang-defer-block-order",
+    "lang-loop-status",
+    "lang-json-flat-labelled",
+    "lang-explicit-extend",
+    "lang-immutable-constructor-migration",
+    "lang-discover-selected-trait-method",
+    "lang-discover-default-trait-method"
+  ],
+  "task_groups": {
+    "silent_semantics_and_api": [
+      "lang-defer-block-order",
+      "lang-json-flat-labelled",
+      "lang-discover-selected-trait-method",
+      "lang-discover-default-trait-method"
+    ],
+    "current_facts": [
+      "lang-defer-exists",
+      "lang-loop-status"
+    ],
+    "warning_migrations": [
+      "lang-explicit-extend",
+      "lang-immutable-constructor-migration"
+    ]
+  },
+  "repetitions": 3,
+  "max_turns": 50,
+  "primary_metric": "mean task pass-rate difference for current minus the pinned historical baseline",
+  "minimum_valuable_difference": 0.15,
+  "stopping_rule": "Run all 48 cells after grader contracts pass. Report non-discriminating tasks instead of replacing them after seeing results. Freeze any API cross-check subset before running Claude Code."
+}

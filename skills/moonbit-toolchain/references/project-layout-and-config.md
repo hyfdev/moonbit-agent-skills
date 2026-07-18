@@ -2,12 +2,23 @@
 
 Everything below was executed against the pinned toolchain (moon 0.1.20260713 / moonc v0.10.4). The current config format is the `moon.mod` / `moon.pkg` DSL; `moon.mod.json` / `moon.pkg.json` are the deprecated JSON predecessors, which still parse at the pin.
 
+## Official topic map
+
+Use these exact headings from the official language documentation to recognize project-operation questions handled here. A heading establishes routing only; the surrounding reference states which behavior was executed and which remains documentation-only.
+
+- Package and module operation: Managing Projects with Packages; Packages and modules; Internal Packages
+- Virtual packages: Virtual Packages; Defining a virtual package; Implementing a virtual package; Using a virtual package; Overriding a virtual package
+
 ## Module and package model
 
 - A **module** is a directory with a `moon.mod` file (or legacy `moon.mod.json`). It is the unit of versioning and publishing, named `user/name`.
 - A **package** is any directory inside the module that contains a `moon.pkg` file. An empty zero-byte `moon.pkg` is enough — presence alone marks the directory as a package. Packages are the unit of compilation and import.
 - The module root is itself a package when it has a `moon.pkg`; other packages import it by the bare module name (`"user/name"`). Subpackages are imported as `"user/name/sub/dir"`.
 - **Trap — silent invisibility:** a directory *without* `moon.pkg` is not a package. Its `.mbt` files are never compiled, and no command emits any diagnostic about them (`moon check` stays green). When code seems ignored, check for a missing `moon.pkg` first.
+
+### Internal Packages
+
+A package below `a/b/c/internal/...` can be imported only by `a/b/c` and packages below that path. A package elsewhere in the same module is still rejected; `internal` is a path boundary, not a module-wide visibility flag and not the language-level `#internal` alert attribute. The `tool-internal-package-access` and `tool-internal-package-denied` fixtures prove both sides of this boundary with warnings denied.
 
 ## What `moon new` generates
 
@@ -86,6 +97,12 @@ pkgtype(kind: "executable")
 Executable packages: both `pkgtype(kind: "executable")` and `options("is-main": true)` are accepted at the pin, and `moon fmt` rewrites the options form **into** `pkgtype` — treat `pkgtype` as canonical. Valid kinds (from the error on an invalid kind): `library`, `executable`, `foreign_library`. Option keys inside `options()` are quoted kebab-case strings (`"is-main"`), unlike moon.mod's snake_case top-level keys.
 
 For a `pkgtype(kind: "foreign_library")` package, `#export_name("symbol")` on a public function selects its generated Wasm/JS/C symbol name. **Documented, not executed end-to-end:** the [0.10.4 release notes](https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release) state that only functions declared in that foreign-library package are exported, not functions from dependencies; native static/dynamic library output was still being polished, so prefer this feature for Wasm/JS at this pin.
+
+## Virtual packages and overrides
+
+A virtual package declares a replaceable API with `options("virtual": { "has-default": true })`. An implementation package points back with `options(implement: "module/path/to/virtual")`. A consuming package imports the virtual package and selects implementations with `options(overrides: [ "module/path/to/implementation" ])`. The `tool-virtual-package` fixture proves that a consumer test resolves calls through the selected implementation on all four pinned targets with warnings denied.
+
+The virtual package's public declarations are the interface; the implementation must provide matching declarations. With `"has-default": true`, the virtual package's own bodies are usable when no override is selected.
 
 ## Legacy JSON → DSL mapping
 

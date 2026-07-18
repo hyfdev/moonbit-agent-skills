@@ -1,4 +1,61 @@
-# Content eval — full matrix
+# Content eval results
+
+## 2026-07-18 high-risk language matrix
+
+This frozen Kimi/K3 experiment compared the current skill with the pinned historical language skill on eight high-risk tasks, with three paired repetitions per task. It is the last full K3 matrix: future experiments default to one repetition and may add one final repetition only for tasks that show a difference, failure, or prior instability.
+
+| Condition | PASS | Input tokens | Cache-read input | Cache-creation input | Output tokens | Duration |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Historical baseline | 24/24 | 214,484 | 3,838,208 | 0 | 53,498 | 1h 07m 54.4s |
+| Current skill | 23/24 | 237,322 | 3,260,928 | 0 | 44,273 | 59m 32.5s |
+| **Total** | **47/48** | **451,806** | **7,099,136** | **0** | **97,771** | **2h 07m 26.9s** |
+
+| Task | Historical baseline | Current skill | Paired outcome |
+| --- | ---: | ---: | --- |
+| Block-scoped `defer` order | 3/3 | 3/3 | 3 both pass |
+| Current `defer` availability | 3/3 | 3/3 | 3 both pass |
+| Default trait-method discovery | 3/3 | 3/3 | 3 both pass |
+| Selected trait-method discovery | 3/3 | 3/3 | 3 both pass |
+| Explicit `extend` migration | 3/3 | 3/3 | 3 both pass |
+| Immutable constructor migration | 3/3 | 3/3 | 3 both pass |
+| Flat labelled JSON layout | 3/3 | 3/3 | 3 both pass |
+| Functional `loop` status and replacement | 3/3 | 2/3 | 2 both pass; 1 baseline only |
+
+The run did not establish a correctness improvement: seven tasks tied and the historical baseline won one repetition of one task. The current-minus-baseline mean task pass-rate difference was -4.17 percentage points, with a task-clustered 95% interval of -12.5 to 0 points and an exact task sign-test p-value of 1.0. The single current-skill failure correctly called `loop` deprecated and named multi-binding `for`, but supplied only `nobreak` and omitted the required explicit `break` replacement. The client exited normally, the cell was analysis-eligible, and the frozen grader correctly rejected it.
+
+The current skill did improve reference discovery even though final outcomes were at or near ceiling:
+
+| Discovery metric across four routed tasks | Historical baseline | Current skill |
+| --- | ---: | ---: |
+| Language skill loaded successfully | 3/12 | 6/12 |
+| Target reference read | 7/12 | 11/12 |
+| Target reference read before action | 3/12 | 11/12 |
+
+All 24 pairs were complete and eligible. Every cell emitted `k3` through Kimi Code 0.26.0; model mismatches, execution-signature mismatches, missing pairs, invalid pairs, timeouts, nonzero exits, and summary errors were all zero. Among the 23 both-pass pairs, median duration was 151.5 seconds for the historical baseline and 126.8 seconds for the current skill; median total tokens were 157,332 and 151,397 respectively. These efficiency figures are descriptive because the experiment was powered for large regressions, not small latency or token differences.
+
+## 2026-07-18 frozen paired runs
+
+The current language skill was compared with a purpose-built route ablation that removes only explicit top-level `extend` guidance while preserving the trait/generics route and every reference byte-for-byte. Tasks, skill trees, the derived ablation, runner files, actual model, and condition order were frozen before calls.
+
+| Client and task group | Current | Route ablation | Eligible pairs | Current only | Ablation only | Both pass |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Kimi/K3, two `extend` tasks × 3 | 6/6 | 6/6 | 6 | 0 | 0 | 6 |
+| Kimi/K3, two regression controls × 3 | 6/6 | 6/6 | 6 | 0 | 0 | 6 |
+| DeepSeek Flash, two `extend` tasks × 1 | 2/2 | 2/2 | 2 | 0 | 0 | 2 |
+
+No run established a task-outcome improvement. The Kimi primary tasks did show a small process difference, reported descriptively because there are only six pairs:
+
+| `extend`-task discovery, Kimi/K3 | Current | Route ablation | Paired current-only | Paired ablation-only |
+| --- | ---: | ---: | ---: | ---: |
+| Language skill loaded successfully | 3/6 | 1/6 | 3 | 1 |
+| Target reference read | 6/6 | 4/6 | 2 | 0 |
+| Target reference read before action | 5/6 | 2/6 | 3 | 0 |
+
+The top-level route may help Kimi reach the correct reference earlier, but the final tasks hit a 100% ceiling in both conditions. The 24 Kimi cells used 249,924 input tokens, 4,129,024 cache-read input tokens, 0 cache-creation input tokens, and 56,056 output tokens; total cell time was 58.9 minutes. All cells emitted `k3` through provider Kimi with alias `kimi-code/k3`; there were no missing pairs, model mismatches, timeouts, or nonzero client exits. The four DeepSeek cells used 66,638 input tokens, 468,480 cache-read input tokens, 0 cache-creation input tokens, and 14,954 output tokens over 132.5 seconds. They emitted `deepseek-v4-flash` and likewise had no client errors, timeouts, or model exclusions.
+
+Before measurement, 11 grader contracts exercised one canonical correct answer and at least two plausible wrong answers per task. After model answers exposed additional valid wording, the final contract suite contains 41/41 passing cases. Measurements affected by an earlier grader or ablation definition are excluded rather than repaired in place.
+
+## Historical full matrix
 
 Run date: 2026-07-17 · runner: `run_content.ts` · client: Claude Code CLI 2.1.212 · requested full-matrix model: `claude-haiku-4-5-20251001` · turn budget: 50 per cell · deterministic grading with an exact MoonBit toolchain build. The full matrix ran on Linux x86_64 with moonc `v0.10.4+ade96c819` (2026-07-13). A release-drift follow-up ran with the current snapshot, moonc `v0.10.4+2cc641edf` (2026-07-15). The official condition used `moonbitlang/skills@5caf81c57cb2ae45654b8f99c5c8f68c812beb91`.
 
@@ -47,20 +104,20 @@ Across the 11 directly comparable tasks, `none` passed 9/11, `official` passed 8
 
 One `ours` condition per area was run as the issue's optional higher-capability supplement.
 
-| Area | Pass rate | Cost |
-| --- | --- | ---: |
-| Language | 5/5 | $1.2506 |
-| Toolchain | 4/4 | $0.9952 |
-| Integration | 1/2 | $0.5048 |
-| **Total** | **10/11** | **$2.7506** |
+| Area | Pass rate |
+| --- | --- |
+| Language | 5/5 |
+| Toolchain | 4/4 |
+| Integration | 1/2 |
+| **Total** | **10/11** |
 
-The Sonnet-requested client invoked a MoonBit skill in 2/11 cells (`loop-status` and `migrate-legacy`). Its JS FFI binding also built successfully but produced a non-callable imported value at runtime. Because only `ours` was run, this supplement is not a cross-condition comparison.
+The Sonnet-requested client invoked a MoonBit skill in 2/11 cells (`loop-status` and `migrate-legacy`). Its JS FFI binding also built successfully but produced a non-callable imported value at runtime. The 11 cells used 380,373 input tokens, 3,404,416 cache-read input tokens, and 35,152 output tokens with no client errors. Because only `ours` was run, this supplement is not a cross-condition comparison.
 
 ## H4 negative-knowledge ablation
 
 The original matrix could not isolate negative knowledge: `forced-language` isolates activation, and the official bundle also contains cross-language warnings. A new `forced-language-no-cross-language` condition keeps the same forced language skill but removes its concentrated cross-language rule, routing entry, and `cross-language-and-stale-syntax.md` reference.
 
-On `fix-rust-habits`, full `forced-language` and the ablation both passed; `none`, `official`, and `ours` also passed. In the path-corrected pair, the full condition read `cross-language-and-stale-syntax.md`, used 19 turns, and cost $0.1337; the ablation had no such file, used 17 turns, and cost $0.1148. One stochastic run is not an efficiency comparison. **Verdict: H4 is not supported by this experiment.** The compiler made this single task self-correcting, and the ablation does not prove that negative knowledge has no value on silent semantic traps.
+On `fix-rust-habits`, full `forced-language` and the ablation both passed; `none`, `official`, and `ours` also passed. In the path-corrected pair, the full condition read `cross-language-and-stale-syntax.md` and used 19 turns, 46,138 input tokens, 465,920 cache-read input tokens, and 5,161 output tokens. The ablation had no such file and used 17 turns, 34,670 input tokens, 394,752 cache-read input tokens, and 5,214 output tokens. One stochastic run is not an efficiency comparison. **Verdict: H4 is not supported by this experiment.** The compiler made this single task self-correcting, and the ablation does not prove that negative knowledge has no value on silent semantic traps.
 
 ## 0.10.4 release-derived supplement
 
@@ -72,7 +129,24 @@ Two deterministic edit tasks were added on 2026-07-18 for guidance introduced by
 | Replace immutable `HashSet::from_array` | PASS | PASS |
 | **Total** | **2/2** | **2/2** |
 
-The first `extend` attempt exposed a grader defect rather than a product failure: the starter's private tuple constructor raised unrelated `unused_constructor` under global `--deny-warn`, so a correct `extend` edit still failed. Changing the starter to a public constructor isolated warning 79. CI then found that the 2026-07-15 compiler changed behavior without changing the 0.10.4 release number: warning 79 moved into the default deprecated-warning set, and or-pattern defaults now require the `with` clause inside parentheses. The first follow-up prompt also allowed a qualified trait call that preserved runtime behavior but changed the requested dot-call API, so that ambiguous cell was discarded and the prompt now states the API requirement directly. At the current exact build, both catalog-only and forced-skill conditions passed the corrected task with `moon check --deny-warn` and one test. Release-supplement cost was $0.9138 including both discarded prompt/grader cells; the corrected post-drift pair cost $0.1673.
+The first `extend` attempt exposed a grader defect rather than a product failure: the starter's private tuple constructor raised unrelated `unused_constructor` under global `--deny-warn`, so a correct `extend` edit still failed. Changing the starter to a public constructor isolated warning 79. CI then found that the 2026-07-15 compiler changed behavior without changing the 0.10.4 release number: warning 79 moved into the default deprecated-warning set, and or-pattern defaults now require the `with` clause inside parentheses. The first follow-up prompt also allowed a qualified trait call that preserved runtime behavior but changed the requested dot-call API, so that ambiguous cell was discarded and the prompt now states the API requirement directly. At the current exact build, both catalog-only and forced-skill conditions passed the corrected task with `moon check --deny-warn` and one test. The corrected post-drift pair used 72,230 input tokens, 413,952 cache-read input tokens, and 4,599 output tokens with no client errors.
+
+## Language-reference discoverability follow-up
+
+Run date: 2026-07-18 · client: Claude Code CLI 2.1.212 · pinned moonc: `v0.10.4+2cc641edf` · historical condition: skill tree `291192ad3ba3bd5c3bd47e4352580fab7682d711` at `b4a323735da6f2f33d8846536f912eaf339f2512` · current condition: skill tree `090a9057d2b9ab7d8e39fdcddaef52f2301f1899` at `b612b7412baeea833a35af4b6277a9e757b1e1e0`. Each run manifest records both tree IDs and every installed skill file's SHA-256. No user-level or plugin-provided `moonbit-language` skill was present.
+
+The two tasks start from warning-free, passing cross-package projects, do not name `extend`, and do not expose a compiler diagnostic that contains the answer. Hidden graders require the exact public attachment, preserve qualified APIs and trait implementations, test downstream dot calls with fresh values, and prove that an unselected method remains unavailable.
+
+| Requested condition | Emitted model | Baseline outcome | Current outcome | Baseline skill / reference | Current skill / reference |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Haiku, two balanced repetitions | `deepseek-v4-flash` | 3/4 | 3/4 | 1/4 / 3/4 | 1/4 / 3/4 |
+| Sonnet, one repetition | `deepseek-v4-pro` | 2/2 | 2/2 | 2/2 / 2/2 | 2/2 / 2/2 |
+
+`skill` counts a successful `Skill` tool result. `reference` counts a successful read of `references/traits-and-generics.mbt.md` before an action in a later assistant turn. Neither is part of functional PASS.
+
+The measured result is a tie. The current skill makes `extend` explicit in its top-level feature index and closes a mechanical completeness gate, but these samples do not show a functional gain over the old skill: the old deep trait reference already contained the syntax whenever the model found it. On the failed Haiku repetition, both conditions skipped the skill and reference and wrote a standalone `fn Robot::greet`, which the hidden grader rejected. The stronger run loaded the skill and routed reference in every cell and both conditions passed. The eight Haiku cells used 296,846 input tokens, 2,915,200 cache-read input tokens, and 32,184 output tokens; the four Sonnet cells used 126,754 input tokens, 1,212,288 cache-read input tokens, and 14,571 output tokens. Neither set recorded a client error.
+
+One earlier four-cell run was discarded after it exposed an ambiguous task contract: both conditions added the correct `pub extend` but removed a qualified wrapper that the hidden grader expected even though the prompt had not explicitly protected it. The prompt now names that requirement. The discarded run used 152,581 input tokens, 1,750,144 cache-read input tokens, and 20,239 output tokens with no client errors; it is excluded from the table.
 
 ## What the full run says
 
@@ -84,14 +158,12 @@ The first `extend` attempt exposed a grader defect rather than a product failure
 
 ## Grader corrections and audit trail
 
-Before paid measurement, the runner was changed so a nonzero Claude exit cannot pass, exact-first-line checks are exact, full stdout/stderr and failed workspaces are preserved, the official cache commit is verified, the MoonBit pin is checked before the first model call, actual Bash commands can be graded, and hidden behavior tests prevent empty-project or deleted-test passes.
+Before model measurement, the runner was changed so a nonzero Claude exit cannot pass, exact-first-line checks are exact, sanitized stdout/stderr and failed workspaces are preserved, the official cache commit is verified, the MoonBit pin is checked before the first model call, actual Bash commands can be graded, and hidden behavior tests prevent empty-project or deleted-test passes.
 
 The run then exposed grader defects: legal anonymous `test {}` blocks and valid package-scoped forms (`moon test -p utils`, `moon test utils[/]`) caused false failures; prefix matching accepted extra text after a required first-line token; and the loop-status grader first accepted a claim that `loop` was removed, then accepted a generic mention of `for` without the required functional `for ... break` replacement. Each `task.json` records its correction. Replacement reruns were used for the affected cells, and the final loop-status rerun passed only after producing the specific current replacement.
 
 The first forced-content runs also exposed a harness error: injected instructions referred to relative `references/...` paths without naming their installed skill root, so attempted reads could resolve outside the skill. The runner now states the root explicitly; all forced language and toolchain cells, plus the H4 pair, were rerun with accessible references. Unit tests cover the prompt root, exact first-line grading, observed Bash commands, source preservation, temporary hidden tests, the ablation, and the accepted trailing-slash package command.
 
-Final review added conservative checks after the paid model calls: successful Bash evidence is now linked to its tool result and expected output, command regexes reject extra test scope, recursive source checks exclude injected `.claude` templates, required package files and nonzero hidden-test discovery prevent empty-project passes, resume configuration is fixed in `run.json`, and answer/behavior graders enforce details that the prompts already required. These checks are not present in every original `results.jsonl` record. Preserved artifacts were re-audited without another stochastic model sample: final-text checks were reapplied to the stored answers; every final MBTI and single-test transcript passed the new command-plus-result checks; all six stored Option implementations and all four JS FFI implementations were reconstructed from their Write/Edit traces and executed against their hidden tests; and the migration transcripts preserved the original `twice` implementation, whose hidden behavior test passed after the deterministic migration. The JS runtime audit changed primary official and Sonnet-requested `ours` from PASS to FAIL; no other classification changed. The checked-in unit suite covers the new false-pass cases.
-
-Primary full-matrix cost was $3.7752. The requested-Sonnet supplement cost $2.7506, all H4, grader-correction, and path-correction runs cost $1.6307, and the release-derived supplement cost $0.9138, for $9.0703 of checked content runs including superseded cells. Raw records, transcripts, stderr, and failed workspaces remain under the gitignored `evals/*/runs/` directories.
+Final review added conservative checks after the model calls: successful Bash evidence is now linked to its tool result and expected output, command regexes reject extra test scope, recursive source checks exclude injected `.claude` templates, required package files and nonzero hidden-test discovery prevent empty-project passes, resume configuration is fixed in `run.json`, and answer/behavior graders enforce details that the prompts already required. These checks are not present in every original `results.jsonl` record. Preserved artifacts were re-audited without another stochastic model sample: final-text checks were reapplied to the stored answers; every final MBTI and single-test transcript passed the new command-plus-result checks; all six stored Option implementations and all four JS FFI implementations were reconstructed from their Write/Edit traces and executed against their hidden tests; and the migration transcripts preserved the original `twice` implementation, whose hidden behavior test passed after the deterministic migration. The JS runtime audit changed primary official and Sonnet-requested `ours` from PASS to FAIL; no other classification changed. The checked-in unit suite covers the new false-pass cases.
 
 Limitations: one run per final cell; mixed client model routing as disclosed above; Sonnet requested only for `ours`; the H4 ablation covers one compiler-detectable Rust-habit task and removes the concentrated guide rather than every negative sentence in the skill; Bash network access was not OS-blocked, although transcript inspection found no model-initiated network lookup; and most primary cells ran on the superseded 2026-07-13 exact build, while the corrected `extend` follow-up ran on the current 2026-07-15 exact build.

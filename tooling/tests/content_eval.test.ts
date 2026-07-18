@@ -1,16 +1,30 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { describe, expect, it } from "vite-plus/test";
 import {
   REPO_ROOT,
+  catalogIsolation,
+  discoveryEvidence,
   ensureRunManifest,
   forcedPrompt,
   grade,
   installLanguageAblation,
+  installTopLevelExtendAblation,
+  materializeGitSkills,
   parseStream,
   preflight,
+  prepareDerivedConditionSnapshots,
+  runTask,
   snapshotFiles,
   type CommandResult,
   type CommandRunner,
@@ -39,11 +53,105 @@ function task(area: string, id: string): { grade: JsonRecord[] } {
 }
 
 describe("content eval grading", () => {
+  it("supports negative and exact-count file assertions", () => {
+    temporary("content-grade-", (project) => {
+      const source = join(project, "api.mbt");
+      writeFileSync(source, "pub extend Item with Trait::{describe}\n");
+      expect(
+        grade(
+          { type: "file_not_contains", path: "api.mbt", regex: "Trait::\\{name" },
+          project,
+          "",
+          [],
+          {},
+        ).ok,
+      ).toBe(true);
+      expect(
+        grade(
+          {
+            type: "file_match_count",
+            path: "api.mbt",
+            regex: "pub\\s+extend",
+            exact: 1,
+          },
+          project,
+          "",
+          [],
+          {},
+        ).ok,
+      ).toBe(true);
+      expect(
+        grade(
+          { type: "file_match_count", path: "api.mbt", regex: "extend", exact: 2 },
+          project,
+          "",
+          [],
+          {},
+        ).ok,
+      ).toBe(false);
+    });
+  });
+
+  it("checks expected diagnostics from a failing moon command", () => {
+    temporary("content-grade-", (project) => {
+      const runner: CommandRunner = () => commandResult(1, "", "Error E4015: no method name\n");
+      expect(
+        grade(
+          {
+            type: "moon",
+            args: ["check"],
+            expect_ok: false,
+            output_regex: "E4015|no method",
+          },
+          project,
+          "",
+          [],
+          {},
+          runner,
+        ).ok,
+      ).toBe(true);
+    });
+  });
+
   it("requires the exact first non-empty line", () => {
     temporary("content-grade-", (project) => {
       const check = { type: "first_line_is", value: "YES" };
       expect(grade(check, project, "YES\nwhy", [], {}).ok).toBe(true);
       expect(grade(check, project, "YESBUT\nwhy", [], {}).ok).toBe(false);
+    });
+  });
+
+  it("compares JSON structurally on the first answer line", () => {
+    temporary("content-grade-", (project) => {
+      const check = {
+        type: "first_line_json_is",
+        value: ["Axes", { x: -1, y: 1 }],
+      };
+      expect(grade(check, project, '`["Axes", {"y":1, "x":-1}]`\nwhy', [], {}).ok).toBe(true);
+      expect(
+        grade(
+          check,
+          project,
+          '{"Axes":{"x":-1,"y":1}}\nAnother option is ["Axes",{"x":-1,"y":1}].',
+          [],
+          {},
+        ).ok,
+      ).toBe(false);
+    });
+  });
+
+  it("compares comma-separated answer items without grading separator whitespace", () => {
+    temporary("content-grade-", (project) => {
+      const check = {
+        type: "first_line_csv_is",
+        value: ["body-1", "inner-body", "deferred-inner"],
+      };
+      expect(grade(check, project, "`body-1, inner-body,deferred-inner`\nwhy", [], {}).ok).toBe(
+        true,
+      );
+      expect(
+        grade(check, project, "body-1,inner-body,deferred-inner,alternative\nwhy", [], {}).ok,
+      ).toBe(false);
     });
   });
 
@@ -94,7 +202,7 @@ describe("content eval grading", () => {
     });
   });
 
-  it("accepts the single-test package path with a trailing slash", () => {
+  it("accepts only the requested single-test file path", () => {
     const commandCheck = task("toolchain", "tool-single-test-command").grade.find(
       (check) => check.type === "command_matches",
     ) as JsonRecord;
@@ -106,7 +214,7 @@ describe("content eval grading", () => {
           "",
           [
             {
-              command: "moon test utils/",
+              command: "moon test utils/utils_test.mbt",
               is_error: false,
               output: "Total tests: 1, passed: 1, failed: 0.",
             },
@@ -140,6 +248,29 @@ describe("content eval grading", () => {
     });
   });
 
+  it("rejects package scope when another test file exists in that package", () => {
+    const commandCheck = task("toolchain", "tool-single-test-command").grade.find(
+      (check) => check.type === "command_matches",
+    ) as JsonRecord;
+    temporary("content-grade-", (project) => {
+      expect(
+        grade(
+          commandCheck,
+          project,
+          "",
+          [
+            {
+              command: "moon test utils/",
+              is_error: false,
+              output: "Total tests: 2, passed: 2, failed: 0.",
+            },
+          ],
+          {},
+        ).ok,
+      ).toBe(false);
+    });
+  });
+
   it("ignores injected skill templates in any-file checks", () => {
     temporary("content-grade-", (project) => {
       const template = join(project, ".claude", "skills", "example.mbt");
@@ -158,6 +289,27 @@ describe("content eval grading", () => {
           {},
         ).ok,
       ).toBe(false);
+    });
+  });
+
+  it("checks forbidden source across project files but ignores injected skills", () => {
+    temporary("content-grade-", (project) => {
+      const check = {
+        type: "no_file_contains",
+        glob: "*.mbt",
+        regex: "fn\\s+Robot::greet",
+      };
+      mkdirSync(join(project, "nested"));
+      writeFileSync(join(project, "nested", "extension.mbt"), "fn safe() -> Unit {}\n");
+      const template = join(project, ".claude", "skills", "example.mbt");
+      mkdirSync(dirname(template), { recursive: true });
+      writeFileSync(template, "fn Robot::greet(self : Robot) -> String { self.name }\n");
+      expect(grade(check, project, "", [], {}).ok).toBe(true);
+      writeFileSync(
+        join(project, "nested", "extension.mbt"),
+        "fn Robot::greet(self : Robot) -> String { self.name }\n",
+      );
+      expect(grade(check, project, "", [], {}).ok).toBe(false);
     });
   });
 
@@ -199,6 +351,38 @@ describe("content eval grading", () => {
       expect(allPass("DEPRECATED\nUse a for loop with break.")).toBe(false);
       expect(allPass("DEPRECATED\nUse the multi-binding for form with break.")).toBe(true);
       expect(allPass("DEPRECATED\nReplace with for state binders and explicit break.")).toBe(true);
+      expect(
+        allPass("DEPRECATED\nReplacement: `for acc = 0, v = xs { ... }` with explicit `break`."),
+      ).toBe(true);
+      expect(allPass("DEPRECATED\nReplace with `for acc = 0; acc < 10; acc += 1` and break.")).toBe(
+        false,
+      );
+    });
+  });
+
+  it("accepts equivalent block lifetime wording for defer", () => {
+    const checks = task("language", "lang-defer-exists").grade;
+    temporary("content-grade-", (project) => {
+      const allPass = (text: string): boolean =>
+        checks.every((check) => grade(check, project, text, [], {}).ok);
+      expect(
+        allPass(
+          "YES\nScoping is lexical and block-based, not function-based: a defer runs when its block exits.",
+        ),
+      ).toBe(true);
+      expect(allPass("YES\nIt is not block-based; every defer waits for function return.")).toBe(
+        false,
+      );
+    });
+  });
+
+  it("accepts harmless Markdown around an exact first-line answer", () => {
+    temporary("content-grade-", (project) => {
+      const check = { type: "first_line_is", value: "YES" };
+      expect(grade(check, project, "`YES`\nExplanation.", [], {}).ok).toBe(true);
+      expect(grade(check, project, "**YES**\nExplanation.", [], {}).ok).toBe(true);
+      expect(grade(check, project, "```text\nYES\n```", [], {}).ok).toBe(true);
+      expect(grade(check, project, "YESBUT\nExplanation.", [], {}).ok).toBe(false);
     });
   });
 
@@ -276,6 +460,48 @@ describe("content eval conditions", () => {
       expect(existsSync(join(skill, "references", "declarations-and-functions.mbt.md"))).toBe(true);
     });
   });
+
+  it("removes top-level extend guidance while preserving the deep reference byte-for-byte", () => {
+    temporary("content-condition-", (root) => {
+      const skills = join(root, "skills");
+      mkdirSync(skills);
+      installTopLevelExtendAblation(skills);
+      const installed = join(skills, "moonbit-language");
+      const skill = readFileSync(join(installed, "SKILL.md"), "utf8");
+      expect(skill).not.toContain("explicit extend/pub extend");
+      expect(skill).not.toContain("Trait implementations do not automatically create dot-call");
+      expect(skill).toContain(
+        "| Traits; generics; impls; Builtin traits; Deriving builtin traits; operators; trait objects | references/traits-and-generics.mbt.md |",
+      );
+      expect(
+        readFileSync(join(installed, "references", "traits-and-generics.mbt.md"), "utf8"),
+      ).toBe(
+        readFileSync(
+          join(REPO_ROOT, "skills", "moonbit-language", "references", "traits-and-generics.mbt.md"),
+          "utf8",
+        ),
+      );
+      expect(existsSync(join(skills, "moonbit-toolchain", "SKILL.md"))).toBe(true);
+    });
+  });
+
+  it("pins every file in a derived ablation before model calls", () => {
+    temporary("content-condition-snapshot-", (root) => {
+      const snapshots = prepareDerivedConditionSnapshots(root, ["ours-no-top-level-extend"], {
+        current: join(REPO_ROOT, "skills"),
+      });
+      const snapshot = snapshots["ours-no-top-level-extend"];
+      expect(snapshot.aggregate_sha256).toMatch(/^[0-9a-f]{64}$/);
+      expect(snapshot.files).toHaveProperty(
+        "moonbit-language/references/traits-and-generics.mbt.md",
+      );
+      expect(
+        prepareDerivedConditionSnapshots(root, ["ours-no-top-level-extend"], {
+          current: join(REPO_ROOT, "skills"),
+        }),
+      ).toEqual(snapshots);
+    });
+  });
 });
 
 describe("content eval run manifests", () => {
@@ -310,6 +536,57 @@ describe("content eval run manifests", () => {
           true,
         ),
       ).toThrow("cannot safely resume");
+    });
+  });
+});
+
+describe("content eval persisted artifacts", () => {
+  it("keeps token usage while removing money from results, transcripts, and stderr", () => {
+    temporary("content-artifact-", (root) => {
+      const runDirectory = join(root, "run");
+      const cacheDirectory = join(root, "cache");
+      mkdirSync(runDirectory);
+      mkdirSync(cacheDirectory);
+      const stdout = [
+        JSON.stringify({
+          type: "assistant",
+          message: { model: "model-a", content: [] },
+        }),
+        JSON.stringify({
+          type: "result",
+          billing: "API",
+          subtype: "success",
+          is_error: false,
+          result: "YES\nIt is block-scoped.",
+          num_turns: 1,
+          total_cost_usd: 0.2,
+          usage: { input_tokens: 3, output_tokens: 4 },
+          modelUsage: { "model-a": { inputTokens: 3, costUSD: 0.2 } },
+        }),
+      ].join("\n");
+      const runner: CommandRunner = () => ({
+        ...commandResult(0, stdout, "--max-budget-usd 0.50"),
+        durationMs: 10,
+      });
+      const result = runTask(
+        join(REPO_ROOT, "evals", "language", "tasks", "lang-defer-exists"),
+        "none",
+        "model-a",
+        12,
+        cacheDirectory,
+        runDirectory,
+        runner,
+        { current: join(REPO_ROOT, "skills") },
+        "claude-code",
+        1,
+      );
+
+      expect(result.usage).toEqual({ input_tokens: 3, output_tokens: 4, num_turns: 1 });
+      expect(JSON.stringify(result)).not.toMatch(/total_cost_usd|costUSD|"billing"/);
+      const transcript = readFileSync(join(runDirectory, String(result.transcript)), "utf8");
+      const stderr = readFileSync(join(runDirectory, String(result.stderr)), "utf8");
+      expect(transcript).not.toMatch(/total_cost_usd|costUSD|"billing"/);
+      expect(stderr).not.toMatch(/max[-_]budget[-_]usd|0\.50/);
     });
   });
 });
@@ -352,6 +629,220 @@ describe("content eval stream parser", () => {
         output: "Exit code 1",
       },
     ]);
+    expect(parsed.tool_uses[0]).toMatchObject({
+      id: "call-1",
+      name: "Bash",
+      assistant_turn: 1,
+    });
+    expect(parsed.tool_results[0]).toMatchObject({
+      tool_use_id: "call-1",
+      is_error: true,
+    });
+  });
+
+  it("requires a successful reference read before a later action turn", () => {
+    const events = [
+      {
+        type: "assistant",
+        message: {
+          model: "claude-haiku-4-5-20251001",
+          content: [
+            {
+              type: "tool_use",
+              id: "skill-1",
+              name: "Skill",
+              input: { skill: "moonbit-language" },
+            },
+            {
+              type: "tool_use",
+              id: "read-1",
+              name: "Read",
+              input: {
+                file_path: ".claude/skills/moonbit-language/references/traits-and-generics.mbt.md",
+              },
+            },
+          ],
+        },
+      },
+      {
+        type: "user",
+        message: {
+          content: [
+            { type: "tool_result", tool_use_id: "skill-1", content: "loaded" },
+            { type: "tool_result", tool_use_id: "read-1", content: "extend syntax" },
+          ],
+        },
+      },
+      {
+        type: "assistant",
+        message: {
+          model: "claude-haiku-4-5-20251001",
+          content: [
+            {
+              type: "tool_use",
+              id: "edit-1",
+              name: "Edit",
+              input: { file_path: "lib/api.mbt" },
+            },
+          ],
+        },
+      },
+    ];
+    const parsed = parseStream(events.map((event) => JSON.stringify(event)).join("\n"));
+    const evidence = discoveryEvidence(parsed, {
+      skill: "moonbit-language",
+      reference: "references/traits-and-generics.mbt.md",
+    });
+    expect(parsed.emitted_models).toEqual(["claude-haiku-4-5-20251001"]);
+    expect(parsed.successful_skills).toEqual(["moonbit-language"]);
+    expect(evidence).toEqual({
+      requested_skill: "moonbit-language",
+      requested_reference: "references/traits-and-generics.mbt.md",
+      skill_activated_successfully: true,
+      reference_read_successfully: true,
+      reference_read_before_action: true,
+    });
+  });
+
+  it("does not count a parallel same-turn read and action as discovery", () => {
+    const events = [
+      {
+        type: "assistant",
+        message: {
+          content: [
+            {
+              type: "tool_use",
+              id: "read-1",
+              name: "Read",
+              input: { file_path: "references/traits-and-generics.mbt.md" },
+            },
+            {
+              type: "tool_use",
+              id: "edit-1",
+              name: "Edit",
+              input: { file_path: "api.mbt" },
+            },
+          ],
+        },
+      },
+      {
+        type: "user",
+        message: {
+          content: [
+            { type: "tool_result", tool_use_id: "read-1", content: "read" },
+            { type: "tool_result", tool_use_id: "edit-1", content: "edited" },
+          ],
+        },
+      },
+    ];
+    const parsed = parseStream(events.map((event) => JSON.stringify(event)).join("\n"));
+    expect(
+      discoveryEvidence(parsed, {
+        reference: "references/traits-and-generics.mbt.md",
+      }).reference_read_before_action,
+    ).toBe(false);
+  });
+
+  it("counts a successful reference read before a knowledge-only final answer", () => {
+    const events = [
+      {
+        type: "assistant",
+        message: {
+          content: [
+            {
+              type: "tool_use",
+              id: "read-1",
+              name: "Read",
+              input: { file_path: "references/types-structs-enums.mbt.md" },
+            },
+          ],
+        },
+      },
+      {
+        type: "user",
+        message: {
+          content: [{ type: "tool_result", tool_use_id: "read-1", content: "JSON layout" }],
+        },
+      },
+      {
+        type: "result",
+        subtype: "success",
+        is_error: false,
+        result: '["Axes",{"x":-1,"y":1}]',
+      },
+    ];
+    const parsed = parseStream(events.map((event) => JSON.stringify(event)).join("\n"));
+    expect(
+      discoveryEvidence(parsed, {
+        reference: "references/types-structs-enums.mbt.md",
+      }).reference_read_before_action,
+    ).toBe(true);
+  });
+});
+
+describe("content eval skill snapshots", () => {
+  it("materializes a pinned Git skills tree with content digests", () => {
+    temporary("content-snapshot-", (root) => {
+      const repository = join(root, "repository");
+      const destination = join(root, "snapshot");
+      mkdirSync(join(repository, "skills", "moonbit-language"), { recursive: true });
+      writeFileSync(
+        join(repository, "skills", "moonbit-language", "SKILL.md"),
+        "---\nname: moonbit-language\n---\n",
+      );
+      const git = (...args: string[]): void => {
+        const result = spawnSync("git", args, { cwd: repository, encoding: "utf8" });
+        expect(result.status, result.stderr).toBe(0);
+      };
+      git("init", "--quiet");
+      git("config", "user.name", "Eval Test");
+      git("config", "user.email", "eval@example.com");
+      git("add", "skills");
+      git("commit", "--quiet", "-m", "fixture");
+      const snapshot = materializeGitSkills(repository, "HEAD", destination);
+      expect(snapshot.commit).toMatch(/^[0-9a-f]{40,64}$/);
+      expect(snapshot.files).toHaveProperty("moonbit-language/SKILL.md");
+      expect(readFileSync(join(destination, "moonbit-language", "SKILL.md"), "utf8")).toContain(
+        "name: moonbit-language",
+      );
+      expect(materializeGitSkills(repository, "HEAD", destination)).toEqual(snapshot);
+    });
+  });
+
+  it("rejects a same-name global skill", () => {
+    temporary("content-home-", (home) => {
+      expect(catalogIsolation(home).conflicting_moonbit_language_skills).toEqual([]);
+      const collision = join(home, ".claude", "skills", "moonbit-language", "SKILL.md");
+      mkdirSync(dirname(collision), { recursive: true });
+      writeFileSync(collision, "collision\n");
+      expect(() => catalogIsolation(home)).toThrow("isolation failed");
+    });
+  });
+
+  it("rejects a same-name global skill installed through a directory symlink", () => {
+    temporary("content-home-", (home) => {
+      const target = join(home, "installed-moonbit-language");
+      mkdirSync(target);
+      writeFileSync(join(target, "SKILL.md"), "collision\n");
+      const skills = join(home, ".claude", "skills");
+      mkdirSync(skills, { recursive: true });
+      symlinkSync(target, join(skills, "moonbit-language"), "dir");
+      expect(() => catalogIsolation(home)).toThrow("isolation failed");
+    });
+  });
+
+  it("follows plugin directory symlinks once and rejects nested same-name skills", () => {
+    temporary("content-home-", (home) => {
+      const target = join(home, "plugin-target");
+      const collision = join(target, "nested", "skills", "moonbit-language", "SKILL.md");
+      mkdirSync(dirname(collision), { recursive: true });
+      writeFileSync(collision, "collision\n");
+      const plugins = join(home, ".claude", "plugins");
+      mkdirSync(plugins, { recursive: true });
+      symlinkSync(target, join(plugins, "linked-plugin"), "dir");
+      symlinkSync(plugins, join(target, "nested", "cycle"), "dir");
+      expect(() => catalogIsolation(home)).toThrow("isolation failed");
+    });
   });
 });
 
@@ -411,4 +902,69 @@ it("executes the TypeScript content runner directly with Node 24", () => {
   expect(result.status).toBe(0);
   expect(result.stderr).toBe("");
   expect(result.stdout).toContain("1 task(s) valid");
+});
+
+it("rejects more than two direct content repetitions", () => {
+  const result = spawnSync(
+    process.execPath,
+    [
+      RUNNER,
+      "--area",
+      "language",
+      "--ids",
+      "lang-explicit-extend",
+      "--condition",
+      "ours",
+      "--repetitions",
+      "3",
+      "--dry-run",
+    ],
+    { encoding: "utf8" },
+  );
+  expect(result.status).toBe(2);
+  expect(result.stderr).toContain("--repetitions must be 1 or 2");
+});
+
+it("rejects replay of a frozen historical K3 experiment", () => {
+  const result = spawnSync(
+    process.execPath,
+    [RUNNER, "--experiment", "evals/experiments/extend-route-kimi-k3.json", "--dry-run"],
+    { cwd: REPO_ROOT, encoding: "utf8" },
+  );
+  expect(result.status).toBe(2);
+  expect(result.stderr).toContain("repetitions must be 1 or 2");
+});
+
+it("accepts a runtime-only API budget alongside a frozen experiment", () => {
+  const result = spawnSync(
+    process.execPath,
+    [
+      RUNNER,
+      "--experiment",
+      "evals/experiments/extend-route-deepseek-flash.json",
+      "--paid-budget-usd",
+      "1",
+      "--dry-run",
+    ],
+    { cwd: REPO_ROOT, encoding: "utf8" },
+  );
+  expect(result.status, result.stderr).toBe(0);
+  expect(result.stdout).toContain("2 task(s) valid");
+});
+
+it("rejects runtime overrides of a frozen experiment manifest", () => {
+  const result = spawnSync(
+    process.execPath,
+    [
+      RUNNER,
+      "--experiment",
+      "evals/experiments/extend-route-kimi-k3.json",
+      "--model",
+      "different-model",
+      "--dry-run",
+    ],
+    { cwd: REPO_ROOT, encoding: "utf8" },
+  );
+  expect(result.status).toBe(2);
+  expect(result.stderr).toContain("--experiment cannot be combined with --model");
 });

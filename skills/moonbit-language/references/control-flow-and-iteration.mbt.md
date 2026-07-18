@@ -2,6 +2,12 @@
 
 Every `mbt check` block in this file is compiled and run by the repository's verification suite (`tooling/run_checked_docs.ts`). Blocks marked `mbt nocheck` show rejected or deprecated forms and are never compiled.
 
+## Official topic map
+
+Search these exact official documentation topic names to route a question into this reference. A listed name is a discoverability route; the verification labels in the surrounding reference still determine whether its claim was executed or is documentation-only.
+
+- Control structures and iteration: Control Structures; Conditional Expressions; Match Expression; Guard Statement; Guard statement and is expression; While loop; For Loop; `for .. in` loop; Range expression in `for .. in` loop; List comprehension; Labelled Continue/Break; `defer` expression; Iterator
+
 ## `if` and `match` are expressions
 
 Both yield a value. An `if` without `else` is `Unit`-typed. (Full pattern syntax lives in pattern-matching.mbt.md.)
@@ -95,6 +101,19 @@ test "control flow: for-in over collections" {
     pairs.push((k, v))
   }
   debug_inspect(pairs, content="[(\"a\", 1), (\"b\", 2)]")
+}
+```
+
+## List comprehensions
+
+An ordinary comprehension uses `[ for ... => ... ]` and builds the collection selected by the expected type. With no stronger context it builds an `Array`; an expected `String` consumes generated `Char` values. This differs from the lazy Iter comprehension `[| for ... => ... |]` covered below.
+
+```mbt check
+test "control flow: eager list comprehensions" {
+  let squares = [ for x in 1..<=4 => x * x ]
+  assert_eq(squares, [1, 4, 9, 16])
+  let text : String = [ for x in 0..<3 => (x + 'a').unsafe_to_char() ]
+  assert_eq(text, "abc")
 }
 ```
 

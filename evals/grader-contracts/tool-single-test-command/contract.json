@@ -1,0 +1,38 @@
+{
+  "area": "toolchain",
+  "task": "tool-single-test-command",
+  "cases": [
+    {
+      "name": "correct-file-scoped-command",
+      "expected": "pass",
+      "final_text": "Used `moon test utils/utils_test.mbt`; it passed.",
+      "bash_results": [
+        {
+          "command": "moon test utils/utils_test.mbt",
+          "is_error": false,
+          "output": "Total tests: 1, passed: 1, failed: 0."
+        }
+      ]
+    },
+    {
+      "name": "wrong-package-scope",
+      "expected": "fail",
+      "final_text": "Used `moon test utils/`; it passed.",
+      "bash_results": [
+        {
+          "command": "moon test utils/",
+          "is_error": false,
+          "output": "Total tests: 2, passed: 2, failed: 0."
+        }
+      ],
+      "must_fail_check_types": ["command_matches"]
+    },
+    {
+      "name": "wrong-claim-without-observed-command",
+      "expected": "fail",
+      "final_text": "Used `moon test utils/utils_test.mbt`; it passed.",
+      "bash_results": [],
+      "must_fail_check_types": ["command_matches"]
+    }
+  ]
+}

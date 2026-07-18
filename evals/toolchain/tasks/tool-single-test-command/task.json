@@ -5,14 +5,14 @@
   "grade": [
     {
       "type": "command_matches",
-      "regex": "^\\s*(?:\\S*/)?moon\\s+test\\s+(?:(?:-p|--package)\\s+utils|(?:\\./)?utils(?:/|/utils_test\\.mbt)?)(?:\\s+2>&1)?\\s*$",
+      "regex": "^\\s*(?:\\S*/)?moon\\s+test\\s+(?:\\./)?utils/utils_test\\.mbt(?:\\s+2>&1)?\\s*$",
       "output_regex": "Total tests:\\s*1,\\s*passed:\\s*1,\\s*failed:\\s*0"
     },
     {"type": "initial_files_unchanged"},
-    {"type": "moon", "args": ["test", "utils/"], "min_tests": 1},
+    {"type": "moon", "args": ["test", "utils/utils_test.mbt"], "min_tests": 1, "output_regex": "Total tests:\\s*1,\\s*passed:\\s*1,\\s*failed:\\s*0"},
     {
       "type": "output_matches",
-      "regex": "moon test[^\\n]*(?:(?:-p|--package)\\s+utils|utils(?:/|/utils_test\\.mbt)?)"
+      "regex": "moon test[^\\n]*utils/utils_test\\.mbt"
     },
     {
       "type": "output_not_matches",

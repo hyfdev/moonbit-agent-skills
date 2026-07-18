@@ -1,0 +1,48 @@
+{
+  "area": "language",
+  "task": "lang-loop-status",
+  "cases": [
+    {
+      "name": "correct-concrete-two-binding-syntax",
+      "expected": "pass",
+      "final_text": "DEPRECATED\nReplacement: the `for` loop with loop variables — `for acc = 0, v = xs { ... }` with explicit `break`."
+    },
+    {
+      "name": "claims-functional-loop-is-current",
+      "expected": "fail",
+      "final_text": "CURRENT\nThe multi-binding for form with state binders and break is merely an alternative.",
+      "must_fail_check_types": [
+        "first_line_is"
+      ]
+    },
+    {
+      "name": "names-generic-for-without-state-binding",
+      "expected": "fail",
+      "final_text": "DEPRECATED\nReplace it with a for loop and break.",
+      "must_fail_check_types": [
+        "output_matches"
+      ]
+    },
+    {
+      "name": "names-only-one-for-binding",
+      "expected": "fail",
+      "final_text": "DEPRECATED\nReplace it with `for acc = 0; acc < 10; acc += 1 { ... }` and break.",
+      "must_fail_check_types": [
+        "output_matches"
+      ]
+    },
+    {
+      "name": "claims-deprecated-loop-was-removed",
+      "expected": "fail",
+      "final_text": "DEPRECATED\nIt was removed; use the multi-binding for form with state binders and break.",
+      "must_fail_check_types": [
+        "output_not_matches"
+      ]
+    },
+    {
+      "name": "rejects-replacement-while-repeating-keywords",
+      "expected": "fail",
+      "final_text": "DEPRECATED\nDo not use the multi-binding for form: state binders are unsupported and break cannot replace recursion."
+    }
+  ]
+}

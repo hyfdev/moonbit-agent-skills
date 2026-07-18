@@ -1,11 +1,23 @@
 {
   "id": "lang-defer-exists",
+  "risk_class": "current-fact-no-diagnostic",
+  "claim_id": "language.defer.exists-and-block-scope",
+  "primary_metric": "exact-status-and-scope",
   "prompt": "Does current MoonBit have a defer statement? Reply with a first line that is exactly YES or NO, then at most three lines of justification (mention scoping behavior if YES).",
-  "grader_note": "2026-07-17: first_line_is now checks equality rather than prefix matching, so answers such as YESBUT no longer false-pass; the required justification must identify block scope.",
+  "grader_note": "2026-07-18: first_line_is checks equality, so answers such as YESBUT do not pass; the required justification must identify block-based or block-scoped lifetime and must not negate that property.",
   "grade": [
-    {"type": "first_line_is", "value": "YES"},
-    {"type": "output_matches", "regex": "block[- ]scoped|enclosing (?:\\*\\*)?block"},
-    {"type": "output_not_matches", "regex": "moonbit (does not|doesn't) (have|support) defer"}
+    {
+      "type": "first_line_is",
+      "value": "YES"
+    },
+    {
+      "type": "output_matches",
+      "regex": "(?:block|lexical)[- ](?:scoped|based)|(?:enclosing|surrounding|lexical) (?:\\*\\*)?block"
+    },
+    {
+      "type": "output_not_matches",
+      "regex": "(?:\\bnot\\b|isn['’]?t|never)\\s+(?:actually\\s+)?(?:\\*\\*)?(?:block|lexical)[- ](?:scoped|based)"
+    }
   ],
   "truth": "defer exists since the 2025-08 update; it is block-scoped, LIFO per block (verified by fixture lang-trap-go-defer-block-scoped)."
 }

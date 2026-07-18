@@ -17,7 +17,7 @@ import {
   statSync,
   writeFileSync,
 } from "node:fs";
-import { arch, platform, release, tmpdir, type } from "node:os";
+import { arch, homedir, platform, release, tmpdir, type } from "node:os";
 import {
   basename,
   delimiter,
@@ -31,17 +31,43 @@ import {
 } from "node:path";
 import { isDeepStrictEqual, parseArgs } from "node:util";
 import { fileURLToPath } from "node:url";
+import {
+  ApiBudgetGuard,
+  aggregateTokenUsage,
+  analysisEligibility,
+  buildAgentInvocation,
+  claudeBudgetCharge,
+  clientExecutable,
+  clientRunSucceeded,
+  enrichKimiStream,
+  parseAgentStream,
+  parseClaudeStream,
+  sanitizeAgentStreamForPersistence,
+  type AgentClient,
+  type AnalysisEligibility,
+  type AnalysisEligibilityReason,
+  type BashResult as NormalizedBashResult,
+  type JsonRecord as AgentJsonRecord,
+  type ParsedAgentStream,
+  type ToolResultRecord as NormalizedToolResultRecord,
+  type ToolUseRecord as NormalizedToolUseRecord,
+} from "./lib/agent_cli.ts";
+import { MAX_EVAL_REPETITIONS } from "./lib/eval_policy.ts";
+import { pairedSummary, type PairableResult } from "./lib/paired_stats.ts";
 
 const DESCRIPTION =
   "Content eval: compare agent outcomes across MoonBit knowledge conditions in isolated contexts.";
 const USAGE =
   "Usage: node evals/run_content.ts --area language|toolchain|integration " +
   "--condition CONDITION [--condition CONDITION ...] [--ids ID,ID] " +
-  "[--model ID] [--max-turns N] [--run-name NAME] [--resume] [--dry-run]";
+  "[--client claude-code|kimi-code] [--model ID] [--max-turns N] " +
+  "[--paid-budget-usd N] [--repetitions N] [--run-name NAME] [--resume] [--dry-run] " +
+  "or node evals/run_content.ts --experiment evals/experiments/FILE.json [--run-name NAME] [--resume] [--dry-run]";
 
 export const HERE = dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = resolve(HERE, "..");
 export const SKILLS_SRC = join(REPO_ROOT, "skills");
+const BASELINES_PATH = join(HERE, "baselines.json");
 
 const sourcesFile = JSON.parse(
   readFileSync(join(REPO_ROOT, "verification", "sources", "sources.json"), "utf8"),
@@ -54,73 +80,141 @@ export const OFFICIAL_COMMIT =
     throw new Error("verification/sources/sources.json has no moonbitlang-skills source");
   })();
 
-export const ALLOWED_TOOLS = "Bash,Edit,Write,Read,Glob,Grep";
-export const DISALLOWED_TOOLS = "WebFetch,WebSearch,Task";
+export const ALLOWED_TOOLS = "Bash,Edit,Write,Read,Glob,Grep,Skill";
+export const DISALLOWED_TOOLS = "WebFetch,WebSearch,FetchURL,Task,Agent,AgentSwarm";
 export const VALID_CONDITIONS = new Set([
   "none",
   "official",
+  "baseline",
   "ours",
+  "ours-no-top-level-extend",
   "forced-language",
   "forced-language-no-cross-language",
   "forced-toolchain",
 ]);
 
 export type Area = "language" | "toolchain" | "integration";
-export type JsonRecord = Record<string, unknown>;
+export type JsonRecord = AgentJsonRecord;
 
 export interface CommandResult {
   exitCode: number | null;
   stdout: string;
   stderr: string;
   timedOut: boolean;
+  durationMs?: number;
 }
 
 export type CommandRunner = (
   command: string,
   args: readonly string[],
-  options?: { cwd?: string; timeout?: number },
+  options?: { cwd?: string; timeout?: number; env?: NodeJS.ProcessEnv },
 ) => CommandResult;
 
-export interface BashResult {
-  command: string;
-  is_error: boolean;
-  output: string;
-}
-
-export interface ParsedStream {
-  final_text: string;
-  activated_skills: string[];
-  bash_results: BashResult[];
-  tool_uses: Array<{ name: string; input: unknown }>;
-  usage: JsonRecord;
-  model_usage: JsonRecord;
-}
+export type BashResult = NormalizedBashResult;
+export type ParsedStream = ParsedAgentStream;
+export type ToolUseRecord = NormalizedToolUseRecord;
+export type ToolResultRecord = NormalizedToolResultRecord;
 
 export interface GradeResult {
   ok: boolean;
   detail: string;
 }
 
-interface ContentTask {
+export interface ContentTask {
   id: string;
   prompt: string;
   grade: JsonRecord[];
+  claim_id?: string;
+  risk_class?: string;
+  primary_metric?: string;
+  discovery?: {
+    skill?: string;
+    reference?: string;
+  };
+}
+
+export interface SkillSources {
+  current: string;
+  baseline?: string;
+}
+
+export interface BaselineConfig {
+  commit: string;
+  skills_tree: string;
+  language_tree: string;
+  purpose: string;
+}
+
+export interface SkillSnapshot {
+  ref: string;
+  commit: string;
+  skills_tree: string;
+  language_tree: string;
+  files: Record<string, string>;
+}
+
+export interface PreparedSkillSnapshots {
+  sources: SkillSources;
+  manifest: {
+    baseline_name: string;
+    baseline_purpose: string;
+    current: SkillSnapshot;
+    baseline: SkillSnapshot;
+  };
+}
+
+export interface DerivedConditionSnapshot {
+  transformation: string;
+  files: Record<string, string>;
+  aggregate_sha256: string;
+}
+
+export interface DiscoveryEvidence {
+  requested_skill: string | null;
+  requested_reference: string | null;
+  skill_activated_successfully: boolean | null;
+  reference_read_successfully: boolean | null;
+  reference_read_before_action: boolean | null;
 }
 
 interface CliOptions {
   area: Area;
+  client: AgentClient;
   conditions: string[];
   ids?: string;
   model: string;
   maxTurns: number;
+  paidBudgetUsd?: number;
+  repetitions: number;
   runName?: string;
   resume: boolean;
   dryRun: boolean;
+  experiment?: JsonRecord;
+}
+
+interface ContentExperiment {
+  schema_version: 2;
+  id: string;
+  runner: "content";
+  stage: "exploratory" | "confirmatory";
+  area: Area;
+  client: AgentClient;
+  model: string;
+  conditions: string[];
+  task_ids: string[];
+  task_groups?: Record<string, string[]>;
+  repetitions: number;
+  max_turns: number;
+  primary_metric: string;
+  minimum_valuable_difference: number;
+  stopping_rule: string;
 }
 
 export const runCommand: CommandRunner = (command, args, options = {}) => {
+  const started = Date.now();
   const result = spawnSync(command, [...args], {
     cwd: options.cwd,
+    env: options.env,
     encoding: "utf8",
     timeout: options.timeout,
     maxBuffer: 256 * 1024 * 1024,
@@ -140,6 +234,7 @@ export const runCommand: CommandRunner = (command, args, options = {}) => {
     stdout: typeof result.stdout === "string" ? result.stdout : "",
     stderr: typeof result.stderr === "string" ? result.stderr : "",
     timedOut,
+    durationMs: Date.now() - started,
   };
 };
 
@@ -158,6 +253,57 @@ function stringArray(value: unknown): string[] {
     throw new Error("expected an array of strings");
   }
   return value as string[];
+}
+
+function observedStrings(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string")
+    : [];
+}
+
+const ANALYSIS_ELIGIBILITY_REASONS = new Set<AnalysisEligibilityReason>([
+  "completed",
+  "predeclared_turn_limit",
+  "wall_timeout",
+  "transport_failure",
+  "client_failure",
+]);
+
+export function resultAnalysisEligibility(result: JsonRecord): AnalysisEligibility {
+  const stored = asRecord(result.analysis_eligibility);
+  if (
+    typeof stored.eligible === "boolean" &&
+    typeof stored.reason === "string" &&
+    ANALYSIS_ELIGIBILITY_REASONS.has(stored.reason as AnalysisEligibilityReason)
+  ) {
+    return {
+      eligible: stored.eligible,
+      reason: stored.reason as AnalysisEligibilityReason,
+    };
+  }
+  if (result.timed_out === true) {
+    return { eligible: false, reason: "wall_timeout" };
+  }
+  const clientExit = (Array.isArray(result.checks) ? result.checks : [])
+    .map(asRecord)
+    .find((check) => asRecord(check.check).type === "client_exit");
+  if (clientExit?.ok === true) {
+    return { eligible: true, reason: "completed" };
+  }
+  if (result.exit_code === 1 && typeof clientExit?.detail === "string") {
+    const turnCounts = clientExit.detail.match(/observed_steps=(\d+); step_limit=(\d+)/);
+    if (
+      clientExit.detail.includes("result_subtype=error_max_turns") &&
+      turnCounts !== null &&
+      Number(turnCounts[1]) >= Number(turnCounts[2])
+    ) {
+      return { eligible: true, reason: "predeclared_turn_limit" };
+    }
+  }
+  if (result.exit_code === null) {
+    return { eligible: false, reason: "transport_failure" };
+  }
+  return { eligible: false, reason: "client_failure" };
 }
 
 function booleanText(value: boolean): string {
@@ -260,9 +406,12 @@ export function officialSkillsCheckout(
   return join(destination, "skills");
 }
 
-export function installLanguageAblation(skillsDestination: string): string {
+export function installLanguageAblation(
+  skillsDestination: string,
+  skillsSource = SKILLS_SRC,
+): string {
   const skillDestination = join(skillsDestination, "moonbit-language");
-  copyTreeExclusive(join(SKILLS_SRC, "moonbit-language"), skillDestination);
+  copyTreeExclusive(join(skillsSource, "moonbit-language"), skillDestination);
   const skillPath = join(skillDestination, "SKILL.md");
   let content = readFileSync(skillPath, "utf8");
   content = content.replace(
@@ -280,6 +429,46 @@ export function installLanguageAblation(skillsDestination: string): string {
   writeFileSync(skillPath, content);
   rmSync(join(skillDestination, "references", "cross-language-and-stale-syntax.md"));
   return content;
+}
+
+function replaceExactlyOnce(content: string, before: string, after: string): string {
+  const first = content.indexOf(before);
+  if (first === -1 || content.indexOf(before, first + before.length) !== -1) {
+    throw new Error("ablation source text must occur exactly once: " + JSON.stringify(before));
+  }
+  return content.slice(0, first) + after + content.slice(first + before.length);
+}
+
+export function installTopLevelExtendAblation(
+  skillsDestination: string,
+  skillsSource = SKILLS_SRC,
+): void {
+  for (const entry of readdirSync(skillsSource, { withFileTypes: true }).sort((left, right) =>
+    left.name.localeCompare(right.name),
+  )) {
+    const source = join(skillsSource, entry.name);
+    if (isFile(join(source, "SKILL.md"))) {
+      copyTreeExclusive(source, join(skillsDestination, entry.name));
+    }
+  }
+  const skillPath = join(skillsDestination, "moonbit-language", "SKILL.md");
+  let content = readFileSync(skillPath, "utf8");
+  content = replaceExactlyOnce(
+    content,
+    "traits and explicit extend/pub extend, generics",
+    "traits and generics",
+  );
+  content = replaceExactlyOnce(
+    content,
+    "| Traits; generics; impls; explicit `extend` and `pub extend`; `implicit_impl_as_method`; supertrait dot-call migration; Builtin traits; Deriving builtin traits; operators; trait objects | references/traits-and-generics.mbt.md |\n",
+    "| Traits; generics; impls; Builtin traits; Deriving builtin traits; operators; trait objects | references/traits-and-generics.mbt.md |\n",
+  );
+  content = replaceExactlyOnce(
+    content,
+    "- Trait implementations do not automatically create dot-call methods. Attach intended methods with `extend Type with Trait::{method}`; use `pub extend` when downstream packages need the dot call. Rename identifiers called `extend`, and use qualified `Trait::method(value)` for deprecated supertrait or ambiguous constrained dot calls.\n",
+    "",
+  );
+  writeFileSync(skillPath, content);
 }
 
 export function forcedPrompt(content: string, skill: string): string {
@@ -314,6 +503,7 @@ export function installCondition(
   condition: string,
   cacheDir: string,
   runner: CommandRunner = runCommand,
+  skillSources: SkillSources = { current: SKILLS_SRC },
 ): string {
   const skillsDestination = join(project, ".claude", "skills");
   if (condition === "none") {
@@ -332,28 +522,39 @@ export function installCondition(
     }
     return "";
   }
-  if (condition === "ours") {
+  if (condition === "ours" || condition === "baseline") {
+    const sourceRoot =
+      condition === "baseline"
+        ? (skillSources.baseline ?? (() => {
+            throw new Error("baseline condition requires a pinned baseline skill source");
+          })())
+        : skillSources.current;
     mkdirExclusive(skillsDestination);
-    for (const entry of readdirSync(SKILLS_SRC, { withFileTypes: true }).sort((a, b) =>
+    for (const entry of readdirSync(sourceRoot, { withFileTypes: true }).sort((a, b) =>
       a.name.localeCompare(b.name),
     )) {
-      const source = join(SKILLS_SRC, entry.name);
+      const source = join(sourceRoot, entry.name);
       if (isFile(join(source, "SKILL.md"))) {
         copyTreeExclusive(source, join(skillsDestination, entry.name));
       }
     }
     return "";
   }
+  if (condition === "ours-no-top-level-extend") {
+    mkdirExclusive(skillsDestination);
+    installTopLevelExtendAblation(skillsDestination, skillSources.current);
+    return "";
+  }
   if (condition === "forced-language-no-cross-language") {
     mkdirExclusive(skillsDestination);
-    const content = installLanguageAblation(skillsDestination);
+    const content = installLanguageAblation(skillsDestination, skillSources.current);
     return forcedPrompt(content, "moonbit-language");
   }
   if (condition === "forced-language" || condition === "forced-toolchain") {
     const skill = "moonbit-" + condition.slice("forced-".length);
-    const content = readFileSync(join(SKILLS_SRC, skill, "SKILL.md"), "utf8");
+    const content = readFileSync(join(skillSources.current, skill, "SKILL.md"), "utf8");
     mkdirExclusive(skillsDestination);
-    copyTreeExclusive(join(SKILLS_SRC, skill), join(skillsDestination, skill));
+    copyTreeExclusive(join(skillSources.current, skill), join(skillsDestination, skill));
     return forcedPrompt(content, skill);
   }
   throw new Error("unknown condition " + JSON.stringify(condition));
@@ -392,6 +593,304 @@ export function snapshotFiles(root: string): Record<string, string> {
       .filter((path) => !ignoredSnapshotPath(path))
       .map((path) => [path, fileDigest(join(root, path))]),
   );
+}
+
+export function prepareDerivedConditionSnapshots(
+  cacheDirectory: string,
+  conditions: string[],
+  skillSources: SkillSources,
+): Record<string, DerivedConditionSnapshot> {
+  const root = join(cacheDirectory, "derived-condition-snapshots");
+  mkdirSync(root, { recursive: true });
+  const snapshots: Record<string, DerivedConditionSnapshot> = {};
+  for (const condition of conditions) {
+    let transformation: string | undefined;
+    const destination = join(root, condition);
+    if (condition === "ours-no-top-level-extend") {
+      transformation =
+        "Remove only explicit extend terms and the direct migration rule from moonbit-language/SKILL.md; preserve the traits/generics route and every reference byte-for-byte.";
+      if (!existsSync(destination)) {
+        mkdirExclusive(destination);
+        installTopLevelExtendAblation(destination, skillSources.current);
+      }
+    } else if (condition === "forced-language-no-cross-language") {
+      transformation =
+        "Remove the concentrated cross-language route, rule, and reference from the forced moonbit-language skill.";
+      if (!existsSync(destination)) {
+        mkdirExclusive(destination);
+        installLanguageAblation(destination, skillSources.current);
+      }
+    }
+    if (transformation === undefined) continue;
+    const files = snapshotFiles(destination);
+    snapshots[condition] = {
+      transformation,
+      files,
+      aggregate_sha256: createHash("sha256")
+        .update(JSON.stringify(files))
+        .digest("hex"),
+    };
+  }
+  return snapshots;
+}
+
+function checkedRawOutput(
+  runner: CommandRunner,
+  command: string,
+  args: readonly string[],
+  options?: { cwd?: string; timeout?: number },
+): string {
+  const result = runner(command, args, options);
+  if (result.timedOut) {
+    throw new Error(command + " timed out");
+  }
+  if (result.exitCode !== 0) {
+    throw new Error(
+      command +
+        " " +
+        args.join(" ") +
+        " exited " +
+        String(result.exitCode) +
+        ":\n" +
+        result.stdout +
+        result.stderr,
+    );
+  }
+  return result.stdout;
+}
+
+export function materializeGitSkills(
+  repository: string,
+  ref: string,
+  destination: string,
+  runner: CommandRunner = runCommand,
+): SkillSnapshot {
+  const commit = checkedOutput(runner, "git", ["rev-parse", ref], { cwd: repository });
+  const skillsTree = checkedOutput(runner, "git", ["rev-parse", commit + ":skills"], {
+    cwd: repository,
+  });
+  const languageTree = checkedOutput(
+    runner,
+    "git",
+    ["rev-parse", commit + ":skills/moonbit-language"],
+    { cwd: repository },
+  );
+  const trackedPaths = checkedOutput(
+    runner,
+    "git",
+    ["ls-tree", "-r", "--name-only", commit, "--", "skills"],
+    { cwd: repository },
+  )
+    .split(/\r?\n/)
+    .filter((path) => path.startsWith("skills/") && path !== "skills/")
+    .sort();
+  if (trackedPaths.length === 0) {
+    throw new Error("Git snapshot " + commit + " has no tracked skills");
+  }
+
+  const contents = new Map<string, string>();
+  const expectedFiles: Record<string, string> = {};
+  for (const trackedPath of trackedPaths) {
+    const relativePath = trackedPath.slice("skills/".length);
+    const content = checkedRawOutput(
+      runner,
+      "git",
+      ["show", commit + ":" + trackedPath],
+      { cwd: repository },
+    );
+    contents.set(relativePath, content);
+    expectedFiles[relativePath] = createHash("sha256").update(content).digest("hex");
+  }
+
+  if (existsSync(destination)) {
+    const actualFiles = snapshotFiles(destination);
+    if (!isDeepStrictEqual(actualFiles, expectedFiles)) {
+      throw new Error(
+        "cached skill snapshot differs from Git tree " + commit + "; use a fresh --run-name",
+      );
+    }
+  } else {
+    mkdirSync(destination, { recursive: true });
+    for (const [relativePath, content] of contents) {
+      const path = join(destination, relativePath);
+      mkdirSync(dirname(path), { recursive: true });
+      writeFileSync(path, content);
+    }
+  }
+
+  return {
+    ref,
+    commit,
+    skills_tree: skillsTree,
+    language_tree: languageTree,
+    files: expectedFiles,
+  };
+}
+
+export function prepareSkillSnapshots(
+  cacheDir: string,
+  runner: CommandRunner = runCommand,
+): PreparedSkillSnapshots {
+  const dirtySkills = checkedRawOutput(
+    runner,
+    "git",
+    ["status", "--porcelain", "--untracked-files=all", "--", "skills"],
+    { cwd: REPO_ROOT },
+  ).trim();
+  if (dirtySkills !== "") {
+    throw new Error(
+      "paid content evals require committed, clean skills/; current changes:\n" + dirtySkills,
+    );
+  }
+
+  const baselineName = "language-reference-before-feature-index";
+  const baselines = JSON.parse(readFileSync(BASELINES_PATH, "utf8")) as Record<
+    string,
+    BaselineConfig
+  >;
+  const baselineConfig = baselines[baselineName];
+  if (baselineConfig === undefined) {
+    throw new Error("missing pinned baseline " + baselineName + " in " + BASELINES_PATH);
+  }
+  const snapshotsRoot = join(cacheDir, "skill-snapshots");
+  const currentRoot = join(snapshotsRoot, "current");
+  const baselineRoot = join(snapshotsRoot, "baseline");
+  const current = materializeGitSkills(REPO_ROOT, "HEAD", currentRoot, runner);
+  const baseline = materializeGitSkills(
+    REPO_ROOT,
+    baselineConfig.commit,
+    baselineRoot,
+    runner,
+  );
+  if (
+    baseline.skills_tree !== baselineConfig.skills_tree ||
+    baseline.language_tree !== baselineConfig.language_tree
+  ) {
+    throw new Error(
+      "pinned baseline tree OIDs differ from evals/baselines.json: got " +
+        baseline.skills_tree +
+        " / " +
+        baseline.language_tree,
+    );
+  }
+  return {
+    sources: { current: currentRoot, baseline: baselineRoot },
+    manifest: {
+      baseline_name: baselineName,
+      baseline_purpose: baselineConfig.purpose,
+      current,
+      baseline,
+    },
+  };
+}
+
+function pluginSkillCollisions(
+  pluginRoot: string,
+  allowedRealRoots: readonly string[],
+): { collisions: string[]; escapedDirectorySymlinks: string[] } {
+  const collisions = new Set<string>();
+  const escapedDirectorySymlinks = new Set<string>();
+  const visitedRealDirectories = new Set<string>();
+
+  const isWithinAllowedRoot = (path: string): boolean =>
+    allowedRealRoots.some((root) => pathIsWithin(root, path));
+  const recordCandidate = (directory: string): void => {
+    const candidate = join(directory, "skills", "moonbit-language", "SKILL.md");
+    if (isFile(candidate)) {
+      collisions.add(candidate);
+    }
+  };
+  const visit = (directory: string): void => {
+    recordCandidate(directory);
+    let realDirectory: string;
+    try {
+      realDirectory = realpathSync(directory);
+    } catch {
+      return;
+    }
+    if (visitedRealDirectories.has(realDirectory)) {
+      return;
+    }
+    visitedRealDirectories.add(realDirectory);
+
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      const path = join(directory, entry.name);
+      if (entry.isDirectory()) {
+        visit(path);
+      } else if (entry.isSymbolicLink() && isDirectory(path)) {
+        recordCandidate(path);
+        const realTarget = realpathSync(path);
+        if (isWithinAllowedRoot(realTarget)) {
+          visit(path);
+        } else {
+          escapedDirectorySymlinks.add(path);
+        }
+      }
+    }
+  };
+
+  visit(pluginRoot);
+  return {
+    collisions: [...collisions].sort(),
+    escapedDirectorySymlinks: [...escapedDirectorySymlinks].sort(),
+  };
+}
+
+export function catalogIsolation(homeDirectory = homedir()): JsonRecord {
+  const directSkillRoots = [
+    join(homeDirectory, ".claude", "skills"),
+    join(homeDirectory, ".agents", "skills"),
+    join(homeDirectory, ".codex", "skills"),
+  ];
+  const pluginRoots = [
+    join(homeDirectory, ".claude", "plugins"),
+    join(homeDirectory, ".agents", "plugins"),
+    join(homeDirectory, ".codex", "plugins"),
+  ];
+  const checkedRoots = [...directSkillRoots, ...pluginRoots];
+  const collisions = new Set(
+    directSkillRoots
+      .map((root) => join(root, "moonbit-language", "SKILL.md"))
+      .filter((path) => isFile(path)),
+  );
+  const escapedDirectorySymlinks = new Set<string>();
+  let realHome: string | undefined;
+  try {
+    realHome = realpathSync(homeDirectory);
+  } catch {
+    // The direct-path checks above still provide a useful result for a missing home.
+  }
+  for (const pluginRoot of pluginRoots.filter((root) => isDirectory(root))) {
+    const allowedRealRoots = [realpathSync(pluginRoot)];
+    if (realHome !== undefined) {
+      allowedRealRoots.push(realHome);
+    }
+    const scan = pluginSkillCollisions(pluginRoot, allowedRealRoots);
+    for (const path of scan.collisions) {
+      collisions.add(path);
+    }
+    for (const path of scan.escapedDirectorySymlinks) {
+      escapedDirectorySymlinks.add(path);
+    }
+  }
+  const sortedCollisions = [...collisions].sort();
+  const sortedEscapedDirectorySymlinks = [...escapedDirectorySymlinks].sort();
+  if (sortedCollisions.length > 0) {
+    throw new Error(
+      "content eval isolation failed: a global or plugin moonbit-language skill is installed at " +
+        sortedCollisions.join(", "),
+    );
+  }
+  if (sortedEscapedDirectorySymlinks.length > 0) {
+    throw new Error(
+      "content eval isolation failed: refusing plugin directory symlinks outside the home or plugin root: " +
+        sortedEscapedDirectorySymlinks.join(", "),
+    );
+  }
+  return {
+    checked_roots: checkedRoots,
+    conflicting_moonbit_language_skills: sortedCollisions,
+  };
 }
 
 function pathIsWithin(root: string, candidate: string): boolean {
@@ -446,6 +945,25 @@ function matchesRecursiveGlob(path: string, pattern: string): boolean {
   return matchesGlob(path, pattern) || matchesGlob(path, "**/" + pattern);
 }
 
+function normalizedAnswerLines(finalText: string): string[] {
+  const nonemptyLines = finalText
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line !== "");
+  const first = nonemptyLines[0] ?? "";
+  const answerLines =
+    /^```(?:text|json|moonbit)?$/i.test(first) && nonemptyLines.length > 1
+      ? nonemptyLines.slice(1)
+      : nonemptyLines;
+  if (answerLines.length === 0) return [];
+  const normalized = [...answerLines];
+  const inlineCode = normalized[0].match(/^`([^`\r\n]+)`$/);
+  if (inlineCode !== null) normalized[0] = inlineCode[1].trim();
+  const bold = normalized[0].match(/^\*\*([^*\r\n]+)\*\*$/);
+  if (bold !== null) normalized[0] = bold[1].trim();
+  return normalized;
+}
+
 export function grade(
   check: JsonRecord,
   project: string,
@@ -492,6 +1010,20 @@ export function grade(
         testMatch !== null && Number.parseInt(testMatch[1], 10) >= check.min_tests;
       ok = ok && testCountOk;
     }
+    const outputMatches =
+      typeof check.output_regex === "string"
+        ? regex(check.output_regex, "is").test(output)
+        : undefined;
+    const outputAvoids =
+      typeof check.output_not_regex === "string"
+        ? !regex(check.output_not_regex, "is").test(output)
+        : undefined;
+    if (outputMatches !== undefined) {
+      ok = ok && outputMatches;
+    }
+    if (outputAvoids !== undefined) {
+      ok = ok && outputAvoids;
+    }
     const argumentsText = stringArray(check.args).join(" ");
     let detail = "moon " + argumentsText + " -> exit " + String(result.exitCode);
     if (typeof check.min_tests === "number") {
@@ -503,6 +1035,12 @@ export function grade(
         String(check.min_tests) +
         " -> " +
         String(testCountOk === null ? null : booleanText(testCountOk));
+    }
+    if (outputMatches !== undefined) {
+      detail += `; output ~ /${stringValue(check.output_regex)}/ -> ${booleanText(outputMatches)}`;
+    }
+    if (outputAvoids !== undefined) {
+      detail += `; output !~ /${stringValue(check.output_not_regex)}/ -> ${booleanText(outputAvoids)}`;
     }
     if (!ok) {
       const outputTail = output.trim().slice(-500);
@@ -532,6 +1070,47 @@ export function grade(
         "file_contains " + path + " ~ /" + stringValue(check.regex) + "/ -> " + booleanText(ok),
     };
   }
+  if (kind === "file_not_contains") {
+    const path = stringValue(check.path);
+    const fullPath = join(project, path);
+    const ok = isFile(fullPath) && !regex(check.regex).test(readFileSync(fullPath, "utf8"));
+    return {
+      ok,
+      detail:
+        "file_not_contains " +
+        path +
+        " !~ /" +
+        stringValue(check.regex) +
+        "/ -> " +
+        booleanText(ok),
+    };
+  }
+  if (kind === "file_match_count") {
+    const path = stringValue(check.path);
+    const fullPath = join(project, path);
+    const pattern = stringValue(check.regex);
+    const count =
+      isFile(fullPath) && pattern !== ""
+        ? [...readFileSync(fullPath, "utf8").matchAll(new RegExp(pattern, "gis"))].length
+        : -1;
+    const exact = typeof check.exact === "number" ? check.exact : undefined;
+    const minimum = typeof check.min === "number" ? check.min : undefined;
+    const maximum = typeof check.max === "number" ? check.max : undefined;
+    const ok =
+      count >= 0 &&
+      (exact === undefined || count === exact) &&
+      (minimum === undefined || count >= minimum) &&
+      (maximum === undefined || count <= maximum) &&
+      (exact !== undefined || minimum !== undefined || maximum !== undefined);
+    return {
+      ok,
+      detail:
+        `file_match_count ${path} ~ /${pattern}/ -> ${count}` +
+        (exact === undefined ? "" : `, exact=${exact}`) +
+        (minimum === undefined ? "" : `, min=${minimum}`) +
+        (maximum === undefined ? "" : `, max=${maximum}`),
+    };
+  }
   if (kind === "any_file_contains") {
     const pattern = stringValue(check.glob);
     const expression = regex(check.regex);
@@ -549,6 +1128,25 @@ export function grade(
         stringValue(check.regex) +
         "/ -> " +
         booleanText(ok),
+    };
+  }
+  if (kind === "no_file_contains") {
+    const pattern = stringValue(check.glob);
+    const expression = regex(check.regex, "is");
+    const hits = walkFiles(project)
+      .map((path) => relative(project, path))
+      .filter((path) => !ignoredSnapshotPath(path))
+      .filter((path) => matchesRecursiveGlob(path, pattern))
+      .filter((path) => expression.test(readFileSync(join(project, path), "utf8")));
+    return {
+      ok: hits.length === 0,
+      detail:
+        "no_file_contains " +
+        pattern +
+        " !~ /" +
+        stringValue(check.regex) +
+        "/ -> hits=" +
+        quotedList(hits),
     };
   }
   if (kind === "output_matches") {
@@ -600,93 +1198,141 @@ export function grade(
     };
   }
   if (kind === "first_line_is") {
-    const first = finalText
-      .split(/\r?\n/)
-      .map((line) => line.trim())
-      .find((line) => line !== "") ?? "";
+    const rawFirst =
+      finalText
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .find((line) => line !== "") ?? "";
+    const first = normalizedAnswerLines(finalText)[0] ?? "";
     const expected = stringValue(check.value);
     const ok = first.toUpperCase() === expected.toUpperCase();
     return {
       ok,
-      detail: "first_line_is " + expected + " -> got " + JSON.stringify(first.slice(0, 40)),
+      detail:
+        "first_line_is " +
+        expected +
+        " -> got " +
+        JSON.stringify(rawFirst.slice(0, 40)) +
+        (first === rawFirst ? "" : "; normalized=" + JSON.stringify(first.slice(0, 40))),
+    };
+  }
+  if (kind === "first_line_json_is") {
+    const first = normalizedAnswerLines(finalText)[0] ?? "";
+    let actual: unknown;
+    let parseError: string | null = null;
+    try {
+      actual = JSON.parse(first);
+    } catch (error) {
+      parseError = (error as Error).message;
+    }
+    const ok = parseError === null && isDeepStrictEqual(actual, check.value);
+    return {
+      ok,
+      detail:
+        "first_line_json_is " +
+        JSON.stringify(check.value) +
+        " -> " +
+        (parseError === null
+          ? JSON.stringify(actual)
+          : "parse error: " + parseError + "; got " + JSON.stringify(first.slice(0, 80))),
+    };
+  }
+  if (kind === "first_line_csv_is") {
+    const first = normalizedAnswerLines(finalText)[0] ?? "";
+    const actual = first.split(",").map((item) => item.trim());
+    const expected = stringArray(check.value);
+    const ok = isDeepStrictEqual(actual, expected);
+    return {
+      ok,
+      detail:
+        "first_line_csv_is " +
+        JSON.stringify(expected) +
+        " -> " +
+        JSON.stringify(actual),
     };
   }
   throw new Error("unknown check type " + JSON.stringify(kind));
 }
 
 export function parseStream(stdout: string): ParsedStream {
-  const parsed: ParsedStream = {
-    final_text: "",
-    activated_skills: [],
-    bash_results: [],
-    tool_uses: [],
-    usage: {},
-    model_usage: {},
-  };
-  const pendingBash = new Map<string, string>();
-  for (const line of stdout.split(/\r?\n/)) {
-    let event: JsonRecord;
-    try {
-      event = asRecord(JSON.parse(line));
-    } catch {
-      continue;
-    }
-    if (event.type === "assistant") {
-      const message = asRecord(event.message);
-      const content = Array.isArray(message.content) ? message.content : [];
-      for (const rawBlock of content) {
-        const block = asRecord(rawBlock);
-        if (block.type !== "tool_use") {
-          continue;
-        }
-        const name = stringValue(block.name);
-        const input = block.input ?? {};
-        parsed.tool_uses.push({ name, input });
-        const inputs = asRecord(input);
-        if (name === "Skill") {
-          parsed.activated_skills.push(stringValue(inputs.skill));
-        } else if (name === "Bash") {
-          const toolId = stringValue(block.id);
-          if (toolId !== "") {
-            pendingBash.set(toolId, stringValue(inputs.command));
-          }
-        }
-      }
-    } else if (event.type === "user") {
-      const message = asRecord(event.message);
-      const content = Array.isArray(message.content) ? message.content : [];
-      for (const rawBlock of content) {
-        const block = asRecord(rawBlock);
-        if (block.type !== "tool_result") {
-          continue;
-        }
-        const toolId = stringValue(block.tool_use_id);
-        const command = pendingBash.get(toolId);
-        if (command === undefined) {
-          continue;
-        }
-        const contentValue = block.content ?? "";
-        parsed.bash_results.push({
-          command,
-          is_error: Boolean(block.is_error ?? false),
-          output:
-            typeof contentValue === "string" ? contentValue : JSON.stringify(contentValue),
+  return parseClaudeStream(stdout);
+}
+
+export function discoveryEvidence(
+  parsed: ParsedStream,
+  requested?: ContentTask["discovery"],
+): DiscoveryEvidence {
+  const requestedSkill = requested?.skill ?? null;
+  const requestedReference = requested?.reference ?? null;
+  const resultsByUse = new Map(
+    parsed.tool_results.map((result) => [result.tool_use_id, result]),
+  );
+  const successfulUses = parsed.tool_uses.filter((toolUse) => {
+    const result = resultsByUse.get(toolUse.id);
+    return result !== undefined && !result.is_error;
+  });
+  const skillActivatedSuccessfully =
+    requestedSkill === null
+      ? null
+      : successfulUses.some(
+          (toolUse) =>
+            toolUse.name === "Skill" &&
+            stringValue(asRecord(toolUse.input).skill) === requestedSkill,
+        );
+  const referenceUses =
+    requestedReference === null
+      ? []
+      : successfulUses.filter(
+          (toolUse) =>
+            (toolUse.name === "Read" || toolUse.name === "Grep") &&
+            JSON.stringify(toolUse.input).includes(requestedReference),
+        );
+  const referenceReadSuccessfully =
+    requestedReference === null ? null : referenceUses.length > 0;
+  const actionTools = new Set(["Bash", "Edit", "Write"]);
+  const firstActionEvent = parsed.tool_uses
+    .filter((toolUse) => actionTools.has(toolUse.name))
+    .map((toolUse) => toolUse.event_index)
+    .sort((left, right) => left - right)[0];
+  const referenceReadBeforeAction =
+    requestedReference === null
+      ? null
+      : referenceUses.some((referenceUse) => {
+          const result = resultsByUse.get(referenceUse.id);
+          if (result === undefined) return false;
+          return firstActionEvent === undefined
+            ? parsed.final_text !== ""
+            : result.event_index < firstActionEvent;
         });
-        pendingBash.delete(toolId);
-      }
-    } else if (event.type === "result") {
-      parsed.final_text = stringValue(event.result);
-      parsed.usage = { ...asRecord(event.usage) };
-      parsed.usage.total_cost_usd = event.total_cost_usd;
-      parsed.usage.num_turns = event.num_turns;
-      parsed.model_usage = asRecord(event.modelUsage);
-    }
-  }
-  return parsed;
+  return {
+    requested_skill: requestedSkill,
+    requested_reference: requestedReference,
+    skill_activated_successfully: skillActivatedSuccessfully,
+    reference_read_successfully: referenceReadSuccessfully,
+    reference_read_before_action: referenceReadBeforeAction,
+  };
 }
 
 function loadTask(taskDirectory: string): ContentTask {
-  return JSON.parse(readFileSync(join(taskDirectory, "task.json"), "utf8")) as ContentTask;
+  const task = JSON.parse(
+    readFileSync(join(taskDirectory, "task.json"), "utf8"),
+  ) as ContentTask;
+  if (
+    task.id !== basename(taskDirectory) ||
+    typeof task.prompt !== "string" ||
+    !Array.isArray(task.grade)
+  ) {
+    throw new Error(join(taskDirectory, "task.json") + ": invalid content task");
+  }
+  const metadata = [task.claim_id, task.risk_class, task.primary_metric];
+  const present = metadata.filter((value) => typeof value === "string" && value !== "").length;
+  if (present !== 0 && present !== metadata.length) {
+    throw new Error(
+      join(taskDirectory, "task.json") +
+        ": claim_id, risk_class, and primary_metric must be provided together",
+    );
+  }
+  return task;
 }
 
 function failedWorkspaceFilter(root: string, sourcePath: string): boolean {
@@ -696,7 +1342,12 @@ function failedWorkspaceFilter(root: string, sourcePath: string): boolean {
     .some((part) => part === "_build" || part === ".claude");
 }
 
-export function runTask(
+interface ContentInvocationResult {
+  result: JsonRecord;
+  budgetCharge: number | null;
+}
+
+function runTaskInvocation(
   taskDirectory: string,
   condition: string,
   model: string,
@@ -704,10 +1355,15 @@ export function runTask(
   cacheDir: string,
   runDir: string,
   runner: CommandRunner = runCommand,
-): JsonRecord {
+  skillSources: SkillSources = { current: SKILLS_SRC },
+  client: AgentClient = "claude-code",
+  maxBudgetUsd?: number,
+  repetition = 0,
+): ContentInvocationResult {
   const task = loadTask(taskDirectory);
   const temporary = mkdtempSync(join(tmpdir(), "mbteval-"));
   let resultArtifact: JsonRecord;
+  let budgetCharge: number | null = client === "claude-code" ? null : 0;
   try {
     const project = join(temporary, "project");
     const workspace = join(taskDirectory, "workspace");
@@ -717,37 +1373,46 @@ export function runTask(
       mkdirSync(project);
     }
     const initialFiles = snapshotFiles(project);
-    const prefix = installCondition(project, condition, cacheDir, runner);
-    const command = [
-      "-p",
-      prefix + task.prompt,
-      "--model",
+    const prefix = installCondition(project, condition, cacheDir, runner, skillSources);
+    const skillsDirectory = join(project, ".claude", "skills");
+    mkdirSync(skillsDirectory, { recursive: true });
+    const claudeConfigDirectory = join(temporary, "claude-config");
+    mkdirSync(claudeConfigDirectory);
+    const invocation = buildAgentInvocation({
+      client,
+      prompt: prefix + task.prompt,
       model,
-      "--output-format",
-      "stream-json",
-      "--verbose",
-      "--max-turns",
-      String(maxTurns),
-      "--strict-mcp-config",
-      "--allowedTools",
-      ALLOWED_TOOLS,
-      "--disallowedTools",
-      DISALLOWED_TOOLS,
-    ];
-    const processResult = runner("claude", command, {
+      maxTurns,
+      skillsDir: skillsDirectory,
+      allowedTools: ALLOWED_TOOLS.split(","),
+      disallowedTools: DISALLOWED_TOOLS.split(","),
+      claudeConfigDir: claudeConfigDirectory,
+      maxBudgetUsd,
+    });
+    const processResult = runner(invocation.command, invocation.args, {
       cwd: project,
       timeout: 1_800_000,
+      env: invocation.environment,
     });
+    if (client === "claude-code") {
+      budgetCharge = claudeBudgetCharge(processResult.stdout);
+    }
 
-    const artifactStem = task.id + "--" + condition;
+    const artifactStem =
+      task.id + "--r" + String(repetition + 1).padStart(2, "0") + "--" + condition;
     const transcriptsDir = join(runDir, "transcripts");
     mkdirSync(transcriptsDir, { recursive: true });
     const transcriptPath = join(transcriptsDir, artifactStem + ".jsonl");
     const stderrPath = join(transcriptsDir, artifactStem + ".stderr.txt");
-    writeFileSync(transcriptPath, processResult.stdout);
-    writeFileSync(stderrPath, processResult.stderr);
+    writeFileSync(
+      transcriptPath,
+      sanitizeAgentStreamForPersistence(processResult.stdout),
+    );
+    writeFileSync(stderrPath, sanitizeAgentStreamForPersistence(processResult.stderr));
 
-    const parsed = parseStream(processResult.stdout);
+    const parsed = parseAgentStream(client, processResult.stdout);
+    if (client === "kimi-code") enrichKimiStream(parsed);
+    const discovery = discoveryEvidence(parsed, task.discovery);
     const checks = task.grade.map((check) => {
       const result = grade(
         check,
@@ -759,17 +1424,51 @@ export function runTask(
       );
       return { check, ok: result.ok, detail: result.detail };
     });
-    const clientOk = processResult.exitCode === 0 && !processResult.timedOut;
+    const forbiddenTools = new Set(DISALLOWED_TOOLS.split(","));
+    const observedForbiddenTools = [
+      ...new Set(
+        parsed.tool_uses.map((use) => use.name).filter((name) => forbiddenTools.has(name)),
+      ),
+    ].sort();
+    checks.push({
+      check: { type: "forbidden_tool_use" },
+      ok: observedForbiddenTools.length === 0,
+      detail:
+        observedForbiddenTools.length === 0
+          ? "forbidden_tool_use -> False"
+          : "forbidden_tool_use -> " + quotedList(observedForbiddenTools),
+    });
+    const clientOk =
+      clientRunSucceeded(
+        client,
+        parsed,
+        processResult.exitCode,
+        processResult.timedOut,
+      ) && parsed.num_turns <= maxTurns;
     checks.push({
       check: { type: "client_exit" },
       ok: clientOk,
       detail:
-        "claude exit " +
+        client +
+        " exit " +
         String(processResult.exitCode) +
         "; timed_out=" +
-        booleanText(processResult.timedOut),
+        booleanText(processResult.timedOut) +
+        "; result_subtype=" +
+        String(parsed.result_subtype) +
+        "; observed_steps=" +
+        String(parsed.num_turns) +
+        "; step_limit=" +
+        String(maxTurns),
     });
     const passed = checks.every((check) => check.ok);
+    const cellAnalysisEligibility = analysisEligibility(
+      client,
+      parsed,
+      processResult.exitCode,
+      processResult.timedOut,
+      maxTurns,
+    );
     let failedWorkspace: string | null = null;
     if (!passed) {
       const failedDirectory = join(runDir, "failed-workspaces", artifactStem);
@@ -782,15 +1481,30 @@ export function runTask(
 
     resultArtifact = {
       id: task.id,
+      claim_id: task.claim_id ?? null,
+      risk_class: task.risk_class ?? null,
+      primary_metric: task.primary_metric ?? null,
       condition,
+      client,
       passed,
+      analysis_eligibility: cellAnalysisEligibility,
       checks,
       activated_skills: parsed.activated_skills,
+      successful_skills: parsed.successful_skills,
+      discovery,
       usage: parsed.usage,
       model_usage: parsed.model_usage,
+      emitted_models: parsed.emitted_models,
+      model_aliases: parsed.model_aliases,
+      providers: parsed.providers,
+      thinking_efforts: parsed.thinking_efforts,
+      init_model: parsed.init_model,
+      session_id: parsed.session_id,
       exit_code: processResult.exitCode,
       timed_out: processResult.timedOut,
+      duration_ms: processResult.durationMs ?? null,
       tool_uses: parsed.tool_uses,
+      tool_results: parsed.tool_results,
       bash_results: parsed.bash_results,
       transcript: relative(runDir, transcriptPath),
       stderr: relative(runDir, stderrPath),
@@ -801,7 +1515,35 @@ export function runTask(
   } finally {
     rmSync(temporary, { recursive: true, force: true });
   }
-  return resultArtifact;
+  return { result: resultArtifact, budgetCharge };
+}
+
+export function runTask(
+  taskDirectory: string,
+  condition: string,
+  model: string,
+  maxTurns: number,
+  cacheDir: string,
+  runDir: string,
+  runner: CommandRunner = runCommand,
+  skillSources: SkillSources = { current: SKILLS_SRC },
+  client: AgentClient = "claude-code",
+  maxBudgetUsd?: number,
+  repetition = 0,
+): JsonRecord {
+  return runTaskInvocation(
+    taskDirectory,
+    condition,
+    model,
+    maxTurns,
+    cacheDir,
+    runDir,
+    runner,
+    skillSources,
+    client,
+    maxBudgetUsd,
+    repetition,
+  ).result;
 }
 
 export function findExecutable(tool: string, environment = process.env): string | undefined {
@@ -838,8 +1580,10 @@ export function preflight(
   locate: (tool: string) => string | undefined = findExecutable,
   platformName: () => string = currentPlatform,
   environment = process.env,
+  client: AgentClient = "claude-code",
 ): JsonRecord {
-  const missing = ["claude", "moon", "node", "git"].filter(
+  const executable = clientExecutable(client);
+  const missing = [executable, "moon", "node", "git"].filter(
     (tool) => locate(tool) === undefined,
   );
   if (missing.length > 0) {
@@ -859,25 +1603,42 @@ export function preflight(
         mismatches.join(","),
     );
   }
-  const modelEnvironment = Object.fromEntries(
-    [
-      "ANTHROPIC_MODEL",
-      "ANTHROPIC_DEFAULT_HAIKU_MODEL",
-      "ANTHROPIC_DEFAULT_SONNET_MODEL",
-      "ANTHROPIC_DEFAULT_OPUS_MODEL",
-      "CLAUDE_CODE_SUBAGENT_MODEL",
-      "CLAUDE_CODE_EFFORT_LEVEL",
-    ]
-      .filter((name) => Boolean(environment[name]))
-      .map((name) => [name, environment[name]]),
-  );
+  const modelEnvironment =
+    client === "claude-code"
+      ? Object.fromEntries(
+          [
+            "ANTHROPIC_MODEL",
+            "ANTHROPIC_DEFAULT_HAIKU_MODEL",
+            "ANTHROPIC_DEFAULT_SONNET_MODEL",
+            "ANTHROPIC_DEFAULT_OPUS_MODEL",
+            "CLAUDE_CODE_SUBAGENT_MODEL",
+            "CLAUDE_CODE_EFFORT_LEVEL",
+          ]
+            .filter((name) => Boolean(environment[name]))
+            .map((name) => [name, environment[name]]),
+        )
+      : {};
+  let providerOrigin: string | null = null;
+  if (client === "claude-code" && environment.ANTHROPIC_BASE_URL) {
+    try {
+      providerOrigin = new URL(environment.ANTHROPIC_BASE_URL).origin;
+    } catch {
+      providerOrigin = "invalid ANTHROPIC_BASE_URL";
+    }
+  }
   return {
-    client: checkedOutput(runner, "claude", ["--version"]),
+    agent_client: client,
+    client: checkedOutput(runner, executable, ["--version"]),
     node_version: checkedOutput(runner, "node", ["--version"]),
     moon_version_all: moonVersion.trim(),
     platform: platformName(),
     official_skills_commit: OFFICIAL_COMMIT,
     model_environment: modelEnvironment,
+    provider_origin: providerOrigin,
+    model_observability:
+      client === "claude-code"
+        ? "stream events plus model usage"
+        : "Kimi session wire whitelist",
   };
 }
 
@@ -907,6 +1668,88 @@ export function ensureRunManifest(
   writeFileSync(manifestPath, JSON.stringify(config, null, 2) + "\n");
 }
 
+function loadContentExperiment(pathValue: string): {
+  experiment: ContentExperiment;
+  disclosure: JsonRecord;
+} {
+  const experimentsRoot = join(HERE, "experiments");
+  const path = resolve(REPO_ROOT, pathValue);
+  const fromRoot = relative(experimentsRoot, path);
+  if (fromRoot === "" || fromRoot.startsWith("..") || isAbsolute(fromRoot)) {
+    throw new Error("--experiment must name a JSON file under evals/experiments/");
+  }
+  const experiment = JSON.parse(readFileSync(path, "utf8")) as ContentExperiment;
+  if (
+    experiment.schema_version !== 2 ||
+    experiment.runner !== "content" ||
+    !/^[a-zA-Z0-9._-]+$/.test(experiment.id) ||
+    (experiment.stage !== "exploratory" && experiment.stage !== "confirmatory") ||
+    (experiment.area !== "language" &&
+      experiment.area !== "toolchain" &&
+      experiment.area !== "integration") ||
+    (experiment.client !== "claude-code" && experiment.client !== "kimi-code") ||
+    !Array.isArray(experiment.conditions) ||
+    experiment.conditions.length < 2 ||
+    !Array.isArray(experiment.task_ids) ||
+    experiment.task_ids.length === 0 ||
+    !Number.isSafeInteger(experiment.repetitions) ||
+    experiment.repetitions < 1 ||
+    !Number.isInteger(experiment.max_turns) ||
+    experiment.max_turns < 1 ||
+    typeof experiment.primary_metric !== "string" ||
+    typeof experiment.stopping_rule !== "string" ||
+    typeof experiment.minimum_valuable_difference !== "number" ||
+    experiment.minimum_valuable_difference <= 0 ||
+    experiment.minimum_valuable_difference > 1
+  ) {
+    throw new Error(pathValue + ": invalid content experiment manifest");
+  }
+  if (experiment.repetitions > MAX_EVAL_REPETITIONS) {
+    throw new Error(
+      `${pathValue}: repetitions must be 1 or ${MAX_EVAL_REPETITIONS}; historical K3 manifests are evidence only`,
+    );
+  }
+  if (new Set(experiment.conditions).size !== experiment.conditions.length) {
+    throw new Error(pathValue + ": duplicate experiment conditions");
+  }
+  if (new Set(experiment.task_ids).size !== experiment.task_ids.length) {
+    throw new Error(pathValue + ": duplicate experiment task ids");
+  }
+  if (experiment.task_groups !== undefined) {
+    const entries = Object.entries(experiment.task_groups);
+    if (
+      entries.length === 0 ||
+      entries.some(
+        ([name, ids]) =>
+          !/^[a-zA-Z0-9._-]+$/.test(name) ||
+          !Array.isArray(ids) ||
+          ids.length === 0 ||
+          ids.some((id) => typeof id !== "string"),
+      )
+    ) {
+      throw new Error(pathValue + ": invalid experiment task_groups");
+    }
+    const grouped = entries.flatMap(([, ids]) => ids);
+    if (
+      new Set(grouped).size !== grouped.length ||
+      grouped.length !== experiment.task_ids.length ||
+      [...grouped].sort().join("\n") !== [...experiment.task_ids].sort().join("\n")
+    ) {
+      throw new Error(
+        pathValue + ": task_groups must partition task_ids exactly once",
+      );
+    }
+  }
+  return {
+    experiment,
+    disclosure: {
+      path: relative(REPO_ROOT, path),
+      sha256: fileDigest(path),
+      manifest: experiment,
+    },
+  };
+}
+
 function parseCli(argv: string[]): { options?: CliOptions; exitCode?: number } {
   if (argv.includes("--help") || argv.includes("-h")) {
     console.log(DESCRIPTION + "\n\n" + USAGE);
@@ -918,10 +1761,14 @@ function parseCli(argv: string[]): { options?: CliOptions; exitCode?: number } {
       args: argv,
       options: {
         area: { type: "string" },
+        client: { type: "string", default: "claude-code" },
         condition: { type: "string", multiple: true },
+        experiment: { type: "string" },
         ids: { type: "string" },
-        model: { type: "string", default: "claude-haiku-4-5-20251001" },
+        model: { type: "string" },
         "max-turns": { type: "string", default: "50" },
+        "paid-budget-usd": { type: "string" },
+        repetitions: { type: "string", default: "1" },
         "run-name": { type: "string" },
         resume: { type: "boolean", default: false },
         "dry-run": { type: "boolean", default: false },
@@ -933,6 +1780,64 @@ function parseCli(argv: string[]): { options?: CliOptions; exitCode?: number } {
     console.error(USAGE);
     console.error("error: " + (error as Error).message);
     return { exitCode: 2 };
+  }
+  if (typeof parsed.values.experiment === "string") {
+    const conflicting = [
+      "--area",
+      "--client",
+      "--condition",
+      "--ids",
+      "--max-turns",
+      "--model",
+      "--repetitions",
+    ].filter((flag) => argv.includes(flag));
+    if (conflicting.length > 0) {
+      console.error(USAGE);
+      console.error(
+        "error: --experiment cannot be combined with " + conflicting.join(", "),
+      );
+      return { exitCode: 2 };
+    }
+    try {
+      const loaded = loadContentExperiment(parsed.values.experiment);
+      const experiment = loaded.experiment;
+      const runNameValue = parsed.values["run-name"];
+      const runName = typeof runNameValue === "string" ? runNameValue : experiment.id;
+      if (!/^[a-zA-Z0-9._-]+$/.test(runName)) {
+        throw new Error(
+          "--run-name may contain only letters, digits, dot, underscore, and hyphen",
+        );
+      }
+      const paidBudgetValue = parsed.values["paid-budget-usd"];
+      const paidBudgetUsd =
+        typeof paidBudgetValue === "string" ? Number(paidBudgetValue) : undefined;
+      if (
+        paidBudgetUsd !== undefined &&
+        (!Number.isFinite(paidBudgetUsd) || paidBudgetUsd <= 0)
+      ) {
+        throw new Error("--paid-budget-usd must be a positive number");
+      }
+      return {
+        options: {
+          area: experiment.area,
+          client: experiment.client,
+          conditions: experiment.conditions,
+          ids: experiment.task_ids.join(","),
+          model: experiment.model,
+          maxTurns: experiment.max_turns,
+          paidBudgetUsd,
+          repetitions: experiment.repetitions,
+          runName,
+          resume: parsed.values.resume === true,
+          dryRun: parsed.values["dry-run"] === true,
+          experiment: loaded.disclosure,
+        },
+      };
+    } catch (error) {
+      console.error(USAGE);
+      console.error("error: " + (error as Error).message);
+      return { exitCode: 2 };
+    }
   }
   const area = parsed.values.area;
   if (area !== "language" && area !== "toolchain" && area !== "integration") {
@@ -951,14 +1856,47 @@ function parseCli(argv: string[]): { options?: CliOptions; exitCode?: number } {
     return { exitCode: 2 };
   }
   const conditions = conditionsValue as string[];
+  const clientValue = parsed.values.client;
+  if (clientValue !== "claude-code" && clientValue !== "kimi-code") {
+    console.error(USAGE);
+    console.error("error: --client must be claude-code or kimi-code");
+    return { exitCode: 2 };
+  }
   const maxTurnsValue = parsed.values["max-turns"];
   const maxTurns = Number.parseInt(
     typeof maxTurnsValue === "string" ? maxTurnsValue : "",
     10,
   );
-  if (!Number.isInteger(maxTurns)) {
+  if (!Number.isInteger(maxTurns) || maxTurns < 1) {
     console.error(USAGE);
-    console.error("error: --max-turns must be an integer");
+    console.error("error: --max-turns must be a positive integer");
+    return { exitCode: 2 };
+  }
+  const repetitionsValue = parsed.values.repetitions;
+  const repetitions = Number.parseInt(
+    typeof repetitionsValue === "string" ? repetitionsValue : "",
+    10,
+  );
+  if (
+    !Number.isSafeInteger(repetitions) ||
+    repetitions < 1 ||
+    repetitions > MAX_EVAL_REPETITIONS
+  ) {
+    console.error(USAGE);
+    console.error(
+      `error: --repetitions must be 1 or ${MAX_EVAL_REPETITIONS}`,
+    );
+    return { exitCode: 2 };
+  }
+  const paidBudgetValue = parsed.values["paid-budget-usd"];
+  const paidBudgetUsd =
+    typeof paidBudgetValue === "string" ? Number(paidBudgetValue) : undefined;
+  if (
+    paidBudgetUsd !== undefined &&
+    (!Number.isFinite(paidBudgetUsd) || paidBudgetUsd <= 0)
+  ) {
+    console.error(USAGE);
+    console.error("error: --paid-budget-usd must be a positive number");
     return { exitCode: 2 };
   }
   const ids = parsed.values.ids;
@@ -969,10 +1907,18 @@ function parseCli(argv: string[]): { options?: CliOptions; exitCode?: number } {
   return {
     options: {
       area,
+      client: clientValue,
       conditions,
       ids: typeof ids === "string" ? ids : undefined,
-      model: typeof model === "string" ? model : "claude-haiku-4-5-20251001",
+      model:
+        typeof model === "string"
+          ? model
+          : clientValue === "kimi-code"
+            ? "kimi-code/k3"
+            : "haiku",
       maxTurns,
+      paidBudgetUsd,
+      repetitions,
       runName: typeof runName === "string" ? runName : undefined,
       resume: typeof resume === "boolean" ? resume : false,
       dryRun: typeof dryRun === "boolean" ? dryRun : false,
@@ -986,6 +1932,9 @@ export function main(argv = process.argv.slice(2)): number {
     return cli.exitCode;
   }
   const options = cli.options as CliOptions;
+  if (new Set(options.conditions).size !== options.conditions.length) {
+    throw new Error("duplicate --condition values are not allowed");
+  }
   const unknownConditions = [...new Set(options.conditions)]
     .filter((condition) => !VALID_CONDITIONS.has(condition))
     .sort();
@@ -1002,24 +1951,85 @@ export function main(argv = process.argv.slice(2)): number {
   if (options.ids !== undefined) {
     const wanted = new Set(options.ids.split(","));
     taskDirectories = taskDirectories.filter((directory) => wanted.has(basename(directory)));
+    const found = new Set(taskDirectories.map((directory) => basename(directory)));
+    const missing = [...wanted].filter((id) => !found.has(id)).sort();
+    if (missing.length > 0) {
+      throw new Error("unknown task id(s): " + missing.join(", "));
+    }
   }
   if (taskDirectories.length === 0) {
     throw new Error("no tasks selected");
   }
+  const taskDefinitions = Object.fromEntries(
+    taskDirectories.map((directory) => {
+      const task = loadTask(directory);
+      return [task.id, task];
+    }),
+  );
+  if (
+    options.experiment !== undefined &&
+    Object.values(taskDefinitions).some(
+      (task) =>
+        task.claim_id === undefined ||
+        task.risk_class === undefined ||
+        task.primary_metric === undefined,
+    )
+  ) {
+    throw new Error(
+      "experiment tasks require claim_id, risk_class, and primary_metric",
+    );
+  }
   if (options.dryRun) {
-    for (const directory of taskDirectories) {
-      loadTask(directory);
-    }
     console.log(String(taskDirectories.length) + " task(s) valid");
     return 0;
   }
+  if (
+    options.client === "claude-code" &&
+    options.paidBudgetUsd === undefined &&
+    !options.resume
+  ) {
+    throw new Error("Claude Code runs require an explicit --paid-budget-usd total budget");
+  }
+  if (options.client === "kimi-code" && options.paidBudgetUsd !== undefined) {
+    throw new Error("Kimi subscription runs do not accept --paid-budget-usd");
+  }
 
-  const environment = preflight();
-  const runName = options.runName ?? options.model.replaceAll("/", "-");
+  const environment = preflight(
+    runCommand,
+    findExecutable,
+    currentPlatform,
+    process.env,
+    options.client,
+  );
+  const isolation =
+    options.client === "claude-code"
+      ? catalogIsolation()
+      : {
+          mechanism: "kimi --skills-dir replaces automatic skill discovery",
+          global_skill_scan_required: false,
+        };
+  const runName =
+    options.runName ?? options.client + "-" + options.model.replaceAll("/", "-");
   const runDirectory = join(HERE, options.area, "runs", runName);
   mkdirSync(runDirectory, { recursive: true });
   const cacheDirectory = join(runDirectory, "_cache");
   mkdirSync(cacheDirectory, { recursive: true });
+  const needsSkillSnapshots = options.conditions.some(
+    (condition) =>
+      condition === "baseline" ||
+      condition === "ours" ||
+      condition.startsWith("ours-") ||
+      condition.startsWith("forced-"),
+  );
+  const preparedSkills = needsSkillSnapshots
+    ? prepareSkillSnapshots(cacheDirectory)
+    : undefined;
+  const skillSources = preparedSkills?.sources ?? { current: SKILLS_SRC };
+  const derivedConditionSnapshots = prepareDerivedConditionSnapshots(
+    cacheDirectory,
+    options.conditions,
+    skillSources,
+  );
 
   const resultsPath = join(runDirectory, "results.jsonl");
   if (existsSync(resultsPath) && !options.resume) {
@@ -1028,10 +2038,37 @@ export function main(argv = process.argv.slice(2)): number {
     );
   }
   const runConfig = {
+    runner: "content-paired-v4",
     area: options.area,
+    client: options.client,
+    conditions: options.conditions,
+    repetitions: options.repetitions,
+    condition_order: "AB/BA counterbalanced by task and repetition",
+    tasks: Object.fromEntries(
+      taskDirectories.map((directory) => [basename(directory), snapshotFiles(directory)]),
+    ),
+    task_metadata: Object.fromEntries(
+      Object.entries(taskDefinitions).map(([id, task]) => [
+        id,
+        {
+          claim_id: task.claim_id ?? null,
+          risk_class: task.risk_class ?? null,
+          primary_metric: task.primary_metric ?? null,
+        },
+      ]),
+    ),
     model: options.model,
     max_turns: options.maxTurns,
+    experiment: options.experiment ?? null,
     environment,
+    catalog_isolation: isolation,
+    skill_snapshots: preparedSkills?.manifest ?? null,
+    derived_condition_snapshots: derivedConditionSnapshots,
+    runner_files: {
+      "evals/run_content.ts": fileDigest(fileURLToPath(import.meta.url)),
+      "evals/lib/agent_cli.ts": fileDigest(join(HERE, "lib", "agent_cli.ts")),
+      "evals/lib/paired_stats.ts": fileDigest(join(HERE, "lib", "paired_stats.ts")),
+    },
   };
   ensureRunManifest(runDirectory, runConfig, existsSync(resultsPath));
 
@@ -1043,31 +2080,80 @@ export function main(argv = process.argv.slice(2)): number {
     : [];
   const completed = new Set(
     previousResults.map((result) =>
-      JSON.stringify([stringValue(result.id), stringValue(result.condition)]),
+      JSON.stringify([
+        stringValue(result.id),
+        Number(result.repetition ?? 0),
+        stringValue(result.condition),
+      ]),
     ),
   );
+  if (
+    options.client === "claude-code" &&
+    options.paidBudgetUsd === undefined &&
+    completed.size <
+      taskDirectories.length * options.conditions.length * options.repetitions
+  ) {
+    throw new Error(
+      "Claude Code needs --paid-budget-usd when unfinished cells require model calls",
+    );
+  }
   const results = [...previousResults];
-  for (const taskDirectory of taskDirectories) {
-    for (const condition of options.conditions) {
-      const completedKey = JSON.stringify([basename(taskDirectory), condition]);
-      if (completed.has(completedKey)) {
-        console.log(
-          basename(taskDirectory) + " [" + condition + "] ... already complete",
+  const budgetGuard = new ApiBudgetGuard(options.paidBudgetUsd);
+  for (let repetition = 0; repetition < options.repetitions; repetition += 1) {
+    for (const [taskIndex, taskDirectory] of taskDirectories.entries()) {
+      const orderedConditions =
+        (taskIndex + repetition) % 2 === 0
+          ? options.conditions
+          : [...options.conditions].reverse();
+      for (const [orderIndex, condition] of orderedConditions.entries()) {
+        const completedKey = JSON.stringify([
+          basename(taskDirectory),
+          repetition,
+          condition,
+        ]);
+        const label =
+          basename(taskDirectory) +
+          " [r" +
+          String(repetition + 1) +
+          ", " +
+          condition +
+          "]";
+        if (completed.has(completedKey)) {
+          console.log(label + " ... already complete");
+          continue;
+        }
+        const remainingBudget = budgetGuard.remaining();
+        if (remainingBudget !== undefined && remainingBudget <= 0) {
+          throw new Error(
+            "paid experiment budget exhausted before " +
+              label +
+              "; resume with a new invocation budget to continue remaining cells",
+          );
+        }
+        console.log(label + " ...");
+        const invocationResult = runTaskInvocation(
+          taskDirectory,
+          condition,
+          options.model,
+          options.maxTurns,
+          cacheDirectory,
+          runDirectory,
+          runCommand,
+          skillSources,
+          options.client,
+          remainingBudget,
+          repetition,
         );
-        continue;
+        const result = invocationResult.result;
+        result.repetition = repetition;
+        result.pair_id = basename(taskDirectory) + "--r" + String(repetition + 1);
+        result.condition_order = orderedConditions;
+        result.order_index = orderIndex;
+        results.push(result);
+        appendFileSync(resultsPath, JSON.stringify(result) + "\n");
+        budgetGuard.recordCharge(invocationResult.budgetCharge);
+        console.log("    " + (result.passed ? "PASS" : "FAIL"));
       }
-      console.log(basename(taskDirectory) + " [" + condition + "] ...");
-      const result = runTask(
-        taskDirectory,
-        condition,
-        options.model,
-        options.maxTurns,
-        cacheDirectory,
-        runDirectory,
-      );
-      results.push(result);
-      appendFileSync(resultsPath, JSON.stringify(result) + "\n");
-      console.log("    " + (result.passed ? "PASS" : "FAIL"));
     }
   }
 
@@ -1083,6 +2169,15 @@ export function main(argv = process.argv.slice(2)): number {
       results.flatMap((result) => Object.keys(asRecord(result.model_usage))),
     ),
   ].sort();
+  const emittedModels = [
+    ...new Set(
+      results.flatMap((result) =>
+        Array.isArray(result.emitted_models)
+          ? result.emitted_models.filter((model): model is string => typeof model === "string")
+          : [],
+      ),
+    ),
+  ].sort();
   const passRateByCondition = Object.fromEntries(
     [...byCondition.entries()]
       .sort(([left], [right]) => left.localeCompare(right))
@@ -1093,18 +2188,97 @@ export function main(argv = process.argv.slice(2)): number {
           String(items.length),
       ]),
   );
-  const totalCost = results.reduce((total, result) => {
-    const usage = asRecord(result.usage);
-    return total + (typeof usage.total_cost_usd === "number" ? usage.total_cost_usd : 0);
-  }, 0);
+  const tokenUsage = aggregateTokenUsage(results.map((result) => asRecord(result.usage)));
+  const durationMs = results.reduce(
+    (total, result) =>
+      total + (typeof result.duration_ms === "number" ? result.duration_ms : 0),
+    0,
+  );
+  const discoveryByCondition = Object.fromEntries(
+    [...byCondition.entries()]
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([condition, items]) => {
+        const evidence = items
+          .map((item) => asRecord(item.discovery))
+          .filter(
+            (item) =>
+              item.requested_skill !== null || item.requested_reference !== null,
+          );
+        const rate = (field: string): string => {
+          const applicable = evidence.filter((item) => typeof item[field] === "boolean");
+          return (
+            String(applicable.filter((item) => item[field] === true).length) +
+            "/" +
+            String(applicable.length)
+          );
+        };
+        return [
+          condition,
+          {
+            skill_activation: rate("skill_activated_successfully"),
+            reference_read: rate("reference_read_successfully"),
+            reference_before_action: rate("reference_read_before_action"),
+          },
+        ];
+      }),
+  );
+  const pairableResults = results.map((result): PairableResult => ({
+    id: stringValue(result.id),
+    condition: stringValue(result.condition),
+    repetition: typeof result.repetition === "number" ? result.repetition : 0,
+    passed: result.passed === true,
+    analysis_eligibility: resultAnalysisEligibility(result),
+    emitted_models: observedStrings(result.emitted_models),
+    model_aliases: observedStrings(result.model_aliases),
+    providers: observedStrings(result.providers),
+    thinking_efforts: observedStrings(result.thinking_efforts),
+    duration_ms: typeof result.duration_ms === "number" ? result.duration_ms : null,
+    usage: asRecord(result.usage),
+  }));
+  const pairedComparisons = (taskIds?: Set<string>): ReturnType<typeof pairedSummary>[] =>
+    options.conditions.flatMap((left, leftIndex) =>
+      options.conditions.slice(leftIndex + 1).map((right) =>
+        pairedSummary(
+          taskIds === undefined
+            ? pairableResults
+            : pairableResults.filter((result) => taskIds.has(result.id)),
+          left,
+          right,
+        ),
+      ),
+    );
+  const experimentManifest = asRecord(asRecord(options.experiment).manifest);
+  const taskGroups = asRecord(experimentManifest.task_groups);
   const summary = {
+    runner: "content-paired-v4",
     area: options.area,
+    client: options.client,
     model: options.model,
     max_turns: options.maxTurns,
+    repetitions: options.repetitions,
     environment,
     resolved_models: resolvedModels,
+    emitted_models: emittedModels,
     pass_rate_by_condition: passRateByCondition,
-    total_cost_usd: Number(totalCost.toFixed(4)),
+    discovery_by_condition: discoveryByCondition,
+    paired_comparisons: pairedComparisons(),
+    paired_comparisons_by_task_group: Object.fromEntries(
+      Object.entries(taskGroups).map(([name, ids]) => [
+        name,
+        pairedComparisons(new Set(stringArray(ids))),
+      ]),
+    ),
+    usage: tokenUsage,
+    duration_ms: durationMs,
+    errors: results
+      .filter((result) => result.exit_code !== 0 || result.timed_out === true)
+      .map((result) => ({
+        id: stringValue(result.id),
+        repetition: typeof result.repetition === "number" ? result.repetition : 0,
+        condition: stringValue(result.condition),
+        exit_code: result.exit_code ?? null,
+        timed_out: result.timed_out === true,
+      })),
   };
   writeFileSync(join(runDirectory, "summary.json"), JSON.stringify(summary, null, 2) + "\n");
   console.log(JSON.stringify(summary, null, 2));

@@ -16,7 +16,11 @@ import {
   loadExistingResults,
   loadPrompts,
   materializePrompt,
+  parseCliArgs,
   parseActivationStream,
+  prepareActivationInputs,
+  scoreActivation,
+  stderrTailForPersistence,
   summarize,
   type ActivationPrompt,
   type ActivationResult,
@@ -30,6 +34,15 @@ const ENVIRONMENT = {
   model_environment: {},
 };
 
+it("limits activation repetitions to two", () => {
+  expect(
+    parseCliArgs(["--client", "kimi-code", "--repetitions", "2", "--dry-run"]).repetitions,
+  ).toBe(2);
+  expect(() => parseCliArgs(["--client", "kimi-code", "--repetitions", "3", "--dry-run"])).toThrow(
+    "--repetitions must be 1 or 2",
+  );
+});
+
 function result(overrides: Partial<ActivationResult> = {}): ActivationResult {
   return {
     id: "prompt-1",
@@ -39,7 +52,7 @@ function result(overrides: Partial<ActivationResult> = {}): ActivationResult {
     activated_all: ["moonbit-language"],
     expected: { required: ["moonbit-language"], forbidden: ["moonbit-toolchain"] },
     verdict: { recall_ok: true, no_forbidden: true, exact: true },
-    usage: { total_cost_usd: 0.1 },
+    usage: { input_tokens: 10, output_tokens: 2 },
     model_usage: { "claude-haiku-4-5-20251001": { inputTokens: 10 } },
     num_turns: 1,
     exit_code: 0,
@@ -49,6 +62,7 @@ function result(overrides: Partial<ActivationResult> = {}): ActivationResult {
     stderr: "transcripts/prompt-1.stderr.txt",
     final_text: "done",
     tool_uses: [],
+    duration_ms: 25,
     ...overrides,
   };
 }
@@ -123,6 +137,16 @@ describe("activation eval input", () => {
 });
 
 describe("activation eval transcript and metrics", () => {
+  it("sanitizes the stderr tail copied into serialized results", () => {
+    expect(
+      stderrTailForPersistence(
+        1,
+        "client failed after --max-budget-usd 0.25; total_cost_usd=0.10; $0.30",
+      ),
+    ).not.toMatch(/max[-_]budget[-_]usd|total[-_]cost[-_]usd|\$0\.30|0\.25/);
+    expect(stderrTailForPersistence(0, "ignored --max-budget-usd 0.25")).toBe("");
+  });
+
   it("deduplicates Skill calls and discloses the resolved model", () => {
     const parsed = parseActivationStream(
       [
@@ -130,9 +154,34 @@ describe("activation eval transcript and metrics", () => {
           type: "assistant",
           message: {
             content: [
-              { type: "tool_use", name: "Skill", input: { skill: "moonbit-language" } },
-              { type: "tool_use", name: "Skill", input: { skill: "moonbit-language" } },
-              { type: "tool_use", name: "Skill", input: { skill: "unrelated" } },
+              {
+                type: "tool_use",
+                id: "skill-1",
+                name: "Skill",
+                input: { skill: "moonbit-language" },
+              },
+              {
+                type: "tool_use",
+                id: "skill-2",
+                name: "Skill",
+                input: { skill: "moonbit-language" },
+              },
+              {
+                type: "tool_use",
+                id: "skill-3",
+                name: "Skill",
+                input: { skill: "unrelated" },
+              },
+            ],
+          },
+        }),
+        JSON.stringify({
+          type: "user",
+          message: {
+            content: [
+              { type: "tool_result", tool_use_id: "skill-1", content: "loaded" },
+              { type: "tool_result", tool_use_id: "skill-2", content: "loaded" },
+              { type: "tool_result", tool_use_id: "skill-3", content: "loaded" },
             ],
           },
         }),
@@ -148,10 +197,103 @@ describe("activation eval transcript and metrics", () => {
       ].join("\n"),
     );
     expect(parsed.activatedAll).toEqual(["moonbit-language", "unrelated"]);
+    expect(parsed.activatedSucceeded).toEqual(["moonbit-language", "unrelated"]);
+    expect(parsed.activatedFailed).toEqual([]);
     expect(parsed.finalText).toBe("finished");
     expect(parsed.numTurns).toBe(2);
-    expect(parsed.usage.total_cost_usd).toBe(0.125);
+    expect(parsed.usage).toEqual({ input_tokens: 10, output_tokens: 4, num_turns: 2 });
     expect(Object.keys(parsed.modelUsage)).toEqual(["claude-haiku-4-5-20251001"]);
+  });
+
+  it("does not credit a failed Skill tool result", () => {
+    const parsed = parseActivationStream(
+      [
+        JSON.stringify({
+          type: "assistant",
+          message: {
+            content: [
+              {
+                type: "tool_use",
+                id: "skill-failed",
+                name: "Skill",
+                input: { skill: "moonbit-language" },
+              },
+            ],
+          },
+        }),
+        JSON.stringify({
+          type: "user",
+          message: {
+            content: [
+              {
+                type: "tool_result",
+                tool_use_id: "skill-failed",
+                is_error: true,
+                content: "not found",
+              },
+            ],
+          },
+        }),
+      ].join("\n"),
+    );
+    const decision = scoreActivation(
+      parsed,
+      { required: ["moonbit-language"], forbidden: ["moonbit-toolchain"] },
+      "routing",
+    );
+    expect(decision).toMatchObject({
+      activated: [],
+      activatedAttempted: ["moonbit-language"],
+      activatedSucceeded: [],
+      activatedFailed: ["moonbit-language"],
+      activatedBeforeDomainAction: [],
+      verdict: {
+        recall_ok: false,
+        timely_recall_ok: false,
+        no_forbidden: true,
+        exact: false,
+      },
+    });
+  });
+
+  it("does not count a same-turn Skill success as timely before a domain action", () => {
+    const parsed = parseActivationStream(
+      [
+        JSON.stringify({
+          type: "assistant",
+          message: {
+            content: [
+              {
+                type: "tool_use",
+                id: "skill-parallel",
+                name: "Skill",
+                input: { skill: "moonbit-language" },
+              },
+              {
+                type: "tool_use",
+                id: "bash-parallel",
+                name: "Bash",
+                input: { command: "moon check" },
+              },
+            ],
+          },
+        }),
+        JSON.stringify({
+          type: "user",
+          message: {
+            content: [
+              { type: "tool_result", tool_use_id: "skill-parallel", content: "loaded" },
+              { type: "tool_result", tool_use_id: "bash-parallel", content: "ok" },
+            ],
+          },
+        }),
+      ].join("\n"),
+    );
+    const decision = scoreActivation(parsed, { required: ["moonbit-language"] }, "end-to-end");
+    expect(decision.activated).toEqual(["moonbit-language"]);
+    expect(decision.activatedBeforeDomainAction).toEqual([]);
+    expect(decision.verdict.recall_ok).toBe(true);
+    expect(decision.verdict.timely_recall_ok).toBe(false);
   });
 
   it("keeps the original routing metrics and adds run/model disclosure", () => {
@@ -164,7 +306,7 @@ describe("activation eval transcript and metrics", () => {
         activated: ["moonbit-language"],
         expected: { required: ["moonbit-language", "moonbit-toolchain"], forbidden: [] },
         verdict: { recall_ok: false, no_forbidden: true, exact: false },
-        usage: { total_cost_usd: 0.2 },
+        usage: { input_tokens: 20, output_tokens: 4 },
       }),
       result({
         id: "negative-false-positive",
@@ -173,7 +315,7 @@ describe("activation eval transcript and metrics", () => {
         activated: ["moonbit-toolchain"],
         expected: { required: [], forbidden: ["moonbit-language", "moonbit-toolchain"] },
         verdict: { recall_ok: true, no_forbidden: false, exact: false },
-        usage: { total_cost_usd: 0.3 },
+        usage: { input_tokens: 30, output_tokens: 6 },
       }),
     ];
     const summary = summarize(results, "requested-model", 12, ENVIRONMENT);
@@ -188,11 +330,71 @@ describe("activation eval transcript and metrics", () => {
     });
     expect(summary.resolved_models).toEqual(["claude-haiku-4-5-20251001"]);
     expect(summary.environment).toEqual(ENVIRONMENT);
-    expect(summary.total_cost_usd).toBe(0.6);
+    expect(summary.usage).toEqual({
+      input_tokens: 60,
+      output_tokens: 12,
+      total_tokens: 72,
+    });
+    expect(summary.duration_ms).toBe(75);
   });
 });
 
 describe("activation eval resume artifacts", () => {
+  it("freezes selected prompts and installed skills and rejects resume drift", () => {
+    const temporary = mkdtempSync(join(tmpdir(), "activation-freeze-test-"));
+    try {
+      const runDirectory = join(temporary, "run");
+      const skillsSource = join(temporary, "skills");
+      const languageSkill = join(skillsSource, "moonbit-language");
+      mkdirSync(join(languageSkill, "references"), { recursive: true });
+      writeFileSync(
+        join(languageSkill, "SKILL.md"),
+        "---\nname: moonbit-language\ndescription: frozen\n---\n",
+      );
+      writeFileSync(join(languageSkill, "references", "syntax.md"), "original\n");
+      mkdirSync(runDirectory);
+      const prompts: ActivationPrompt[] = [
+        {
+          id: "language-question",
+          category: "language-only",
+          prompt: "Explain this MoonBit syntax.",
+          expected: { required: ["moonbit-language"] },
+        },
+      ];
+      const prepared = prepareActivationInputs(runDirectory, prompts, skillsSource);
+      expect(prepared.manifest.prompts.ids).toEqual(["language-question"]);
+      expect(Object.keys(prepared.manifest.skills.files)).toEqual([
+        "moonbit-language/SKILL.md",
+        "moonbit-language/references/syntax.md",
+      ]);
+
+      writeFileSync(join(languageSkill, "references", "syntax.md"), "changed live source\n");
+      const project = join(temporary, "project");
+      mkdirSync(project);
+      materializePrompt(project, prepared.prompts[0], prepared.skillsDirectory);
+      expect(
+        readFileSync(
+          join(project, ".claude", "skills", "moonbit-language", "references", "syntax.md"),
+          "utf8",
+        ),
+      ).toBe("original\n");
+      expect(() => prepareActivationInputs(runDirectory, prompts, skillsSource)).toThrow(
+        "installed skills differ",
+      );
+
+      writeFileSync(join(languageSkill, "references", "syntax.md"), "original\n");
+      expect(() =>
+        prepareActivationInputs(
+          runDirectory,
+          [{ ...prompts[0], prompt: "Explain the changed syntax." }],
+          skillsSource,
+        ),
+      ).toThrow("selected prompts differ");
+    } finally {
+      rmSync(temporary, { force: true, recursive: true });
+    }
+  });
+
   it("pins run configuration before accepting resumable results", () => {
     const temporary = mkdtempSync(join(tmpdir(), "activation-resume-test-"));
     try {
@@ -201,6 +403,7 @@ describe("activation eval resume artifacts", () => {
         model: "requested-model",
         max_turns: 12,
         environment: ENVIRONMENT,
+        runner_files: { "evals/activation/run_activation.ts": "runner-hash" },
       };
       ensureRunManifest(temporary, config, false);
       expect(JSON.parse(readFileSync(join(temporary, "run.json"), "utf8"))).toEqual(config);
@@ -208,6 +411,16 @@ describe("activation eval resume artifacts", () => {
       expect(() => ensureRunManifest(temporary, { ...config, max_turns: 13 }, true)).toThrow(
         "run configuration differs",
       );
+      expect(() =>
+        ensureRunManifest(
+          temporary,
+          {
+            ...config,
+            runner_files: { "evals/activation/run_activation.ts": "changed-runner-hash" },
+          },
+          true,
+        ),
+      ).toThrow("run configuration differs");
 
       const resultsPath = join(temporary, "results.jsonl");
       writeFileSync(resultsPath, `${JSON.stringify(result())}\n`);
@@ -256,15 +469,21 @@ if (process.argv.includes("--version")) {
 }
 console.log(JSON.stringify({
   type: "assistant",
-  message: { content: [{ type: "tool_use", name: "Skill", input: { skill: "moonbit-language" } }] },
+  message: { content: [{ type: "tool_use", id: "skill-1", name: "Skill", input: { skill: "moonbit-language" } }] },
+}));
+console.log(JSON.stringify({
+  type: "user",
+  message: { content: [{ type: "tool_result", tool_use_id: "skill-1", content: "loaded" }] },
 }));
 console.log(JSON.stringify({
   type: "result",
+  subtype: "success",
+  is_error: false,
   result: "done",
   num_turns: 1,
   total_cost_usd: 0.01,
   usage: { input_tokens: 1, output_tokens: 1 },
-  modelUsage: { "resolved-test-model": { inputTokens: 1 } },
+  modelUsage: { "resolved-test-model": { inputTokens: 1, costUSD: 0.01 } },
 }));
 `,
       );
@@ -275,6 +494,8 @@ console.log(JSON.stringify({
         "lang-extend-ordinary",
         "--model",
         "requested-test-model",
+        "--paid-budget-usd",
+        "1",
         "--run-name",
         runName,
       ];
@@ -293,12 +514,41 @@ console.log(JSON.stringify({
         readFileSync(join(runDirectory, "results.jsonl"), "utf8").trim().split("\n"),
       ).toHaveLength(1);
       expect(JSON.parse(readFileSync(join(runDirectory, "summary.json"), "utf8"))).toMatchObject({
+        runner: "activation-v4",
+        measurement: "prompted-routing-classification",
         model: "requested-test-model",
         resolved_models: ["resolved-test-model"],
         n: 1,
         routing_exact_accuracy: { "language-only": 1 },
       });
-      expect(existsSync(join(runDirectory, "transcripts/lang-extend-ordinary.jsonl"))).toBe(true);
+      expect(JSON.parse(readFileSync(join(runDirectory, "run.json"), "utf8"))).toMatchObject({
+        runner: "activation-v4",
+        measurement: "prompted-routing-classification",
+        input_snapshot: {
+          prompts: { ids: ["lang-extend-ordinary"] },
+          skills: { files: expect.any(Object) },
+        },
+        runner_files: {
+          "evals/activation/run_activation.ts": expect.any(String),
+          "evals/lib/agent_cli.ts": expect.any(String),
+        },
+      });
+      expect(existsSync(join(runDirectory, "transcripts/lang-extend-ordinary--r01.jsonl"))).toBe(
+        true,
+      );
+      for (const artifact of [
+        "results.jsonl",
+        "summary.json",
+        "run.json",
+        "transcripts/lang-extend-ordinary--r01.jsonl",
+        "transcripts/lang-extend-ordinary--r01.stderr.txt",
+      ]) {
+        const persisted = readFileSync(join(runDirectory, artifact), "utf8");
+        expect(persisted).not.toMatch(/total_cost_usd|costUSD|paid_budget_usd|"billing"/);
+      }
+      expect(readFileSync(join(runDirectory, "results.jsonl"), "utf8")).toContain(
+        '"input_tokens":1',
+      );
 
       const rejected = spawnSync(process.execPath, command, {
         cwd: REPO_ROOT,
@@ -318,6 +568,35 @@ console.log(JSON.stringify({
       expect(
         readFileSync(join(runDirectory, "results.jsonl"), "utf8").trim().split("\n"),
       ).toHaveLength(1);
+
+      const budgetIndex = command.indexOf("--paid-budget-usd");
+      const commandWithoutBudget = command.filter(
+        (_, index) => index !== budgetIndex && index !== budgetIndex + 1,
+      );
+      const completedResume = spawnSync(process.execPath, [...commandWithoutBudget, "--resume"], {
+        cwd: REPO_ROOT,
+        encoding: "utf8",
+        env: environment,
+      });
+      expect(completedResume.status, completedResume.stderr).toBe(0);
+      expect(completedResume.stdout).toContain("already complete");
+
+      const frozenSkill = join(
+        runDirectory,
+        "_cache",
+        "activation-inputs",
+        "skills",
+        "moonbit-language",
+        "SKILL.md",
+      );
+      writeFileSync(frozenSkill, `${readFileSync(frozenSkill, "utf8")}\ncache drift\n`);
+      const driftedResume = spawnSync(process.execPath, [...command, "--resume"], {
+        cwd: REPO_ROOT,
+        encoding: "utf8",
+        env: environment,
+      });
+      expect(driftedResume.status).toBe(1);
+      expect(driftedResume.stderr).toContain("installed skills differ");
     } finally {
       rmSync(temporary, { force: true, recursive: true });
       rmSync(runDirectory, { force: true, recursive: true });

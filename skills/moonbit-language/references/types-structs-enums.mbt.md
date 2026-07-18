@@ -2,6 +2,13 @@
 
 Every `mbt check` block in this file is compiled and run by the repository's verification suite (`tooling/run_checked_docs.ts`). Blocks marked `mbt nocheck` show rejected or deprecated forms and are never compiled.
 
+## Official topic map
+
+Search these exact official documentation topic names to route a question into this reference. A listed name is a discoverability route; the verification labels in the surrounding reference still determine whether its claim was executed or is documentation-only.
+
+- Custom data types: Custom Data Types; Struct; Constructing Struct with Shorthand; Struct Update Syntax; Custom constructors; Enum; Constructor with labelled arguments; Constructor with mutable fields; Extensible enum; Tuple Struct; Type alias; Local types
+- Derived traits: Deriving traits; Eq and Compare; Debug; Default; Hash; Arbitrary; FromJson and ToJson; Enum styles; Deriving `Option`; Container arguments; Case arguments; Field arguments
+
 ## Structs
 
 Fields are newline-separated — no commas. `mut` marks a mutable field. Three construction forms: qualified `Pixel::{ ... }` (supports field punning), a plain literal `{ x: 1, ... }` where the expected type is already known, and spread-update `{ ..base, y: 9 }` — the spread comes **first**, not last as in Rust. Mutating a `mut` field goes through any binding; no `let mut` needed.
@@ -28,7 +35,7 @@ test "struct construction: punning, plain literal, spread update" {
 
 ## Derives
 
-The working set is `Eq, Compare, Hash, Debug, ToJson, FromJson, Default, Arbitrary`. There is **no `Clone`** (E4023) — values are GC references, and MoonBit generates no copying machinery. `derive(Show)` still compiles but is deprecated outright (warning 0027); for debugging use `Debug` (`debug_inspect`, `to_repr`) instead. `derive(FromJson)` and `derive(Arbitrary)` work too, but their traits live in `moonbitlang/core/json` and `moonbitlang/core/quickcheck`, and using them without listing those packages in the `moon.pkg` imports is deprecated (warning E0071) — so they stay out of the compiled fence below.
+The working set is `Eq, Compare, Hash, Debug, ToJson, FromJson, Default, Arbitrary`. `Eq` and `Compare` inspect fields in declaration order; enum cases compare in declaration order. `Default` uses every field's default for a struct, but an enum can derive it only when exactly one case has no payload. There is **no `Clone`** (E4023) — values are GC references, and MoonBit generates no copying machinery. `derive(Show)` still compiles but is deprecated outright (warning 0027); for debugging use `Debug` (`debug_inspect`, `to_repr`) instead. `derive(FromJson)` and `derive(Arbitrary)` work too, but their traits live in `moonbitlang/core/json` and `moonbitlang/core/quickcheck`, and using them without listing those packages in the `moon.pkg` imports is deprecated (warning E0071) — so they stay out of the compiled fence below.
 
 ```mbt check
 pub struct ScoreCard { // pub only so every derived impl counts as used
@@ -45,6 +52,43 @@ test "derives: Default and ToJson in action" {
 priv struct P { x : Int } derive(Clone) // WRONG: E4023 — the trait Clone does not exist
 priv struct Q { x : Int } derive(Show)  // DEPRECATED: use derive(Debug) or implement Show manually
 ```
+
+### JSON derive layouts: enum styles and arguments
+
+`FromJson` and `ToJson` accept layout arguments. Select an enum style explicitly: `style="legacy"` produces a tagged object. At the pinned compiler, `style="flat"` produces a string for a payload-free case, `["Case", value]` for a positional payload, and `["Case", { "label": value }]` for labelled payloads. The checked result below is intentionally more precise than the current official prose, whose labelled `flat` example shows the field values flattened directly into the array. An `Option[T]` that is a direct struct field is encoded as `T | undefined`; a nested `Option[T]` uses `[T] | null` so `Some(None)` remains distinguishable from `None`.
+
+Container arguments include `rename_fields`, `rename_cases`, `fields(...)` for a struct, and `cases(...)` for an enum. A Case argument can rename that case and provide its own `fields(...)`; a Field argument can rename that field. A specific case/field rename overrides a container-wide rename rule.
+
+```mbt check
+priv enum TypesJsonStyle {
+  TypesJsonNone
+  TypesJsonUniform(Int)
+  TypesJsonAxes(x~ : Int, y~ : Int)
+} derive(ToJson(style="flat"))
+
+priv enum TypesJsonLegacy {
+  TypesJsonLegacyAxes(x~ : Int, y~ : Int)
+} derive(ToJson(style="legacy"))
+
+priv struct TypesJsonFields {
+  x : Int
+  y : Int
+} derive(ToJson(fields(x(rename="renamedX"))))
+
+test "JSON derive style and field rename" {
+  json_inspect(TypesJsonNone, content="TypesJsonNone")
+  json_inspect(TypesJsonUniform(2), content=["TypesJsonUniform", 2])
+  json_inspect(TypesJsonAxes(x=-1, y=1), content=["TypesJsonAxes", { "x": -1, "y": 1 }])
+  json_inspect(TypesJsonLegacyAxes(x=-1, y=1), content={
+    "$tag": "TypesJsonLegacyAxes",
+    "x": -1,
+    "y": 1,
+  })
+  json_inspect(TypesJsonFields::{ x: 1, y: 2 }, content={ "renamedX": 1, "y": 2 })
+}
+```
+
+**Documented warning, not an executed deprecation diagnostic:** the official [deriving reference](https://docs.moonbitlang.com/en/latest/language/derive.html#fromjson-and-tojson) calls JSON layout arguments unstable and says advanced arguments including `repr`, `case_repr`, `default`, and `rename_all` are deprecated. Use the remaining controls only for coarse layout choices; implement `FromJson` and `ToJson` directly when an exact long-lived wire format matters.
 
 ## Enums
 
@@ -89,6 +133,47 @@ priv enum Chain[T] {
 test "generic enum" {
   let l : Chain[Int] = Link(1, Link(2, End))
   debug_inspect(l, content="Link(1, Link(2, End))")
+}
+```
+
+## Mutable enum fields and extensible enums
+
+Labelled enum payload fields may be mutable: declare `Variant(mut field~ : Type, ...)`. Narrow the enum to that variant and bind the whole constructor with `Pattern as name` before assigning `name.field`.
+
+An `extenum` is an open enum. Its declaring package supplies initial variants, and `extenum Type += { ... }` adds variants. Matches must keep a wildcard because another declaration or package may extend the type. Cross-package extension also depends on package visibility; the `lang-extenum-cross-package` fixture verifies that boundary.
+
+```mbt check
+priv enum TypesMutableTree {
+  TypesEmpty
+  TypesNode(mut value~ : Int, child~ : TypesMutableTree)
+}
+
+priv extenum TypesEvent {
+  TypesStarted
+}
+
+extenum TypesEvent += {
+  TypesStopped(Int)
+}
+
+fn types_describe_event(event : TypesEvent) -> String {
+  match event {
+    TypesStarted => "started"
+    TypesStopped(code) => "stopped \{code}"
+    _ => "unknown"
+  }
+}
+
+test "mutable enum fields and same-package extenum" {
+  let tree : TypesMutableTree = TypesNode(value=1, child=TypesEmpty)
+  guard tree is (TypesNode(_) as node) else {
+    fail("node not found")
+  }
+  node.value = 2
+  assert_eq(node.value, 2)
+  assert_true(node.child is TypesEmpty)
+  assert_eq(types_describe_event(TypesStarted), "started")
+  assert_eq(types_describe_event(TypesStopped(42)), "stopped 42")
 }
 ```
 
@@ -184,4 +269,14 @@ test "type alias is interchangeable with its target" {
 ```mbt nocheck
 typealias String as Label // DEPRECATED: compiles with a warning — write `type Label = String`
 typealias Label = String  // WRONG: parsed as the deprecated `as` form, then rejected
+```
+
+## Local type definitions are deprecated
+
+The official fundamentals page still presents a type declared inside a function, but the pinned compiler emits warning 0027 `deprecated_syntax` unless that warning is suppressed. Move the declaration to top level. The `lang-dep-local-type` fixture proves both the warning and the top-level replacement with warnings denied.
+
+```mbt nocheck
+fn old_local_type() -> Unit {
+  enum Local { Only } // DEPRECATED: move Local to top level
+}
 ```

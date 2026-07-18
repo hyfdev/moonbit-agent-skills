@@ -4,6 +4,15 @@
 
 This file is plain Markdown, not a checked `.mbt.md`: its code blocks are illustrative and are **not** run by the verification suite. Every snippet below was verified by hand against the pinned toolchain; each block notes the target it was checked on. Build, link, and dependency wiring (`moon.pkg` imports, `is-main`, `supported_targets`, stub sources, `--target`) is the **moonbit-toolchain** skill — this file covers only what the language accepts.
 
+## Official topic map
+
+Search these exact official documentation topic names to route a question into this reference. A listed name is a discoverability route; the verification labels in the surrounding reference still determine whether its claim was executed or is documentation-only.
+
+- FFI type and ownership attributes: External Attribute; Borrow and Owned Attribute
+- FFI declarations and backend types: Foreign Function Interface (FFI); Backends; Declare Foreign Type; Declare Foreign Function; Types; Callbacks; Customize integer value of constant enum
+- FFI exports and lifetime management: Export Functions; Lifetime management; Lifetime management of external object; Lifetime management of MoonBit object; The calling convention of reference counting; The managed types; The borrow and owned attribute
+- Async language and runtime boundary: Async programming support; Getting started; Async function; Structured concurrency and task group; Cancellation makes asynchronous program modular; Interacting with the world; JavaScript support; Experimental Wasm1 support
+
 ## Async syntax
 
 The async forms are `async fn f(...)`, `async test "..."`, and the async entry point `async fn main` (no parameter list, like `fn main`). **There is no `await` keyword** — an async call is written as an ordinary call; using `await` is Error [4021] ("The value identifier await is unbound"). An async call must still sit inside an async context (`async fn` / `async test`); calling one from a plain function is Error [4149] ("cannot call async function in non-async function").
@@ -68,7 +77,28 @@ The idiomatic spawn closure is a plain arrow `() => { ... }` (async-ness is infe
 
 There is **no** language-level async extern: both `extern "js" async fn ...` and `async extern "js" fn ...` are parse errors. A JS `Promise` cannot be bound directly as an async MoonBit function; host async interop goes through the `moonbitlang/async` runtime, not the extern declaration.
 
+### Cancellation and runtime support
+
+**Documented, not executed against the external package:** the official [async reference](https://docs.moonbitlang.com/en/latest/language/async-experimental.html#cancellation-makes-asynchronous-program-modular) says `with_task_group` returns only after every child has terminated. A child failure cancels the other children and waits for their cleanup. Cancellation is raised as an error at the operation where a task was blocked, so ordinary propagation, `defer`, and error handlers perform cleanup; async operations are cancellable by default.
+
+The native runtime has the broadest IO support, including HTTP(S), files, sockets, and process spawning. JavaScript supports IO-independent APIs such as task groups and timeouts, but not the general IO layer because its host may be a browser; `moonbitlang/async/js_async` is the supported bridge for awaiting a host Promise or exporting a MoonBit async function as a Promise. Wasm1 support and its missing APIs are experimental as described above. Check the installed async package because this runtime API is not stable.
+
 ## FFI declarations
+
+### Stable FFI types and constant enums
+
+**Documented, not executed as an ABI test:** the official [FFI Types table](https://docs.moonbitlang.com/en/latest/language/ffi.html#types) is the stability boundary. Types absent from that table do not have a stable foreign representation.
+
+| MoonBit value | Wasm / Wasm GC | JavaScript | C |
+| --- | --- | --- | --- |
+| `Bool` | `i32` | `boolean` | `int32_t` |
+| `Int` / `UInt` | `i32` | `number` | `int32_t` / `uint32_t` |
+| `Int64` / `UInt64` | `i64` | not listed as a stable FFI type | `int64_t` / `uint64_t` |
+| `Float` / `Double` | `f32` / `f64` | `number` | `float` / `double` |
+| constant `enum` | `i32` | `number` | `int32_t` |
+| `#external type T` | `externref` | `any` | `void*` |
+
+Customize integer value of constant enum variants with `Case = N`; later unassigned cases continue counting from that value. At an FFI boundary the host receives those integer values in the representation above. This layout does not generate a MoonBit `to_int` method—write an explicit conversion when MoonBit code also needs the number.
 
 ### `extern "js"` — JavaScript (js target)
 
@@ -142,3 +172,9 @@ pub fn use_external() -> Int {
   // a callback that captured a local instead of `x => x * 2` would be Error [4151]
 }
 ```
+
+### Exported functions and lifetime boundaries
+
+**Documented, not executed:** the official [FFI reference](https://docs.moonbitlang.com/en/latest/language/ffi.html#export-functions) defines `#export_name("symbol")` on a public function in a `pkgtype(kind: "foreign_library")` package. The symbol must be a unique C identifier, and the attribute does not apply to generic functions, optional-argument functions, methods, or body-less declarations. Package type and backend link exports are project configuration owned by moonbit-toolchain.
+
+**Documented, not executed:** the official [lifetime-management reference](https://docs.moonbitlang.com/en/latest/language/ffi.html#lifetime-management) says Wasm and C backends use reference counting at the foreign boundary, while wasm-gc and JavaScript reuse their host GC. `#borrow(param)` means the callee does not consume that parameter's reference; `#owned(param)` transfers responsibility to the foreign side. External-resource finalization and raw `incref` / `decref` calls are backend ABI concerns: verify them against the generated target and current `moonbit.h`, not from a language-only snippet.

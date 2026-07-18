@@ -2,6 +2,12 @@
 
 Every `mbt check` block in this file is compiled and run by the repository's verification suite (`tooling/run_checked_docs.ts`). Blocks marked `mbt nocheck` show rejected or deprecated forms and are never compiled.
 
+## Official topic map
+
+Search these exact official documentation topic names to route a question into this reference. A listed name is a discoverability route; the verification labels in the surrounding reference still determine whether its claim was executed or is documentation-only.
+
+- Checked errors and recovery: Error handling; Error Types; Failure; Throwing Errors; Error Polymorphism; Handling Errors; Try ... Catch; Transforming to Result; Panic on Errors; Error Inference
+
 ## Declaring error types
 
 Error types are declared with `suberror`. A bare `suberror EhEmpty` has no payload. The enum-style form gives it constructors, each with positional or labeled fields exactly like an enum variant — `label~ : Type` at the declaration, matched with `label~`. The old one-line payload form `suberror MsgErr String` still compiles but warns; write the constructor form instead.

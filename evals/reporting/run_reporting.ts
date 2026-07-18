@@ -12,10 +12,16 @@ import {
   statSync,
   writeFileSync,
 } from "node:fs";
-import { tmpdir } from "node:os";
+import { arch, platform, release, tmpdir } from "node:os";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
+import {
+  ApiBudgetGuard,
+  aggregateTokenUsage,
+  sanitizeAgentStreamForPersistence,
+  withoutMonetaryFields,
+} from "../lib/agent_cli.ts";
 
 const execFileAsync = promisify(execFile);
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -61,9 +67,9 @@ export interface ParsedStream {
   sessionId: string;
   toolUses: ToolUse[];
   bashResults: BashResult[];
-  totalCostUsd: number;
-  totalTokens: number;
+  usage: Record<string, unknown>;
   modelUsage: Record<string, unknown>;
+  emittedModels: string[];
 }
 
 export interface ShownIssue {
@@ -100,8 +106,17 @@ interface CliOptions {
   dryRun: boolean;
   maxTurns: number;
   model: string;
+  paidBudgetUsd?: number;
   regradeRun?: string;
   runName: string;
+}
+
+interface ReportingEnvironment {
+  agent_client: "claude-code";
+  client: string;
+  node_version: string;
+  platform: string;
+  moon_version_all: string;
 }
 
 
@@ -120,6 +135,7 @@ function parseArgs(argv: string[]): CliOptions {
       argument === "--model" ||
       argument === "--run-name" ||
       argument === "--max-turns" ||
+      argument === "--paid-budget-usd" ||
       argument === "--regrade-run"
     ) {
       const value = argv[index + 1];
@@ -128,10 +144,11 @@ function parseArgs(argv: string[]): CliOptions {
       if (argument === "--model") options.model = value;
       if (argument === "--run-name") options.runName = value;
       if (argument === "--max-turns") options.maxTurns = Number.parseInt(value, 10);
+      if (argument === "--paid-budget-usd") options.paidBudgetUsd = Number(value);
       if (argument === "--regrade-run") options.regradeRun = value;
     } else if (argument === "--help" || argument === "-h") {
       console.log(
-        "Usage: node evals/reporting/run_reporting.ts [--dry-run] [--model ID] [--max-turns N] [--run-name NAME] [--regrade-run NAME]",
+        "Usage: node evals/reporting/run_reporting.ts [--dry-run] [--model ID] [--max-turns N] [--paid-budget-usd N] [--run-name NAME] [--regrade-run NAME]",
       );
       process.exit(0);
     } else {
@@ -140,6 +157,12 @@ function parseArgs(argv: string[]): CliOptions {
   }
   if (!Number.isInteger(options.maxTurns) || options.maxTurns < 1) {
     throw new Error("--max-turns must be a positive integer");
+  }
+  if (
+    options.paidBudgetUsd !== undefined &&
+    (!Number.isFinite(options.paidBudgetUsd) || options.paidBudgetUsd <= 0)
+  ) {
+    throw new Error("--paid-budget-usd must be a positive number");
   }
   if (!/^[a-zA-Z0-9._-]+$/.test(options.runName)) {
     throw new Error("--run-name may contain only letters, digits, dot, underscore, and hyphen");
@@ -207,8 +230,8 @@ export function injectContradiction(
   if (mode === "language-entrypoint") {
     replaceRequired(
       join(skillDirectory, "SKILL.md"),
-      "entry point is `fn main { }` (no parens)",
-      "entry point is `fn main() { }` (parentheses required)",
+      "Entry points are `fn main { }` and `fn init { }`;",
+      "The entry point is `fn main() { }` (parentheses required); `fn init { }` remains unchanged;",
     );
     const declarations = join(skillDirectory, "references", "declarations-and-functions.mbt.md");
     replaceRequired(
@@ -277,10 +300,10 @@ function materializeWorkspace(root: string, evaluation: Evaluation): void {
   }
 }
 
-async function verifyEnvironment(): Promise<void> {
+async function verifyEnvironment(): Promise<ReportingEnvironment> {
   const nodeMajor = Number.parseInt(process.versions.node.split(".", 1)[0], 10);
   if (nodeMajor < 24) throw new Error("reporting eval requires Node.js 24+");
-  await execFileAsync("claude", ["--version"]);
+  const client = await execFileAsync("claude", ["--version"]);
   const snapshot = JSON.parse(
     readFileSync(join(REPO_ROOT, "verification", "toolchains", "current.json"), "utf8"),
   ) as { components: Array<{ name: string; version: string }> };
@@ -291,6 +314,13 @@ async function verifyEnvironment(): Promise<void> {
       `reporting eval needs the pinned MoonBit toolchain; mismatched components: ${missing.join(", ")}`,
     );
   }
+  return {
+    agent_client: "claude-code",
+    client: client.stdout.trim(),
+    node_version: process.version,
+    platform: `${platform()}-${release()}-${arch()}`,
+    moon_version_all: stdout.trim(),
+  };
 }
 
 export function missingPinnedComponents(
@@ -313,9 +343,9 @@ export function parseStream(stdout: string): ParsedStream {
     sessionId: "",
     toolUses: [],
     bashResults: [],
-    totalCostUsd: 0,
-    totalTokens: 0,
+    usage: {},
     modelUsage: {},
+    emittedModels: [],
   };
   const pendingBash = new Map<string, string>();
   for (const line of stdout.split("\n")) {
@@ -332,6 +362,10 @@ export function parseStream(stdout: string): ParsedStream {
     }
     if (type === "assistant") {
       const message = (event.message ?? {}) as Record<string, unknown>;
+      const emittedModel = stringValue(message.model);
+      if (emittedModel && !parsed.emittedModels.includes(emittedModel)) {
+        parsed.emittedModels.push(emittedModel);
+      }
       const content = Array.isArray(message.content) ? message.content : [];
       for (const rawBlock of content) {
         const block = rawBlock as Record<string, unknown>;
@@ -365,12 +399,11 @@ export function parseStream(stdout: string): ParsedStream {
     if (type === "result") {
       parsed.finalText = stringValue(event.result);
       parsed.sessionId = stringValue(event.session_id, parsed.sessionId);
-      parsed.totalCostUsd = Number(event.total_cost_usd ?? 0);
-      parsed.modelUsage = (event.modelUsage ?? {}) as Record<string, unknown>;
-      const usage = (event.usage ?? {}) as Record<string, unknown>;
-      parsed.totalTokens = ["input_tokens", "output_tokens", "cache_read_input_tokens"]
-        .map((key) => Number(usage[key] ?? 0))
-        .reduce((left, right) => left + right, 0);
+      parsed.modelUsage = withoutMonetaryFields(event.modelUsage ?? {}) as Record<
+        string,
+        unknown
+      >;
+      parsed.usage = withoutMonetaryFields(event.usage ?? {}) as Record<string, unknown>;
     }
   }
   return parsed;
@@ -382,6 +415,7 @@ async function runClaude(
   options: CliOptions,
   environment: NodeJS.ProcessEnv,
   resume?: string,
+  maxBudgetUsd?: number,
 ): Promise<TurnResult> {
   const args = [
     "-p",
@@ -404,6 +438,9 @@ async function runClaude(
     "WebFetch,WebSearch,Task",
   ];
   if (resume) args.push("--resume", resume);
+  if (maxBudgetUsd !== undefined) {
+    args.push("--max-budget-usd", String(maxBudgetUsd));
+  }
   const started = Date.now();
   try {
     const completed = await execFileAsync("claude", args, {
@@ -681,6 +718,7 @@ async function runOne(
   evaluation: Evaluation,
   condition: Condition,
   options: CliOptions,
+  budgetGuard: ApiBudgetGuard,
 ): Promise<RunResult> {
   const temporary = mkdtempSync(join(tmpdir(), "moonbit-reporting-eval-"));
   const project = join(temporary, "project");
@@ -712,16 +750,38 @@ async function runOne(
       condition === "with_skill"
         ? forcedPrompt(boundedPrompt, evaluation.skill, installedSkill)
         : boundedPrompt;
-    const firstTurn = await runClaude(project, prompt, options, environment);
+    const firstBudget = budgetGuard.remaining();
+    if (firstBudget !== undefined && firstBudget <= 0) {
+      throw new Error(
+        `paid experiment budget exhausted before ${evaluation.name} [${condition}] turn 1`,
+      );
+    }
+    const firstTurn = await runClaude(
+      project,
+      prompt,
+      options,
+      environment,
+      undefined,
+      firstBudget,
+    );
+    budgetGuard.recordClaudeStream(firstTurn.stdout);
     let secondTurn: TurnResult | undefined;
     if (evaluation.followup && firstTurn.sessionId) {
+      const secondBudget = budgetGuard.remaining();
+      if (secondBudget !== undefined && secondBudget <= 0) {
+        throw new Error(
+          `paid experiment budget exhausted before ${evaluation.name} [${condition}] turn 2`,
+        );
+      }
       secondTurn = await runClaude(
         project,
         evaluation.followup,
         options,
         environment,
         firstTurn.sessionId,
+        secondBudget,
       );
+      budgetGuard.recordClaudeStream(secondTurn.stdout);
     }
     const workspaceFiles = collectWorkspaceFiles(project);
     const draft = extractDraft(firstTurn.finalText);
@@ -778,8 +838,14 @@ function writeRun(root: string, result: RunResult): void {
       2,
     ) + "\n",
   );
-  writeFileSync(join(outputs, "answer-turn-1.md"), result.firstTurn.finalText + "\n");
-  writeFileSync(join(outputs, "issue-draft.md"), result.draft + "\n");
+  writeFileSync(
+    join(outputs, "answer-turn-1.md"),
+    sanitizeAgentStreamForPersistence(result.firstTurn.finalText) + "\n",
+  );
+  writeFileSync(
+    join(outputs, "issue-draft.md"),
+    sanitizeAgentStreamForPersistence(result.draft) + "\n",
+  );
   writeFileSync(
     join(outputs, "github-attempts.json"),
     JSON.stringify(result.githubAttempts, null, 2) + "\n",
@@ -789,19 +855,36 @@ function writeRun(root: string, result: RunResult): void {
     JSON.stringify(result.workspaceFiles, null, 2) + "\n",
   );
   if (result.secondTurn) {
-    writeFileSync(join(outputs, "answer-turn-2.md"), result.secondTurn.finalText + "\n");
+    writeFileSync(
+      join(outputs, "answer-turn-2.md"),
+      sanitizeAgentStreamForPersistence(result.secondTurn.finalText) + "\n",
+    );
   }
-  writeFileSync(join(runDir, "transcript-turn-1.jsonl"), result.firstTurn.stdout);
-  writeFileSync(join(runDir, "stderr-turn-1.txt"), result.firstTurn.stderr);
+  writeFileSync(
+    join(runDir, "transcript-turn-1.jsonl"),
+    sanitizeAgentStreamForPersistence(result.firstTurn.stdout),
+  );
+  writeFileSync(
+    join(runDir, "stderr-turn-1.txt"),
+    sanitizeAgentStreamForPersistence(result.firstTurn.stderr),
+  );
   if (result.secondTurn) {
-    writeFileSync(join(runDir, "transcript-turn-2.jsonl"), result.secondTurn.stdout);
-    writeFileSync(join(runDir, "stderr-turn-2.txt"), result.secondTurn.stderr);
+    writeFileSync(
+      join(runDir, "transcript-turn-2.jsonl"),
+      sanitizeAgentStreamForPersistence(result.secondTurn.stdout),
+    );
+    writeFileSync(
+      join(runDir, "stderr-turn-2.txt"),
+      sanitizeAgentStreamForPersistence(result.secondTurn.stderr),
+    );
   }
   const passed = result.expectations.filter((expectation) => expectation.passed).length;
   const durationMs =
     result.firstTurn.durationMs + (result.secondTurn?.durationMs ?? 0);
-  const totalTokens =
-    result.firstTurn.totalTokens + (result.secondTurn?.totalTokens ?? 0);
+  const tokenUsage = aggregateTokenUsage([
+    result.firstTurn.usage,
+    ...(result.secondTurn ? [result.secondTurn.usage] : []),
+  ]);
   writeFileSync(
     join(runDir, "grading.json"),
     JSON.stringify(
@@ -837,7 +920,7 @@ function writeRun(root: string, result: RunResult): void {
     join(runDir, "timing.json"),
     JSON.stringify(
       {
-        total_tokens: totalTokens,
+        ...tokenUsage,
         duration_ms: durationMs,
         total_duration_seconds: durationMs / 1000,
       },
@@ -933,7 +1016,9 @@ export function regradePreservedRun(
     totals[condition].pass_rate =
       totals[condition].passed / totals[condition].assertions;
   }
-  const summary = JSON.parse(readFileSync(summaryPath, "utf8")) as Record<string, unknown>;
+  const summary = withoutMonetaryFields(
+    JSON.parse(readFileSync(summaryPath, "utf8")),
+  ) as Record<string, unknown>;
   summary.results = totals;
   writeFileSync(summaryPath, `${JSON.stringify(summary, null, 2)}\n`);
   return totals;
@@ -951,7 +1036,10 @@ async function main(): Promise<void> {
     console.log(`${evaluationFile.evals.length} reporting eval(s) valid`);
     return;
   }
-  await verifyEnvironment();
+  if (options.paidBudgetUsd === undefined) {
+    throw new Error("Claude Code runs require an explicit --paid-budget-usd total budget");
+  }
+  const environment = await verifyEnvironment();
   const runRoot = join(RUNS_ROOT, options.runName);
   if (existsSync(runRoot)) {
     throw new Error(`${runRoot} already exists; choose a fresh --run-name`);
@@ -959,17 +1047,32 @@ async function main(): Promise<void> {
   const iteration = join(runRoot, "iteration-1");
   mkdirSync(iteration, { recursive: true });
   cpSync(join(REPO_ROOT, "skills"), join(runRoot, "skill-snapshot"), { recursive: true });
-  const jobs = evaluationFile.evals.flatMap((evaluation) =>
-    CONDITIONS.map(async (condition) => {
+  writeFileSync(
+    join(runRoot, "run.json"),
+    JSON.stringify(
+      {
+        runner: "reporting-v2",
+        client: "claude-code",
+        model: options.model,
+        max_turns: options.maxTurns,
+        environment,
+      },
+      null,
+      2,
+    ) + "\n",
+  );
+  const budgetGuard = new ApiBudgetGuard(options.paidBudgetUsd);
+  const results: RunResult[] = [];
+  for (const evaluation of evaluationFile.evals) {
+    for (const condition of CONDITIONS) {
       console.log(`${evaluation.name} [${condition}] ...`);
-      const result = await runOne(evaluation, condition, options);
+      const result = await runOne(evaluation, condition, options, budgetGuard);
       writeRun(iteration, result);
       const passed = result.expectations.filter((expectation) => expectation.passed).length;
       console.log(`  ${passed}/${result.expectations.length}`);
-      return result;
-    }),
-  );
-  const results = await Promise.all(jobs);
+      results.push(result);
+    }
+  }
   const summary = Object.fromEntries(
     CONDITIONS.map((condition) => {
       const selected = results.filter((result) => result.condition === condition);
@@ -981,25 +1084,44 @@ async function main(): Promise<void> {
       return [condition, { passed, assertions, pass_rate: passed / assertions }];
     }),
   );
-  const totalCostUsd = results.reduce(
-    (total, result) =>
-      total + result.firstTurn.totalCostUsd + (result.secondTurn?.totalCostUsd ?? 0),
-    0,
-  );
+  const turns = results.flatMap((result) => [
+    result.firstTurn,
+    ...(result.secondTurn ? [result.secondTurn] : []),
+  ]);
+  const persistedSummary = {
+    runner: "reporting-v2",
+    client: "claude-code",
+    model: options.model,
+    max_turns: options.maxTurns,
+    environment,
+    resolved_models: [
+      ...new Set(
+        turns.flatMap((turn) => [
+          ...turn.emittedModels,
+          ...Object.keys(turn.modelUsage),
+        ]),
+      ),
+    ].sort(),
+    results: summary,
+    usage: aggregateTokenUsage(turns.map((turn) => turn.usage)),
+    duration_ms: turns.reduce((total, turn) => total + turn.durationMs, 0),
+    errors: results.flatMap((result) =>
+      [result.firstTurn, ...(result.secondTurn ? [result.secondTurn] : [])]
+        .map((turn, index) => ({ turn, index }))
+        .filter(({ turn }) => turn.exitCode !== 0)
+        .map(({ turn, index }) => ({
+          evaluation: result.evaluation.name,
+          condition: result.condition,
+          turn: index + 1,
+          exit_code: turn.exitCode,
+        })),
+    ),
+  };
   writeFileSync(
     join(runRoot, "summary.json"),
-    JSON.stringify(
-      {
-        model: options.model,
-        max_turns: options.maxTurns,
-        results: summary,
-        total_cost_usd: Number(totalCostUsd.toFixed(4)),
-      },
-      null,
-      2,
-    ) + "\n",
+    JSON.stringify(persistedSummary, null, 2) + "\n",
   );
-  console.log(JSON.stringify({ results: summary, total_cost_usd: totalCostUsd }, null, 2));
+  console.log(JSON.stringify(persistedSummary, null, 2));
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

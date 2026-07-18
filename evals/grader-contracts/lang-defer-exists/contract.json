@@ -1,0 +1,38 @@
+{
+  "area": "language",
+  "task": "lang-defer-exists",
+  "cases": [
+    {
+      "name": "correct-lexical-block-based-defer",
+      "expected": "pass",
+      "final_text": "YES\nScoping is lexical and block-based, not function-based: a defer runs when its block exits."
+    },
+    {
+      "name": "claims-defer-does-not-exist",
+      "expected": "fail",
+      "final_text": "NO\nMoonBit does not have a defer statement.",
+      "must_fail_check_types": [
+        "first_line_is",
+        "output_matches"
+      ]
+    },
+    {
+      "name": "claims-function-exit-scope",
+      "expected": "fail",
+      "final_text": "YES\nDeferred work waits until the entire function returns.",
+      "must_fail_check_types": [
+        "output_matches"
+      ]
+    },
+    {
+      "name": "negates-block-scope-while-repeating-keywords",
+      "expected": "fail",
+      "final_text": "YES\nIt is not block-scoped; every defer waits until the entire function returns."
+    },
+    {
+      "name": "negates-block-based-wording",
+      "expected": "fail",
+      "final_text": "YES\nIt is not block-based; every defer waits until the entire function returns."
+    }
+  ]
+}

@@ -1,10 +1,16 @@
 {
   "id": "lang-visibility-cross-package",
   "owner_skill": "moonbit-language",
-  "knowledge": "Across packages, a default (no-modifier) type is abstract (name usable, fields hidden), pub is read-only (fields readable, external construction rejected), pub(all) is fully open, priv is invisible, plain fn is package-private, and pub traits are sealed while pub(open) traits accept external impls.",
+  "knowledge": "Across packages, a default (no-modifier) type is abstract (name usable, fields hidden), pub is read-only, pub(all) is fully open, priv is invisible, plain fn is package-private, pub traits are sealed, pub(open) traits accept external impls, and pub impl plus pub extend expose conformance and selected dot-call methods downstream.",
   "expect": "test-pass",
   "targets": [
-    "wasm-gc"
+    "wasm-gc",
+    "wasm",
+    "js",
+    "native"
+  ],
+  "moon_args": [
+    "--deny-warn"
   ],
   "source": "observed",
   "fix": "n/a",

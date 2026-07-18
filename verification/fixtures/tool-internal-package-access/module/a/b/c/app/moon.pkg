@@ -1,0 +1,3 @@
+import {
+  "mbtskills/internal_fixture/a/b/c/internal/secret" @secret,
+}

@@ -72,10 +72,10 @@ describe("reporting behavior fixtures", () => {
       cpSync(source, installed, { recursive: true });
       injectContradiction(installed, "language-entrypoint");
       expect(readFileSync(join(source, "SKILL.md"), "utf8")).toContain(
-        "entry point is `fn main { }` (no parens)",
+        "Entry points are `fn main { }` and `fn init { }`;",
       );
       expect(readFileSync(join(installed, "SKILL.md"), "utf8")).toContain(
-        "entry point is `fn main() { }` (parentheses required)",
+        "The entry point is `fn main() { }` (parentheses required);",
       );
     } finally {
       rmSync(temporary, { recursive: true, force: true });
@@ -168,17 +168,25 @@ Linux x86_64`;
         }),
         JSON.stringify({
           type: "result",
+          billing: "API",
           result: "done",
           session_id: "session-1",
           total_cost_usd: 0.1,
           usage: { input_tokens: 2, output_tokens: 3, cache_read_input_tokens: 5 },
+          modelUsage: { "model-a": { inputTokens: 2, costUSD: 0.1 } },
         }),
       ].join("\n"),
     );
     expect(parsed.finalText).toBe("done");
     expect(parsed.cwd).toBe("/tmp/user-project");
     expect(parsed.sessionId).toBe("session-1");
-    expect(parsed.totalTokens).toBe(10);
+    expect(parsed.usage).toEqual({
+      input_tokens: 2,
+      output_tokens: 3,
+      cache_read_input_tokens: 5,
+    });
+    expect(parsed.modelUsage).toEqual({ "model-a": { inputTokens: 2 } });
+    expect(JSON.stringify(parsed)).not.toMatch(/total_cost_usd|costUSD|"billing"/);
     expect(parsed.bashResults).toEqual([
       { command: "moon version --all", is_error: false, output: "moonc v0.10.5" },
     ]);

@@ -1,0 +1,23 @@
+{
+  "id": "lang-json-flat-labelled",
+  "risk_class": "silent-semantics",
+  "claim_id": "language.json.flat-labelled-enum-layout",
+  "primary_metric": "exact-runtime-shape",
+  "prompt": "Current MoonBit has this enum: `enum Shape { Axes(x~ : Int, y~ : Int) } derive(ToJson(style=\"flat\"))`. What exact JSON value does `Shape::Axes(x=-1, y=1).to_json()` produce at the repository's pinned compiler? Reply with the compact JSON on the first line and at most two lines of explanation. Do not give multiple possible layouts.",
+  "discovery": {
+    "skill": "moonbit-language",
+    "reference": "references/types-structs-enums.mbt.md"
+  },
+  "grade": [
+    {
+      "type": "first_line_json_is",
+      "value": [
+        "Axes",
+        {
+          "x": -1,
+          "y": 1
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "id": "lang-dep-local-type",
+  "owner_skill": "moonbit-language",
+  "knowledge": "Local type definitions still parse at MoonBit 0.10.4 but emit deprecated_syntax; move the type to top level.",
+  "expect": "check-fail",
+  "diagnostic_contains": [
+    "local type definition",
+    "deprecated",
+    "toplevel type definition"
+  ],
+  "fix": "Move the type declaration to top level.",
+  "targets": [
+    "wasm-gc",
+    "wasm",
+    "js",
+    "native"
+  ],
+  "moon_args": [
+    "--deny-warn"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-07-18",
+    "components": {
+      "moon": "0.1.20260713 (75c7e1f 2026-07-13)",
+      "moonc": "v0.10.4+2cc641edf (2026-07-15)",
+      "moonrun": "moonrun 0.1.20260713 (75c7e1f 2026-07-13)"
+    },
+    "platform": "Linux-x86_64"
+  }
+}

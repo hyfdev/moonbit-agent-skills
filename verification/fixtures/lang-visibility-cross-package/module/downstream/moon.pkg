@@ -1,0 +1,4 @@
+import {
+  "mbtskills/fixture/client",
+  "mbtskills/fixture/vis",
+}

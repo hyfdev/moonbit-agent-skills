@@ -15,7 +15,7 @@
       "args": ["test", "--target", "js"],
       "min_tests": 1,
       "temp_files": {
-        "zz_eval_now_ms_test.mbt": "///|\nextern \"js\" fn grader_date_now() -> Int64 = \"() => BigInt(Date.now())\"\n\n///|\ntest \"grader now_ms delegates to Date.now\" {\n  let delta = now_ms() - grader_date_now()\n  assert_true(delta >= -1000L && delta <= 1000L)\n}\n"
+        "zz_eval_now_ms_test.mbt": "///|\nextern \"js\" fn grader_install_date_now() -> Unit = \"() => { globalThis.__mbt_eval_original_date_now = Date.now; Date.now = () => 731245678; }\"\n\n///|\nextern \"js\" fn grader_restore_date_now() -> Unit = \"() => { Date.now = globalThis.__mbt_eval_original_date_now; delete globalThis.__mbt_eval_original_date_now; }\"\n\n///|\ntest \"grader now_ms dynamically delegates to Date.now\" {\n  grader_install_date_now()\n  let actual = now_ms()\n  grader_restore_date_now()\n  assert_eq(actual, 731245678L)\n}\n"
       }
     }
   ]

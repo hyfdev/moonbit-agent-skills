@@ -2,6 +2,12 @@
 
 A test is a `test "name" { ... }` block; write assertions with `assert_eq` / `inspect` — syntax details live in the moonbit-language skill. This file is about *running* tests. Examples use the verification template (root package plus a `textutil` subpackage whose test is named "shout uppercases").
 
+## Official topic map
+
+Use these exact headings from the official language documentation to recognize project-operation questions handled here. A heading establishes routing only; the surrounding reference states which behavior was executed and which remains documentation-only.
+
+- Benchmarks: Writing Benchmarks; Benchmarking with Test Blocks; Batch Benchmarking; Raw Benchmark Statistics
+
 ## Selecting what runs
 
 ```sh

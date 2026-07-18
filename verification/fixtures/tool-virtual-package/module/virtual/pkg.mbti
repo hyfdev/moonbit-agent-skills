@@ -1,0 +1,3 @@
+package "mbtskills/virtualfixture/virtual"
+
+fn selected_value() -> Int

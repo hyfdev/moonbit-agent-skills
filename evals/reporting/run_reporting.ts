@@ -18,7 +18,9 @@ import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
 import {
   ApiBudgetGuard,
+  DEFAULT_CLAUDE_EVAL_MODEL,
   aggregateTokenUsage,
+  assertDefaultClaudeExecutionModel,
   sanitizeAgentStreamForPersistence,
   withoutMonetaryFields,
 } from "../lib/agent_cli.ts";
@@ -120,11 +122,11 @@ interface ReportingEnvironment {
 }
 
 
-function parseArgs(argv: string[]): CliOptions {
+export function parseArgs(argv: string[]): CliOptions {
   const options: CliOptions = {
     dryRun: false,
     maxTurns: 35,
-    model: "claude-haiku-4-5-20251001",
+    model: DEFAULT_CLAUDE_EVAL_MODEL,
     runName: `reporting-${new Date().toISOString().slice(0, 10)}`,
   };
   for (let index = 0; index < argv.length; index += 1) {
@@ -764,6 +766,11 @@ async function runOne(
       undefined,
       firstBudget,
     );
+    assertDefaultClaudeExecutionModel(
+      "claude-code",
+      options.model,
+      firstTurn.emittedModels,
+    );
     budgetGuard.recordClaudeStream(firstTurn.stdout);
     let secondTurn: TurnResult | undefined;
     if (evaluation.followup && firstTurn.sessionId) {
@@ -780,6 +787,11 @@ async function runOne(
         environment,
         firstTurn.sessionId,
         secondBudget,
+      );
+      assertDefaultClaudeExecutionModel(
+        "claude-code",
+        options.model,
+        secondTurn.emittedModels,
       );
       budgetGuard.recordClaudeStream(secondTurn.stdout);
     }

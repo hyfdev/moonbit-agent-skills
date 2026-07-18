@@ -11,9 +11,14 @@ import {
   isExternalScratchCheckCommand,
   isMoonCheckCommand,
   missingPinnedComponents,
+  parseArgs,
   parseStream,
 } from "../../evals/reporting/run_reporting.ts";
 import { REPO_ROOT } from "../lib/repo.ts";
+
+it("defaults reporting runs to the local DeepSeek Pro alias", () => {
+  expect(parseArgs(["--dry-run"]).model).toBe("sonnet");
+});
 
 describe("reporting protocol", () => {
   it("keeps the two installed protocol copies identical", () => {

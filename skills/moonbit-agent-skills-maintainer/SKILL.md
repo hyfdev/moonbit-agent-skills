@@ -5,7 +5,7 @@ license: MIT
 user-invocable: true
 compatibility: Repository-maintenance workflow for hyfdev/moonbit-agent-skills. Needs Git, Node.js 24+, Vite+, and the MoonBit toolchain for executable verification.
 metadata:
-  skill-version: "0.2.0"
+  skill-version: "0.2.1"
   scope: "repository-maintenance"
   internal: true
 ---
@@ -29,7 +29,7 @@ This workflow exists because testing only written claims cannot detect omitted k
 5. Treat official documentation as a discovery source, not a compiler oracle. Inspect upstream warning configuration and run an isolated minimal POC with warnings enabled; the official local-type example is a known case that passes only because its package suppresses `deprecated_syntax`.
 6. Add checked documentation or fixtures for language behavior, command-manifest entries or fixtures for project behavior, and explicit `Documented, not executed` text plus a direct source for facts the environment cannot execute.
 7. Treat deprecations as migrations: remove the old recommendation, enable the warning, add `--deny-warn`, prove the old form is caught, and prove the replacement passes under the same settings. A documented-only deprecation still needs separate old-form and replacement evidence and the reason execution is unavailable.
-8. Add a deterministic content eval for each change that materially alters agent behavior. Follow `references/evaluation.md`: prove the grader with correct and wrong solutions, prefer silent-semantic risks over compiler-self-correcting tasks, and start with one paired AB/BA pass. Add at most one second repetition, only for tasks whose first pair shows a condition difference, a valid failure, or known instability; never run a third repetition or repeat unaffected tasks. When evaluating discoverability, use a clean task that does not expose the answer through compiler diagnostics and compare the current skill with a byte-identical purpose-built ablation of the route under test; use a historical tree only when the whole historical skill is the intended variable.
+8. Add a deterministic content eval for each change that materially alters agent behavior. Follow `references/evaluation.md`: prove the grader with correct and wrong solutions, prefer silent-semantic risks over compiler-self-correcting tasks, and start with one paired AB/BA pass on DeepSeek Pro. Add at most one second repetition, only when the current-skill cell fails or the pair is unstable; use one Kimi fallback pair only if the current-skill cell fails again. Never run a third repetition or repeat unaffected tasks. When evaluating discoverability, use a clean task that does not expose the answer through compiler diagnostics and compare the current skill with a byte-identical purpose-built ablation of the route under test; use a historical tree only when the whole historical skill is the intended variable. Report the result in two layers: a short user-facing comparison first and the complete technical evidence second.
 9. Run `vp run check-release-coverage` and `vp run check-language-surface`. In update mode, do not change toolchain pins, fixture stamps, skill pins, or README status until both completeness gates close.
 10. Run the full repository check sequence from `AGENTS.md`, all relevant pinned targets, targeted model evals, and the required independent reviews.
 
@@ -37,9 +37,12 @@ This workflow exists because testing only written claims cannot detect omitted k
 
 Report findings and user value, not a diary of commands. PR descriptions must contain:
 
+- an eval summary that gives every distinct user task its own concrete row, states the number of distinct tasks, identifies the observed model, compares percentages under explicitly named conditions, and says the primary finding in one sentence; always show final task success, while activation and reference reads remain secondary evidence;
 - a release coverage table with counts for verified, documented, out of scope, and not actionable;
 - a language-surface table with official documents, headings, routed topics, and explicit boundaries when that inventory changed;
 - a test table with the exact suites, cases, targets, and results;
 - a short list of corrected wrong recommendations and newly prevented failure modes.
+
+Detailed eval evidence may follow the summary, but exact counts, internal task IDs, claim IDs, condition names, repetitions, cells, grader details, token breakdowns, and statistics must not replace the user-facing result. Never label a comparison only as `Baseline`, count cells as tasks, or hide a task-success tie or regression behind a process metric.
 
 An audit is complete when every relevant upstream source item has a decision and every claimed gap points to exact repository evidence. An update is complete only when both completeness gates, repository tests, targeted content evals, and both reviews are finished.

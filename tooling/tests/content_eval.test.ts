@@ -21,6 +21,7 @@ import {
   installLanguageAblation,
   installTopLevelExtendAblation,
   materializeGitSkills,
+  parseCli,
   parseStream,
   preflight,
   prepareDerivedConditionSnapshots,
@@ -32,6 +33,12 @@ import {
 } from "../../evals/run_content.ts";
 
 const RUNNER = join(REPO_ROOT, "evals", "run_content.ts");
+
+it("defaults Claude content runs to the local DeepSeek Pro alias", () => {
+  expect(parseCli(["--area", "language", "--condition", "none", "--dry-run"]).options?.model).toBe(
+    "sonnet",
+  );
+});
 
 function temporary<T>(name: string, callback: (path: string) => T): T {
   const path = mkdtempSync(join(tmpdir(), name));

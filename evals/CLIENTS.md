@@ -53,7 +53,7 @@ Use a short model alias so the local mapping is explicit, and require a total AP
 
 ```sh
 claude -p "$PROMPT" \
-  --model haiku \
+  --model sonnet \
   --output-format stream-json \
   --verbose \
   --no-session-persistence \
@@ -78,7 +78,7 @@ Parse these fields separately. Persist only the token, timing, model/client, too
 | `user` | matching tool results and error status |
 | `result` | subtype, error status, turns, token usage, sanitized `modelUsage`, permission denials |
 
-On this machine, `system/init.model` and `modelUsage` can retain a requested Claude name while every assistant event names `deepseek-v4-flash`. Treat `assistant.message.model` as the observed execution model and retain all fields for audit. Before pairing cells, normalize and compare the complete observed execution signature: emitted model, model alias, provider, and thinking effort. The emitted-model set must be non-empty. An optional dimension that the client omits in both cells matches as two empty sets; one-sided missing data does not match.
+On this machine, the default `sonnet` alias maps to `deepseek-v4-pro[1m]`, while assistant events name the execution model `deepseek-v4-pro`. `modelUsage` may also include a small auxiliary `deepseek-v4-flash` entry; do not mistake that helper usage for the assistant execution model. Treat `assistant.message.model` as authoritative and retain all fields for audit. Before pairing cells, normalize and compare the complete observed execution signature: emitted model, model alias, provider, and thinking effort. The emitted-model set must be non-empty. An optional dimension that the client omits in both cells matches as two empty sets; one-sided missing data does not match.
 
 Normal completion requires process exit 0, exactly one result event, `subtype=success`, `is_error=false`, no forbidden tool call, and deterministic task graders passing. Every content cell stores a structured analysis-eligibility result. Exclude wall timeouts and client or transport failures from outcome comparisons. A normal result at the predeclared turn limit exits 1 with `subtype=error_max_turns`; retain it as an eligible task failure and account for it in the current invocation's in-memory API guard.
 
@@ -88,6 +88,6 @@ Claude result events expose a charge used only to decrement the current runner i
 
 ## Allocation policy
 
-Use Kimi/K3 for task screening, repeated paired runs, and the main activation/content experiment. Use Claude Code with the `haiku` alias (DeepSeek Flash locally) as an independent execution-path check on a predeclared subset. Use `sonnet` (DeepSeek Pro locally) only for predeclared disagreements or high-variance tasks. Keep providers in separate tables; never pool Kimi and Claude/DeepSeek cells into one effect estimate.
+Use Claude Code with the `sonnet` alias as the default activation and content client; on this machine, verify that every assistant event emits `deepseek-v4-pro`. Start each content case with one paired `none` versus `ours` run. Repeat that DeepSeek pair once only when `ours` fails or the pair is unstable. If `ours` fails again, run the same frozen pair once with Kimi/K3 to distinguish a model-specific failure from a task, grader, or skill problem. Do not run Kimi routinely, do not use the `haiku` alias for new measurements on this setup, and never pool providers into one effect estimate.
 
 The reporting eval remains Claude-only until a Kimi execution path can enforce an equivalent command/tool allowlist. Reporting tests an outward-action safety boundary, so transcript inspection after an unrestricted run is not an adequate substitute.

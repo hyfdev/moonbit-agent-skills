@@ -16,14 +16,11 @@ node evals/activation/run_activation.ts --dry-run
 node evals/run_content.ts --area language --condition none --dry-run
 node evals/reporting/run_reporting.ts --dry-run
 
-# Prompted routing/classification eval on the subscription client.
-node evals/activation/run_activation.ts --client kimi-code --model kimi-code/k3 --mode routing --repetitions 1 --run-name routing-kimi-k1
+# Prompted routing/classification eval on the default DeepSeek Pro path.
+node evals/activation/run_activation.ts --client claude-code --model sonnet --mode routing --repetitions 1 --paid-budget-usd "$EVAL_BUDGET_USD" --run-name routing-deepseek-pro
 
-# Independent API prompted-routing check; pass a runtime-only total budget.
-node evals/activation/run_activation.ts --client claude-code --model haiku --mode routing --repetitions 1 --paid-budget-usd "$EVAL_BUDGET_USD" --run-name routing-deepseek-flash
-
-# Subscription content comparison with paired AB/BA ordering across tasks.
-node evals/run_content.ts --area language --condition baseline --condition ours --client kimi-code --model kimi-code/k3 --repetitions 1 --max-turns 50 --run-name language-kimi-k1
+# Primary user-value comparison with paired AB/BA ordering across tasks.
+node evals/run_content.ts --area language --condition none --condition ours --client claude-code --model sonnet --repetitions 1 --max-turns 50 --paid-budget-usd "$EVAL_BUDGET_USD" --run-name language-deepseek-pro
 
 # New experiment manifests use one or two repetitions. Historical K3 manifests and result summaries remain evidence, but the runners intentionally reject replaying them.
 
@@ -31,13 +28,13 @@ node evals/run_content.ts --area language --condition baseline --condition ours 
 node evals/validate_graders.ts
 
 # Discoverability comparison; the runner alternates condition order across tasks.
-node evals/run_content.ts --area language --ids lang-discover-selected-trait-method,lang-discover-default-trait-method --condition ours-no-top-level-extend --condition ours --client kimi-code --model kimi-code/k3 --repetitions 1 --max-turns 30 --run-name language-reference-discovery
+node evals/run_content.ts --area language --ids lang-discover-selected-trait-method,lang-discover-default-trait-method --condition ours-no-top-level-extend --condition ours --client claude-code --model sonnet --repetitions 1 --max-turns 30 --paid-budget-usd "$EVAL_BUDGET_USD" --run-name language-reference-discovery
 
 # Targeted H4 ablation.
-node evals/run_content.ts --area language --ids lang-fix-rust-habits --condition forced-language-no-cross-language --client claude-code --model haiku --paid-budget-usd "$EVAL_BUDGET_USD" --max-turns 50 --run-name h4-no-cross-language
+node evals/run_content.ts --area language --ids lang-fix-rust-habits --condition forced-language-no-cross-language --client claude-code --model sonnet --paid-budget-usd "$EVAL_BUDGET_USD" --max-turns 50 --run-name h4-no-cross-language
 
 # Error-reporting behavior comparison.
-node evals/reporting/run_reporting.ts --model claude-haiku-4-5-20251001 --paid-budget-usd "$EVAL_BUDGET_USD" --run-name reporting-manual-only
+node evals/reporting/run_reporting.ts --model sonnet --paid-budget-usd "$EVAL_BUDGET_USD" --run-name reporting-manual-only
 
 # Reapply the current deterministic scorer to a preserved reporting run without model calls.
 node evals/reporting/run_reporting.ts --regrade-run reporting-manual-only
@@ -45,7 +42,28 @@ node evals/reporting/run_reporting.ts --regrade-run reporting-manual-only
 
 For activation and content, use a fresh `--run-name` for a new measurement. A pre-existing `results.jsonl` is rejected unless `--resume` is given; resume skips completed prompt/task, repetition, and condition cells and recomputes the summary. These runners write `run.json` before the first task and refuse to resume when conditions, repetitions, selected inputs, environment, provider, runner/parser files, or skill snapshots changed. Activation freezes the selected prompts and every installed skill before its first model call, materializes every cell from that snapshot, and scores only Skill calls with successful tool results. Content alternates AB/BA condition order and reports paired task outcomes; pairs with different or unobserved actual models are excluded. Claude API runs require an explicit total `--paid-budget-usd`; the runner keeps it only in memory and passes the remaining allowance to each child. A resume command starts a fresh in-memory guard from the supplied cap and applies it only to unfinished cells; a fully completed resume needs no cap because it makes no model call. Kimi subscription runs use the same token, duration, model, and error records without an API cap. API content runs require committed, clean `skills/`; current and historical skills are materialized once from Git trees into the run cache, and the manifest records commit IDs, tree IDs, every included path, and SHA-256. Purpose-built ablations are also materialized and hashed before the first model call, including their transformation description and every derived file. Reporting runs are smaller one-shot comparisons with the same runtime-only API guard: always use a fresh name; the runner rejects an existing directory and does not support resume. `--regrade-run` only reapplies the checked-in deterministic scorer to preserved artifacts and makes no model call.
 
+For new content measurements, count distinct user cases rather than condition cells. A case may have at most two materially different user-facing angles, and each angle may run at most twice. Start with one `none` versus `ours` pair on Claude Code's `sonnet` alias and verify that the assistant execution model is `deepseek-v4-pro` on this machine. Repeat the DeepSeek pair only when `ours` fails or the pair is unstable. Use Kimi/K3 once on the same frozen pair only if `ours` fails again; keep that fallback result separate. Do not automatically cross-product angles, repetitions, and clients.
+
 Results are written to `*/runs/<run-name>/` and gitignored. Activation and content use `run.json`, `results.jsonl`, `summary.json`, `transcripts/`, and, for content failures, `failed-workspaces/`. Reporting stores per-scenario answers, sanitized workspace snapshots, detected GitHub command attempts, transcripts, and deterministic grading under `iteration-1/`, plus top-level `run.json` and `summary.json`. Persisted artifacts retain normalized token counters, duration, requested and observed model/client identity, and errors. Monetary fields and runtime caps are removed from structured records, transcripts, and stderr. Checked-in `RESULTS.md` snapshots use the same token-only reporting policy.
+
+## Reporting results
+
+Every new or updated checked-in eval report starts with a short result that readers can understand without knowing the harness. A detailed technical analysis may follow, but it never replaces this section.
+
+```md
+## Results
+
+Distinct tasks: 2
+
+| Task | Model | No skills | With current skills |
+| --- | --- | ---: | ---: |
+| Expose one implemented trait method as a public dot-call API with `extend` | `deepseek-v4-pro` | 0% | **100%** |
+| Expose one default trait method as a public dot-call API with `extend` | `deepseek-v4-pro` | 100% | **100%** |
+
+With current skills, task success was 100%, compared with 50% without skills.
+```
+
+Give every distinct task its own row and use a plain description of what the agent had to do, not an internal task ID or metric name. For a different comparison, replace `No skills` with the exact condition a reader can understand, such as `Historical skill` or `Without the extend route`; never use the ambiguous label `Baseline`. Use percentages in this table and state the number of distinct tasks separately. Never present condition cells or repetitions as task coverage. Final task success is mandatory, including ties and regressions. Activation, reference-read, duration, and token results may appear afterward as secondary evidence. Put exact counts, condition IDs, claim IDs, per-repetition rows, invalid cells, grader contracts, execution signatures, uncertainty analysis, and other audit data in the technical section.
 
 ## `activation/prompts.jsonl` schema
 

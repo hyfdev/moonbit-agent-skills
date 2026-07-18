@@ -43,6 +43,10 @@ it("limits activation repetitions to two", () => {
   );
 });
 
+it("defaults Claude activation runs to the local DeepSeek Pro alias", () => {
+  expect(parseCliArgs(["--dry-run"]).model).toBe("sonnet");
+});
+
 function result(overrides: Partial<ActivationResult> = {}): ActivationResult {
   return {
     id: "prompt-1",

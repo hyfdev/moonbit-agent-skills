@@ -13,6 +13,8 @@ Every knowledge change must ship with its proof:
 | A toolchain command or flag | The command line in a ```sh fence plus a `verification/commands/manifest.json` entry that actually executes it (CI enforces coverage) |
 | A fact you cannot execute here (docs-only) | An explicit `documented` label plus the source URL in the text |
 
+The proof table checks accuracy. Completeness has a separate gate: `verification/language-surface/source.json` mechanically inventories the pinned official language toctree, included pages, and headings; its `coverage.json` routes every topic to exact product content or records a concrete boundary. Official documentation is an input to investigate, not executable truth. Run an unsuppressed minimal POC before recommending syntax—the official local-type example currently passes only because its package disables the deprecation warning.
+
 Run the full local check sequence from AGENTS.md before opening a PR. If a
 change touches a skill `description`, also re-run the activation eval and
 include the summary numbers in the PR description.
@@ -22,12 +24,13 @@ include the summary numbers in the PR description.
 Use the repository's internal `moonbit-agent-skills-maintainer` skill so the workflow and gates below are loaded together.
 
 1. Resolve the official release Markdown in `moonbitlang/website` to a full commit and path. Run `vp run snapshot-release ... --output verification/releases/<release>/source.json`; never summarize the web page directly into a hand-written checklist.
-2. Create schema-v2 `coverage.json` beside the source inventory. Account for every generated source ID exactly once. For actionable decisions, enumerate each claim and link it to a unique evidence role owned by one product skill; otherwise give a concrete out-of-scope/not-actionable reason. Run `vp run verify-release-sources` and `vp run check-release-coverage`.
+2. Create schema-v2 `coverage.json` beside the source inventory. Account for every generated source ID exactly once. For actionable decisions, enumerate each claim, link it to a unique evidence role owned by one product skill, and add a `discoverability` route whose reference and exact feature terms occur together in the product skill's `Feature index`; otherwise give a concrete out-of-scope/not-actionable reason. Run `vp run verify-release-sources` and `vp run check-release-coverage`.
 3. Close content gaps. New language forms need checked examples for every claimed behavior; deprecations need the old form caught with warnings denied plus a passing replacement; commands/configuration need manifest or fixture evidence; unexecutable facts need an explicit `Documented, not executed` label and direct source. A documented-only deprecation still needs separate old-form and replacement roles and an explicit reason it cannot execute.
 4. Add or update deterministic content evals for changes that materially alter agent recommendations.
 5. Only after coverage is closed, run `moon upgrade` (or install the new channel build), `vp run snapshot-toolchain --date $(date +%F)`, and the three verification runners. Fix drift exposed by the new toolchain.
 6. Run `vp run run-fixtures --stamp --date $(date +%F)`, update the two product skills' frontmatter pins and compatibility lines, bump their `skill-version`, and run `vp run check-versions`.
-7. Run the complete sequence in `AGENTS.md`, the targeted content evals, and the two release reviews required by the maintainer skill.
+7. Re-pin the official language surface if the documentation commit changed, close every added or renamed topic, and run `vp run verify-language-surface-source` plus `vp run check-language-surface`.
+8. Run the complete sequence in `AGENTS.md`, the targeted content evals, and the two release reviews required by the maintainer skill.
 
 ## Style
 

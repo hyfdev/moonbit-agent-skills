@@ -1,0 +1,8 @@
+{
+  "language-reference-before-feature-index": {
+    "commit": "b4a323735da6f2f33d8846536f912eaf339f2512",
+    "skills_tree": "291192ad3ba3bd5c3bd47e4352580fab7682d711",
+    "language_tree": "ef1ad26b047a0e5eca3b401b2449d91c71350168",
+    "purpose": "Old-vs-new discoverability baseline before the language feature index and official language-surface gate."
+  }
+}

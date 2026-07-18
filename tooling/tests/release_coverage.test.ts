@@ -146,6 +146,31 @@ describe("release coverage closure", () => {
     expect(releaseCoverageProblems(REPO_ROOT)).toEqual([]);
   });
 
+  it("requires a discoverable SKILL.md route for every current actionable decision", () => {
+    const inventory = JSON.parse(
+      readFileSync(join(REPO_ROOT, "verification/releases/0.10.4/source.json"), "utf8"),
+    ) as ReleaseInventory;
+    const coverage = JSON.parse(
+      readFileSync(join(REPO_ROOT, "verification/releases/0.10.4/coverage.json"), "utf8"),
+    );
+    delete coverage.decisions[0].discoverability;
+    const manifest = JSON.parse(
+      readFileSync(join(REPO_ROOT, "verification/commands/manifest.json"), "utf8"),
+    ) as { entries: Array<{ id: string }> };
+    expect(
+      validateCoverage(
+        coverage,
+        inventory,
+        "coverage.json",
+        REPO_ROOT,
+        new Set(manifest.entries.map((entry) => entry.id)),
+        true,
+      ),
+    ).toContain(
+      "coverage.json: language-1,language-1-p1,language-1-b1,language-1-b2,language-1-p2,language-1-b3,language-1-b4,language-1-p3: current actionable decisions require discoverability",
+    );
+  });
+
   it("reports an omitted source item", () => {
     const inventory = createReleaseInventory(RELEASE_MARKDOWN, SOURCE_METADATA);
     const coverage = coverageFor(inventory);

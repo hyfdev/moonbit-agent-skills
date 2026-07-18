@@ -5,7 +5,7 @@ license: MIT
 user-invocable: false
 compatibility: Verified only against moon 0.1.20260713 and moonrun 0.1.20260713 (MoonBit v0.10.4, 2026-07-13), Linux x86_64. Network needed for dependency and registry operations; Node.js 24+ runs the bundled environment-report helper.
 metadata:
-  skill-version: "0.2.1"
+  skill-version: "0.3.0"
   moon-version: "0.1.20260713"
   moonrun-version: "0.1.20260713"
   moonbit-release: "0.10.4"
@@ -38,21 +38,21 @@ Every command and configuration shape in this skill was executed for real agains
 
 - **If a command or config contradicts this skill, complete the reporting protocol before the final response rather than merely mentioning the mismatch.** Rebuild it in a scratch module with generic names, prepare a privacy-scrubbed public issue draft, show the user its exact title and body, and provide the issue-template link. Stop there: never submit the issue or invoke GitHub from this skill workflow, even if the user gave blanket or draft-specific permission. A later request for the host agent to send it is a separate outbound action governed by that client's own approval controls. Never edit the installed skill copy or write the draft into the user's repository. Exact protocol: references/reporting-errors.md
 
-## Reference routing
+## Feature index
 
 Load only what the task needs:
 
-- Module/package layout, moon.mod & moon.pkg DSL, legacy JSON mapping → references/project-layout-and-config.md
-- Everyday commands (new, check, build, run, test, fmt, info, doc, clean) with verified flags → references/commands.md
-- Test filtering, snapshot updates, doc tests, coverage, benchmarks → references/testing-workflows.md
-- Dependencies, mooncakes registry, publishing, packaging → references/dependencies-and-registry.md
-- Target selection, preferred/supported targets, per-file conditional builds, link options, native stubs → references/targets-and-conditional-builds.md
-- Semantic code queries (peek-def, outline, doc search, hover, references, rename) → references/moon-ide.md
-- moon.work workspaces, .mbtx script mode, pre-build rules → references/workspaces-and-scripts.md
-- Diagnosing build/test/dependency failures, moon explain, warning lists → references/diagnostics-and-recovery.md
+- Module/package layout; `moon.mod` / `moon.pkg`; deprecated `moon.mod.json` / `moon.pkg.json`; `source`; formatter; `pkgtype`; `#export_name`; virtual packages with `options("virtual")`, `implement`, and `overrides` → references/project-layout-and-config.md
+- Everyday `moon new`, `check`, `build`, `run`, `test`, `fmt`, `info`, `doc`, and `clean`; executed-program exit code → references/commands.md
+- Test path filtering, snapshots, doc tests, coverage, `moon bench PATH`, and raw benchmark statistics → references/testing-workflows.md
+- Dependencies, mooncakes registry, publishing, and packaging → references/dependencies-and-registry.md
+- Target selection; `preferred-target`; supported targets; native platform matrix; conditional builds; link options; native stubs → references/targets-and-conditional-builds.md
+- Semantic code queries including peek-def, outline, doc search, hover, references, and rename → references/moon-ide.md
+- `moon.work` workspaces, `.mbtx` script mode, module-root test and pre-build execution, and pre-build paths → references/workspaces-and-scripts.md
+- Build, test, and dependency diagnostics; `moon explain`; warning lists and `--deny-warn` → references/diagnostics-and-recovery.md
 
 Every `moon ...` command line shown in these references is executed against the pinned toolchain by the source repository's CI — the examples are guaranteed to have run, not just to look plausible.
-- Toolchain contradicts this skill → report upstream (with consent): references/reporting-errors.md
+- Toolchain contradicts this skill; minimal reproduction and issue draft → references/reporting-errors.md
 
 ## Boundary
 

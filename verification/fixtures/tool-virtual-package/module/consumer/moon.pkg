@@ -1,0 +1,7 @@
+import {
+  "mbtskills/virtualfixture/virtual",
+}
+
+options(
+  overrides: [ "mbtskills/virtualfixture/implementation" ],
+)

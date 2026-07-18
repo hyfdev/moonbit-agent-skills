@@ -1,7 +1,7 @@
 interface:
   display_name: "MoonBit Language"
-  short_description: "Version-pinned, machine-verified MoonBit language knowledge"
-  default_prompt: "Use $moonbit-language when reading, writing, or fixing MoonBit code (.mbt / .mbt.md): syntax, types, pattern matching, traits, visibility, checked errors, async, FFI declarations."
+  short_description: "Verified MoonBit syntax, semantics, migrations, and diagnostics"
+  default_prompt: "Use $moonbit-language when understanding, writing, reviewing, or fixing MoonBit code (.mbt / .mbt.md), including current function and argument syntax, structs and enums, patterns, traits and explicit extend/pub extend, visibility, checked errors, async, tests, and FFI declarations."
 
 policy:
   allow_implicit_invocation: true

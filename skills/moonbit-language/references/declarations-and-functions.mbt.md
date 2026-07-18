@@ -14,6 +14,10 @@ fn main() { ... }   // WRONG: E3003 — write `fn main { ... }`
 init { ... }        // WRONG: parse error — write `fn init { ... }`
 ```
 
+## Names and keywords
+
+Value and function identifiers begin lowercase; types, enum constructors, and constants begin uppercase. MoonBit also has soft or reserved-for-future words that may still parse as identifiers while warning. In particular, `extend` is transitioning into syntax: rename an identifier called `extend` and use it only for explicit trait-method attachment. The `lang-dep-extend-identifier` fixture proves the warning and replacement.
+
 ## Top-level bindings
 
 Top-level `let` is allowed; top-level `let mut` is a parse error. There are no mutable globals — use a `Ref[T]` cell, constructed with `Ref(value)` (`Ref::new` is deprecated).
@@ -66,9 +70,51 @@ test "lambda forms" {
 
 The `_` partial-application shorthand `f(a, _)` is deprecated (warning `deprecated_syntax`); write the arrow lambda instead. Scala-style bare `_ * 2` lambdas never existed (E4116).
 
+## Function arguments, declarations, aliases, and recursion
+
+Labelled parameters use `name~ : Type` and calls use `name=value` (or `name~` when forwarding a same-named local). Optional parameters use `name? : Type = default`; without a default, the parameter has type `Type?` and receives `None`. Forward an existing option without wrapping it again as `name?=option`. `#callsite(autofill(param))` supplies supported location types such as `SourceLoc` when a caller omits the labelled argument.
+
+`declare fn` separates a top-level signature from its matching implementation. Mutually recursive local functions use `letrec ... and ...`; an ordinary local `fn` may only call itself and earlier local functions.
+
+```mbt check
+fn decl_render(name~ : String, count? : Int = 1, suffix? : String) -> String {
+  let suffix = suffix.unwrap_or("")
+  "\{name}:\{count}\{suffix}"
+}
+
+#callsite(autofill(loc))
+fn decl_call_location(loc~ : SourceLoc) -> SourceLoc {
+  loc
+}
+
+declare fn decl_sum(x : Int, y : Int) -> Int
+
+fn decl_sum(x : Int, y : Int) -> Int {
+  x + y
+}
+
+test "labelled, optional, autofill, declare, and letrec" {
+  assert_eq(decl_render(count=2, name="x", suffix="!"), "x:2!")
+  assert_eq(decl_render(name="x"), "x:1")
+  let suffix : String? = Some("?")
+  assert_eq(decl_render(name="x", suffix?=suffix), "x:1?")
+  ignore(decl_call_location())
+  assert_eq(decl_sum(20, 22), 42)
+  letrec even = x => x == 0 || odd(x - 1)
+  and odd = x => x != 0 && even(x - 1)
+  assert_true(even(42))
+}
+```
+
+Function aliases use `#alias(other_name)` on the original declaration; the full attribute behavior is owned by attributes.mbt.md. The old standalone `fnalias original as alias` form still parses but is deprecated.
+
+```mbt nocheck
+fnalias original as alias // DEPRECATED: use #alias(alias) on `original`
+```
+
 ## Pipeline operator
 
-`x |> f(a)` pipes `x` into the **first** argument: it means `f(x, a)`.
+`x |> f(a)` pipes `x` into the **first** argument: it means `f(x, a)`. Reverse pipe supplies the final argument: `f(a) <| x` means `f(a, x)`.
 
 ```mbt check
 fn add2(x : Int, y : Int) -> Int {
@@ -77,6 +123,7 @@ fn add2(x : Int, y : Int) -> Int {
 
 test "pipeline feeds the first argument" {
   assert_eq(5 |> add2(10), 15)
+  assert_eq(add2(10) <| 5, 15)
 }
 ```
 
@@ -136,5 +183,15 @@ test "cascade keeps the receiver" {
   let buf = StringBuilder::new()
   buf..write_string("a")..write_string("b").write_string("c")
   assert_eq(buf.to_string(), "abc")
+}
+```
+
+## TODO placeholders
+
+`...` is an unfinished-expression placeholder that can inhabit any expected type, but it emits warning `todo`. It is useful while sketching and must not survive a warnings-denied check. The `lang-warning-todo-placeholder` fixture proves the warning and a completed replacement.
+
+```mbt nocheck
+pub fn unfinished() -> Int {
+  ... // Warning [0028] todo: unfinished code
 }
 ```

@@ -87,6 +87,12 @@ Executable packages: both `pkgtype(kind: "executable")` and `options("is-main": 
 
 For a `pkgtype(kind: "foreign_library")` package, `#export_name("symbol")` on a public function selects its generated Wasm/JS/C symbol name. **Documented, not executed end-to-end:** the [0.10.4 release notes](https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release) state that only functions declared in that foreign-library package are exported, not functions from dependencies; native static/dynamic library output was still being polished, so prefer this feature for Wasm/JS at this pin.
 
+## Virtual packages and overrides
+
+A virtual package declares a replaceable API with `options("virtual": { "has-default": true })`. An implementation package points back with `options(implement: "module/path/to/virtual")`. A consuming package imports the virtual package and selects implementations with `options(overrides: [ "module/path/to/implementation" ])`. The `tool-virtual-package` fixture proves that a consumer test resolves calls through the selected implementation on all four pinned targets with warnings denied.
+
+The virtual package's public declarations are the interface; the implementation must provide matching declarations. With `"has-default": true`, the virtual package's own bodies are usable when no override is selected.
+
 ## Legacy JSON → DSL mapping
 
 | Legacy (`moon.mod.json` / `moon.pkg.json`) | Current DSL |

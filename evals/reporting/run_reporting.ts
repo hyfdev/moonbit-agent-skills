@@ -207,8 +207,8 @@ export function injectContradiction(
   if (mode === "language-entrypoint") {
     replaceRequired(
       join(skillDirectory, "SKILL.md"),
-      "entry point is `fn main { }` (no parens)",
-      "entry point is `fn main() { }` (parentheses required)",
+      "Entry points are `fn main { }` and `fn init { }`;",
+      "The entry point is `fn main() { }` (parentheses required); `fn init { }` remains unchanged;",
     );
     const declarations = join(skillDirectory, "references", "declarations-and-functions.mbt.md");
     replaceRequired(

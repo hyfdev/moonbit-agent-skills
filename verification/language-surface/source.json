@@ -1,0 +1,1996 @@
+{
+  "documents": [
+    {
+      "id": "document-introduction",
+      "path": "next/language/introduction.md",
+      "sha256": "82983a8ad8f3560c97b3a065b0faa04f425d7d1d5471bdf51c368d1341c92ee8",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/introduction.html"
+    },
+    {
+      "id": "document-fundamentals",
+      "path": "next/language/fundamentals.md",
+      "sha256": "ccf360d2c91762ff829f4ccbe500bea915a1b3f029f988e9c80014a345de3b19",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/fundamentals.html"
+    },
+    {
+      "id": "document-methods",
+      "path": "next/language/methods.md",
+      "sha256": "aed6939fbbcd815709b8ca76cde0537452d85998966f663f9b0885456eb31b0c",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/methods.html"
+    },
+    {
+      "id": "document-derive",
+      "path": "next/language/derive.md",
+      "sha256": "f8c4e9f8136593baca31a7ff685aa37b699fa676450bda9fafc5041b85ff48c3",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/derive.html"
+    },
+    {
+      "id": "document-error-handling",
+      "path": "next/language/error-handling.md",
+      "sha256": "afc60790fec99c0e5ce2503961a9adfd0ba1a8bafac5de1f7548f62d293e8146",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/error-handling.html"
+    },
+    {
+      "id": "document-packages",
+      "path": "next/language/packages.md",
+      "sha256": "318c30667465b96efe36c879bae34d29bdca0efb52b0532f215939ab88c065b1",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/packages.html"
+    },
+    {
+      "id": "document-tests",
+      "path": "next/language/tests.md",
+      "sha256": "3a1f03b1c07ec5059e4c4a47a85b7c1faf381ce04e868fd1fc75265f77af6e14",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/tests.html"
+    },
+    {
+      "id": "document-benchmarks",
+      "path": "next/language/benchmarks.md",
+      "sha256": "860b3d7e0013746baa74ea92d4e3c88b26eddeb0a48a03c65b172b933fb8c0e8",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/benchmarks.html"
+    },
+    {
+      "id": "document-docs",
+      "path": "next/language/docs.md",
+      "sha256": "43a5760d2451b03804f62c2c56110ebc8133202022447688c660cb7e9470a728",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/docs.html"
+    },
+    {
+      "id": "document-attributes-deprecated",
+      "path": "next/language/attributes/deprecated.md",
+      "sha256": "9c37e91dbb518af17cd15fbd3b4a3d183977db9c4105ac2a5b9ed3b9f91431d5",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/deprecated.html"
+    },
+    {
+      "id": "document-attributes-alert",
+      "path": "next/language/attributes/alert.md",
+      "sha256": "2c75a0c6183c17e109c7e138ac171f89ddd41ccd08b22e1f570a6373955c2a83",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/alert.html"
+    },
+    {
+      "id": "document-attributes-alias",
+      "path": "next/language/attributes/alias.md",
+      "sha256": "ec26e2f383ee6bca2f4ae77d21e05c324dce86d88e20e973a504c9da0daaeb91",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/alias.html"
+    },
+    {
+      "id": "document-attributes-label_migration",
+      "path": "next/language/attributes/label_migration.md",
+      "sha256": "388cdc28f982cc02f6d693210800b14e45f4f16d7c4b0a30c45a8a97ceb87c2f",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/label_migration.html"
+    },
+    {
+      "id": "document-attributes-visibility",
+      "path": "next/language/attributes/visibility.md",
+      "sha256": "a5ed829d259a36cd24d1532268ede94f1be5ce34c6f875a829ed1d0c0354490e",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/visibility.html"
+    },
+    {
+      "id": "document-attributes-internal",
+      "path": "next/language/attributes/internal.md",
+      "sha256": "f3926be50a63ae0efe82ab5767a665f48408387523ab87fb343af4b09c616632",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/internal.html"
+    },
+    {
+      "id": "document-attributes-doc_hidden",
+      "path": "next/language/attributes/doc_hidden.md",
+      "sha256": "a6f4c6b5bba6fbdddc9a0d2419f5d8d43245dcd3be8f7bd0f60d199621d6814d",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/doc_hidden.html"
+    },
+    {
+      "id": "document-attributes-warnings",
+      "path": "next/language/attributes/warnings.md",
+      "sha256": "17a52bf7ad56d20b4611ab870a08b705b28e9a3adfb7734c3a3e023b0b01cca6",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/warnings.html"
+    },
+    {
+      "id": "document-attributes-must_implement_one",
+      "path": "next/language/attributes/must_implement_one.md",
+      "sha256": "a6e3526db34aba4befe707f7917233b9693a3c2079a8d008f7aa04ea67907a32",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/must_implement_one.html"
+    },
+    {
+      "id": "document-attributes-inline",
+      "path": "next/language/attributes/inline.md",
+      "sha256": "02a50909012abb127d764c66e73c56a6969a8ccfe2c1aa395b00928e2c2e44e1",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/inline.html"
+    },
+    {
+      "id": "document-attributes-external",
+      "path": "next/language/attributes/external.md",
+      "sha256": "25573204576f58fcdfd4e65d8a011462aebe1752f456a04d241166917528b7fd",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/external.html"
+    },
+    {
+      "id": "document-attributes-borrow_and_owned",
+      "path": "next/language/attributes/borrow_and_owned.md",
+      "sha256": "400365b1568f37b5a9beb2a66762f9e6481039721287ea09ab89c6360c1e72ad",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/borrow_and_owned.html"
+    },
+    {
+      "id": "document-attributes-as_free_fn",
+      "path": "next/language/attributes/as_free_fn.md",
+      "sha256": "abce91c9652cb3527e08e745d9a7425351aaf733148c704a857558d72c3e45fe",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/as_free_fn.html"
+    },
+    {
+      "id": "document-attributes-callsite",
+      "path": "next/language/attributes/callsite.md",
+      "sha256": "a920fd627655ec1b74029d55f7b9771a23fd7840bf619d16158c3029c3c91ef7",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/callsite.html"
+    },
+    {
+      "id": "document-attributes-skip",
+      "path": "next/language/attributes/skip.md",
+      "sha256": "4c822128d1dbedb71a1450a0fc66c55b44337112c190d764f4e017966aec98a3",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/skip.html"
+    },
+    {
+      "id": "document-attributes-coverage_skip",
+      "path": "next/language/attributes/coverage_skip.md",
+      "sha256": "67be3fdef0bc0381d6153b68b94319b7ac1ed21b8639786cd12e0ea8f5bb9cc6",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/coverage_skip.html"
+    },
+    {
+      "id": "document-attributes-cfg",
+      "path": "next/language/attributes/cfg.md",
+      "sha256": "cf742185677042cbca8d894883e9b01e9db60acc06734daf81316510b7b39754",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/cfg.html"
+    },
+    {
+      "id": "document-attributes-module",
+      "path": "next/language/attributes/module.md",
+      "sha256": "0fa4a165da98beb751c81635213c54e85906187e03b9c38da71be1d8a3124b7d",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/module.html"
+    },
+    {
+      "id": "document-attributes",
+      "path": "next/language/attributes.md",
+      "sha256": "a0d9e0629946878da3a034ca5d5ec42197f1230765f569cb80800713332dec93",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes.html"
+    },
+    {
+      "id": "document-ffi",
+      "path": "next/language/ffi.md",
+      "sha256": "5ddb29f1f9660bbee05d3a6033e4192bd4f38dccda99310e7feda18bb3febf96",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/ffi.html"
+    },
+    {
+      "id": "document-async-experimental",
+      "path": "next/language/async-experimental.md",
+      "sha256": "c1f1798bb1110b74ff99581ec49a2451b30a0ca936ad8e04ba927fd4a37a0877",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/async-experimental.html"
+    },
+    {
+      "id": "document-verification",
+      "path": "next/language/verification.md",
+      "sha256": "646308d589164d96d1047873f0035a9e6b5fc31c98be7a143d28e74a95f27f62",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/verification.html"
+    },
+    {
+      "id": "document-lexical-conventions",
+      "path": "next/language/lexical-conventions.md",
+      "sha256": "e0d8ed41b579b8960b82573f6e4ca14dc5997e6e34e58dc3aa39979f8ffe2e5d",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/lexical-conventions.html"
+    },
+    {
+      "id": "document-error_codes-index",
+      "path": "next/language/error_codes/index.md",
+      "sha256": "02222311ac0acc2603a482acaf3897044f6f79a835b7814d7c62efda56cd566a",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/index.html"
+    }
+  ],
+  "generated_by": "tooling/snapshot_language_surface.ts",
+  "items": [
+    {
+      "document_id": "document-introduction",
+      "id": "document-introduction",
+      "kind": "document",
+      "level": 1,
+      "text": "Introduction"
+    },
+    {
+      "document_id": "document-introduction",
+      "id": "document-introduction-expressions-and-statements",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-introduction",
+      "text": "Expressions and Statements"
+    },
+    {
+      "document_id": "document-introduction",
+      "id": "document-introduction-variable-binding",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-introduction",
+      "text": "Variable Binding"
+    },
+    {
+      "document_id": "document-introduction",
+      "id": "document-introduction-naming-conventions",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-introduction",
+      "text": "Naming conventions"
+    },
+    {
+      "document_id": "document-introduction",
+      "id": "document-introduction-keywords",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-introduction-naming-conventions",
+      "text": "Keywords"
+    },
+    {
+      "document_id": "document-introduction",
+      "id": "document-introduction-reserved-keywords",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-introduction-naming-conventions",
+      "text": "Reserved Keywords"
+    },
+    {
+      "document_id": "document-introduction",
+      "id": "document-introduction-program-entrance",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-introduction",
+      "text": "Program entrance"
+    },
+    {
+      "document_id": "document-introduction",
+      "id": "document-introduction-init-and-main",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-introduction-program-entrance",
+      "text": "`init` and `main`"
+    },
+    {
+      "document_id": "document-introduction",
+      "id": "document-introduction-test",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-introduction-program-entrance",
+      "text": "`test`"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals",
+      "kind": "document",
+      "level": 1,
+      "text": "Fundamentals"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-built-in-data-structures",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-fundamentals",
+      "text": "Built-in Data Structures"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-unit",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-built-in-data-structures",
+      "text": "Unit"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-boolean",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-built-in-data-structures",
+      "text": "Boolean"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-number",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-built-in-data-structures",
+      "text": "Number"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-string",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-built-in-data-structures",
+      "text": "String"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-char",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-built-in-data-structures",
+      "text": "Char"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-byte-s",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-built-in-data-structures",
+      "text": "Byte(s)"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-choosing-a-byte-container",
+      "kind": "heading",
+      "level": 4,
+      "parent": "document-fundamentals-byte-s",
+      "text": "Choosing a Byte Container"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-tuple",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-built-in-data-structures",
+      "text": "Tuple"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-ref",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-built-in-data-structures",
+      "text": "Ref"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-option-and-result",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-built-in-data-structures",
+      "text": "Option and Result"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-array",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-built-in-data-structures",
+      "text": "Array"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-arrayview",
+      "kind": "heading",
+      "level": 4,
+      "parent": "document-fundamentals-array",
+      "text": "ArrayView"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-map",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-built-in-data-structures",
+      "text": "Map"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-json",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-built-in-data-structures",
+      "text": "Json"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-overloaded-literals",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-fundamentals",
+      "text": "Overloaded Literals"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-escape-sequences-in-overloaded-literals",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-overloaded-literals",
+      "text": "Escape Sequences in Overloaded Literals"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-functions",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-fundamentals",
+      "text": "Functions"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-top-level-functions",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-functions",
+      "text": "Top-Level Functions"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-local-functions",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-functions",
+      "text": "Local Functions"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-function-applications",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-functions",
+      "text": "Function Applications"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-partial-applications",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-functions",
+      "text": "Partial Applications"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-labelled-arguments",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-functions",
+      "text": "Labelled arguments"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-optional-arguments",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-functions",
+      "text": "Optional arguments"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-optional-arguments-without-default-values",
+      "kind": "heading",
+      "level": 4,
+      "parent": "document-fundamentals-optional-arguments",
+      "text": "Optional arguments without default values"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-autofill-arguments",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-functions",
+      "text": "Autofill arguments"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-function-alias",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-functions",
+      "text": "Function alias"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-control-structures",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-fundamentals",
+      "text": "Control Structures"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-conditional-expressions",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-control-structures",
+      "text": "Conditional Expressions"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-match-expression",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-control-structures",
+      "text": "Match Expression"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-guard-statement",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-control-structures",
+      "text": "Guard Statement"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-guard-statement-and-is-expression",
+      "kind": "heading",
+      "level": 4,
+      "parent": "document-fundamentals-guard-statement",
+      "text": "Guard statement and is expression"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-while-loop",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-control-structures",
+      "text": "While loop"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-for-loop",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-control-structures",
+      "text": "For Loop"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-for-in-loop",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-control-structures",
+      "text": "`for .. in` loop"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-range-expression-in-for-in-loop",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-control-structures",
+      "text": "Range expression in `for .. in` loop"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-list-comprehension",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-control-structures",
+      "text": "List comprehension"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-labelled-continue-break",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-control-structures",
+      "text": "Labelled Continue/Break"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-defer-expression",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-control-structures",
+      "text": "`defer` expression"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-iterator",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-fundamentals",
+      "text": "Iterator"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-custom-data-types",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-fundamentals",
+      "text": "Custom Data Types"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-struct",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-custom-data-types",
+      "text": "Struct"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-constructing-struct-with-shorthand",
+      "kind": "heading",
+      "level": 4,
+      "parent": "document-fundamentals-struct",
+      "text": "Constructing Struct with Shorthand"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-struct-update-syntax",
+      "kind": "heading",
+      "level": 4,
+      "parent": "document-fundamentals-struct",
+      "text": "Struct Update Syntax"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-custom-constructors",
+      "kind": "heading",
+      "level": 4,
+      "parent": "document-fundamentals-struct",
+      "text": "Custom constructors"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-enum",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-custom-data-types",
+      "text": "Enum"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-constructor-with-labelled-arguments",
+      "kind": "heading",
+      "level": 4,
+      "parent": "document-fundamentals-enum",
+      "text": "Constructor with labelled arguments"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-constructor-with-mutable-fields",
+      "kind": "heading",
+      "level": 4,
+      "parent": "document-fundamentals-enum",
+      "text": "Constructor with mutable fields"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-extensible-enum",
+      "kind": "heading",
+      "level": 4,
+      "parent": "document-fundamentals-enum",
+      "text": "Extensible enum"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-tuple-struct",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-custom-data-types",
+      "text": "Tuple Struct"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-type-alias",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-custom-data-types",
+      "text": "Type alias"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-local-types",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-custom-data-types",
+      "text": "Local types"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-pattern-matching",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-fundamentals",
+      "text": "Pattern Matching"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-simple-patterns",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-pattern-matching",
+      "text": "Simple Patterns"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-array-pattern",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-pattern-matching",
+      "text": "Array Pattern"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-bitstring-pattern",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-pattern-matching",
+      "text": "Bitstring Pattern"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-range-pattern",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-pattern-matching",
+      "text": "Range Pattern"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-map-pattern",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-pattern-matching",
+      "text": "Map Pattern"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-json-pattern",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-pattern-matching",
+      "text": "Json Pattern"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-default-bindings-in-or-patterns",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-pattern-matching",
+      "text": "Default bindings in or-patterns"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-guard-condition",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-pattern-matching",
+      "text": "Guard condition"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-generics",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-fundamentals",
+      "text": "Generics"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-special-syntax",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-fundamentals",
+      "text": "Special Syntax"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-pipelines",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-special-syntax",
+      "text": "Pipelines"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-cascade-operator",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-special-syntax",
+      "text": "Cascade Operator"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-is-expression",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-special-syntax",
+      "text": "is Expression"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-regex-literal-expression",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-special-syntax",
+      "text": "Regex Literal Expression"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-regex-match-expression",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-special-syntax",
+      "text": "Regex Match Expression"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-lexscan",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-special-syntax",
+      "text": "Lexscan"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-lexmatch-deprecated",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-special-syntax",
+      "text": "Lexmatch (deprecated)"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-spread-operator",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-special-syntax",
+      "text": "Spread Operator"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "id": "document-fundamentals-todo-syntax",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-special-syntax",
+      "text": "TODO syntax"
+    },
+    {
+      "document_id": "document-methods",
+      "id": "document-methods",
+      "kind": "document",
+      "level": 1,
+      "text": "Method and Trait"
+    },
+    {
+      "document_id": "document-methods",
+      "id": "document-methods-method-system",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-methods",
+      "text": "Method system"
+    },
+    {
+      "document_id": "document-methods",
+      "id": "document-methods-local-method",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-methods-method-system",
+      "text": "Local method"
+    },
+    {
+      "document_id": "document-methods",
+      "id": "document-methods-alias-methods-as-functions",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-methods-method-system",
+      "text": "Alias methods as functions"
+    },
+    {
+      "document_id": "document-methods",
+      "id": "document-methods-operator-overloading",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-methods",
+      "text": "Operator Overloading"
+    },
+    {
+      "document_id": "document-methods",
+      "id": "document-methods-trait-system",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-methods",
+      "text": "Trait system"
+    },
+    {
+      "document_id": "document-methods",
+      "id": "document-methods-extending-traits",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-methods-trait-system",
+      "text": "Extending traits"
+    },
+    {
+      "document_id": "document-methods",
+      "id": "document-methods-implementing-traits",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-methods-trait-system",
+      "text": "Implementing traits"
+    },
+    {
+      "document_id": "document-methods",
+      "id": "document-methods-attaching-trait-methods-with-extend",
+      "kind": "heading",
+      "level": 4,
+      "parent": "document-methods-implementing-traits",
+      "text": "Attaching trait methods with `extend`"
+    },
+    {
+      "document_id": "document-methods",
+      "id": "document-methods-using-traits",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-methods-trait-system",
+      "text": "Using traits"
+    },
+    {
+      "document_id": "document-methods",
+      "id": "document-methods-invoke-trait-methods-directly",
+      "kind": "heading",
+      "level": 4,
+      "parent": "document-methods-using-traits",
+      "text": "Invoke trait methods directly"
+    },
+    {
+      "document_id": "document-methods",
+      "id": "document-methods-trait-objects",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-methods",
+      "text": "Trait objects"
+    },
+    {
+      "document_id": "document-methods",
+      "id": "document-methods-builtin-traits",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-methods",
+      "text": "Builtin traits"
+    },
+    {
+      "document_id": "document-methods",
+      "id": "document-methods-deriving-builtin-traits",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-methods-builtin-traits",
+      "text": "Deriving builtin traits"
+    },
+    {
+      "document_id": "document-derive",
+      "id": "document-derive",
+      "kind": "document",
+      "level": 1,
+      "text": "Deriving traits"
+    },
+    {
+      "document_id": "document-derive",
+      "id": "document-derive-eq-and-compare",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-derive",
+      "text": "Eq and Compare"
+    },
+    {
+      "document_id": "document-derive",
+      "id": "document-derive-debug",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-derive",
+      "text": "Debug"
+    },
+    {
+      "document_id": "document-derive",
+      "id": "document-derive-default",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-derive",
+      "text": "Default"
+    },
+    {
+      "document_id": "document-derive",
+      "id": "document-derive-hash",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-derive",
+      "text": "Hash"
+    },
+    {
+      "document_id": "document-derive",
+      "id": "document-derive-arbitrary",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-derive",
+      "text": "Arbitrary"
+    },
+    {
+      "document_id": "document-derive",
+      "id": "document-derive-fromjson-and-tojson",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-derive",
+      "text": "FromJson and ToJson"
+    },
+    {
+      "document_id": "document-derive",
+      "id": "document-derive-enum-styles",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-derive-fromjson-and-tojson",
+      "text": "Enum styles"
+    },
+    {
+      "document_id": "document-derive",
+      "id": "document-derive-deriving-option",
+      "kind": "heading",
+      "level": 4,
+      "parent": "document-derive-enum-styles",
+      "text": "Deriving `Option`"
+    },
+    {
+      "document_id": "document-derive",
+      "id": "document-derive-container-arguments",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-derive-fromjson-and-tojson",
+      "text": "Container arguments"
+    },
+    {
+      "document_id": "document-derive",
+      "id": "document-derive-case-arguments",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-derive-fromjson-and-tojson",
+      "text": "Case arguments"
+    },
+    {
+      "document_id": "document-derive",
+      "id": "document-derive-field-arguments",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-derive-fromjson-and-tojson",
+      "text": "Field arguments"
+    },
+    {
+      "document_id": "document-error-handling",
+      "id": "document-error-handling",
+      "kind": "document",
+      "level": 1,
+      "text": "Error handling"
+    },
+    {
+      "document_id": "document-error-handling",
+      "id": "document-error-handling-error-types",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error-handling",
+      "text": "Error Types"
+    },
+    {
+      "document_id": "document-error-handling",
+      "id": "document-error-handling-failure",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-error-handling-error-types",
+      "text": "Failure"
+    },
+    {
+      "document_id": "document-error-handling",
+      "id": "document-error-handling-throwing-errors",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error-handling",
+      "text": "Throwing Errors"
+    },
+    {
+      "document_id": "document-error-handling",
+      "id": "document-error-handling-error-polymorphism",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-error-handling-throwing-errors",
+      "text": "Error Polymorphism"
+    },
+    {
+      "document_id": "document-error-handling",
+      "id": "document-error-handling-handling-errors",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error-handling",
+      "text": "Handling Errors"
+    },
+    {
+      "document_id": "document-error-handling",
+      "id": "document-error-handling-try-catch",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-error-handling-handling-errors",
+      "text": "Try ... Catch"
+    },
+    {
+      "document_id": "document-error-handling",
+      "id": "document-error-handling-transforming-to-result",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-error-handling-handling-errors",
+      "text": "Transforming to Result"
+    },
+    {
+      "document_id": "document-error-handling",
+      "id": "document-error-handling-panic-on-errors",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-error-handling-handling-errors",
+      "text": "Panic on Errors"
+    },
+    {
+      "document_id": "document-error-handling",
+      "id": "document-error-handling-error-inference",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-error-handling-handling-errors",
+      "text": "Error Inference"
+    },
+    {
+      "document_id": "document-packages",
+      "id": "document-packages",
+      "kind": "document",
+      "level": 1,
+      "text": "Managing Projects with Packages"
+    },
+    {
+      "document_id": "document-packages",
+      "id": "document-packages-packages-and-modules",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-packages",
+      "text": "Packages and modules"
+    },
+    {
+      "document_id": "document-packages",
+      "id": "document-packages-prelude-and-builtin-names",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-packages-packages-and-modules",
+      "text": "Prelude and builtin names"
+    },
+    {
+      "document_id": "document-packages",
+      "id": "document-packages-internal-packages",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-packages-packages-and-modules",
+      "text": "Internal Packages"
+    },
+    {
+      "document_id": "document-packages",
+      "id": "document-packages-using",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-packages-packages-and-modules",
+      "text": "Using"
+    },
+    {
+      "document_id": "document-packages",
+      "id": "document-packages-access-control",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-packages",
+      "text": "Access Control"
+    },
+    {
+      "document_id": "document-packages",
+      "id": "document-packages-functions",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-packages-access-control",
+      "text": "Functions"
+    },
+    {
+      "document_id": "document-packages",
+      "id": "document-packages-aliases",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-packages-access-control",
+      "text": "Aliases"
+    },
+    {
+      "document_id": "document-packages",
+      "id": "document-packages-types",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-packages-access-control",
+      "text": "Types"
+    },
+    {
+      "document_id": "document-packages",
+      "id": "document-packages-traits",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-packages-access-control",
+      "text": "Traits"
+    },
+    {
+      "document_id": "document-packages",
+      "id": "document-packages-trait-implementations",
+      "kind": "heading",
+      "level": 4,
+      "parent": "document-packages-traits",
+      "text": "Trait Implementations"
+    },
+    {
+      "document_id": "document-packages",
+      "id": "document-packages-virtual-packages",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-packages",
+      "text": "Virtual Packages"
+    },
+    {
+      "document_id": "document-packages",
+      "id": "document-packages-defining-a-virtual-package",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-packages-virtual-packages",
+      "text": "Defining a virtual package"
+    },
+    {
+      "document_id": "document-packages",
+      "id": "document-packages-implementing-a-virtual-package",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-packages-virtual-packages",
+      "text": "Implementing a virtual package"
+    },
+    {
+      "document_id": "document-packages",
+      "id": "document-packages-using-a-virtual-package",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-packages-virtual-packages",
+      "text": "Using a virtual package"
+    },
+    {
+      "document_id": "document-packages",
+      "id": "document-packages-overriding-a-virtual-package",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-packages-virtual-packages",
+      "text": "Overriding a virtual package"
+    },
+    {
+      "document_id": "document-tests",
+      "id": "document-tests",
+      "kind": "document",
+      "level": 1,
+      "text": "Writing Tests"
+    },
+    {
+      "document_id": "document-tests",
+      "id": "document-tests-test-blocks",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-tests",
+      "text": "Test Blocks"
+    },
+    {
+      "document_id": "document-tests",
+      "id": "document-tests-snapshot-tests",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-tests",
+      "text": "Snapshot Tests"
+    },
+    {
+      "document_id": "document-tests",
+      "id": "document-tests-snapshotting-show",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-tests-snapshot-tests",
+      "text": "Snapshotting `Show`"
+    },
+    {
+      "document_id": "document-tests",
+      "id": "document-tests-snapshotting-json",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-tests-snapshot-tests",
+      "text": "Snapshotting `JSON`"
+    },
+    {
+      "document_id": "document-tests",
+      "id": "document-tests-snapshotting-anything",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-tests-snapshot-tests",
+      "text": "Snapshotting Anything"
+    },
+    {
+      "document_id": "document-tests",
+      "id": "document-tests-blackbox-tests-and-whitebox-tests",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-tests",
+      "text": "BlackBox Tests and WhiteBox Tests"
+    },
+    {
+      "document_id": "document-benchmarks",
+      "id": "document-benchmarks",
+      "kind": "document",
+      "level": 1,
+      "text": "Writing Benchmarks"
+    },
+    {
+      "document_id": "document-benchmarks",
+      "id": "document-benchmarks-benchmarking-with-test-blocks",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-benchmarks",
+      "text": "Benchmarking with Test Blocks"
+    },
+    {
+      "document_id": "document-benchmarks",
+      "id": "document-benchmarks-batch-benchmarking",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-benchmarks",
+      "text": "Batch Benchmarking"
+    },
+    {
+      "document_id": "document-benchmarks",
+      "id": "document-benchmarks-raw-benchmark-statistics",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-benchmarks",
+      "text": "Raw Benchmark Statistics"
+    },
+    {
+      "document_id": "document-docs",
+      "id": "document-docs",
+      "kind": "document",
+      "level": 1,
+      "text": "Comments and Documentation"
+    },
+    {
+      "document_id": "document-docs",
+      "id": "document-docs-comments",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-docs",
+      "text": "Comments"
+    },
+    {
+      "document_id": "document-docs",
+      "id": "document-docs-doc-comments",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-docs",
+      "text": "Doc Comments"
+    },
+    {
+      "document_id": "document-docs",
+      "id": "document-docs-literate-mbt-md-files",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-docs",
+      "text": "Literate `.mbt.md` Files"
+    },
+    {
+      "document_id": "document-attributes-deprecated",
+      "id": "document-attributes-deprecated",
+      "kind": "document",
+      "level": 1,
+      "text": "Deprecated Attribute"
+    },
+    {
+      "document_id": "document-attributes-alert",
+      "id": "document-attributes-alert",
+      "kind": "document",
+      "level": 1,
+      "text": "Alert Attribute"
+    },
+    {
+      "document_id": "document-attributes-alias",
+      "id": "document-attributes-alias",
+      "kind": "document",
+      "level": 1,
+      "text": "Alias Attribute"
+    },
+    {
+      "document_id": "document-attributes-label_migration",
+      "id": "document-attributes-label_migration",
+      "kind": "document",
+      "level": 1,
+      "text": "`label_migration` Attribute"
+    },
+    {
+      "document_id": "document-attributes-visibility",
+      "id": "document-attributes-visibility",
+      "kind": "document",
+      "level": 1,
+      "text": "Visibility Attribute"
+    },
+    {
+      "document_id": "document-attributes-internal",
+      "id": "document-attributes-internal",
+      "kind": "document",
+      "level": 1,
+      "text": "Internal Attribute"
+    },
+    {
+      "document_id": "document-attributes-doc_hidden",
+      "id": "document-attributes-doc_hidden",
+      "kind": "document",
+      "level": 1,
+      "text": "Doc Hidden Attribute"
+    },
+    {
+      "document_id": "document-attributes-warnings",
+      "id": "document-attributes-warnings",
+      "kind": "document",
+      "level": 1,
+      "text": "Warnings Attribute"
+    },
+    {
+      "document_id": "document-attributes-must_implement_one",
+      "id": "document-attributes-must_implement_one",
+      "kind": "document",
+      "level": 1,
+      "text": "Must Implement One Attribute"
+    },
+    {
+      "document_id": "document-attributes-inline",
+      "id": "document-attributes-inline",
+      "kind": "document",
+      "level": 1,
+      "text": "Inline Attribute"
+    },
+    {
+      "document_id": "document-attributes-external",
+      "id": "document-attributes-external",
+      "kind": "document",
+      "level": 1,
+      "text": "External Attribute"
+    },
+    {
+      "document_id": "document-attributes-borrow_and_owned",
+      "id": "document-attributes-borrow_and_owned",
+      "kind": "document",
+      "level": 1,
+      "text": "Borrow and Owned Attribute"
+    },
+    {
+      "document_id": "document-attributes-as_free_fn",
+      "id": "document-attributes-as_free_fn",
+      "kind": "document",
+      "level": 1,
+      "text": "`as_free_fn` Attribute"
+    },
+    {
+      "document_id": "document-attributes-callsite",
+      "id": "document-attributes-callsite",
+      "kind": "document",
+      "level": 1,
+      "text": "Callsite Attribute"
+    },
+    {
+      "document_id": "document-attributes-skip",
+      "id": "document-attributes-skip",
+      "kind": "document",
+      "level": 1,
+      "text": "Skip Attribute"
+    },
+    {
+      "document_id": "document-attributes-coverage_skip",
+      "id": "document-attributes-coverage_skip",
+      "kind": "document",
+      "level": 1,
+      "text": "Coverage Skip Attribute"
+    },
+    {
+      "document_id": "document-attributes-cfg",
+      "id": "document-attributes-cfg",
+      "kind": "document",
+      "level": 1,
+      "text": "Configuration attribute"
+    },
+    {
+      "document_id": "document-attributes-module",
+      "id": "document-attributes-module",
+      "kind": "document",
+      "level": 1,
+      "text": "Module attribute"
+    },
+    {
+      "document_id": "document-attributes",
+      "id": "document-attributes",
+      "kind": "document",
+      "level": 1,
+      "text": "Attribute"
+    },
+    {
+      "document_id": "document-ffi",
+      "id": "document-ffi",
+      "kind": "document",
+      "level": 1,
+      "text": "Foreign Function Interface (FFI)"
+    },
+    {
+      "document_id": "document-ffi",
+      "id": "document-ffi-backends",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-ffi",
+      "text": "Backends"
+    },
+    {
+      "document_id": "document-ffi",
+      "id": "document-ffi-declare-foreign-type",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-ffi",
+      "text": "Declare Foreign Type"
+    },
+    {
+      "document_id": "document-ffi",
+      "id": "document-ffi-declare-foreign-function",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-ffi",
+      "text": "Declare Foreign Function"
+    },
+    {
+      "document_id": "document-ffi",
+      "id": "document-ffi-types",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-ffi-declare-foreign-function",
+      "text": "Types"
+    },
+    {
+      "document_id": "document-ffi",
+      "id": "document-ffi-callbacks",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-ffi-declare-foreign-function",
+      "text": "Callbacks"
+    },
+    {
+      "document_id": "document-ffi",
+      "id": "document-ffi-customize-integer-value-of-constant-enum",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-ffi-declare-foreign-function",
+      "text": "Customize integer value of constant enum"
+    },
+    {
+      "document_id": "document-ffi",
+      "id": "document-ffi-export-functions",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-ffi",
+      "text": "Export Functions"
+    },
+    {
+      "document_id": "document-ffi",
+      "id": "document-ffi-lifetime-management",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-ffi",
+      "text": "Lifetime management"
+    },
+    {
+      "document_id": "document-ffi",
+      "id": "document-ffi-lifetime-management-of-external-object",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-ffi-lifetime-management",
+      "text": "Lifetime management of external object"
+    },
+    {
+      "document_id": "document-ffi",
+      "id": "document-ffi-lifetime-management-of-moonbit-object",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-ffi-lifetime-management",
+      "text": "Lifetime management of MoonBit object"
+    },
+    {
+      "document_id": "document-ffi",
+      "id": "document-ffi-the-calling-convention-of-reference-counting",
+      "kind": "heading",
+      "level": 4,
+      "parent": "document-ffi-lifetime-management-of-moonbit-object",
+      "text": "The calling convention of reference counting"
+    },
+    {
+      "document_id": "document-ffi",
+      "id": "document-ffi-the-managed-types",
+      "kind": "heading",
+      "level": 4,
+      "parent": "document-ffi-lifetime-management-of-moonbit-object",
+      "text": "The managed types"
+    },
+    {
+      "document_id": "document-ffi",
+      "id": "document-ffi-the-borrow-and-owned-attribute",
+      "kind": "heading",
+      "level": 4,
+      "parent": "document-ffi-lifetime-management-of-moonbit-object",
+      "text": "The borrow and owned attribute"
+    },
+    {
+      "document_id": "document-async-experimental",
+      "id": "document-async-experimental",
+      "kind": "document",
+      "level": 1,
+      "text": "Async programming support"
+    },
+    {
+      "document_id": "document-async-experimental",
+      "id": "document-async-experimental-getting-started",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-async-experimental",
+      "text": "Getting started"
+    },
+    {
+      "document_id": "document-async-experimental",
+      "id": "document-async-experimental-async-function",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-async-experimental",
+      "text": "Async function"
+    },
+    {
+      "document_id": "document-async-experimental",
+      "id": "document-async-experimental-structured-concurrency-and-task-group",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-async-experimental",
+      "text": "Structured concurrency and task group"
+    },
+    {
+      "document_id": "document-async-experimental",
+      "id": "document-async-experimental-cancellation-makes-asynchronous-program-modular",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-async-experimental",
+      "text": "Cancellation makes asynchronous program modular"
+    },
+    {
+      "document_id": "document-async-experimental",
+      "id": "document-async-experimental-interacting-with-the-world",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-async-experimental",
+      "text": "Interacting with the world"
+    },
+    {
+      "document_id": "document-async-experimental",
+      "id": "document-async-experimental-javascript-support",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-async-experimental",
+      "text": "JavaScript support"
+    },
+    {
+      "document_id": "document-async-experimental",
+      "id": "document-async-experimental-experimental-wasm1-support",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-async-experimental",
+      "text": "Experimental Wasm1 support"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification",
+      "kind": "document",
+      "level": 1,
+      "text": "Formal Verification"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-overview-example-binary-search",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-verification",
+      "text": "Overview Example: Binary Search"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-setup",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-verification",
+      "text": "Setup"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-environment-setup",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-verification-setup",
+      "text": "Environment Setup"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-why3",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-verification-setup",
+      "text": "Why3"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-external-solvers",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-verification-setup",
+      "text": "External Solvers"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-enabling-proofs-in-a-package",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-verification-setup",
+      "text": "Enabling Proofs in a Package"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-structure-of-verified-code",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-verification",
+      "text": "Structure of Verified Code"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-source-layout",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-verification-structure-of-verified-code",
+      "text": "Source Layout"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-program-side-and-logic-side",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-verification-structure-of-verified-code",
+      "text": "Program Side and Logic Side"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-writing-specifications-and-proofs",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-verification",
+      "text": "Writing Specifications and Proofs"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-contracts-in-mbt",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-verification-writing-specifications-and-proofs",
+      "text": "Contracts in `.mbt`"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-proof-specific-annotations",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-verification-writing-specifications-and-proofs",
+      "text": "Proof-Specific Annotations"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-proof-pure",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-verification-writing-specifications-and-proofs",
+      "text": "`#proof_pure`"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-proof-decrease",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-verification-writing-specifications-and-proofs",
+      "text": "`proof_decrease`"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-proof-axiomatized",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-verification-writing-specifications-and-proofs",
+      "text": "`proof_axiomatized`"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-predicates-and-lemmas-in-mbtp",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-verification-writing-specifications-and-proofs",
+      "text": "Predicates and Lemmas in `.mbtp`"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-loop-invariants",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-verification-writing-specifications-and-proofs",
+      "text": "Loop Invariants"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-model-based-verification",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-verification-writing-specifications-and-proofs",
+      "text": "Model-Based Verification"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-recommended-style",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-verification-writing-specifications-and-proofs",
+      "text": "Recommended Style"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-running-verification",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-verification",
+      "text": "Running Verification"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-what-moon-prove-checks",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-verification-running-verification",
+      "text": "What `moon prove` Checks"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-running-the-verifier",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-verification-running-verification",
+      "text": "Running the Verifier"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-trust-model-and-limitations",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-verification",
+      "text": "Trust Model and Limitations"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-trusted-assumptions",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-verification-trust-model-and-limitations",
+      "text": "Trusted Assumptions"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-current-status",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-verification-trust-model-and-limitations",
+      "text": "Current Status"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-preferred-verification-style",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-verification-trust-model-and-limitations",
+      "text": "Preferred Verification Style"
+    },
+    {
+      "document_id": "document-verification",
+      "id": "document-verification-further-reading",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-verification",
+      "text": "Further Reading"
+    },
+    {
+      "document_id": "document-lexical-conventions",
+      "id": "document-lexical-conventions",
+      "kind": "document",
+      "level": 1,
+      "text": "Lexical Conventions"
+    },
+    {
+      "document_id": "document-lexical-conventions",
+      "id": "document-lexical-conventions-common-lexical-classes",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-lexical-conventions",
+      "text": "Common Lexical Classes"
+    },
+    {
+      "document_id": "document-lexical-conventions",
+      "id": "document-lexical-conventions-string-literals",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-lexical-conventions",
+      "text": "String Literals"
+    },
+    {
+      "document_id": "document-lexical-conventions",
+      "id": "document-lexical-conventions-interpolation",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-lexical-conventions-string-literals",
+      "text": "Interpolation"
+    },
+    {
+      "document_id": "document-lexical-conventions",
+      "id": "document-lexical-conventions-multiline-string-literals",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-lexical-conventions",
+      "text": "Multiline String Literals"
+    },
+    {
+      "document_id": "document-lexical-conventions",
+      "id": "document-lexical-conventions-bytes-literals",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-lexical-conventions",
+      "text": "Bytes Literals"
+    },
+    {
+      "document_id": "document-lexical-conventions",
+      "id": "document-lexical-conventions-character-literals",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-lexical-conventions",
+      "text": "Character Literals"
+    },
+    {
+      "document_id": "document-lexical-conventions",
+      "id": "document-lexical-conventions-byte-literals",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-lexical-conventions",
+      "text": "Byte Literals"
+    },
+    {
+      "document_id": "document-error_codes-index",
+      "id": "document-error_codes-index",
+      "kind": "document",
+      "level": 1,
+      "text": "Error Codes Index"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "commit": "0a910e151998d92dcf8c7cd84acafe12aac2870e",
+    "index_path": "next/language/index.md",
+    "index_sha256": "b6d7df45b48176394db49e78f27c284c4e22662217d731ff1c50768d142bd8b0",
+    "index_web_url": "https://docs.moonbitlang.com/en/latest/language/",
+    "repository": "https://github.com/moonbitlang/moonbit-docs"
+  }
+}

@@ -98,6 +98,19 @@ test "control flow: for-in over collections" {
 }
 ```
 
+## List comprehensions
+
+An ordinary comprehension uses `[ for ... => ... ]` and builds the collection selected by the expected type. With no stronger context it builds an `Array`; an expected `String` consumes generated `Char` values. This differs from the lazy Iter comprehension `[| for ... => ... |]` covered below.
+
+```mbt check
+test "control flow: eager list comprehensions" {
+  let squares = [ for x in 1..<=4 => x * x ]
+  assert_eq(squares, [1, 4, 9, 16])
+  let text : String = [ for x in 0..<3 => (x + 'a').unsafe_to_char() ]
+  assert_eq(text, "abc")
+}
+```
+
 ## Functional `for` with accumulators
 
 A `for` can carry comma-separated state binders: `for i = 1, acc = 0; cond; i = ..., acc = ... { } nobreak { acc }`. Here `continue v1, v2` rebinds **all** state (it is not Go/Rust's plain `continue`); omitting the condition and updates makes an infinite loop that needs an explicit `break value`. An optional `where { proof_invariant: ..., proof_reasoning: ... }` records verification metadata — it is compile-time documentation, not a runtime assert.

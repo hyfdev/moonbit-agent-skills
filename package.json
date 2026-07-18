@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "check-duplication": "node tooling/check_duplication.ts",
+    "check-language-surface": "node tooling/check_language_surface.ts",
     "check-release-coverage": "node tooling/check_release_coverage.ts",
     "check-versions": "node tooling/check_versions.ts",
     "compare-toolchain": "node tooling/compare_toolchain.ts",
@@ -14,8 +15,10 @@
     "run-reporting-eval": "node evals/reporting/run_reporting.ts",
     "snapshot-toolchain": "node tooling/snapshot_toolchain.ts",
     "snapshot-release": "node tooling/snapshot_release.ts",
+    "snapshot-language-surface": "node tooling/snapshot_language_surface.ts",
     "validate-skills": "node tooling/validate_skills.ts",
     "verify-release-sources": "node tooling/verify_release_sources.ts",
+    "verify-language-surface-source": "node tooling/verify_language_surface_source.ts",
     "verify-commands": "node tooling/verify_commands.ts"
   },
   "devDependencies": {

@@ -1,0 +1,848 @@
+{
+  "schema_version": 1,
+  "source_inventory": "source.json",
+  "routes": [
+    {
+      "source_ids": [
+        "document-introduction",
+        "document-introduction-expressions-and-statements",
+        "document-introduction-variable-binding",
+        "document-introduction-program-entrance",
+        "document-introduction-init-and-main"
+      ],
+      "summary": "Program structure and entry points",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/declarations-and-functions.mbt.md",
+        "terms": [
+          "fn main",
+          "fn init"
+        ]
+      },
+      "content": {
+        "marker": "## Program structure"
+      }
+    },
+    {
+      "source_ids": [
+        "document-introduction-naming-conventions",
+        "document-introduction-keywords",
+        "document-introduction-reserved-keywords"
+      ],
+      "summary": "Naming and keyword status",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/declarations-and-functions.mbt.md",
+        "terms": [
+          "Program structure",
+          "function aliases"
+        ]
+      },
+      "content": {
+        "marker": "## Names and keywords"
+      }
+    },
+    {
+      "source_ids": [
+        "document-introduction-test"
+      ],
+      "summary": "Top-level test syntax",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/tests-and-checked-docs.mbt.md",
+        "terms": [
+          "test",
+          "snapshots",
+          ".mbt.md"
+        ]
+      },
+      "content": {
+        "marker": "# Tests, snapshots, doc tests, and literate `.mbt.md`"
+      }
+    },
+    {
+      "source_ids": [
+        "document-fundamentals"
+      ],
+      "summary": "Fundamentals entry",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/declarations-and-functions.mbt.md",
+        "terms": [
+          "fn main",
+          "fn init"
+        ]
+      },
+      "content": {
+        "marker": "## Program structure"
+      }
+    },
+    {
+      "source_ids": [
+        "document-fundamentals-built-in-data-structures",
+        "document-fundamentals-unit",
+        "document-fundamentals-boolean",
+        "document-fundamentals-number",
+        "document-fundamentals-string",
+        "document-fundamentals-char",
+        "document-fundamentals-byte-s",
+        "document-fundamentals-choosing-a-byte-container",
+        "document-fundamentals-tuple",
+        "document-fundamentals-ref",
+        "document-fundamentals-option-and-result",
+        "document-fundamentals-array",
+        "document-fundamentals-arrayview",
+        "document-fundamentals-map",
+        "document-fundamentals-json",
+        "document-fundamentals-overloaded-literals",
+        "document-fundamentals-escape-sequences-in-overloaded-literals"
+      ],
+      "summary": "Built-in data and overloaded literals",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/data-types.mbt.md",
+        "terms": [
+          "Numbers",
+          "strings",
+          "bytes"
+        ]
+      },
+      "content": {
+        "marker": "# Data types: numbers, text, and collections"
+      }
+    },
+    {
+      "source_ids": [
+        "document-fundamentals-functions",
+        "document-fundamentals-top-level-functions",
+        "document-fundamentals-local-functions",
+        "document-fundamentals-function-applications",
+        "document-fundamentals-partial-applications",
+        "document-fundamentals-labelled-arguments",
+        "document-fundamentals-optional-arguments",
+        "document-fundamentals-optional-arguments-without-default-values",
+        "document-fundamentals-autofill-arguments",
+        "document-fundamentals-function-alias"
+      ],
+      "summary": "Functions, arguments, aliases, and recursion",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/declarations-and-functions.mbt.md",
+        "terms": [
+          "labelled arguments",
+          "optional arguments",
+          "declare fn",
+          "letrec"
+        ]
+      },
+      "content": {
+        "marker": "## Function arguments, declarations, aliases, and recursion"
+      }
+    },
+    {
+      "source_ids": [
+        "document-fundamentals-control-structures",
+        "document-fundamentals-conditional-expressions",
+        "document-fundamentals-match-expression",
+        "document-fundamentals-guard-statement",
+        "document-fundamentals-guard-statement-and-is-expression",
+        "document-fundamentals-while-loop",
+        "document-fundamentals-for-loop",
+        "document-fundamentals-for-in-loop",
+        "document-fundamentals-range-expression-in-for-in-loop",
+        "document-fundamentals-list-comprehension",
+        "document-fundamentals-labelled-continue-break",
+        "document-fundamentals-defer-expression",
+        "document-fundamentals-iterator"
+      ],
+      "summary": "Control structures and iteration",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/control-flow-and-iteration.mbt.md",
+        "terms": [
+          "list comprehensions",
+          "Iter",
+          "loop"
+        ]
+      },
+      "content": {
+        "marker": "# Control flow and iteration"
+      }
+    },
+    {
+      "source_ids": [
+        "document-fundamentals-custom-data-types",
+        "document-fundamentals-struct",
+        "document-fundamentals-constructing-struct-with-shorthand",
+        "document-fundamentals-struct-update-syntax",
+        "document-fundamentals-custom-constructors",
+        "document-fundamentals-enum",
+        "document-fundamentals-constructor-with-labelled-arguments",
+        "document-fundamentals-constructor-with-mutable-fields",
+        "document-fundamentals-extensible-enum",
+        "document-fundamentals-tuple-struct",
+        "document-fundamentals-type-alias",
+        "document-fundamentals-local-types"
+      ],
+      "summary": "Custom data types",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/types-structs-enums.mbt.md",
+        "terms": [
+          "Structs",
+          "extenum",
+          "derives"
+        ]
+      },
+      "content": {
+        "marker": "# Structs, enums, newtypes, and aliases"
+      }
+    },
+    {
+      "source_ids": [
+        "document-fundamentals-pattern-matching",
+        "document-fundamentals-simple-patterns",
+        "document-fundamentals-array-pattern",
+        "document-fundamentals-bitstring-pattern",
+        "document-fundamentals-range-pattern",
+        "document-fundamentals-map-pattern",
+        "document-fundamentals-json-pattern",
+        "document-fundamentals-default-bindings-in-or-patterns",
+        "document-fundamentals-guard-condition"
+      ],
+      "summary": "Pattern matching forms",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/pattern-matching.mbt.md",
+        "terms": [
+          "bitstring",
+          "Json",
+          "lexscan"
+        ]
+      },
+      "content": {
+        "marker": "# Pattern matching, `is`, and `guard`"
+      }
+    },
+    {
+      "source_ids": [
+        "document-fundamentals-generics"
+      ],
+      "summary": "Generics",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/traits-and-generics.mbt.md",
+        "terms": [
+          "Traits",
+          "extend",
+          "trait objects"
+        ]
+      },
+      "content": {
+        "marker": "# Traits and generics"
+      }
+    },
+    {
+      "source_ids": [
+        "document-fundamentals-special-syntax",
+        "document-fundamentals-pipelines",
+        "document-fundamentals-cascade-operator"
+      ],
+      "summary": "Special syntax overview and pipelines",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/declarations-and-functions.mbt.md",
+        "terms": [
+          "pipelines",
+          "methods"
+        ]
+      },
+      "content": {
+        "marker": "## Pipeline operator"
+      }
+    },
+    {
+      "source_ids": [
+        "document-fundamentals-is-expression",
+        "document-fundamentals-regex-literal-expression",
+        "document-fundamentals-regex-match-expression",
+        "document-fundamentals-lexscan",
+        "document-fundamentals-lexmatch-deprecated"
+      ],
+      "summary": "is, regex, lexscan, and lexmatch",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/pattern-matching.mbt.md",
+        "terms": [
+          "bitstring",
+          "Json",
+          "lexscan"
+        ]
+      },
+      "content": {
+        "marker": "# Pattern matching, `is`, and `guard`"
+      }
+    },
+    {
+      "source_ids": [
+        "document-fundamentals-spread-operator"
+      ],
+      "summary": "Spread operator",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/data-types.mbt.md",
+        "terms": [
+          "Numbers",
+          "strings",
+          "bytes"
+        ]
+      },
+      "content": {
+        "marker": "# Data types: numbers, text, and collections"
+      }
+    },
+    {
+      "source_ids": [
+        "document-fundamentals-todo-syntax"
+      ],
+      "summary": "TODO placeholder",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/declarations-and-functions.mbt.md",
+        "terms": [
+          "TODO placeholder",
+          "..."
+        ]
+      },
+      "content": {
+        "marker": "## TODO placeholders"
+      }
+    },
+    {
+      "source_ids": [
+        "document-methods",
+        "document-methods-method-system",
+        "document-methods-local-method",
+        "document-methods-alias-methods-as-functions"
+      ],
+      "summary": "Methods and aliases",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/declarations-and-functions.mbt.md",
+        "terms": [
+          "methods",
+          "cascades"
+        ]
+      },
+      "content": {
+        "marker": "## Methods"
+      }
+    },
+    {
+      "source_ids": [
+        "document-methods-operator-overloading",
+        "document-methods-trait-system",
+        "document-methods-extending-traits",
+        "document-methods-implementing-traits",
+        "document-methods-attaching-trait-methods-with-extend",
+        "document-methods-using-traits",
+        "document-methods-invoke-trait-methods-directly",
+        "document-methods-trait-objects",
+        "document-methods-builtin-traits",
+        "document-methods-deriving-builtin-traits"
+      ],
+      "summary": "Operators and traits",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/traits-and-generics.mbt.md",
+        "terms": [
+          "Traits",
+          "extend",
+          "trait objects"
+        ]
+      },
+      "content": {
+        "marker": "# Traits and generics"
+      }
+    },
+    {
+      "source_ids": [
+        "document-derive",
+        "document-derive-eq-and-compare",
+        "document-derive-debug",
+        "document-derive-default",
+        "document-derive-hash",
+        "document-derive-arbitrary",
+        "document-derive-fromjson-and-tojson",
+        "document-derive-enum-styles",
+        "document-derive-deriving-option",
+        "document-derive-container-arguments",
+        "document-derive-case-arguments",
+        "document-derive-field-arguments"
+      ],
+      "summary": "Derived traits",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/types-structs-enums.mbt.md",
+        "terms": [
+          "Structs",
+          "extenum",
+          "derives"
+        ]
+      },
+      "content": {
+        "marker": "# Structs, enums, newtypes, and aliases"
+      }
+    },
+    {
+      "source_ids": [
+        "document-error-handling",
+        "document-error-handling-error-types",
+        "document-error-handling-failure",
+        "document-error-handling-throwing-errors",
+        "document-error-handling-error-polymorphism",
+        "document-error-handling-handling-errors",
+        "document-error-handling-try-catch",
+        "document-error-handling-transforming-to-result",
+        "document-error-handling-panic-on-errors",
+        "document-error-handling-error-inference"
+      ],
+      "summary": "Checked errors and recovery",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/errors-and-error-handling.mbt.md",
+        "terms": [
+          "Error types",
+          "raise",
+          "noraise"
+        ]
+      },
+      "content": {
+        "marker": "# Errors, raise, try/catch, Option and Result"
+      }
+    },
+    {
+      "source_ids": [
+        "document-packages",
+        "document-packages-packages-and-modules",
+        "document-packages-internal-packages"
+      ],
+      "summary": "Package and module operation",
+      "disposition": "routed",
+      "owner_skill": "moonbit-toolchain",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/project-layout-and-config.md",
+        "terms": [
+          "moon.mod",
+          "moon.pkg",
+          "virtual packages"
+        ]
+      },
+      "content": {
+        "marker": "# Project layout and configuration"
+      }
+    },
+    {
+      "source_ids": [
+        "document-packages-prelude-and-builtin-names",
+        "document-packages-using",
+        "document-packages-access-control",
+        "document-packages-functions",
+        "document-packages-aliases",
+        "document-packages-types",
+        "document-packages-traits",
+        "document-packages-trait-implementations"
+      ],
+      "summary": "Prelude, using, visibility, and cross-package semantics",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/visibility.mbt.md",
+        "terms": [
+          "source-level",
+          "using",
+          "cross-package"
+        ]
+      },
+      "content": {
+        "marker": "# Visibility"
+      }
+    },
+    {
+      "source_ids": [
+        "document-packages-virtual-packages",
+        "document-packages-defining-a-virtual-package",
+        "document-packages-implementing-a-virtual-package",
+        "document-packages-using-a-virtual-package",
+        "document-packages-overriding-a-virtual-package"
+      ],
+      "summary": "Virtual packages",
+      "disposition": "routed",
+      "owner_skill": "moonbit-toolchain",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/project-layout-and-config.md",
+        "terms": [
+          "virtual packages",
+          "implement",
+          "overrides"
+        ]
+      },
+      "content": {
+        "marker": "## Virtual packages and overrides"
+      }
+    },
+    {
+      "source_ids": [
+        "document-tests",
+        "document-tests-test-blocks",
+        "document-tests-snapshot-tests",
+        "document-tests-snapshotting-show",
+        "document-tests-snapshotting-json",
+        "document-tests-snapshotting-anything",
+        "document-tests-blackbox-tests-and-whitebox-tests"
+      ],
+      "summary": "Tests and snapshots",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/tests-and-checked-docs.mbt.md",
+        "terms": [
+          "test",
+          "snapshots",
+          ".mbt.md"
+        ]
+      },
+      "content": {
+        "marker": "# Tests, snapshots, doc tests, and literate `.mbt.md`"
+      }
+    },
+    {
+      "source_ids": [
+        "document-benchmarks",
+        "document-benchmarks-benchmarking-with-test-blocks",
+        "document-benchmarks-batch-benchmarking",
+        "document-benchmarks-raw-benchmark-statistics"
+      ],
+      "summary": "Benchmarks",
+      "disposition": "routed",
+      "owner_skill": "moonbit-toolchain",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/testing-workflows.md",
+        "terms": [
+          "moon bench PATH",
+          "raw benchmark statistics"
+        ]
+      },
+      "content": {
+        "marker": "## Benchmarks"
+      }
+    },
+    {
+      "source_ids": [
+        "document-docs",
+        "document-docs-comments",
+        "document-docs-doc-comments"
+      ],
+      "summary": "Comments and doc comments",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/declarations-and-functions.mbt.md",
+        "terms": [
+          "fn main",
+          "fn init"
+        ]
+      },
+      "content": {
+        "marker": "## Program structure"
+      }
+    },
+    {
+      "source_ids": [
+        "document-docs-literate-mbt-md-files"
+      ],
+      "summary": "Literate checked documentation",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/tests-and-checked-docs.mbt.md",
+        "terms": [
+          "test",
+          "snapshots",
+          ".mbt.md"
+        ]
+      },
+      "content": {
+        "marker": "# Tests, snapshots, doc tests, and literate `.mbt.md`"
+      }
+    },
+    {
+      "source_ids": [
+        "document-attributes-callsite"
+      ],
+      "summary": "Callsite autofill attribute",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/declarations-and-functions.mbt.md",
+        "terms": [
+          "labelled arguments",
+          "optional arguments",
+          "declare fn",
+          "letrec"
+        ]
+      },
+      "content": {
+        "marker": "## Function arguments, declarations, aliases, and recursion"
+      }
+    },
+    {
+      "source_ids": [
+        "document-attributes-external",
+        "document-attributes-borrow_and_owned"
+      ],
+      "summary": "FFI type and ownership attributes",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/async-and-ffi.md",
+        "terms": [
+          "extern \"js\"",
+          "extern \"wasm\"",
+          "extern \"C\""
+        ]
+      },
+      "content": {
+        "marker": "## FFI declarations"
+      }
+    },
+    {
+      "source_ids": [
+        "document-attributes-deprecated",
+        "document-attributes-alert",
+        "document-attributes-alias",
+        "document-attributes-label_migration",
+        "document-attributes-visibility",
+        "document-attributes-internal",
+        "document-attributes-doc_hidden",
+        "document-attributes-warnings",
+        "document-attributes-must_implement_one",
+        "document-attributes-inline",
+        "document-attributes-as_free_fn",
+        "document-attributes-skip",
+        "document-attributes-coverage_skip",
+        "document-attributes-cfg",
+        "document-attributes-module",
+        "document-attributes"
+      ],
+      "summary": "Language attributes",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/attributes.mbt.md",
+        "terms": [
+          "#cfg",
+          "#deprecated",
+          "#alias"
+        ]
+      },
+      "content": {
+        "marker": "## The catalog"
+      }
+    },
+    {
+      "source_ids": [
+        "document-ffi",
+        "document-ffi-backends",
+        "document-ffi-declare-foreign-type",
+        "document-ffi-declare-foreign-function",
+        "document-ffi-types",
+        "document-ffi-callbacks",
+        "document-ffi-customize-integer-value-of-constant-enum"
+      ],
+      "summary": "FFI declarations and backend types",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/async-and-ffi.md",
+        "terms": [
+          "extern \"js\"",
+          "extern \"wasm\"",
+          "extern \"C\""
+        ]
+      },
+      "content": {
+        "marker": "## FFI declarations"
+      }
+    },
+    {
+      "source_ids": [
+        "document-ffi-export-functions",
+        "document-ffi-lifetime-management",
+        "document-ffi-lifetime-management-of-external-object",
+        "document-ffi-lifetime-management-of-moonbit-object",
+        "document-ffi-the-calling-convention-of-reference-counting",
+        "document-ffi-the-managed-types",
+        "document-ffi-the-borrow-and-owned-attribute"
+      ],
+      "summary": "FFI exports and lifetime management",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/async-and-ffi.md",
+        "terms": [
+          "exported functions",
+          "FFI ownership"
+        ]
+      },
+      "content": {
+        "marker": "### Exported functions and lifetime boundaries"
+      }
+    },
+    {
+      "source_ids": [
+        "document-async-experimental",
+        "document-async-experimental-getting-started",
+        "document-async-experimental-async-function",
+        "document-async-experimental-structured-concurrency-and-task-group",
+        "document-async-experimental-cancellation-makes-asynchronous-program-modular",
+        "document-async-experimental-interacting-with-the-world",
+        "document-async-experimental-javascript-support",
+        "document-async-experimental-experimental-wasm1-support"
+      ],
+      "summary": "Async language and runtime boundary",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/async-and-ffi.md",
+        "terms": [
+          "async",
+          "task groups",
+          "Wasm1"
+        ]
+      },
+      "content": {
+        "marker": "## Async syntax"
+      }
+    },
+    {
+      "source_ids": [
+        "document-verification",
+        "document-verification-overview-example-binary-search",
+        "document-verification-setup",
+        "document-verification-environment-setup",
+        "document-verification-why3",
+        "document-verification-external-solvers",
+        "document-verification-enabling-proofs-in-a-package",
+        "document-verification-structure-of-verified-code",
+        "document-verification-source-layout",
+        "document-verification-program-side-and-logic-side",
+        "document-verification-writing-specifications-and-proofs",
+        "document-verification-contracts-in-mbt",
+        "document-verification-proof-specific-annotations",
+        "document-verification-proof-pure",
+        "document-verification-proof-decrease",
+        "document-verification-proof-axiomatized",
+        "document-verification-predicates-and-lemmas-in-mbtp",
+        "document-verification-loop-invariants",
+        "document-verification-model-based-verification",
+        "document-verification-recommended-style",
+        "document-verification-running-verification",
+        "document-verification-what-moon-prove-checks",
+        "document-verification-running-the-verifier",
+        "document-verification-trust-model-and-limitations",
+        "document-verification-trusted-assumptions",
+        "document-verification-current-status",
+        "document-verification-preferred-verification-style",
+        "document-verification-further-reading"
+      ],
+      "summary": "Formal verification",
+      "disposition": "out-of-scope",
+      "reason": "Formal proof authoring and solver operation are specialized workflows not promised by the two general MoonBit language and toolchain references."
+    },
+    {
+      "source_ids": [
+        "document-lexical-conventions",
+        "document-lexical-conventions-common-lexical-classes",
+        "document-lexical-conventions-string-literals",
+        "document-lexical-conventions-interpolation",
+        "document-lexical-conventions-multiline-string-literals",
+        "document-lexical-conventions-bytes-literals",
+        "document-lexical-conventions-character-literals",
+        "document-lexical-conventions-byte-literals"
+      ],
+      "summary": "Lexical conventions and literals",
+      "disposition": "routed",
+      "owner_skill": "moonbit-language",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/data-types.mbt.md",
+        "terms": [
+          "Numbers",
+          "strings",
+          "bytes"
+        ]
+      },
+      "content": {
+        "marker": "# Data types: numbers, text, and collections"
+      }
+    },
+    {
+      "source_ids": [
+        "document-error_codes-index"
+      ],
+      "summary": "Exhaustive compiler error-code catalog",
+      "disposition": "out-of-scope",
+      "reason": "The language skill routes diagnostics by construct and verifies migrations; it does not promise an exhaustive compiler error-code encyclopedia."
+    }
+  ]
+}

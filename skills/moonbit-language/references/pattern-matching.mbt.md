@@ -129,6 +129,50 @@ test "map patterns: required and optional keys" {
 }
 ```
 
+## Bitstring and `Json` patterns
+
+Bitstring patterns decode fixed-width fields from `Bytes` and bind the remaining view with `.. rest`; suffixes such as `u16be` state width, signedness, and byte order. `Json` patterns use object and array shapes directly. Keep `..` in object patterns when extra fields are allowed.
+
+```mbt check
+test "bitstring and Json patterns" {
+  let bytes = b"\x12\x34tail"
+  guard bytes is [u16be(code), .. rest] else {
+    fail("header not found")
+  }
+  assert_eq(code, 0x1234U)
+  assert_true(rest is b"tail")
+
+  let json : Json = { "version": "1", "items": [1, 2] }
+  guard json is { "version": "1", "items": [..] as items, .. } else {
+    fail("JSON shape not found")
+  }
+  assert_true(items is [1, 2])
+}
+```
+
+## Regex literals and match expressions
+
+`re"..."` creates a regex value. `input =~ (...)` searches and pattern-matches a regex composition; `as` binds the match while `before=` and `after=` bind the surrounding text. Use `lexscan` below for multi-case scanner logic.
+
+```mbt check
+const PATTERN_IDENT_START = re"[A-Za-z_]"
+const PATTERN_IDENT_CONT = re"[A-Za-z0-9_]*"
+
+test "regex match expression" {
+  let input = " name=42"
+  guard input =~ (
+    (PATTERN_IDENT_START + PATTERN_IDENT_CONT) as ident,
+    before=head,
+    after=tail,
+  ) else {
+    fail("identifier not found")
+  }
+  assert_true(head is " ")
+  assert_true(ident is "name")
+  assert_true(tail is "=42")
+}
+```
+
 ## `lexscan` for regular-expression scanning
 
 The experimental `lexmatch` form was deprecated in 0.10.4 and replaced by `lexscan`, which also supports a `with longest` strategy. Its cases may bind the text before and after a regex match. **Documented, not executed for legacy edge cases:** the [0.10.4 release notes](https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release) say `lexscan` does not support Bytes/BytesView inputs or guards, so those old `lexmatch` cases need a manual rewrite.

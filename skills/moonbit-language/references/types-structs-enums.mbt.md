@@ -92,6 +92,47 @@ test "generic enum" {
 }
 ```
 
+## Mutable enum fields and extensible enums
+
+Labelled enum payload fields may be mutable: declare `Variant(mut field~ : Type, ...)`. Narrow the enum to that variant and bind the whole constructor with `Pattern as name` before assigning `name.field`.
+
+An `extenum` is an open enum. Its declaring package supplies initial variants, and `extenum Type += { ... }` adds variants. Matches must keep a wildcard because another declaration or package may extend the type. Cross-package extension also depends on package visibility; the `lang-extenum-cross-package` fixture verifies that boundary.
+
+```mbt check
+priv enum TypesMutableTree {
+  TypesEmpty
+  TypesNode(mut value~ : Int, child~ : TypesMutableTree)
+}
+
+priv extenum TypesEvent {
+  TypesStarted
+}
+
+extenum TypesEvent += {
+  TypesStopped(Int)
+}
+
+fn types_describe_event(event : TypesEvent) -> String {
+  match event {
+    TypesStarted => "started"
+    TypesStopped(code) => "stopped \{code}"
+    _ => "unknown"
+  }
+}
+
+test "mutable enum fields and same-package extenum" {
+  let tree : TypesMutableTree = TypesNode(value=1, child=TypesEmpty)
+  guard tree is (TypesNode(_) as node) else {
+    fail("node not found")
+  }
+  node.value = 2
+  assert_eq(node.value, 2)
+  assert_true(node.child is TypesEmpty)
+  assert_eq(types_describe_event(TypesStarted), "started")
+  assert_eq(types_describe_event(TypesStopped(42)), "stopped 42")
+}
+```
+
 ## Custom constructors for any type
 
 Since 0.10.4, any type may define a constructor named after the type with `fn Type::Type(..)`, not just a struct. The constructor cannot reuse an existing constructor name. This enum example makes `Figure(radius)` choose an existing variant:
@@ -184,4 +225,14 @@ test "type alias is interchangeable with its target" {
 ```mbt nocheck
 typealias String as Label // DEPRECATED: compiles with a warning — write `type Label = String`
 typealias Label = String  // WRONG: parsed as the deprecated `as` form, then rejected
+```
+
+## Local type definitions are deprecated
+
+The official fundamentals page still presents a type declared inside a function, but the pinned compiler emits warning 0027 `deprecated_syntax` unless that warning is suppressed. Move the declaration to top level. The `lang-dep-local-type` fixture proves both the warning and the top-level replacement with warnings denied.
+
+```mbt nocheck
+fn old_local_type() -> Unit {
+  enum Local { Only } // DEPRECATED: move Local to top level
+}
 ```

@@ -40,6 +40,11 @@ A decision may group closely related source IDs, but each source ID may occur in
       ],
       "disposition": "verified",
       "owner_skill": "moonbit-language",
+      "discoverability": {
+        "section": "Feature index",
+        "reference": "references/traits-and-generics.mbt.md",
+        "terms": ["extend", "pub extend"]
+      },
       "evidence": [
         {
           "kind": "checked-doc",
@@ -63,6 +68,8 @@ Allowed dispositions:
 | `not-actionable` | A concrete reason that explains why the release item produces no stable user guidance. No evidence entry. |
 
 The checker rejects missing/duplicate source IDs, unknown manifest entries, missing files or markers, non-product owners, fixture owner mismatches, repository-escaping paths, evidence without a unique role, claims without linked proof, verified claims without executable proof, and documented claims without a direct source and explicit label.
+
+For the current release, every actionable decision also needs `discoverability`. The owning skill's named section must contain one physical line with the reference path and every term, and every term must occur in the decision summary or agent behavior. This is not semantic evidence; it prevents correct material from being buried in a reference that the primary skill entry never names. Archived releases do not keep this live-text requirement.
 
 ## Evidence rules
 

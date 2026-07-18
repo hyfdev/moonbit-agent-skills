@@ -142,3 +142,9 @@ pub fn use_external() -> Int {
   // a callback that captured a local instead of `x => x * 2` would be Error [4151]
 }
 ```
+
+### Exported functions and lifetime boundaries
+
+**Documented, not executed:** the official [FFI reference](https://docs.moonbitlang.com/en/latest/language/ffi.html#export-functions) defines `#export_name("symbol")` on a public function in a `pkgtype(kind: "foreign_library")` package. The symbol must be a unique C identifier, and the attribute does not apply to generic functions, optional-argument functions, methods, or body-less declarations. Package type and backend link exports are project configuration owned by moonbit-toolchain.
+
+**Documented, not executed:** the official [lifetime-management reference](https://docs.moonbitlang.com/en/latest/language/ffi.html#lifetime-management) says Wasm and C backends use reference counting at the foreign boundary, while wasm-gc and JavaScript reuse their host GC. `#borrow(param)` means the callee does not consume that parameter's reference; `#owned(param)` transfers responsibility to the foreign side. External-resource finalization and raw `incref` / `decref` calls are backend ABI concerns: verify them against the generated target and current `moonbit.h`, not from a language-only snippet.

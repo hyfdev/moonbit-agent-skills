@@ -17,7 +17,7 @@ import {
   statSync,
   writeFileSync,
 } from "node:fs";
-import { arch, platform, release, tmpdir, type } from "node:os";
+import { arch, homedir, platform, release, tmpdir, type } from "node:os";
 import {
   basename,
   delimiter,
@@ -42,6 +42,7 @@ const USAGE =
 export const HERE = dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = resolve(HERE, "..");
 export const SKILLS_SRC = join(REPO_ROOT, "skills");
+const BASELINES_PATH = join(HERE, "baselines.json");
 
 const sourcesFile = JSON.parse(
   readFileSync(join(REPO_ROOT, "verification", "sources", "sources.json"), "utf8"),
@@ -59,6 +60,7 @@ export const DISALLOWED_TOOLS = "WebFetch,WebSearch,Task";
 export const VALID_CONDITIONS = new Set([
   "none",
   "official",
+  "baseline",
   "ours",
   "forced-language",
   "forced-language-no-cross-language",
@@ -90,10 +92,28 @@ export interface BashResult {
 export interface ParsedStream {
   final_text: string;
   activated_skills: string[];
+  successful_skills: string[];
   bash_results: BashResult[];
-  tool_uses: Array<{ name: string; input: unknown }>;
+  tool_uses: ToolUseRecord[];
+  tool_results: ToolResultRecord[];
+  emitted_models: string[];
   usage: JsonRecord;
   model_usage: JsonRecord;
+}
+
+export interface ToolUseRecord {
+  id: string;
+  name: string;
+  input: unknown;
+  assistant_turn: number;
+  event_index: number;
+}
+
+export interface ToolResultRecord {
+  tool_use_id: string;
+  is_error: boolean;
+  output: string;
+  event_index: number;
 }
 
 export interface GradeResult {
@@ -101,10 +121,52 @@ export interface GradeResult {
   detail: string;
 }
 
-interface ContentTask {
+export interface ContentTask {
   id: string;
   prompt: string;
   grade: JsonRecord[];
+  discovery?: {
+    skill?: string;
+    reference?: string;
+  };
+}
+
+export interface SkillSources {
+  current: string;
+  baseline?: string;
+}
+
+export interface BaselineConfig {
+  commit: string;
+  skills_tree: string;
+  language_tree: string;
+  purpose: string;
+}
+
+export interface SkillSnapshot {
+  ref: string;
+  commit: string;
+  skills_tree: string;
+  language_tree: string;
+  files: Record<string, string>;
+}
+
+export interface PreparedSkillSnapshots {
+  sources: SkillSources;
+  manifest: {
+    baseline_name: string;
+    baseline_purpose: string;
+    current: SkillSnapshot;
+    baseline: SkillSnapshot;
+  };
+}
+
+export interface DiscoveryEvidence {
+  requested_skill: string | null;
+  requested_reference: string | null;
+  skill_activated_successfully: boolean | null;
+  reference_read_successfully: boolean | null;
+  reference_read_before_action: boolean | null;
 }
 
 interface CliOptions {
@@ -260,9 +322,12 @@ export function officialSkillsCheckout(
   return join(destination, "skills");
 }
 
-export function installLanguageAblation(skillsDestination: string): string {
+export function installLanguageAblation(
+  skillsDestination: string,
+  skillsSource = SKILLS_SRC,
+): string {
   const skillDestination = join(skillsDestination, "moonbit-language");
-  copyTreeExclusive(join(SKILLS_SRC, "moonbit-language"), skillDestination);
+  copyTreeExclusive(join(skillsSource, "moonbit-language"), skillDestination);
   const skillPath = join(skillDestination, "SKILL.md");
   let content = readFileSync(skillPath, "utf8");
   content = content.replace(
@@ -314,6 +379,7 @@ export function installCondition(
   condition: string,
   cacheDir: string,
   runner: CommandRunner = runCommand,
+  skillSources: SkillSources = { current: SKILLS_SRC },
 ): string {
   const skillsDestination = join(project, ".claude", "skills");
   if (condition === "none") {
@@ -332,12 +398,18 @@ export function installCondition(
     }
     return "";
   }
-  if (condition === "ours") {
+  if (condition === "ours" || condition === "baseline") {
+    const sourceRoot =
+      condition === "baseline"
+        ? (skillSources.baseline ?? (() => {
+            throw new Error("baseline condition requires a pinned baseline skill source");
+          })())
+        : skillSources.current;
     mkdirExclusive(skillsDestination);
-    for (const entry of readdirSync(SKILLS_SRC, { withFileTypes: true }).sort((a, b) =>
+    for (const entry of readdirSync(sourceRoot, { withFileTypes: true }).sort((a, b) =>
       a.name.localeCompare(b.name),
     )) {
-      const source = join(SKILLS_SRC, entry.name);
+      const source = join(sourceRoot, entry.name);
       if (isFile(join(source, "SKILL.md"))) {
         copyTreeExclusive(source, join(skillsDestination, entry.name));
       }
@@ -346,14 +418,14 @@ export function installCondition(
   }
   if (condition === "forced-language-no-cross-language") {
     mkdirExclusive(skillsDestination);
-    const content = installLanguageAblation(skillsDestination);
+    const content = installLanguageAblation(skillsDestination, skillSources.current);
     return forcedPrompt(content, "moonbit-language");
   }
   if (condition === "forced-language" || condition === "forced-toolchain") {
     const skill = "moonbit-" + condition.slice("forced-".length);
-    const content = readFileSync(join(SKILLS_SRC, skill, "SKILL.md"), "utf8");
+    const content = readFileSync(join(skillSources.current, skill, "SKILL.md"), "utf8");
     mkdirExclusive(skillsDestination);
-    copyTreeExclusive(join(SKILLS_SRC, skill), join(skillsDestination, skill));
+    copyTreeExclusive(join(skillSources.current, skill), join(skillsDestination, skill));
     return forcedPrompt(content, skill);
   }
   throw new Error("unknown condition " + JSON.stringify(condition));
@@ -392,6 +464,183 @@ export function snapshotFiles(root: string): Record<string, string> {
       .filter((path) => !ignoredSnapshotPath(path))
       .map((path) => [path, fileDigest(join(root, path))]),
   );
+}
+
+function checkedRawOutput(
+  runner: CommandRunner,
+  command: string,
+  args: readonly string[],
+  options?: { cwd?: string; timeout?: number },
+): string {
+  const result = runner(command, args, options);
+  if (result.timedOut) {
+    throw new Error(command + " timed out");
+  }
+  if (result.exitCode !== 0) {
+    throw new Error(
+      command +
+        " " +
+        args.join(" ") +
+        " exited " +
+        String(result.exitCode) +
+        ":\n" +
+        result.stdout +
+        result.stderr,
+    );
+  }
+  return result.stdout;
+}
+
+export function materializeGitSkills(
+  repository: string,
+  ref: string,
+  destination: string,
+  runner: CommandRunner = runCommand,
+): SkillSnapshot {
+  const commit = checkedOutput(runner, "git", ["rev-parse", ref], { cwd: repository });
+  const skillsTree = checkedOutput(runner, "git", ["rev-parse", commit + ":skills"], {
+    cwd: repository,
+  });
+  const languageTree = checkedOutput(
+    runner,
+    "git",
+    ["rev-parse", commit + ":skills/moonbit-language"],
+    { cwd: repository },
+  );
+  const trackedPaths = checkedOutput(
+    runner,
+    "git",
+    ["ls-tree", "-r", "--name-only", commit, "--", "skills"],
+    { cwd: repository },
+  )
+    .split(/\r?\n/)
+    .filter((path) => path.startsWith("skills/") && path !== "skills/")
+    .sort();
+  if (trackedPaths.length === 0) {
+    throw new Error("Git snapshot " + commit + " has no tracked skills");
+  }
+
+  const contents = new Map<string, string>();
+  const expectedFiles: Record<string, string> = {};
+  for (const trackedPath of trackedPaths) {
+    const relativePath = trackedPath.slice("skills/".length);
+    const content = checkedRawOutput(
+      runner,
+      "git",
+      ["show", commit + ":" + trackedPath],
+      { cwd: repository },
+    );
+    contents.set(relativePath, content);
+    expectedFiles[relativePath] = createHash("sha256").update(content).digest("hex");
+  }
+
+  if (existsSync(destination)) {
+    const actualFiles = snapshotFiles(destination);
+    if (!isDeepStrictEqual(actualFiles, expectedFiles)) {
+      throw new Error(
+        "cached skill snapshot differs from Git tree " + commit + "; use a fresh --run-name",
+      );
+    }
+  } else {
+    mkdirSync(destination, { recursive: true });
+    for (const [relativePath, content] of contents) {
+      const path = join(destination, relativePath);
+      mkdirSync(dirname(path), { recursive: true });
+      writeFileSync(path, content);
+    }
+  }
+
+  return {
+    ref,
+    commit,
+    skills_tree: skillsTree,
+    language_tree: languageTree,
+    files: expectedFiles,
+  };
+}
+
+export function prepareSkillSnapshots(
+  cacheDir: string,
+  runner: CommandRunner = runCommand,
+): PreparedSkillSnapshots {
+  const dirtySkills = checkedRawOutput(
+    runner,
+    "git",
+    ["status", "--porcelain", "--untracked-files=all", "--", "skills"],
+    { cwd: REPO_ROOT },
+  ).trim();
+  if (dirtySkills !== "") {
+    throw new Error(
+      "paid content evals require committed, clean skills/; current changes:\n" + dirtySkills,
+    );
+  }
+
+  const baselineName = "language-reference-before-feature-index";
+  const baselines = JSON.parse(readFileSync(BASELINES_PATH, "utf8")) as Record<
+    string,
+    BaselineConfig
+  >;
+  const baselineConfig = baselines[baselineName];
+  if (baselineConfig === undefined) {
+    throw new Error("missing pinned baseline " + baselineName + " in " + BASELINES_PATH);
+  }
+  const snapshotsRoot = join(cacheDir, "skill-snapshots");
+  const currentRoot = join(snapshotsRoot, "current");
+  const baselineRoot = join(snapshotsRoot, "baseline");
+  const current = materializeGitSkills(REPO_ROOT, "HEAD", currentRoot, runner);
+  const baseline = materializeGitSkills(
+    REPO_ROOT,
+    baselineConfig.commit,
+    baselineRoot,
+    runner,
+  );
+  if (
+    baseline.skills_tree !== baselineConfig.skills_tree ||
+    baseline.language_tree !== baselineConfig.language_tree
+  ) {
+    throw new Error(
+      "pinned baseline tree OIDs differ from evals/baselines.json: got " +
+        baseline.skills_tree +
+        " / " +
+        baseline.language_tree,
+    );
+  }
+  return {
+    sources: { current: currentRoot, baseline: baselineRoot },
+    manifest: {
+      baseline_name: baselineName,
+      baseline_purpose: baselineConfig.purpose,
+      current,
+      baseline,
+    },
+  };
+}
+
+export function catalogIsolation(homeDirectory = homedir()): JsonRecord {
+  const checkedRoots = [
+    join(homeDirectory, ".claude", "skills"),
+    join(homeDirectory, ".agents", "skills"),
+    join(homeDirectory, ".codex", "skills"),
+    join(homeDirectory, ".claude", "plugins"),
+    join(homeDirectory, ".agents", "plugins"),
+    join(homeDirectory, ".codex", "plugins"),
+  ];
+  const suffix = join("skills", "moonbit-language", "SKILL.md");
+  const collisions = checkedRoots
+    .filter((root) => isDirectory(root))
+    .flatMap((root) => walkFiles(root))
+    .filter((path) => path.endsWith(suffix))
+    .sort();
+  if (collisions.length > 0) {
+    throw new Error(
+      "content eval isolation failed: a global or plugin moonbit-language skill is installed at " +
+        collisions.join(", "),
+    );
+  }
+  return {
+    checked_roots: checkedRoots,
+    conflicting_moonbit_language_skills: collisions,
+  };
 }
 
 function pathIsWithin(root: string, candidate: string): boolean {
@@ -492,6 +741,20 @@ export function grade(
         testMatch !== null && Number.parseInt(testMatch[1], 10) >= check.min_tests;
       ok = ok && testCountOk;
     }
+    const outputMatches =
+      typeof check.output_regex === "string"
+        ? regex(check.output_regex, "is").test(output)
+        : undefined;
+    const outputAvoids =
+      typeof check.output_not_regex === "string"
+        ? !regex(check.output_not_regex, "is").test(output)
+        : undefined;
+    if (outputMatches !== undefined) {
+      ok = ok && outputMatches;
+    }
+    if (outputAvoids !== undefined) {
+      ok = ok && outputAvoids;
+    }
     const argumentsText = stringArray(check.args).join(" ");
     let detail = "moon " + argumentsText + " -> exit " + String(result.exitCode);
     if (typeof check.min_tests === "number") {
@@ -503,6 +766,12 @@ export function grade(
         String(check.min_tests) +
         " -> " +
         String(testCountOk === null ? null : booleanText(testCountOk));
+    }
+    if (outputMatches !== undefined) {
+      detail += `; output ~ /${stringValue(check.output_regex)}/ -> ${booleanText(outputMatches)}`;
+    }
+    if (outputAvoids !== undefined) {
+      detail += `; output !~ /${stringValue(check.output_not_regex)}/ -> ${booleanText(outputAvoids)}`;
     }
     if (!ok) {
       const outputTail = output.trim().slice(-500);
@@ -530,6 +799,47 @@ export function grade(
       ok,
       detail:
         "file_contains " + path + " ~ /" + stringValue(check.regex) + "/ -> " + booleanText(ok),
+    };
+  }
+  if (kind === "file_not_contains") {
+    const path = stringValue(check.path);
+    const fullPath = join(project, path);
+    const ok = isFile(fullPath) && !regex(check.regex).test(readFileSync(fullPath, "utf8"));
+    return {
+      ok,
+      detail:
+        "file_not_contains " +
+        path +
+        " !~ /" +
+        stringValue(check.regex) +
+        "/ -> " +
+        booleanText(ok),
+    };
+  }
+  if (kind === "file_match_count") {
+    const path = stringValue(check.path);
+    const fullPath = join(project, path);
+    const pattern = stringValue(check.regex);
+    const count =
+      isFile(fullPath) && pattern !== ""
+        ? [...readFileSync(fullPath, "utf8").matchAll(new RegExp(pattern, "gis"))].length
+        : -1;
+    const exact = typeof check.exact === "number" ? check.exact : undefined;
+    const minimum = typeof check.min === "number" ? check.min : undefined;
+    const maximum = typeof check.max === "number" ? check.max : undefined;
+    const ok =
+      count >= 0 &&
+      (exact === undefined || count === exact) &&
+      (minimum === undefined || count >= minimum) &&
+      (maximum === undefined || count <= maximum) &&
+      (exact !== undefined || minimum !== undefined || maximum !== undefined);
+    return {
+      ok,
+      detail:
+        `file_match_count ${path} ~ /${pattern}/ -> ${count}` +
+        (exact === undefined ? "" : `, exact=${exact}`) +
+        (minimum === undefined ? "" : `, min=${minimum}`) +
+        (maximum === undefined ? "" : `, max=${maximum}`),
     };
   }
   if (kind === "any_file_contains") {
@@ -618,12 +928,17 @@ export function parseStream(stdout: string): ParsedStream {
   const parsed: ParsedStream = {
     final_text: "",
     activated_skills: [],
+    successful_skills: [],
     bash_results: [],
     tool_uses: [],
+    tool_results: [],
+    emitted_models: [],
     usage: {},
     model_usage: {},
   };
-  const pendingBash = new Map<string, string>();
+  const toolUsesById = new Map<string, ToolUseRecord>();
+  let eventIndex = 0;
+  let assistantTurn = 0;
   for (const line of stdout.split(/\r?\n/)) {
     let event: JsonRecord;
     try {
@@ -631,8 +946,14 @@ export function parseStream(stdout: string): ParsedStream {
     } catch {
       continue;
     }
+    eventIndex += 1;
     if (event.type === "assistant") {
+      assistantTurn += 1;
       const message = asRecord(event.message);
+      const emittedModel = stringValue(message.model);
+      if (emittedModel !== "") {
+        parsed.emitted_models.push(emittedModel);
+      }
       const content = Array.isArray(message.content) ? message.content : [];
       for (const rawBlock of content) {
         const block = asRecord(rawBlock);
@@ -641,15 +962,15 @@ export function parseStream(stdout: string): ParsedStream {
         }
         const name = stringValue(block.name);
         const input = block.input ?? {};
-        parsed.tool_uses.push({ name, input });
+        const id = stringValue(block.id);
+        const toolUse = { id, name, input, assistant_turn: assistantTurn, event_index: eventIndex };
+        parsed.tool_uses.push(toolUse);
+        if (id !== "") {
+          toolUsesById.set(id, toolUse);
+        }
         const inputs = asRecord(input);
         if (name === "Skill") {
           parsed.activated_skills.push(stringValue(inputs.skill));
-        } else if (name === "Bash") {
-          const toolId = stringValue(block.id);
-          if (toolId !== "") {
-            pendingBash.set(toolId, stringValue(inputs.command));
-          }
         }
       }
     } else if (event.type === "user") {
@@ -661,18 +982,33 @@ export function parseStream(stdout: string): ParsedStream {
           continue;
         }
         const toolId = stringValue(block.tool_use_id);
-        const command = pendingBash.get(toolId);
-        if (command === undefined) {
+        if (toolId === "") {
           continue;
         }
         const contentValue = block.content ?? "";
-        parsed.bash_results.push({
-          command,
-          is_error: Boolean(block.is_error ?? false),
-          output:
-            typeof contentValue === "string" ? contentValue : JSON.stringify(contentValue),
+        const output =
+          typeof contentValue === "string" ? contentValue : JSON.stringify(contentValue);
+        const isError = Boolean(block.is_error ?? false);
+        parsed.tool_results.push({
+          tool_use_id: toolId,
+          is_error: isError,
+          output,
+          event_index: eventIndex,
         });
-        pendingBash.delete(toolId);
+        const toolUse = toolUsesById.get(toolId);
+        if (toolUse?.name === "Bash") {
+          parsed.bash_results.push({
+            command: stringValue(asRecord(toolUse.input).command),
+            is_error: isError,
+            output,
+          });
+        }
+        if (toolUse?.name === "Skill" && !isError) {
+          const skill = stringValue(asRecord(toolUse.input).skill);
+          if (skill !== "") {
+            parsed.successful_skills.push(skill);
+          }
+        }
       }
     } else if (event.type === "result") {
       parsed.final_text = stringValue(event.result);
@@ -682,7 +1018,64 @@ export function parseStream(stdout: string): ParsedStream {
       parsed.model_usage = asRecord(event.modelUsage);
     }
   }
+  parsed.activated_skills = [...new Set(parsed.activated_skills)];
+  parsed.successful_skills = [...new Set(parsed.successful_skills)];
+  parsed.emitted_models = [...new Set(parsed.emitted_models)];
   return parsed;
+}
+
+export function discoveryEvidence(
+  parsed: ParsedStream,
+  requested?: ContentTask["discovery"],
+): DiscoveryEvidence {
+  const requestedSkill = requested?.skill ?? null;
+  const requestedReference = requested?.reference ?? null;
+  const resultsByUse = new Map(
+    parsed.tool_results.map((result) => [result.tool_use_id, result]),
+  );
+  const successfulUses = parsed.tool_uses.filter((toolUse) => {
+    const result = resultsByUse.get(toolUse.id);
+    return result !== undefined && !result.is_error;
+  });
+  const skillActivatedSuccessfully =
+    requestedSkill === null
+      ? null
+      : successfulUses.some(
+          (toolUse) =>
+            toolUse.name === "Skill" &&
+            stringValue(asRecord(toolUse.input).skill) === requestedSkill,
+        );
+  const referenceUses =
+    requestedReference === null
+      ? []
+      : successfulUses.filter(
+          (toolUse) =>
+            (toolUse.name === "Read" || toolUse.name === "Grep") &&
+            JSON.stringify(toolUse.input).includes(requestedReference),
+        );
+  const referenceReadSuccessfully =
+    requestedReference === null ? null : referenceUses.length > 0;
+  const actionTools = new Set(["Bash", "Edit", "Write"]);
+  const referenceReadBeforeAction =
+    requestedReference === null
+      ? null
+      : referenceUses.some((referenceUse) => {
+          const result = resultsByUse.get(referenceUse.id);
+          return parsed.tool_uses.some(
+            (toolUse) =>
+              actionTools.has(toolUse.name) &&
+              toolUse.assistant_turn > referenceUse.assistant_turn &&
+              result !== undefined &&
+              toolUse.event_index > result.event_index,
+          );
+        });
+  return {
+    requested_skill: requestedSkill,
+    requested_reference: requestedReference,
+    skill_activated_successfully: skillActivatedSuccessfully,
+    reference_read_successfully: referenceReadSuccessfully,
+    reference_read_before_action: referenceReadBeforeAction,
+  };
 }
 
 function loadTask(taskDirectory: string): ContentTask {
@@ -704,6 +1097,7 @@ export function runTask(
   cacheDir: string,
   runDir: string,
   runner: CommandRunner = runCommand,
+  skillSources: SkillSources = { current: SKILLS_SRC },
 ): JsonRecord {
   const task = loadTask(taskDirectory);
   const temporary = mkdtempSync(join(tmpdir(), "mbteval-"));
@@ -717,7 +1111,7 @@ export function runTask(
       mkdirSync(project);
     }
     const initialFiles = snapshotFiles(project);
-    const prefix = installCondition(project, condition, cacheDir, runner);
+    const prefix = installCondition(project, condition, cacheDir, runner, skillSources);
     const command = [
       "-p",
       prefix + task.prompt,
@@ -748,6 +1142,7 @@ export function runTask(
     writeFileSync(stderrPath, processResult.stderr);
 
     const parsed = parseStream(processResult.stdout);
+    const discovery = discoveryEvidence(parsed, task.discovery);
     const checks = task.grade.map((check) => {
       const result = grade(
         check,
@@ -786,11 +1181,15 @@ export function runTask(
       passed,
       checks,
       activated_skills: parsed.activated_skills,
+      successful_skills: parsed.successful_skills,
+      discovery,
       usage: parsed.usage,
       model_usage: parsed.model_usage,
+      emitted_models: parsed.emitted_models,
       exit_code: processResult.exitCode,
       timed_out: processResult.timedOut,
       tool_uses: parsed.tool_uses,
+      tool_results: parsed.tool_results,
       bash_results: parsed.bash_results,
       transcript: relative(runDir, transcriptPath),
       stderr: relative(runDir, stderrPath),
@@ -986,6 +1385,9 @@ export function main(argv = process.argv.slice(2)): number {
     return cli.exitCode;
   }
   const options = cli.options as CliOptions;
+  if (new Set(options.conditions).size !== options.conditions.length) {
+    throw new Error("duplicate --condition values are not allowed");
+  }
   const unknownConditions = [...new Set(options.conditions)]
     .filter((condition) => !VALID_CONDITIONS.has(condition))
     .sort();
@@ -1015,11 +1417,19 @@ export function main(argv = process.argv.slice(2)): number {
   }
 
   const environment = preflight();
+  const isolation = catalogIsolation();
   const runName = options.runName ?? options.model.replaceAll("/", "-");
   const runDirectory = join(HERE, options.area, "runs", runName);
   mkdirSync(runDirectory, { recursive: true });
   const cacheDirectory = join(runDirectory, "_cache");
   mkdirSync(cacheDirectory, { recursive: true });
+  const needsSkillSnapshots = options.conditions.some(
+    (condition) => condition === "baseline" || condition === "ours" || condition.startsWith("forced-"),
+  );
+  const preparedSkills = needsSkillSnapshots
+    ? prepareSkillSnapshots(cacheDirectory)
+    : undefined;
+  const skillSources = preparedSkills?.sources ?? { current: SKILLS_SRC };
 
   const resultsPath = join(runDirectory, "results.jsonl");
   if (existsSync(resultsPath) && !options.resume) {
@@ -1029,9 +1439,15 @@ export function main(argv = process.argv.slice(2)): number {
   }
   const runConfig = {
     area: options.area,
+    conditions: options.conditions,
+    tasks: Object.fromEntries(
+      taskDirectories.map((directory) => [basename(directory), snapshotFiles(directory)]),
+    ),
     model: options.model,
     max_turns: options.maxTurns,
     environment,
+    catalog_isolation: isolation,
+    skill_snapshots: preparedSkills?.manifest ?? null,
   };
   ensureRunManifest(runDirectory, runConfig, existsSync(resultsPath));
 
@@ -1064,6 +1480,8 @@ export function main(argv = process.argv.slice(2)): number {
         options.maxTurns,
         cacheDirectory,
         runDirectory,
+        runCommand,
+        skillSources,
       );
       results.push(result);
       appendFileSync(resultsPath, JSON.stringify(result) + "\n");
@@ -1083,6 +1501,15 @@ export function main(argv = process.argv.slice(2)): number {
       results.flatMap((result) => Object.keys(asRecord(result.model_usage))),
     ),
   ].sort();
+  const emittedModels = [
+    ...new Set(
+      results.flatMap((result) =>
+        Array.isArray(result.emitted_models)
+          ? result.emitted_models.filter((model): model is string => typeof model === "string")
+          : [],
+      ),
+    ),
+  ].sort();
   const passRateByCondition = Object.fromEntries(
     [...byCondition.entries()]
       .sort(([left], [right]) => left.localeCompare(right))
@@ -1097,13 +1524,43 @@ export function main(argv = process.argv.slice(2)): number {
     const usage = asRecord(result.usage);
     return total + (typeof usage.total_cost_usd === "number" ? usage.total_cost_usd : 0);
   }, 0);
+  const discoveryByCondition = Object.fromEntries(
+    [...byCondition.entries()]
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([condition, items]) => {
+        const evidence = items
+          .map((item) => asRecord(item.discovery))
+          .filter(
+            (item) =>
+              item.requested_skill !== null || item.requested_reference !== null,
+          );
+        const rate = (field: string): string => {
+          const applicable = evidence.filter((item) => typeof item[field] === "boolean");
+          return (
+            String(applicable.filter((item) => item[field] === true).length) +
+            "/" +
+            String(applicable.length)
+          );
+        };
+        return [
+          condition,
+          {
+            skill_activation: rate("skill_activated_successfully"),
+            reference_read: rate("reference_read_successfully"),
+            reference_before_action: rate("reference_read_before_action"),
+          },
+        ];
+      }),
+  );
   const summary = {
     area: options.area,
     model: options.model,
     max_turns: options.maxTurns,
     environment,
     resolved_models: resolvedModels,
+    emitted_models: emittedModels,
     pass_rate_by_condition: passRateByCondition,
+    discovery_by_condition: discoveryByCondition,
     total_cost_usd: Number(totalCost.toFixed(4)),
   };
   writeFileSync(join(runDirectory, "summary.json"), JSON.stringify(summary, null, 2) + "\n");

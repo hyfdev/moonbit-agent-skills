@@ -6,8 +6,12 @@
       "id": "moonbit-docs",
       "kind": "documentation",
       "url": "https://docs.moonbitlang.com/en/latest/",
+      "commit": "0a910e151998d92dcf8c7cd84acafe12aac2870e",
+      "commit_date": "2026-07-17",
+      "path": "next/language/index.md",
+      "sha256": "b6d7df45b48176394db49e78f27c284c4e22662217d731ff1c50768d142bd8b0",
       "version_label": "MoonBit v0.10.4 documentation",
-      "notes": "Docs site banner version. Known lag: trait/impl pages still show the pre-v0.10.0 fn-less syntax that the v0.10.0 release notes superseded."
+      "notes": "Mechanical source for verification/language-surface/source.json. Known lag is not treated as executable truth: the official local-types example suppresses deprecated_syntax even though the pinned compiler warns."
     },
     {
       "id": "moonbit-release-notes",

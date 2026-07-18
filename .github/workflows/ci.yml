@@ -31,6 +31,10 @@ jobs:
         run: vp run verify-release-sources
       - name: Every release item has a closed coverage decision
         run: vp run check-release-coverage
+      - name: Pinned language surface matches official documentation
+        run: vp run verify-language-surface-source
+      - name: Every official language topic has a product route or explicit boundary
+        run: vp run check-language-surface
   # MoonBit distributes install channels (latest / nightly / pre-release),
   # not pinned historical versions (verified 2026-07-17: only channel URLs
   # exist under cli.moonbitlang.com/binaries/). CI therefore cannot

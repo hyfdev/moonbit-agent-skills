@@ -87,6 +87,15 @@ let bad : @vis.VisRead = { x: 99 }     // WRONG: E4036 — cannot create values 
 let bad2 : @vis.VisHidden = ...        // WRONG: E4032 — priv type name is undefined outside
 ```
 
+## Prelude, source-level `using`, and re-export
+
+Unqualified names resolve in the current package and the prelude; compiler-known types such as `Int` are builtins, not members of a fictional `@builtin` package. Package imports are configured in `moon.pkg`, but MoonBit source selects names with `using @pkg {name, trait TraitName, type TypeName}`. Add `pub` to re-export those names so a downstream package can access them through the re-exporting package. The three-package `lang-using-reexport` fixture verifies the boundary on every pinned target.
+
+```mbt nocheck
+// In a package whose moon.pkg imports the dependency as @origin:
+pub using @origin {increment, trait Service, type Handle}
+```
+
 ## Traits: `pub` is sealed, `pub(open)` is implementable
 
 A `pub trait` can be *used* by other packages but not *implemented* by them (E4145). External implementations require `pub(open)`.

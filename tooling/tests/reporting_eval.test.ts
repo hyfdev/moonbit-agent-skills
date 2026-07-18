@@ -72,10 +72,10 @@ describe("reporting behavior fixtures", () => {
       cpSync(source, installed, { recursive: true });
       injectContradiction(installed, "language-entrypoint");
       expect(readFileSync(join(source, "SKILL.md"), "utf8")).toContain(
-        "entry point is `fn main { }` (no parens)",
+        "Entry points are `fn main { }` and `fn init { }`;",
       );
       expect(readFileSync(join(installed, "SKILL.md"), "utf8")).toContain(
-        "entry point is `fn main() { }` (parentheses required)",
+        "The entry point is `fn main() { }` (parentheses required);",
       );
     } finally {
       rmSync(temporary, { recursive: true, force: true });

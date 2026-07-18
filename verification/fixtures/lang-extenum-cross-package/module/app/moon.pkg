@@ -1,0 +1,4 @@
+import {
+  "mbtskills/extenumfixture/base",
+  "mbtskills/extenumfixture/plugin",
+}

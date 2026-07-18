@@ -39,3 +39,21 @@ This was a targeted three-prompt addition, not a rerun of the 35-prompt product-
 | Ordinary `extend` question | language only | language only | yes |
 
 Maintenance auto-activation was 1/2; the missed audit was under-activation, not routing to a product skill. The ordinary `extend` request activated only the language skill, so adding the internal maintainer did not steal that product request. Both maintenance runs reached the runner's turn limit after the activation decision; the activation observations remain usable, but this small check does not establish reliable implicit activation. The maintainer remains explicitly invocable for repository work.
+
+## 2026-07-18 language-reference rerun
+
+The 38-prompt catalog suite was rerun after the language feature index and description update with the same 12-turn budget as the checked-in 35-prompt baseline. Client: Claude Code CLI 2.1.212; requested model: `claude-haiku-4-5-20251001`; resolved usage named both that model and `deepseek-v4-flash`; cost: $2.2728.
+
+| Category | Current | Earlier checked snapshot |
+| --- | ---: | ---: |
+| Language-only, original 10 prompts | 8/10 | 7/10 |
+| Added ordinary `extend` prompt | 1/1 | not present |
+| Toolchain-only | 5/10 | 7/10 |
+| Combined exact dual activation | 1/5 | 1/5 |
+| Confusable negatives | 10/10 | 10/10 |
+| Maintenance-only | 0/2 | previously 1/2 in a separate targeted run |
+| Positive recall, all 28 current prompts | 15/28 | not directly comparable |
+
+The ordinary `extend` request activated only `moonbit-language`, and no negative prompt activated a MoonBit skill. The one-case language increase is not evidence that the new wording generally improves activation: this is one stochastic mixed-routing run, and the unchanged toolchain prompts moved in the opposite direction. The reliable result is that adding explicit language terms did not create false positives or steal ordinary `extend` requests for the internal maintainer.
+
+A preceding three-turn trial was excluded because its turn budget did not match the historical run. It cost $1.6202 and contributes no reported comparison.

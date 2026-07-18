@@ -74,6 +74,23 @@ Two deterministic edit tasks were added on 2026-07-18 for guidance introduced by
 
 The first `extend` attempt exposed a grader defect rather than a product failure: the starter's private tuple constructor raised unrelated `unused_constructor` under global `--deny-warn`, so a correct `extend` edit still failed. Changing the starter to a public constructor isolated warning 79. CI then found that the 2026-07-15 compiler changed behavior without changing the 0.10.4 release number: warning 79 moved into the default deprecated-warning set, and or-pattern defaults now require the `with` clause inside parentheses. The first follow-up prompt also allowed a qualified trait call that preserved runtime behavior but changed the requested dot-call API, so that ambiguous cell was discarded and the prompt now states the API requirement directly. At the current exact build, both catalog-only and forced-skill conditions passed the corrected task with `moon check --deny-warn` and one test. Release-supplement cost was $0.9138 including both discarded prompt/grader cells; the corrected post-drift pair cost $0.1673.
 
+## Language-reference discoverability follow-up
+
+Run date: 2026-07-18 · client: Claude Code CLI 2.1.212 · pinned moonc: `v0.10.4+2cc641edf` · historical condition: skill tree `291192ad3ba3bd5c3bd47e4352580fab7682d711` at `b4a323735da6f2f33d8846536f912eaf339f2512` · current condition: skill tree `090a9057d2b9ab7d8e39fdcddaef52f2301f1899` at `b612b7412baeea833a35af4b6277a9e757b1e1e0`. Each run manifest records both tree IDs and every installed skill file's SHA-256. No user-level or plugin-provided `moonbit-language` skill was present.
+
+The two tasks start from warning-free, passing cross-package projects, do not name `extend`, and do not expose a compiler diagnostic that contains the answer. Hidden graders require the exact public attachment, preserve qualified APIs and trait implementations, test downstream dot calls with fresh values, and prove that an unselected method remains unavailable.
+
+| Requested condition | Emitted model | Baseline outcome | Current outcome | Baseline skill / reference | Current skill / reference | Cost |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| Haiku, two balanced repetitions | `deepseek-v4-flash` | 3/4 | 3/4 | 1/4 / 3/4 | 1/4 / 3/4 | $0.8098 |
+| Sonnet, one repetition | `deepseek-v4-pro` | 2/2 | 2/2 | 2/2 / 2/2 | 2/2 / 2/2 | $1.6297 |
+
+`skill` counts a successful `Skill` tool result. `reference` counts a successful read of `references/traits-and-generics.mbt.md` before an action in a later assistant turn. Neither is part of functional PASS.
+
+The measured result is a tie. The current skill makes `extend` explicit in its top-level feature index and closes a mechanical completeness gate, but these samples do not show a functional gain over the old skill: the old deep trait reference already contained the syntax whenever the model found it. On the failed low-cost repetition, both conditions skipped the skill and reference and wrote a standalone `fn Robot::greet`, which the hidden grader rejected. The stronger run loaded the skill and routed reference in every cell and both conditions passed.
+
+One earlier four-cell run was discarded after it exposed an ambiguous task contract: both conditions added the correct `pub extend` but removed a qualified wrapper that the hidden grader expected even though the prompt had not explicitly protected it. The prompt now names that requirement. The discarded run cost $0.4538 and is excluded from the table.
+
 ## What the full run says
 
 - The no-skill baseline passed all 9 executable workspace tasks and invoked `moon` in every one; it failed both knowledge-only capability questions. Toolchain feedback closes a large part of the execution gap, while it cannot repair facts the agent never tests.

@@ -3,7 +3,7 @@
 Agent Skills for MoonBit. Help coding agents work with MoonBit and write better MoonBit code.
 
 - Up to date with the latest MoonBit release — **[v0.10.4](https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release)**
-- Backed by evaluation across multiple AI models
+- Backed by [evaluation](#evaluation) across multiple AI models
 - Automatic activation based on context
 
 ## Contents
@@ -11,6 +11,7 @@ Agent Skills for MoonBit. Help coding agents work with MoonBit and write better 
 - [Skills](#skills)
 - [Install](#install)
 - [How to use](#how-to-use)
+- [Evaluation](#evaluation)
 - [FAQ](#faq)
 - [License](#license)
 
@@ -51,6 +52,30 @@ Clone or download this repository, then copy either or both skill directories in
 ## How to use
 
 Use your coding agent as usual—no special prompts or manual invocation required.
+
+## Evaluation
+
+Results across two content evaluations:
+
+| What the agent had to do | Observed model | Compared with | Comparison | With current skills |
+| --- | --- | --- | ---: | ---: |
+| Complete 8 high-risk MoonBit language tasks | Kimi K3 | Historical skill | **100%** | 96% |
+| Complete 11 language, toolchain, and integration tasks | DeepSeek Flash | No skills | 82% | **100%** |
+
+Each high-risk task ran three times. The current skill tied the historical skill on 7 of 8 tasks and missed one `loop`-replacement run. In the 11-task evaluation, the current skills corrected `defer` availability and the current `loop` replacement; the other 9 tasks tied.
+
+MoonBit v0.10.4 introduced `extend` for explicitly exposing trait methods as dot-call APIs.
+
+The focused comparison covered 2 distinct tasks: letting downstream callers use one implemented trait method as a dot call and doing the same for one default trait method. It compared the current skills with the same skills after removing only the top-level `extend` guidance.
+
+| What the agent had to do | Observed model | Without top-level `extend` guidance | With current skills |
+| --- | --- | ---: | ---: |
+| Let downstream callers use one implemented trait method as a dot call | Kimi K3 | 100% | 100% |
+| Let downstream callers use one default trait method as a dot call | Kimi K3 | 100% | 100% |
+| Let downstream callers use one implemented trait method as a dot call | DeepSeek Flash | 100% | 100% |
+| Let downstream callers use one default trait method as a dot call | DeepSeek Flash | 100% | 100% |
+
+Across the 6 Kimi runs, the target `extend` reference was read before a later code change 33% of the time without the top-level guidance and 83% with the current skills. This was a discovery improvement; final task success tied. Results use objective graders and preserve failed runs. See the [full content results](evals/RESULTS.md) and [activation results](evals/activation/RESULTS.md).
 
 ## FAQ
 

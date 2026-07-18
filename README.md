@@ -24,7 +24,7 @@ Agent Skills for MoonBit. Help coding agents work with MoonBit and write better 
 ## Install
 
 > [!WARNING]
-> When automatically activated, a skill may detect that its guidance conflicts with actual MoonBit behavior and propose filing an issue here. Nothing is submitted without your explicit approval; approved reports improve the skills for everyone.
+> When a skill detects that its guidance conflicts with actual MoonBit behavior, it instructs the agent to prepare a privacy-scrubbed public issue draft and give you the issue-template link. The built-in workflow stops there: it uses no automatic reporting or telemetry service, and you decide whether to submit the draft.
 
 - Global install for Claude Code and `.agents`:
 

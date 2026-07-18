@@ -1,6 +1,6 @@
 # Activation eval — checked-in snapshot
 
-Run date: 2026-07-17 · runner: `run_activation.py` · 35 prompts · skills at commit of this snapshot · client: Claude Code CLI 2.1.212, catalog-only discovery (prompts never name skills; the runner rejects prompts that do). Raw per-prompt records live in gitignored `runs/`; these tables are the durable summary.
+Run date: 2026-07-17 · runner: `run_activation.ts` · 35 prompts · skills at commit of this snapshot · client: Claude Code CLI 2.1.212, catalog-only discovery (prompts never name skills; the runner rejects prompts that do). Raw per-prompt records live in gitignored `runs/`; these tables are the durable summary.
 
 | Metric | haiku-4.5 | sonnet-5 |
 | --- | --- | --- |
@@ -26,7 +26,7 @@ Run date: 2026-07-17 · runner: `run_activation.py` · 35 prompts · skills at c
 - Run in the author's normal user environment: the user-level skill catalog contained unrelated (non-MoonBit) personal skills as constant background noise across models and conditions.
 - Not yet tested: Claude Code `paths` frontmatter (glob-gated auto-activation on `.mbt`/`moon.pkg` files) — the highest-leverage fix for the workspace-file under-activation pattern, at the cost of being a client-specific extension; description phrasing A/B tests; opus-class models.
 
-Reproduce: `python3 evals/activation/run_activation.py --model <model> --run-name <name>`.
+Reproduce: `node evals/activation/run_activation.ts --model <model> --run-name <name>`.
 
 ## 2026-07-18 targeted internal-maintainer check
 

@@ -45,7 +45,7 @@ export function units(skill: string): Map<string, string> {
       if (normalized.length >= MIN_CHARS && !output.has(normalized)) {
         output.set(
           normalized,
-          `${relative(REPO_ROOT, path)}: ${pythonRepr(block.trim().slice(0, 60))}`,
+          `${relative(REPO_ROOT, path)}: ${singleQuoted(block.trim().slice(0, 60))}`,
         );
       }
     }
@@ -76,7 +76,7 @@ function isDirectory(path: string): boolean {
   return existsSync(path) && statSync(path).isDirectory();
 }
 
-function pythonRepr(value: string): string {
+function singleQuoted(value: string): string {
   return `'${value.replaceAll("\\", "\\\\").replaceAll("'", "\\'").replaceAll("\n", "\\n")}'`;
 }
 

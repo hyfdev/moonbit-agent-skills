@@ -1,34 +1,42 @@
 # Evals
 
-Two separate questions get two separate eval families:
+Three separate questions get three separate eval families:
 
 1. **Activation** (`activation/`) — can the agent, seeing only the skill catalog (names + descriptions), decide per natural request whether to load moonbit-language, moonbit-toolchain, both, or neither? No eval here ever names a skill in the prompt; the runner rejects prompts that do.
 2. **Content** (`language/`, `toolchain/`, `integration/`) — once knowledge is available, does the agent finish MoonBit tasks correctly? Conditions compare no skills, the pinned official `moonbitlang/skills` bundle, this repository's catalog-only skills, and force-injected single skills. `forced-language-no-cross-language` is a targeted H4 ablation: it removes the concentrated cross-language rule, route, and reference while retaining the rest of the forced language skill.
+3. **Error reporting** (`reporting/`) — when the installed guidance conflicts with observed behavior, does the agent verify the conflict, fix the task, display a complete privacy-scrubbed issue draft and template link, and stop without invoking GitHub? The same scenarios run with and without the skill.
 
-Both runners need the Claude Code CLI (`claude`) with credentials. The content runner also needs `moon` and Node.js (`node`) on `PATH`; Node executes JS-target tests. Before its first model call, the content runner verifies that `claude`, `moon`, `node`, and `git` exist, records the Node version, and checks that every MoonBit component matches `verification/toolchains/current.json`. Grading is deterministic — real commands, file/state assertions, hidden behavior tests, and transcript assertions, never an LLM judge.
+All runners are TypeScript executed directly by Node.js 24 and need the Claude Code CLI (`claude`) with credentials for paid runs. The content and reporting runners also need `moon` on `PATH`; content additionally needs `git`, and Node executes its JS-target tests. Before its first model call, the content runner verifies its executables, records the Node version, and checks every MoonBit component against `verification/toolchains/current.json`; the reporting runner likewise refuses to run without Node.js 24+, Claude Code, and the exact MoonBit pin. Grading is deterministic — real commands, file/state assertions, hidden behavior tests, and transcript assertions, never an LLM judge.
 
 ## Running
 
 ```sh
 # Validate prompt/task definitions without spending tokens.
-python3 evals/activation/run_activation.py --dry-run
-python3 evals/run_content.py --area language --condition none --dry-run
+node evals/activation/run_activation.ts --dry-run
+node evals/run_content.ts --area language --condition none --dry-run
+node evals/reporting/run_reporting.ts --dry-run
 
 # Full activation eval.
-python3 evals/activation/run_activation.py --model claude-haiku-4-5-20251001
+node evals/activation/run_activation.ts --model claude-haiku-4-5-20251001
 
 # Full content matrix, one area per process.
-python3 evals/run_content.py --area language --condition none --condition official --condition ours --condition forced-language --max-turns 50
-python3 evals/run_content.py --area toolchain --condition none --condition official --condition ours --condition forced-toolchain --max-turns 50
-python3 evals/run_content.py --area integration --condition none --condition official --condition ours --max-turns 50
+node evals/run_content.ts --area language --condition none --condition official --condition ours --condition forced-language --max-turns 50
+node evals/run_content.ts --area toolchain --condition none --condition official --condition ours --condition forced-toolchain --max-turns 50
+node evals/run_content.ts --area integration --condition none --condition official --condition ours --max-turns 50
 
 # Targeted H4 ablation.
-python3 evals/run_content.py --area language --ids lang-fix-rust-habits --condition forced-language-no-cross-language --max-turns 50 --run-name h4-no-cross-language
+node evals/run_content.ts --area language --ids lang-fix-rust-habits --condition forced-language-no-cross-language --max-turns 50 --run-name h4-no-cross-language
+
+# Error-reporting behavior comparison.
+node evals/reporting/run_reporting.ts --model claude-haiku-4-5-20251001 --run-name reporting-manual-only
+
+# Reapply the current deterministic scorer to a preserved reporting run without model calls.
+node evals/reporting/run_reporting.ts --regrade-run reporting-manual-only
 ```
 
-Use a fresh `--run-name` for a new measurement. A pre-existing `results.jsonl` is rejected unless `--resume` is given; resume skips completed task/condition pairs and recomputes the summary from old plus new records. The runner writes `run.json` before the first task and refuses to resume if the area, model, turn budget, client, MoonBit or Node runtime, platform, or recorded model environment changed.
+For activation and content, use a fresh `--run-name` for a new measurement. A pre-existing `results.jsonl` is rejected unless `--resume` is given; resume skips completed task/condition pairs and recomputes the summary from old plus new records. These runners write `run.json` before the first task and refuse to resume when the recorded run configuration or environment changed. Reporting runs are smaller one-shot comparisons: always use a fresh name; the runner rejects an existing directory and does not support resume. `--regrade-run` only reapplies the checked-in deterministic scorer to preserved artifacts and makes no model call.
 
-Results are written to `*/runs/<run-name>/` and gitignored. `run.json` fixes the resumable run configuration; `results.jsonl` contains checks, usage, full final text, skill activations, and tool calls; `summary.json` contains the turn budget, environment, requested/resolved models, rates, and cost; `transcripts/` preserves full stdout/stderr; and `failed-workspaces/` preserves failed project state without `.claude` or `_build`. Checked-in results live in `RESULTS.md` snapshots with date, client/model disclosure, corrections, and cost.
+Results are written to `*/runs/<run-name>/` and gitignored. Activation and content use `run.json`, `results.jsonl`, `summary.json`, `transcripts/`, and, for content failures, `failed-workspaces/`. Reporting stores per-scenario answers, sanitized workspace snapshots, detected GitHub command attempts, transcripts, and deterministic grading under `iteration-1/`, plus a top-level `summary.json`. Checked-in results live in the corresponding `RESULTS.md` snapshots with date, client/model disclosure, corrections, and cost.
 
 ## `activation/prompts.jsonl` schema
 

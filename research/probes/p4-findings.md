@@ -1,6 +1,6 @@
 # P4 findings: negative examples (foreign-language habits vs current MoonBit)
 
-Toolchain: moon 0.1.20260713, moonc v0.10.4+ade96c819, wasm-gc default target. Every entry below was produced by running the exact code through `moon check` (or `moon test` for behavior proofs) in a fresh minimal package (`moon.mod` name `mbtprobe/case`, empty `moon.pkg`, code as `lib.mbt`). Each entry references a verified standalone case directory under `p4-cases/<id>/` containing `code.mbt` + `meta.json` (with a compiling `fixed_code`). All 52 case dirs were machine-verified by `p4/build_cases.py`: wrong code fails (or warns/behaves as recorded) AND the fixed code passes.
+Toolchain: moon 0.1.20260713, moonc v0.10.4+ade96c819, wasm-gc default target. Every entry below was produced by running the exact code through `moon check` (or `moon test` for behavior proofs) in a fresh minimal package (`moon.mod` name `mbtprobe/case`, empty `moon.pkg`, code as `lib.mbt`). Each entry references a verified standalone case directory under `p4-cases/<id>/` containing `code.mbt` + `meta.json` (with a compiling `fixed_code`). All 52 case dirs were machine-verified: wrong code fails (or warns/behaves as recorded) AND the fixed code passes.
 
 ## CRITICAL: foreign or stale syntax the compiler ACCEPTS
 
@@ -241,4 +241,4 @@ fn init {
 - `package`, `export`, `await`, `use` are explicitly reserved words (Warning 0035 reserved_keyword).
 - Several "warnings" are error-level by default (observed: 0015 unused_mut fails the build), so `moon check` exit code is stricter than the word Warning suggests.
 - Deprecated syntax (Warning 0027) NEVER fails `moon check` — legacy `!` error syntax, `type!`, `for { }` all still build; linting must key off warning text.
-- All wrong/fixed pairs live in `p4-cases/<id>/` (52 dirs) and were re-verified end-to-end by `p4/build_cases.py` (52/52).
+- All wrong/fixed pairs live in `p4-cases/<id>/` (52 dirs) and were re-verified end-to-end (52/52).

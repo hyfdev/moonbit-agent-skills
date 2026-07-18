@@ -125,7 +125,7 @@ export function validateSkill(skillDir: string): string[] {
   }
 
   for (const file of walkFiles(skillDir)) {
-    if (![".md", ".mbt", ".sh", ".py", ".ts"].includes(extname(file))) {
+    if (![".md", ".mbt", ".ts"].includes(extname(file))) {
       continue;
     }
     if (/(?<![\w@])\/(?:Users|home|private\/tmp)\//.test(readFileSync(file, "utf8"))) {

@@ -213,6 +213,15 @@ interface CommandResult {
   durationMs?: number;
 }
 
+export function stderrTailForPersistence(
+  exitCode: number | null,
+  stderr: string,
+): string {
+  return exitCode === 0
+    ? ""
+    : sanitizeAgentStreamForPersistence(stderr.slice(-400));
+}
+
 interface RunConfig {
   runner: "activation" | "activation-v2" | "activation-v3" | "activation-v4";
   client?: AgentClient;
@@ -907,7 +916,7 @@ async function runOne(
       ? 0
       : commandResult.exitCode ?? 1,
     timed_out: commandResult.timedOut,
-    stderr_tail: commandResult.exitCode === 0 ? "" : commandResult.stderr.slice(-400),
+    stderr_tail: stderrTailForPersistence(commandResult.exitCode, commandResult.stderr),
     transcript: transcriptRelative,
     stderr: stderrRelative,
     final_text: parsed.finalText,

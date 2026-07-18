@@ -19,6 +19,7 @@ import {
   parseActivationStream,
   prepareActivationInputs,
   scoreActivation,
+  stderrTailForPersistence,
   summarize,
   type ActivationPrompt,
   type ActivationResult,
@@ -126,6 +127,16 @@ describe("activation eval input", () => {
 });
 
 describe("activation eval transcript and metrics", () => {
+  it("sanitizes the stderr tail copied into serialized results", () => {
+    expect(
+      stderrTailForPersistence(
+        1,
+        "client failed after --max-budget-usd 0.25; total_cost_usd=0.10; $0.30",
+      ),
+    ).not.toMatch(/max[-_]budget[-_]usd|total[-_]cost[-_]usd|\$0\.30|0\.25/);
+    expect(stderrTailForPersistence(0, "ignored --max-budget-usd 0.25")).toBe("");
+  });
+
   it("deduplicates Skill calls and discloses the resolved model", () => {
     const parsed = parseActivationStream(
       [

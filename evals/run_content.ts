@@ -616,30 +616,112 @@ export function prepareSkillSnapshots(
   };
 }
 
+function pluginSkillCollisions(
+  pluginRoot: string,
+  allowedRealRoots: readonly string[],
+): { collisions: string[]; escapedDirectorySymlinks: string[] } {
+  const collisions = new Set<string>();
+  const escapedDirectorySymlinks = new Set<string>();
+  const visitedRealDirectories = new Set<string>();
+
+  const isWithinAllowedRoot = (path: string): boolean =>
+    allowedRealRoots.some((root) => pathIsWithin(root, path));
+  const recordCandidate = (directory: string): void => {
+    const candidate = join(directory, "skills", "moonbit-language", "SKILL.md");
+    if (isFile(candidate)) {
+      collisions.add(candidate);
+    }
+  };
+  const visit = (directory: string): void => {
+    recordCandidate(directory);
+    let realDirectory: string;
+    try {
+      realDirectory = realpathSync(directory);
+    } catch {
+      return;
+    }
+    if (visitedRealDirectories.has(realDirectory)) {
+      return;
+    }
+    visitedRealDirectories.add(realDirectory);
+
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      const path = join(directory, entry.name);
+      if (entry.isDirectory()) {
+        visit(path);
+      } else if (entry.isSymbolicLink() && isDirectory(path)) {
+        recordCandidate(path);
+        const realTarget = realpathSync(path);
+        if (isWithinAllowedRoot(realTarget)) {
+          visit(path);
+        } else {
+          escapedDirectorySymlinks.add(path);
+        }
+      }
+    }
+  };
+
+  visit(pluginRoot);
+  return {
+    collisions: [...collisions].sort(),
+    escapedDirectorySymlinks: [...escapedDirectorySymlinks].sort(),
+  };
+}
+
 export function catalogIsolation(homeDirectory = homedir()): JsonRecord {
-  const checkedRoots = [
+  const directSkillRoots = [
     join(homeDirectory, ".claude", "skills"),
     join(homeDirectory, ".agents", "skills"),
     join(homeDirectory, ".codex", "skills"),
+  ];
+  const pluginRoots = [
     join(homeDirectory, ".claude", "plugins"),
     join(homeDirectory, ".agents", "plugins"),
     join(homeDirectory, ".codex", "plugins"),
   ];
-  const suffix = join("skills", "moonbit-language", "SKILL.md");
-  const collisions = checkedRoots
-    .filter((root) => isDirectory(root))
-    .flatMap((root) => walkFiles(root))
-    .filter((path) => path.endsWith(suffix))
-    .sort();
-  if (collisions.length > 0) {
+  const checkedRoots = [...directSkillRoots, ...pluginRoots];
+  const collisions = new Set(
+    directSkillRoots
+      .map((root) => join(root, "moonbit-language", "SKILL.md"))
+      .filter((path) => isFile(path)),
+  );
+  const escapedDirectorySymlinks = new Set<string>();
+  let realHome: string | undefined;
+  try {
+    realHome = realpathSync(homeDirectory);
+  } catch {
+    // The direct-path checks above still provide a useful result for a missing home.
+  }
+  for (const pluginRoot of pluginRoots.filter((root) => isDirectory(root))) {
+    const allowedRealRoots = [realpathSync(pluginRoot)];
+    if (realHome !== undefined) {
+      allowedRealRoots.push(realHome);
+    }
+    const scan = pluginSkillCollisions(pluginRoot, allowedRealRoots);
+    for (const path of scan.collisions) {
+      collisions.add(path);
+    }
+    for (const path of scan.escapedDirectorySymlinks) {
+      escapedDirectorySymlinks.add(path);
+    }
+  }
+  const sortedCollisions = [...collisions].sort();
+  const sortedEscapedDirectorySymlinks = [...escapedDirectorySymlinks].sort();
+  if (sortedCollisions.length > 0) {
     throw new Error(
       "content eval isolation failed: a global or plugin moonbit-language skill is installed at " +
-        collisions.join(", "),
+        sortedCollisions.join(", "),
+    );
+  }
+  if (sortedEscapedDirectorySymlinks.length > 0) {
+    throw new Error(
+      "content eval isolation failed: refusing plugin directory symlinks outside the home or plugin root: " +
+        sortedEscapedDirectorySymlinks.join(", "),
     );
   }
   return {
     checked_roots: checkedRoots,
-    conflicting_moonbit_language_skills: collisions,
+    conflicting_moonbit_language_skills: sortedCollisions,
   };
 }
 

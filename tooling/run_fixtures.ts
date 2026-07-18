@@ -75,6 +75,11 @@ function runMoon(args: string[], cwd: string, runner: CommandRunner): CommandRes
   return runner("moon", [...args, "--no-render"], { cwd, timeout: 300_000 });
 }
 
+function reportedTestCount(output: string): number | undefined {
+  const match = /Total tests:\s*(\d+)\b/.exec(output);
+  return match === null ? undefined : Number(match[1]);
+}
+
 export function checkOne(
   fixtureDirectory: string,
   verbose: boolean,
@@ -123,6 +128,15 @@ export function checkOne(
         problems.push(
           `[${target}] expected success, got exit ${result.exitCode}:\n${output.slice(0, 800)}`,
         );
+      } else if (expectation === "test-pass") {
+        const testCount = reportedTestCount(output);
+        if (testCount === undefined) {
+          problems.push(
+            `[${target}] successful moon test did not report 'Total tests: N':\n${output.slice(0, 800)}`,
+          );
+        } else if (testCount === 0) {
+          problems.push(`[${target}] successful moon test ran zero tests`);
+        }
       }
       for (const needle of metadata.diagnostic_contains ?? []) {
         if (!output.includes(needle)) {
@@ -153,6 +167,16 @@ export function checkOne(
           problems.push(
             `[${target}] fixed.mbt must pass moon ${fixedSubcommand} but failed:\n${(result.stdout + result.stderr).slice(0, 800)}`,
           );
+        } else if (expectation === "test-pass") {
+          const output = result.stdout + result.stderr;
+          const testCount = reportedTestCount(output);
+          if (testCount === undefined) {
+            problems.push(
+              `[${target}] fixed.mbt moon test did not report 'Total tests: N':\n${output.slice(0, 800)}`,
+            );
+          } else if (testCount === 0) {
+            problems.push(`[${target}] fixed.mbt moon test ran zero tests`);
+          }
         }
       }
     }

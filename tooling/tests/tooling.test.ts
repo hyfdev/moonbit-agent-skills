@@ -416,6 +416,50 @@ it("checks an expected diagnostic and then verifies fixed.mbt", () => {
   }
 });
 
+it("rejects a test-pass fixture when Moon reports zero tests", () => {
+  const temporary = mkdtempSync(join(tmpdir(), "fixture-zero-tests-test-"));
+  try {
+    writeFileSync(
+      join(temporary, "fixture.json"),
+      JSON.stringify({ id: "zero-tests", expect: "test-pass", targets: ["js", "native"] }),
+    );
+    writeFileSync(join(temporary, "code.mbt"), "pub fn helper() -> Unit {}\n");
+    const runner: CommandRunner = () => ({
+      exitCode: 0,
+      stdout: "Total tests: 0, passed: 0, failed: 0.\n",
+      stderr: "",
+    });
+
+    expect(checkOne(temporary, false, runner)).toEqual({
+      ok: false,
+      detail:
+        "[js] successful moon test ran zero tests\n[native] successful moon test ran zero tests",
+    });
+  } finally {
+    rmSync(temporary, { recursive: true, force: true });
+  }
+});
+
+it("accepts a test-pass fixture only when each target reports tests", () => {
+  const temporary = mkdtempSync(join(tmpdir(), "fixture-positive-tests-test-"));
+  try {
+    writeFileSync(
+      join(temporary, "fixture.json"),
+      JSON.stringify({ id: "positive-tests", expect: "test-pass", targets: ["js", "native"] }),
+    );
+    writeFileSync(join(temporary, "code.mbt"), "test {}\n");
+    const runner: CommandRunner = (_command, args) => ({
+      exitCode: 0,
+      stdout: `Total tests: ${args.includes("js") ? 1 : 2}, passed: ${args.includes("js") ? 1 : 2}, failed: 0.\n`,
+      stderr: "",
+    });
+
+    expect(checkOne(temporary, false, runner)).toEqual({ ok: true, detail: "" });
+  } finally {
+    rmSync(temporary, { recursive: true, force: true });
+  }
+});
+
 it("uses a fixture-specific module name to isolate Moon test caches", () => {
   const temporary = mkdtempSync(join(tmpdir(), "fixture-module-name-test-"));
   try {

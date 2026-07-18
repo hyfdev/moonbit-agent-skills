@@ -1,4 +1,12 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -565,6 +573,32 @@ describe("content eval skill snapshots", () => {
       const collision = join(home, ".claude", "skills", "moonbit-language", "SKILL.md");
       mkdirSync(dirname(collision), { recursive: true });
       writeFileSync(collision, "collision\n");
+      expect(() => catalogIsolation(home)).toThrow("isolation failed");
+    });
+  });
+
+  it("rejects a same-name global skill installed through a directory symlink", () => {
+    temporary("content-home-", (home) => {
+      const target = join(home, "installed-moonbit-language");
+      mkdirSync(target);
+      writeFileSync(join(target, "SKILL.md"), "collision\n");
+      const skills = join(home, ".claude", "skills");
+      mkdirSync(skills, { recursive: true });
+      symlinkSync(target, join(skills, "moonbit-language"), "dir");
+      expect(() => catalogIsolation(home)).toThrow("isolation failed");
+    });
+  });
+
+  it("follows plugin directory symlinks once and rejects nested same-name skills", () => {
+    temporary("content-home-", (home) => {
+      const target = join(home, "plugin-target");
+      const collision = join(target, "nested", "skills", "moonbit-language", "SKILL.md");
+      mkdirSync(dirname(collision), { recursive: true });
+      writeFileSync(collision, "collision\n");
+      const plugins = join(home, ".claude", "plugins");
+      mkdirSync(plugins, { recursive: true });
+      symlinkSync(target, join(plugins, "linked-plugin"), "dir");
+      symlinkSync(plugins, join(target, "nested", "cycle"), "dir");
       expect(() => catalogIsolation(home)).toThrow("isolation failed");
     });
   });

@@ -1,0 +1,25 @@
+{
+  "id": "lang-regex-whole-identifier",
+  "risk_class": "silent-regex-search-semantics",
+  "claim_id": "language.regex.whole-string-validation",
+  "primary_metric": "whole-string-identifier-validation",
+  "prompt": "`is_identifier` is meant to validate the entire input, but it currently accepts strings that merely contain an identifier, such as `!name?`. Fix it so only a complete ASCII identifier is accepted: the first character is `[A-Za-z_]`, and every remaining character is `[A-Za-z0-9_]`. Keep the public API and use MoonBit's regex matching support.",
+  "discovery": {
+    "skill": "moonbit-language",
+    "reference": "references/pattern-matching.mbt.md"
+  },
+  "grade": [
+    {
+      "type": "moon",
+      "args": ["check", "--deny-warn"]
+    },
+    {
+      "type": "moon",
+      "args": ["test", "--deny-warn"],
+      "min_tests": 3,
+      "temp_files": {
+        "zz_eval_regex_test.mbt": "///|\ntest \"grader accepts fresh complete identifiers\" {\n  assert_true(is_identifier(\"Z\"))\n  assert_true(is_identifier(\"value_42\"))\n  assert_true(is_identifier(\"__\"))\n}\n\n///|\ntest \"grader rejects surrounding and invalid text\" {\n  assert_false(is_identifier(\"\"))\n  assert_false(is_identifier(\"!name?\"))\n  assert_false(is_identifier(\"name!\"))\n  assert_false(is_identifier(\"x-y\"))\n  assert_false(is_identifier(\" name \"))\n}\n"
+      }
+    }
+  ]
+}

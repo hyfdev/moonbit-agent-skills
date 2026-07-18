@@ -20,6 +20,7 @@ import {
   grade,
   installLanguageAblation,
   installTopLevelExtendAblation,
+  materializeStarterWorkspace,
   materializeGitSkills,
   parseCli,
   parseStream,
@@ -60,6 +61,27 @@ function task(area: string, id: string): { grade: JsonRecord[] } {
 }
 
 describe("content eval grading", () => {
+  it("materializes starter source without generated or injected state", () => {
+    temporary("content-starter-", (root) => {
+      const workspace = join(root, "workspace");
+      const project = join(root, "project");
+      mkdirSync(workspace);
+      writeFileSync(join(workspace, "lib.mbt"), "pub fn answer() -> Int { 42 }\n");
+      for (const directory of [".claude", ".mooncakes", "_build", "target"]) {
+        const path = join(workspace, directory, "stale");
+        mkdirSync(dirname(path), { recursive: true });
+        writeFileSync(path, "generated");
+      }
+
+      materializeStarterWorkspace(workspace, project);
+
+      expect(readFileSync(join(project, "lib.mbt"), "utf8")).toContain("answer");
+      for (const directory of [".claude", ".mooncakes", "_build", "target"]) {
+        expect(existsSync(join(project, directory))).toBe(false);
+      }
+    });
+  });
+
   it("supports negative and exact-count file assertions", () => {
     temporary("content-grade-", (project) => {
       const source = join(project, "api.mbt");
@@ -110,6 +132,27 @@ describe("content eval grading", () => {
             expect_ok: false,
             output_regex: "E4015|no method",
           },
+          project,
+          "",
+          [],
+          {},
+          runner,
+        ).ok,
+      ).toBe(true);
+    });
+  });
+
+  it("runs deterministic Node host checks without a shell", () => {
+    temporary("content-node-grade-", (project) => {
+      const runner: CommandRunner = (command, args, options) => {
+        expect(command).toBe("node");
+        expect(args).toEqual(["verify.mjs"]);
+        expect(options?.cwd).toBe(project);
+        return commandResult(0, '{"value":42}\n');
+      };
+      expect(
+        grade(
+          { type: "node", args: ["verify.mjs"], output_regex: '"value":42' },
           project,
           "",
           [],

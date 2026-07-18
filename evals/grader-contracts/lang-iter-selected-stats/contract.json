@@ -1,0 +1,29 @@
+{
+  "area": "language",
+  "task": "lang-iter-selected-stats",
+  "cases": [
+    {
+      "name": "aggregates-in-one-terminal-operation",
+      "expected": "pass",
+      "files": {
+        "lib.mbt": "///|\npub fn selected_stats(values : Iter[Int], threshold : Int) -> (Int, Int) {\n  values.filter(value => value > threshold).fold(\n    init=(0, 0),\n    (stats, value) => (stats.0 + 1, stats.1 + value),\n  )\n}\n"
+      }
+    },
+    {
+      "name": "counts-then-folds-consumed-iterator",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "///|\npub fn selected_stats(values : Iter[Int], threshold : Int) -> (Int, Int) {\n  let selected = values.filter(value => value > threshold)\n  let count = selected.count()\n  let sum = selected.fold(init=0, (total, value) => total + value)\n  (count, sum)\n}\n"
+      },
+      "must_fail_check_types": ["moon"]
+    },
+    {
+      "name": "folds-then-counts-consumed-iterator",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "///|\npub fn selected_stats(values : Iter[Int], threshold : Int) -> (Int, Int) {\n  let selected = values.filter(value => value > threshold)\n  let sum = selected.fold(init=0, (total, value) => total + value)\n  let count = selected.count()\n  (count, sum)\n}\n"
+      },
+      "must_fail_check_types": ["moon"]
+    }
+  ]
+}

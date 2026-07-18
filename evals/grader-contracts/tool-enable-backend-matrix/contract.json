@@ -1,0 +1,29 @@
+{
+  "area": "toolchain",
+  "task": "tool-enable-backend-matrix",
+  "cases": [
+    {
+      "name": "supports-both-existing-backends",
+      "expected": "pass",
+      "files": {
+        "moon.mod": "name = \"mbteval/backend_matrix\"\nversion = \"0.1.0\"\npreferred_target = \"js\"\nsupported_targets = [ \"js\", \"wasm-gc\" ]\n"
+      }
+    },
+    {
+      "name": "keeps-the-silent-js-only-restriction",
+      "expected": "fail",
+      "files": {
+        "moon.mod": "name = \"mbteval/backend_matrix\"\nversion = \"0.1.0\"\npreferred_target = \"js\"\nsupported_targets = [ \"js\" ]\n"
+      },
+      "must_fail_check_types": ["file_contains", "moon"]
+    },
+    {
+      "name": "changes-the-default-but-not-the-supported-set",
+      "expected": "fail",
+      "files": {
+        "moon.mod": "name = \"mbteval/backend_matrix\"\nversion = \"0.1.0\"\npreferred_target = \"wasm-gc\"\nsupported_targets = [ \"js\" ]\n"
+      },
+      "must_fail_check_types": ["file_contains", "moon"]
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "area": "toolchain",
+  "task": "tool-run-virtual-patch",
+  "cases": [
+    {
+      "name": "package-selection-runs-the-patch",
+      "expected": "pass",
+      "final_text": "Both tests passed with `moon test -p mbteval/patch_file/textutil --patch-file patch.json`.",
+      "bash_results": [
+        {
+          "command": "moon test -p mbteval/patch_file/textutil --patch-file patch.json",
+          "is_error": false,
+          "output": "Total tests: 2, passed: 2, failed: 0."
+        }
+      ]
+    },
+    {
+      "name": "positional-selection-silently-ignores-the-patch",
+      "expected": "fail",
+      "final_text": "The tests passed with `moon test textutil --patch-file patch.json`.",
+      "bash_results": [
+        {
+          "command": "moon test textutil --patch-file patch.json",
+          "is_error": false,
+          "output": "Total tests: 1, passed: 1, failed: 0."
+        }
+      ],
+      "must_fail_check_types": ["command_matches", "output_matches"]
+    },
+    {
+      "name": "package-selection-omits-the-patch",
+      "expected": "fail",
+      "final_text": "The package test passed with `moon test -p textutil`.",
+      "bash_results": [
+        {
+          "command": "moon test -p textutil",
+          "is_error": false,
+          "output": "Total tests: 1, passed: 1, failed: 0."
+        }
+      ],
+      "must_fail_check_types": ["command_matches", "output_matches"]
+    }
+  ]
+}

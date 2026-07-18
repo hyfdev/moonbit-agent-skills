@@ -1,0 +1,29 @@
+{
+  "area": "language",
+  "task": "lang-public-record-construction",
+  "cases": [
+    {
+      "name": "fully-public-record",
+      "expected": "pass",
+      "files": {
+        "lib.mbt": "///|\npub(all) struct Request {\n  verb : String\n  path : String\n}\n\n///|\npub fn default_request() -> Request {\n  { verb: \"GET\", path: \"/\" }\n}\n\n///|\npub fn describe_request(request : Request) -> String {\n  \"\\{request.verb} \\{request.path}\"\n}\n"
+      }
+    },
+    {
+      "name": "read-only-public-record",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "///|\npub struct Request {\n  verb : String\n  path : String\n}\n\n///|\npub fn default_request() -> Request {\n  { verb: \"GET\", path: \"/\" }\n}\n\n///|\npub fn describe_request(request : Request) -> String {\n  \"\\{request.verb} \\{request.path}\"\n}\n"
+      },
+      "must_fail_check_types": ["file_contains", "moon"]
+    },
+    {
+      "name": "abstract-record-with-a-factory",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "///|\nstruct Request {\n  verb : String\n  path : String\n}\n\n///|\npub fn make_request(verb : String, path : String) -> Request {\n  { verb, path }\n}\n\n///|\npub fn default_request() -> Request {\n  make_request(\"GET\", \"/\")\n}\n\n///|\npub fn describe_request(request : Request) -> String {\n  \"\\{request.verb} \\{request.path}\"\n}\n"
+      },
+      "must_fail_check_types": ["file_contains", "moon"]
+    }
+  ]
+}

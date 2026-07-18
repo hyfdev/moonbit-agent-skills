@@ -350,6 +350,17 @@ function copyTreeExclusive(
   });
 }
 
+const STARTER_IGNORED_ROOTS = new Set([".claude", ".mooncakes", "_build", "target"]);
+
+export function materializeStarterWorkspace(source: string, destination: string): void {
+  copyTreeExclusive(source, destination, (sourcePath) => {
+    const fromSource = relative(source, sourcePath);
+    if (fromSource === "") return true;
+    const root = fromSource.split(sep)[0];
+    return root !== undefined && !STARTER_IGNORED_ROOTS.has(root);
+  });
+}
+
 function checkedOutput(
   runner: CommandRunner,
   command: string,
@@ -1052,6 +1063,32 @@ export function grade(
     }
     return { ok, detail };
   }
+  if (kind === "node") {
+    const args = stringArray(check.args);
+    const result = runner("node", args, { cwd: project, timeout: 120_000 });
+    if (result.timedOut) {
+      throw new Error("node grader timed out");
+    }
+    const expectOk = typeof check.expect_ok === "boolean" ? check.expect_ok : true;
+    let ok = (result.exitCode === 0) === expectOk;
+    const output = result.stdout + result.stderr;
+    const outputMatches =
+      typeof check.output_regex === "string"
+        ? regex(check.output_regex, "is").test(output)
+        : undefined;
+    if (outputMatches !== undefined) {
+      ok = ok && outputMatches;
+    }
+    let detail = "node " + args.join(" ") + " -> exit " + String(result.exitCode);
+    if (outputMatches !== undefined) {
+      detail += `; output ~ /${stringValue(check.output_regex)}/ -> ${booleanText(outputMatches)}`;
+    }
+    if (!ok) {
+      const outputTail = output.trim().slice(-500);
+      if (outputTail !== "") detail += "; tail: " + outputTail;
+    }
+    return { ok, detail };
+  }
   if (kind === "file_exists") {
     const path = stringValue(check.path);
     const ok = isFile(join(project, path));
@@ -1370,7 +1407,7 @@ function runTaskInvocation(
     const project = join(temporary, "project");
     const workspace = join(taskDirectory, "workspace");
     if (isDirectory(workspace)) {
-      copyTreeExclusive(workspace, project);
+      materializeStarterWorkspace(workspace, project);
     } else {
       mkdirSync(project);
     }

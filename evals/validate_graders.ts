@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { fileURLToPath } from "node:url";
 import {
   grade,
+  materializeStarterWorkspace,
   snapshotFiles,
   type BashResult,
   type JsonRecord,
@@ -80,7 +81,7 @@ function runCase(contract: GraderContract, item: ContractCase): JsonRecord {
   try {
     const starter = join(taskDirectory, "workspace");
     if (existsSync(starter)) {
-      cpSync(starter, project, { recursive: true });
+      materializeStarterWorkspace(starter, project);
     } else {
       mkdirSync(project);
     }

@@ -1,0 +1,31 @@
+{
+  "id": "lang-enum-constructor-compat",
+  "risk_class": "silent-cross-package-constructor-compatibility",
+  "claim_id": "language.custom-constructor-on-enum",
+  "primary_metric": "legacy-enum-constructor-call",
+  "prompt": "`Source` was migrated from a single-value wrapper to the current `File(String) | Package(String)` enum. Existing callers must still be able to write `Source(text)`: strings beginning with `pkg:` produce `Package`, and every other string produces `File`. Preserve the enum, both variants, and the existing public API; callers must not have to adopt a differently named factory function.",
+  "discovery": {
+    "skill": "moonbit-language",
+    "reference": "references/types-structs-enums.mbt.md"
+  },
+  "grade": [
+    {
+      "type": "file_contains",
+      "path": "lib.mbt",
+      "regex": "pub\\(all\\)\\s+enum\\s+Source\\s*\\{[\\s\\S]*File\\(String\\)[\\s\\S]*Package\\(String\\)[\\s\\S]*\\}"
+    },
+    {
+      "type": "moon",
+      "args": ["check", "--deny-warn"]
+    },
+    {
+      "type": "moon",
+      "args": ["test", "--deny-warn"],
+      "min_tests": 5,
+      "temp_files": {
+        "zz_eval_consumer/moon.pkg": "import {\n  \"mbteval/enum_constructor_compat\" @api,\n} for \"test\"\n",
+        "zz_eval_consumer/consumer_test.mbt": "///|\ntest \"grader keeps the old constructor call for package sources\" {\n  assert_eq(@api.classify(@api.Source(\"pkg:moonbit/core\")), \"package:pkg:moonbit/core\")\n  assert_eq(@api.classify(@api.Source(\"pkg:local\")), \"package:pkg:local\")\n}\n\n///|\ntest \"grader keeps the old constructor call for file sources\" {\n  assert_eq(@api.classify(@api.Source(\"notes.mbt\")), \"file:notes.mbt\")\n  assert_eq(@api.classify(@api.Source(\"./src\")), \"file:./src\")\n}\n"
+      }
+    }
+  ]
+}

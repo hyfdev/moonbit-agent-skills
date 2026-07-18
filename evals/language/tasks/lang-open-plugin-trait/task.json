@@ -1,0 +1,56 @@
+{
+  "id": "lang-open-plugin-trait",
+  "risk_class": "cross-package-trait-visibility",
+  "claim_id": "language.visibility.external-trait-implementation",
+  "primary_metric": "downstream-trait-implementation",
+  "prompt": "Third-party packages must be able to implement `Codec` for their own types. They should still be unable to implement `BuiltinCodec`, which is intentionally sealed. The library's own implementations and tests already pass. Adjust only the trait visibility needed for that plugin boundary, preserving both trait APIs.",
+  "discovery": {
+    "skill": "moonbit-language",
+    "reference": "references/visibility.mbt.md"
+  },
+  "grade": [
+    {
+      "type": "file_contains",
+      "path": "lib.mbt",
+      "regex": "pub\\(open\\)\\s+trait\\s+Codec"
+    },
+    {
+      "type": "file_not_contains",
+      "path": "lib.mbt",
+      "regex": "pub\\(open\\)\\s+trait\\s+BuiltinCodec"
+    },
+    {
+      "type": "file_contains",
+      "path": "lib.mbt",
+      "regex": "pub\\s+trait\\s+BuiltinCodec\\s*\\{\\s*builtin_name\\(Self\\)\\s*->\\s*String\\s*\\}"
+    },
+    {
+      "type": "file_contains",
+      "path": "lib.mbt",
+      "regex": "pub\\s+fn\\s+builtin_json_name[\\s\\S]*BuiltinCodec::builtin_name"
+    },
+    {
+      "type": "moon",
+      "args": ["check", "--deny-warn"]
+    },
+    {
+      "type": "moon",
+      "args": ["test", "--deny-warn"],
+      "min_tests": 3,
+      "temp_files": {
+        "zz_eval_plugin/moon.pkg": "import {\n  \"mbteval/open_plugin_trait\" @api,\n} for \"test\"\n",
+        "zz_eval_plugin/plugin_test.mbt": "///|\nstruct PluginCodec(String)\n\n///|\nimpl @api.Codec for PluginCodec with encode(self) {\n  \"plugin:\\{self.0}\"\n}\n\n///|\ntest \"grader implements Codec downstream\" {\n  assert_eq(@api.Codec::encode(PluginCodec(\"value\")), \"plugin:value\")\n  assert_eq(@api.builtin_json_name(), \"json\")\n}\n"
+      }
+    },
+    {
+      "type": "moon",
+      "args": ["check", "--deny-warn"],
+      "expect_ok": false,
+      "output_regex": "E4145|Cannot implement a readonly trait",
+      "temp_files": {
+        "zz_eval_sealed/moon.pkg": "import {\n  \"mbteval/open_plugin_trait\" @api,\n}\n",
+        "zz_eval_sealed/sealed_check.mbt": "///|\nstruct ExternalBuiltin(String)\n\n///|\nimpl @api.BuiltinCodec for ExternalBuiltin with builtin_name(self) {\n  self.0\n}\n"
+      }
+    }
+  ]
+}

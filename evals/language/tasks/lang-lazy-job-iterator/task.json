@@ -1,0 +1,25 @@
+{
+  "id": "lang-lazy-job-iterator",
+  "risk_class": "silent-iterator-evaluation-timing",
+  "claim_id": "language.iter-literal-evaluation-order",
+  "primary_metric": "demand-driven-job-preparation",
+  "prompt": "`planned_jobs(log)` returns a sequence that yields `10`, `20`, and `30` in order. Creating the sequence must do no preparation work, and consuming any prefix must prepare exactly that prefix and nothing later. For example, a caller that consumes only the first item must append only `prepare 10` to `log`. A full consumer must append all three preparation messages in order. Keep the public return type and yielded values unchanged.",
+  "discovery": {
+    "skill": "moonbit-language",
+    "reference": "references/control-flow-and-iteration.mbt.md"
+  },
+  "grade": [
+    {
+      "type": "moon",
+      "args": ["check", "--deny-warn"]
+    },
+    {
+      "type": "moon",
+      "args": ["test", "--deny-warn"],
+      "min_tests": 6,
+      "temp_files": {
+        "zz_eval_lazy_jobs_test.mbt": "///|\ntest \"grader does no work when constructing the iterator\" {\n  let log : Array[String] = []\n  ignore(planned_jobs(log))\n  assert_eq(log, [])\n}\n\n///|\ntest \"grader prepares only the first demanded item\" {\n  let log : Array[String] = []\n  assert_eq(planned_jobs(log).take(1).collect(), [10])\n  assert_eq(log, [\"prepare 10\"])\n}\n\n///|\ntest \"grader prepares exactly a longer demanded prefix\" {\n  let log : Array[String] = []\n  assert_eq(planned_jobs(log).take(2).collect(), [10, 20])\n  assert_eq(log, [\"prepare 10\", \"prepare 20\"])\n}\n\n///|\ntest \"grader preserves full values and preparation order\" {\n  let log : Array[String] = []\n  assert_eq(planned_jobs(log).collect(), [10, 20, 30])\n  assert_eq(log, [\"prepare 10\", \"prepare 20\", \"prepare 30\"])\n}\n"
+      }
+    }
+  ]
+}

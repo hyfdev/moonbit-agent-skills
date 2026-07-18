@@ -1,0 +1,25 @@
+{
+  "id": "lang-unicode-character-count",
+  "risk_class": "silent-unicode-semantics",
+  "claim_id": "language.string.unicode-character-count",
+  "primary_metric": "unicode-character-limit",
+  "prompt": "`within_character_limit` enforces the display-name limit. Its ASCII tests pass, but a three-character name such as `a🌙b` is rejected when the limit is 3. Fix it so the limit counts MoonBit `Char` values rather than storage units. Keep the public API and add no special cases for particular characters.",
+  "discovery": {
+    "skill": "moonbit-language",
+    "reference": "references/cross-language-and-stale-syntax.md"
+  },
+  "grade": [
+    {
+      "type": "moon",
+      "args": ["check", "--deny-warn"]
+    },
+    {
+      "type": "moon",
+      "args": ["test", "--deny-warn"],
+      "min_tests": 6,
+      "temp_files": {
+        "zz_eval_unicode_test.mbt": "///|\ntest \"grader counts non-BMP characters once\" {\n  assert_true(within_character_limit(\"a🌙b\", 3))\n  assert_true(within_character_limit(\"𐍈\", 1))\n  assert_false(within_character_limit(\"a🌙b\", 2))\n}\n\n///|\ntest \"grader handles empty and zero limits\" {\n  assert_true(within_character_limit(\"\", 0))\n  assert_false(within_character_limit(\"月\", 0))\n}\n"
+      }
+    }
+  ]
+}

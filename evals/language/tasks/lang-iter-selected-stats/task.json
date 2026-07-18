@@ -1,0 +1,25 @@
+{
+  "id": "lang-iter-selected-stats",
+  "risk_class": "silent-one-shot-iterator",
+  "claim_id": "language.iter.single-consumption",
+  "primary_metric": "count-and-sum-from-one-source-traversal",
+  "prompt": "`selected_stats` must return `(count, sum)` for values strictly above the threshold. Its `Iter[Int]` input is one-shot and may be expensive, so consume it only once. The empty-selection test passes, but non-empty inputs currently return an incorrect sum. Fix the implementation without changing the public signature.",
+  "discovery": {
+    "skill": "moonbit-language",
+    "reference": "references/control-flow-and-iteration.mbt.md"
+  },
+  "grade": [
+    {
+      "type": "moon",
+      "args": ["check", "--deny-warn"]
+    },
+    {
+      "type": "moon",
+      "args": ["test", "--deny-warn"],
+      "min_tests": 4,
+      "temp_files": {
+        "zz_eval_iter_stats_test.mbt": "///|\ntest \"grader returns count and sum\" {\n  assert_eq(selected_stats([1, 7, 3, 9, 5].iter(), 4), (3, 21))\n}\n\n///|\ntest \"grader handles all selected\" {\n  assert_eq(selected_stats([2, 4, 6].iter(), 0), (3, 12))\n}\n\n///|\ntest \"grader keeps strict threshold\" {\n  assert_eq(selected_stats([3, 3, 4].iter(), 3), (1, 4))\n}\n"
+      }
+    }
+  ]
+}

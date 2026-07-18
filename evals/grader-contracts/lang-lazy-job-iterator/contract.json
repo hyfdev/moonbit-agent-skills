@@ -1,0 +1,45 @@
+{
+  "area": "language",
+  "task": "lang-lazy-job-iterator",
+  "cases": [
+    {
+      "name": "uses-a-lazy-iter-comprehension",
+      "expected": "pass",
+      "files": {
+        "lib.mbt": "///|\npub fn planned_jobs(log : Array[String]) -> Iter[Int] {\n  [|\n    for value in [10, 20, 30] => {\n      log.push(\"prepare \\{value}\")\n      value\n    }\n  |]\n}\n"
+      }
+    },
+    {
+      "name": "uses-eager-iter-literal-elements",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "///|\npub fn planned_jobs(log : Array[String]) -> Iter[Int] {\n  [|\n    { log.push(\"prepare 10\"); 10 },\n    { log.push(\"prepare 20\"); 20 },\n    { log.push(\"prepare 30\"); 30 },\n  |]\n}\n"
+      },
+      "must_fail_check_types": ["moon"]
+    },
+    {
+      "name": "eagerly-prepares-before-spreading",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "///|\npub fn planned_jobs(log : Array[String]) -> Iter[Int] {\n  let prepared : Array[Int] = []\n  for value in [10, 20, 30] {\n    log.push(\"prepare \\{value}\")\n    prepared.push(value)\n  }\n  [| ..prepared.iter() |]\n}\n"
+      },
+      "must_fail_check_types": ["moon"]
+    },
+    {
+      "name": "collects-a-lazy-map-before-returning",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "///|\npub fn planned_jobs(log : Array[String]) -> Iter[Int] {\n  let prepared = [10, 20, 30].iter().map(value => {\n    log.push(\"prepare \\{value}\")\n    value\n  }).collect()\n  prepared.iter()\n}\n"
+      },
+      "must_fail_check_types": ["moon"]
+    },
+    {
+      "name": "prepares-the-third-job-with-the-second",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "///|\npub fn planned_jobs(log : Array[String]) -> Iter[Int] {\n  [10, 20, 30].iter().map(value => {\n    if value == 10 {\n      log.push(\"prepare 10\")\n    } else if value == 20 {\n      log.push(\"prepare 20\")\n      log.push(\"prepare 30\")\n    }\n    value\n  })\n}\n"
+      },
+      "must_fail_check_types": ["moon"]
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "area": "toolchain",
+  "task": "tool-export-esm-library",
+  "cases": [
+    {
+      "name": "linked-esm-module-with-named-export",
+      "expected": "pass",
+      "files": {
+        "moon.pkg": "options(\n  link: {\n    \"js\": { \"exports\": [ \"add\" ], \"format\": \"esm\" },\n  },\n)\n"
+      }
+    },
+    {
+      "name": "ordinary-library-build-without-linked-artifact",
+      "expected": "fail",
+      "files": {
+        "moon.pkg": ""
+      },
+      "must_fail_check_types": ["file_contains", "file_exists", "node"]
+    },
+    {
+      "name": "esm-artifact-without-a-named-export",
+      "expected": "fail",
+      "files": {
+        "moon.pkg": "options(\n  link: {\n    \"js\": { \"format\": \"esm\" },\n  },\n)\n"
+      },
+      "must_fail_check_types": ["file_contains", "node"]
+    }
+  ]
+}

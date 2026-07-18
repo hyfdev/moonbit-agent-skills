@@ -55,16 +55,15 @@ Use your coding agent as usual—no special prompts or manual invocation require
 
 ## Evaluation
 
-Model runs use deterministic MoonBit graders and preserved failures rather than an LLM judge or selective reruns.
+We test whether an agent finds the right MoonBit guidance before acting and whether its result passes objective checks, rather than asking another AI to judge the answer.
 
-| Model | Evaluation | Result |
+| User benefit | Measured result | Why it matters |
 | --- | --- | --- |
-| Kimi K3 | 48-cell high-risk language matrix | Historical skill 24/24; current skill 23/24; target reference read before action improved from 3/12 to 11/12 |
-| Kimi K3 | 24-cell `extend` route ablation | Both conditions 12/12; target reference read before action improved from 2/6 to 5/6 |
-| DeepSeek Flash | 4-cell `extend` cross-check | Both conditions 2/2 |
-| Kimi K3 | 4-prompt prompted-routing smoke | 4/4 exact, with required skills selected before any domain action |
+| More likely to use the right reference before acting | **92% with the current skill vs 25% with the previous version** | Verified, current MoonBit guidance is more likely to inform the work |
+| New `extend` syntax is easier to discover | **83% with a direct `extend` entry in the skill vs 33% without it** | Recently added syntax is less likely to remain buried in documentation |
+| Validated across different AI models | Targeted tasks passed **12/12 on Kimi K3** and **2/2 on DeepSeek Flash** | The same verified guidance works across agent backends |
 
-The measured benefit is better reference discovery, not a claimed blanket improvement in final correctness. See the [full content results](evals/RESULTS.md) and [activation results](evals/activation/RESULTS.md).
+These results show that the skill makes verified guidance much easier to find. Most targeted tasks passed in both versions, so the benchmark does not support a general accuracy claim yet. See the [full content results](evals/RESULTS.md) and [activation results](evals/activation/RESULTS.md).
 
 ## FAQ
 

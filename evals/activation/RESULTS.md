@@ -2,6 +2,30 @@
 
 Protocol note for new runs: the current runner labels `mode=routing` as `prompted-routing-classification`. It explicitly asks the agent to classify and load applicable skills, so it must not be reported as automatic activation; that claim requires `mode=end-to-end` on the natural request. Each historical section below retains the protocol description under which it was recorded.
 
+## 2026-07-18 frozen-runner smoke
+
+This four-prompt Kimi/K3 run verifies the real-client path after activation inputs and successful Skill results became frozen and auditable. It is a runner smoke, not an accuracy estimate and not an automatic-activation measurement.
+
+| Prompt | Required | Attempted | Loaded successfully | Exact and timely |
+| --- | --- | --- | --- | ---: |
+| Ordinary `extend` question | language | language | language | PASS |
+| One-test-file command | toolchain | toolchain | toolchain | PASS |
+| JS FFI code plus configuration | language + toolchain | language + toolchain | language + toolchain | PASS |
+| Moonshot coffee brand | none | none | none | PASS |
+
+| Audit field | Result |
+| --- | ---: |
+| Completed cells | 4/4 |
+| Failed Skill loads / client errors / timeouts | 0 / 0 / 0 |
+| Observed model | `k3` in 4/4 cells |
+| Prompt snapshot | 4 prompts, SHA-256 `7781534b…74060` |
+| Skill snapshot | 33 files, aggregate SHA-256 `a15cb798…9960` |
+| Usage | 157,378 input tokens, including 141,312 cache-read; 931 output tokens |
+| Total cell time | 110.5 seconds |
+| Billing | Kimi subscription; USD unavailable |
+
+The run manifest also pins the activation runner and shared client parser hashes. All four cells materialized their catalog from the frozen snapshot rather than the live worktree.
+
 Run date: 2026-07-17 · runner: `run_activation.ts` · 35 prompts · skills at commit of this snapshot · client: Claude Code CLI 2.1.212, catalog-only discovery (prompts never name skills; the runner rejects prompts that do). Raw per-prompt records live in gitignored `runs/`; these tables are the durable summary.
 
 | Metric | haiku-4.5 | sonnet-5 |

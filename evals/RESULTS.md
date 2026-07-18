@@ -1,4 +1,28 @@
-# Content eval — full matrix
+# Content eval results
+
+## 2026-07-18 frozen paired runs
+
+The current language skill was compared with a purpose-built route ablation that removes only explicit top-level `extend` guidance while preserving the trait/generics route and every reference byte-for-byte. Tasks, skill trees, the derived ablation, runner files, actual model, and condition order were frozen before calls.
+
+| Client and task group | Current | Route ablation | Eligible pairs | Current only | Ablation only | Both pass | Cost |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Kimi/K3, two `extend` tasks × 3 | 6/6 | 6/6 | 6 | 0 | 0 | 6 | subscription; USD unavailable |
+| Kimi/K3, two regression controls × 3 | 6/6 | 6/6 | 6 | 0 | 0 | 6 | included above |
+| DeepSeek Flash, two `extend` tasks × 1 | 2/2 | 2/2 | 2 | 0 | 0 | 2 | $0.962685 |
+
+No run established a task-outcome improvement. The Kimi primary tasks did show a small process difference, reported descriptively because there are only six pairs:
+
+| `extend`-task discovery, Kimi/K3 | Current | Route ablation | Paired current-only | Paired ablation-only |
+| --- | ---: | ---: | ---: | ---: |
+| Language skill loaded successfully | 3/6 | 1/6 | 3 | 1 |
+| Target reference read | 6/6 | 4/6 | 2 | 0 |
+| Target reference read before action | 5/6 | 2/6 | 3 | 0 |
+
+The top-level route may help Kimi reach the correct reference earlier, but the final tasks hit a 100% ceiling in both conditions. Kimi used 4,378,948 input tokens, including 4,129,024 cache-read tokens, and 56,056 output tokens across 24 cells; total cell time was 58.9 minutes. All cells emitted `k3` through provider Kimi with alias `kimi-code/k3`; there were no missing pairs, model mismatches, timeouts, or nonzero client exits. The DeepSeek cross-check emitted `deepseek-v4-flash` in all four cells and likewise had no client or model exclusions.
+
+Before measurement, 11 grader contracts exercised one canonical correct answer and at least two plausible wrong answers per task. After model answers exposed additional valid wording, the final contract suite contains 41/41 passing cases. Measurements affected by an earlier grader or ablation definition are excluded rather than repaired in place.
+
+## Historical full matrix
 
 Run date: 2026-07-17 · runner: `run_content.ts` · client: Claude Code CLI 2.1.212 · requested full-matrix model: `claude-haiku-4-5-20251001` · turn budget: 50 per cell · deterministic grading with an exact MoonBit toolchain build. The full matrix ran on Linux x86_64 with moonc `v0.10.4+ade96c819` (2026-07-13). A release-drift follow-up ran with the current snapshot, moonc `v0.10.4+2cc641edf` (2026-07-15). The official condition used `moonbitlang/skills@5caf81c57cb2ae45654b8f99c5c8f68c812beb91`.
 

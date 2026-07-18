@@ -4,8 +4,10 @@ import { join } from "node:path";
 import { describe, expect, it } from "vite-plus/test";
 import {
   ApiBudgetGuard,
+  DEFAULT_CLAUDE_EVAL_MODEL,
   aggregateTokenUsage,
   analysisEligibility,
+  assertDefaultClaudeExecutionModel,
   buildAgentInvocation,
   clientRunSucceeded,
   enrichKimiStream,
@@ -16,6 +18,22 @@ import {
 } from "../../evals/lib/agent_cli.ts";
 
 describe("agent CLI stream normalization", () => {
+  it("requires DeepSeek Pro for the default Claude eval alias", () => {
+    expect(() =>
+      assertDefaultClaudeExecutionModel("claude-code", DEFAULT_CLAUDE_EVAL_MODEL, [
+        "deepseek-v4-pro",
+      ]),
+    ).not.toThrow();
+    expect(() =>
+      assertDefaultClaudeExecutionModel("claude-code", DEFAULT_CLAUDE_EVAL_MODEL, [
+        "deepseek-v4-flash",
+      ]),
+    ).toThrow("requires assistant execution model deepseek-v4-pro");
+    expect(() =>
+      assertDefaultClaudeExecutionModel("kimi-code", "kimi-code/k3", ["k3"]),
+    ).not.toThrow();
+  });
+
   it("normalizes Claude tool calls, actual models, usage, and terminal status", () => {
     const parsed = parseClaudeStream(
       [

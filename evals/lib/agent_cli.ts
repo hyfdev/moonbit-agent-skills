@@ -5,6 +5,9 @@ import { join } from "node:path";
 export type AgentClient = "claude-code" | "kimi-code";
 export type JsonRecord = Record<string, unknown>;
 
+export const DEFAULT_CLAUDE_EVAL_MODEL = "sonnet";
+export const REQUIRED_DEFAULT_CLAUDE_EXECUTION_MODEL = "deepseek-v4-pro";
+
 export type AnalysisEligibilityReason =
   | "completed"
   | "predeclared_turn_limit"
@@ -84,6 +87,23 @@ export interface KimiSessionMetadata {
   thinkingEfforts: string[];
   usage: JsonRecord;
   modelUsage: JsonRecord;
+}
+
+export function assertDefaultClaudeExecutionModel(
+  client: AgentClient,
+  requestedModel: string,
+  emittedModels: readonly string[],
+): void {
+  if (client !== "claude-code" || requestedModel !== DEFAULT_CLAUDE_EVAL_MODEL) return;
+  const observed = [...new Set(emittedModels)].sort();
+  if (
+    observed.length !== 1 ||
+    observed[0] !== REQUIRED_DEFAULT_CLAUDE_EXECUTION_MODEL
+  ) {
+    throw new Error(
+      `default Claude eval requires assistant execution model ${REQUIRED_DEFAULT_CLAUDE_EXECUTION_MODEL}; observed ${observed.join(",") || "none"}`,
+    );
+  }
 }
 
 function isMonetaryField(key: string): boolean {

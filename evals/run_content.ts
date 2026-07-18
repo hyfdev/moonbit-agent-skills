@@ -33,8 +33,10 @@ import { isDeepStrictEqual, parseArgs } from "node:util";
 import { fileURLToPath } from "node:url";
 import {
   ApiBudgetGuard,
+  DEFAULT_CLAUDE_EVAL_MODEL,
   aggregateTokenUsage,
   analysisEligibility,
+  assertDefaultClaudeExecutionModel,
   buildAgentInvocation,
   claudeBudgetCharge,
   clientExecutable,
@@ -1412,6 +1414,7 @@ function runTaskInvocation(
 
     const parsed = parseAgentStream(client, processResult.stdout);
     if (client === "kimi-code") enrichKimiStream(parsed);
+    assertDefaultClaudeExecutionModel(client, model, parsed.emitted_models);
     const discovery = discoveryEvidence(parsed, task.discovery);
     const checks = task.grade.map((check) => {
       const result = grade(
@@ -1750,7 +1753,7 @@ function loadContentExperiment(pathValue: string): {
   };
 }
 
-function parseCli(argv: string[]): { options?: CliOptions; exitCode?: number } {
+export function parseCli(argv: string[]): { options?: CliOptions; exitCode?: number } {
   if (argv.includes("--help") || argv.includes("-h")) {
     console.log(DESCRIPTION + "\n\n" + USAGE);
     return { exitCode: 0 };
@@ -1915,7 +1918,7 @@ function parseCli(argv: string[]): { options?: CliOptions; exitCode?: number } {
           ? model
           : clientValue === "kimi-code"
             ? "kimi-code/k3"
-            : "haiku",
+            : DEFAULT_CLAUDE_EVAL_MODEL,
       maxTurns,
       paidBudgetUsd,
       repetitions,

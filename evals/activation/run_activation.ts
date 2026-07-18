@@ -6,7 +6,7 @@
  * - end-to-end: natural-request observation before the first domain action.
  *
  * Usage:
- *   node evals/activation/run_activation.ts --model claude-haiku-4-5-20251001 \
+ *   node evals/activation/run_activation.ts --model sonnet \
  *     [--categories language-only,toolchain-only] [--ids id1,id2] [--resume] [--dry-run]
  *
  * Results land in evals/activation/runs/<run-name>/ (gitignored):
@@ -36,7 +36,9 @@ import { isDeepStrictEqual, parseArgs } from "node:util";
 import { fileURLToPath } from "node:url";
 import {
   ApiBudgetGuard,
+  DEFAULT_CLAUDE_EVAL_MODEL,
   aggregateTokenUsage,
+  assertDefaultClaudeExecutionModel,
   buildAgentInvocation,
   claudeBudgetCharge,
   clientExecutable,
@@ -335,7 +337,8 @@ export function parseCliArgs(argv: string[]): CliOptions {
     throw new Error("--paid-budget-usd must be a positive number");
   }
   const model =
-    values.model ?? (values.client === "kimi-code" ? "kimi-code/k3" : "haiku");
+    values.model ??
+    (values.client === "kimi-code" ? "kimi-code/k3" : DEFAULT_CLAUDE_EVAL_MODEL);
   const runName =
     values["run-name"] ??
     `${values.client}-${values.mode}-${model.replaceAll("/", "-")}`;
@@ -881,8 +884,6 @@ async function runOne(
 
   const normalized = parseAgentStream(client, commandResult.stdout);
   if (client === "kimi-code") enrichKimiStream(normalized);
-  const parsed = parsedActivationView(normalized);
-  const decision = scoreActivation(parsed, prompt.expected, mode);
 
   const transcriptsDirectory = join(runDirectory, "transcripts");
   mkdirSync(transcriptsDirectory, { recursive: true });
@@ -897,6 +898,10 @@ async function runOne(
     join(runDirectory, stderrRelative),
     sanitizeAgentStreamForPersistence(commandResult.stderr),
   );
+
+  assertDefaultClaudeExecutionModel(client, model, normalized.emitted_models);
+  const parsed = parsedActivationView(normalized);
+  const decision = scoreActivation(parsed, prompt.expected, mode);
 
   const result: ActivationResult = {
     id: prompt.id,

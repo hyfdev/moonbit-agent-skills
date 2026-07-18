@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "id": "language-high-risk-kimi-k3",
   "runner": "content",
   "stage": "exploratory",
@@ -38,8 +38,7 @@
   },
   "repetitions": 3,
   "max_turns": 50,
-  "paid_budget_usd": null,
   "primary_metric": "mean task pass-rate difference for current minus the pinned historical baseline",
   "minimum_valuable_difference": 0.15,
-  "stopping_rule": "Run all 48 cells after grader contracts pass. Report non-discriminating tasks instead of replacing them after seeing results. Freeze any paid cross-check subset before running Claude Code."
+  "stopping_rule": "Run all 48 cells after grader contracts pass. Report non-discriminating tasks instead of replacing them after seeing results. Freeze any API cross-check subset before running Claude Code."
 }

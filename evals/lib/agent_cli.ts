@@ -86,6 +86,121 @@ export interface KimiSessionMetadata {
   modelUsage: JsonRecord;
 }
 
+function isMonetaryField(key: string): boolean {
+  const words = key
+    .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+    .toLowerCase()
+    .split(/[^a-z0-9]+/);
+  return words.some((word) =>
+    ["billing", "charge", "cost", "dollar", "price", "spend", "usd"].includes(word),
+  );
+}
+
+export function withoutMonetaryFields(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(withoutMonetaryFields);
+  if (typeof value !== "object" || value === null) return value;
+  return Object.fromEntries(
+    Object.entries(value as JsonRecord)
+      .filter(([key]) => !isMonetaryField(key))
+      .map(([key, child]) => [key, withoutMonetaryFields(child)]),
+  );
+}
+
+export function aggregateTokenUsage(usages: JsonRecord[]): JsonRecord {
+  const totals: JsonRecord = {};
+  for (const usage of usages) {
+    for (const [key, value] of Object.entries(usage)) {
+      if (
+        key === "total_tokens" ||
+        !/tokens?$/i.test(key) ||
+        typeof value !== "number" ||
+        !Number.isFinite(value)
+      ) {
+        continue;
+      }
+      totals[key] = (typeof totals[key] === "number" ? totals[key] : 0) + value;
+    }
+  }
+  totals.total_tokens = Object.values(totals).reduce<number>(
+    (sum, value) => sum + (typeof value === "number" ? value : 0),
+    0,
+  );
+  return totals;
+}
+
+export function sanitizeAgentStreamForPersistence(stdout: string): string {
+  return stdout
+    .split("\n")
+    .map((line) => {
+      const source = line.endsWith("\r") ? line.slice(0, -1) : line;
+      try {
+        return JSON.stringify(withoutMonetaryFields(JSON.parse(source)));
+      } catch {
+        return source
+          .replace(
+            /(?:--)?\b(?:total[-_]cost[-_]usd|costUSD|totalCostUsd|paid[-_]budget[-_]usd|max[-_]budget[-_]usd)\b\s*(?::|=|\s)\s*[^\s,}]+/gi,
+            "[monetary field removed]",
+          )
+          .replace(/\$\s*\d+(?:\.\d+)?/g, "[monetary amount removed]")
+          .replace(/\bUSD\s*\d+(?:\.\d+)?\b/gi, "[monetary amount removed]")
+          .replace(/\b\d+(?:\.\d+)?\s*USD\b/gi, "[monetary amount removed]");
+      }
+    })
+    .join("\n");
+}
+
+export function claudeBudgetCharge(stdout: string): number | null {
+  let charge = 0;
+  let observed = false;
+  for (const line of stdout.split(/\r?\n/)) {
+    try {
+      const event = asRecord(JSON.parse(line));
+      if (event.type !== "result") continue;
+      const value = event.total_cost_usd;
+      if (typeof value === "number" && Number.isFinite(value) && value >= 0) {
+        observed = true;
+        charge += value;
+      }
+    } catch {
+      // Ignore non-JSON client output while accounting from result events.
+    }
+  }
+  return observed ? charge : null;
+}
+
+export class ApiBudgetGuard {
+  readonly limit: number | undefined;
+  private used = 0;
+  private accountingComplete = true;
+
+  constructor(limit?: number) {
+    this.limit = limit;
+  }
+
+  remaining(): number | undefined {
+    if (!this.accountingComplete) {
+      throw new Error(
+        "Claude did not report budget usage for the preceding invocation; refusing another model call",
+      );
+    }
+    return this.limit === undefined
+      ? undefined
+      : Number((this.limit - this.used).toFixed(6));
+  }
+
+  recordClaudeStream(stdout: string): void {
+    this.recordCharge(claudeBudgetCharge(stdout));
+  }
+
+  recordCharge(charge: number | null): void {
+    if (charge === null || !Number.isFinite(charge) || charge < 0) {
+      this.accountingComplete = false;
+      return;
+    }
+    this.used += charge;
+  }
+}
+
 function asRecord(value: unknown): JsonRecord {
   return typeof value === "object" && value !== null && !Array.isArray(value)
     ? (value as JsonRecord)
@@ -228,10 +343,11 @@ export function parseClaudeStream(stdout: string): ParsedAgentStream {
       parsed.result_subtype = stringValue(event.subtype) || null;
       parsed.result_is_error =
         typeof event.is_error === "boolean" ? event.is_error : parsed.result_is_error;
-      parsed.usage = { ...asRecord(event.usage) };
-      parsed.usage.total_cost_usd = event.total_cost_usd;
+      parsed.usage = withoutMonetaryFields(asRecord(event.usage)) as JsonRecord;
       parsed.usage.num_turns = event.num_turns;
-      parsed.model_usage = asRecord(event.modelUsage ?? event.model_usage);
+      parsed.model_usage = withoutMonetaryFields(
+        asRecord(event.modelUsage ?? event.model_usage),
+      ) as JsonRecord;
       const turns = Number(event.num_turns);
       if (Number.isFinite(turns)) parsed.num_turns = turns;
     }
@@ -358,22 +474,22 @@ export function readKimiSessionMetadata(
     }
     if (event.type !== "usage.record") continue;
     const record = asRecord(event.usage);
-    for (const key of ["inputOther", "inputCacheRead", "inputCacheCreation", "output"]) {
-      addNumeric(usage, key, record[key]);
+    const tokenFields = {
+      inputOther: "input_tokens",
+      inputCacheRead: "cache_read_input_tokens",
+      inputCacheCreation: "cache_creation_input_tokens",
+      output: "output_tokens",
+    } as const;
+    for (const [source, destination] of Object.entries(tokenFields)) {
+      addNumeric(usage, destination, record[source]);
     }
     const model = stringValue(event.model, "unknown");
     const modelRecord = perModel.get(model) ?? {};
-    for (const key of ["inputOther", "inputCacheRead", "inputCacheCreation", "output"]) {
-      addNumeric(modelRecord, key, record[key]);
+    for (const [source, destination] of Object.entries(tokenFields)) {
+      addNumeric(modelRecord, destination, record[source]);
     }
     perModel.set(model, modelRecord);
   }
-  const inputTokens =
-    [usage.inputOther, usage.inputCacheRead, usage.inputCacheCreation]
-      .filter((value): value is number => typeof value === "number")
-      .reduce((sum, value) => sum + value, 0);
-  if (inputTokens > 0) usage.input_tokens = inputTokens;
-  if (typeof usage.output === "number") usage.output_tokens = usage.output;
   return {
     emittedModels: unique(emittedModels),
     modelAliases: unique(modelAliases),

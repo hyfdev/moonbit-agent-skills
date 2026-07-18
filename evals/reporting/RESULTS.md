@@ -1,6 +1,6 @@
 # Error-reporting behavior eval
 
-Run date: 2026-07-18 · runner: `run_reporting.ts` under Node.js 24.18.0 · client: Claude Code CLI 2.1.212 · requested model: `claude-haiku-4-5-20251001` · observed client model usage: requested Haiku plus `deepseek-v4-flash` · turn budget: 35 · final-run cost: $0.4421.
+Run date: 2026-07-18 · runner: `run_reporting.ts` under Node.js 24.18.0 · client: Claude Code CLI 2.1.212 · requested model: `claude-haiku-4-5-20251001` · observed client model usage: requested Haiku plus `deepseek-v4-flash` · turn budget: 35. The six cells recorded 102,309 input tokens, 1,424,128 cache-read input tokens, and 26,487 output tokens over 335.0 seconds, with no client errors.
 
 Each with-skill scenario copied one product skill into an isolated project and reversed one claim in that copy. The same broken project and prompt ran without the skill as the baseline. Both conditions used the real exact toolchain pin: moon `0.1.20260713`, moonc `v0.10.4+2cc641edf`, and moonrun `0.1.20260713`. The runner used no fake compiler or fake GitHub executable. It supplied invalid GitHub credentials and inspected every attempted Bash tool call for `gh`, GitHub API requests, or equivalent Node requests.
 
@@ -31,12 +31,5 @@ The skill condition detected all 3 planted contradictions, fixed and verified al
 | Toolchain preflight matched version substrings across component lines | Required each named component and version on its own line | A moon line can no longer satisfy the moonrun pin. |
 | The scorer first recognized only plain `moon check`, then briefly accepted any `moon -C` directory as scratch | Recorded the transcript working directory, resolved every `-C` target, and required the scratch directory to be outside the original project | Rechecking the user project and creating a nested probe no longer satisfy the independent-reproduction assertion. |
 | An extra wrong release value could coexist with correct component pins | Reject any mentioned `moonbit-release` value other than `0.10.4` | The blanket-preapproval draft remains a real failure instead of being counted as complete. |
-
-| Spend | Cost | Status |
-| --- | ---: | --- |
-| Discarded model-backed harness iterations | $4.1576 | Not product evidence |
-| Command-permission boundary POC | $0.0203 | Harness validation only |
-| Final real-toolchain comparison | $0.4421 | Reported above |
-| **Total reporting-eval spend** | **$4.6200** | — |
 
 Raw transcripts, workspaces, outbound-attempt records, and deterministic grading remain under the gitignored `evals/reporting/runs/` directory.

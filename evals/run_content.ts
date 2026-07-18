@@ -32,13 +32,17 @@ import {
 import { isDeepStrictEqual, parseArgs } from "node:util";
 import { fileURLToPath } from "node:url";
 import {
+  ApiBudgetGuard,
+  aggregateTokenUsage,
   analysisEligibility,
   buildAgentInvocation,
+  claudeBudgetCharge,
   clientExecutable,
   clientRunSucceeded,
   enrichKimiStream,
   parseAgentStream,
   parseClaudeStream,
+  sanitizeAgentStreamForPersistence,
   type AgentClient,
   type AnalysisEligibility,
   type AnalysisEligibilityReason,
@@ -188,7 +192,7 @@ interface CliOptions {
 }
 
 interface ContentExperiment {
-  schema_version: 1;
+  schema_version: 2;
   id: string;
   runner: "content";
   stage: "exploratory" | "confirmatory";
@@ -200,7 +204,6 @@ interface ContentExperiment {
   task_groups?: Record<string, string[]>;
   repetitions: number;
   max_turns: number;
-  paid_budget_usd: number | null;
   primary_metric: string;
   minimum_valuable_difference: number;
   stopping_rule: string;
@@ -1338,7 +1341,12 @@ function failedWorkspaceFilter(root: string, sourcePath: string): boolean {
     .some((part) => part === "_build" || part === ".claude");
 }
 
-export function runTask(
+interface ContentInvocationResult {
+  result: JsonRecord;
+  budgetCharge: number | null;
+}
+
+function runTaskInvocation(
   taskDirectory: string,
   condition: string,
   model: string,
@@ -1350,10 +1358,11 @@ export function runTask(
   client: AgentClient = "claude-code",
   maxBudgetUsd?: number,
   repetition = 0,
-): JsonRecord {
+): ContentInvocationResult {
   const task = loadTask(taskDirectory);
   const temporary = mkdtempSync(join(tmpdir(), "mbteval-"));
   let resultArtifact: JsonRecord;
+  let budgetCharge: number | null = client === "claude-code" ? null : 0;
   try {
     const project = join(temporary, "project");
     const workspace = join(taskDirectory, "workspace");
@@ -1384,6 +1393,9 @@ export function runTask(
       timeout: 1_800_000,
       env: invocation.environment,
     });
+    if (client === "claude-code") {
+      budgetCharge = claudeBudgetCharge(processResult.stdout);
+    }
 
     const artifactStem =
       task.id + "--r" + String(repetition + 1).padStart(2, "0") + "--" + condition;
@@ -1391,8 +1403,11 @@ export function runTask(
     mkdirSync(transcriptsDir, { recursive: true });
     const transcriptPath = join(transcriptsDir, artifactStem + ".jsonl");
     const stderrPath = join(transcriptsDir, artifactStem + ".stderr.txt");
-    writeFileSync(transcriptPath, processResult.stdout);
-    writeFileSync(stderrPath, processResult.stderr);
+    writeFileSync(
+      transcriptPath,
+      sanitizeAgentStreamForPersistence(processResult.stdout),
+    );
+    writeFileSync(stderrPath, sanitizeAgentStreamForPersistence(processResult.stderr));
 
     const parsed = parseAgentStream(client, processResult.stdout);
     if (client === "kimi-code") enrichKimiStream(parsed);
@@ -1499,7 +1514,35 @@ export function runTask(
   } finally {
     rmSync(temporary, { recursive: true, force: true });
   }
-  return resultArtifact;
+  return { result: resultArtifact, budgetCharge };
+}
+
+export function runTask(
+  taskDirectory: string,
+  condition: string,
+  model: string,
+  maxTurns: number,
+  cacheDir: string,
+  runDir: string,
+  runner: CommandRunner = runCommand,
+  skillSources: SkillSources = { current: SKILLS_SRC },
+  client: AgentClient = "claude-code",
+  maxBudgetUsd?: number,
+  repetition = 0,
+): JsonRecord {
+  return runTaskInvocation(
+    taskDirectory,
+    condition,
+    model,
+    maxTurns,
+    cacheDir,
+    runDir,
+    runner,
+    skillSources,
+    client,
+    maxBudgetUsd,
+    repetition,
+  ).result;
 }
 
 export function findExecutable(tool: string, environment = process.env): string | undefined {
@@ -1595,7 +1638,6 @@ export function preflight(
       client === "claude-code"
         ? "stream events plus model usage"
         : "Kimi session wire whitelist",
-    billing: client === "claude-code" ? "API" : "subscription; USD unavailable",
   };
 }
 
@@ -1637,7 +1679,7 @@ function loadContentExperiment(pathValue: string): {
   }
   const experiment = JSON.parse(readFileSync(path, "utf8")) as ContentExperiment;
   if (
-    experiment.schema_version !== 1 ||
+    experiment.schema_version !== 2 ||
     experiment.runner !== "content" ||
     !/^[a-zA-Z0-9._-]+$/.test(experiment.id) ||
     (experiment.stage !== "exploratory" && experiment.stage !== "confirmatory") ||
@@ -1692,15 +1734,6 @@ function loadContentExperiment(pathValue: string): {
       );
     }
   }
-  if (
-    experiment.client === "claude-code" &&
-    (typeof experiment.paid_budget_usd !== "number" || experiment.paid_budget_usd <= 0)
-  ) {
-    throw new Error(pathValue + ": Claude experiment needs a positive paid_budget_usd");
-  }
-  if (experiment.client === "kimi-code" && experiment.paid_budget_usd !== null) {
-    throw new Error(pathValue + ": Kimi experiment paid_budget_usd must be null");
-  }
   return {
     experiment,
     disclosure: {
@@ -1750,7 +1783,6 @@ function parseCli(argv: string[]): { options?: CliOptions; exitCode?: number } {
       "--ids",
       "--max-turns",
       "--model",
-      "--paid-budget-usd",
       "--repetitions",
     ].filter((flag) => argv.includes(flag));
     if (conflicting.length > 0) {
@@ -1770,6 +1802,15 @@ function parseCli(argv: string[]): { options?: CliOptions; exitCode?: number } {
           "--run-name may contain only letters, digits, dot, underscore, and hyphen",
         );
       }
+      const paidBudgetValue = parsed.values["paid-budget-usd"];
+      const paidBudgetUsd =
+        typeof paidBudgetValue === "string" ? Number(paidBudgetValue) : undefined;
+      if (
+        paidBudgetUsd !== undefined &&
+        (!Number.isFinite(paidBudgetUsd) || paidBudgetUsd <= 0)
+      ) {
+        throw new Error("--paid-budget-usd must be a positive number");
+      }
       return {
         options: {
           area: experiment.area,
@@ -1778,7 +1819,7 @@ function parseCli(argv: string[]): { options?: CliOptions; exitCode?: number } {
           ids: experiment.task_ids.join(","),
           model: experiment.model,
           maxTurns: experiment.max_turns,
-          paidBudgetUsd: experiment.paid_budget_usd ?? undefined,
+          paidBudgetUsd,
           repetitions: experiment.repetitions,
           runName,
           resume: parsed.values.resume === true,
@@ -1930,7 +1971,11 @@ export function main(argv = process.argv.slice(2)): number {
     console.log(String(taskDirectories.length) + " task(s) valid");
     return 0;
   }
-  if (options.client === "claude-code" && options.paidBudgetUsd === undefined) {
+  if (
+    options.client === "claude-code" &&
+    options.paidBudgetUsd === undefined &&
+    !options.resume
+  ) {
     throw new Error("Claude Code runs require an explicit --paid-budget-usd total budget");
   }
   if (options.client === "kimi-code" && options.paidBudgetUsd !== undefined) {
@@ -1981,7 +2026,7 @@ export function main(argv = process.argv.slice(2)): number {
     );
   }
   const runConfig = {
-    runner: "content-paired-v3",
+    runner: "content-paired-v4",
     area: options.area,
     client: options.client,
     conditions: options.conditions,
@@ -2002,7 +2047,6 @@ export function main(argv = process.argv.slice(2)): number {
     ),
     model: options.model,
     max_turns: options.maxTurns,
-    paid_budget_usd: options.paidBudgetUsd ?? null,
     experiment: options.experiment ?? null,
     environment,
     catalog_isolation: isolation,
@@ -2031,11 +2075,18 @@ export function main(argv = process.argv.slice(2)): number {
       ]),
     ),
   );
+  if (
+    options.client === "claude-code" &&
+    options.paidBudgetUsd === undefined &&
+    completed.size <
+      taskDirectories.length * options.conditions.length * options.repetitions
+  ) {
+    throw new Error(
+      "Claude Code needs --paid-budget-usd when unfinished cells require model calls",
+    );
+  }
   const results = [...previousResults];
-  let spentUsd = results.reduce((total, result) => {
-    const cost = asRecord(result.usage).total_cost_usd;
-    return total + (typeof cost === "number" ? cost : 0);
-  }, 0);
+  const budgetGuard = new ApiBudgetGuard(options.paidBudgetUsd);
   for (let repetition = 0; repetition < options.repetitions; repetition += 1) {
     for (const [taskIndex, taskDirectory] of taskDirectories.entries()) {
       const orderedConditions =
@@ -2059,19 +2110,16 @@ export function main(argv = process.argv.slice(2)): number {
           console.log(label + " ... already complete");
           continue;
         }
-        const remainingBudget =
-          options.paidBudgetUsd === undefined
-            ? undefined
-            : Number((options.paidBudgetUsd - spentUsd).toFixed(6));
+        const remainingBudget = budgetGuard.remaining();
         if (remainingBudget !== undefined && remainingBudget <= 0) {
           throw new Error(
             "paid experiment budget exhausted before " +
               label +
-              "; resume with a larger --paid-budget-usd only in a fresh run",
+              "; resume with a new invocation budget to continue remaining cells",
           );
         }
         console.log(label + " ...");
-        const result = runTask(
+        const invocationResult = runTaskInvocation(
           taskDirectory,
           condition,
           options.model,
@@ -2084,14 +2132,14 @@ export function main(argv = process.argv.slice(2)): number {
           remainingBudget,
           repetition,
         );
+        const result = invocationResult.result;
         result.repetition = repetition;
         result.pair_id = basename(taskDirectory) + "--r" + String(repetition + 1);
         result.condition_order = orderedConditions;
         result.order_index = orderIndex;
         results.push(result);
         appendFileSync(resultsPath, JSON.stringify(result) + "\n");
-        const cost = asRecord(result.usage).total_cost_usd;
-        if (typeof cost === "number") spentUsd += cost;
+        budgetGuard.recordCharge(invocationResult.budgetCharge);
         console.log("    " + (result.passed ? "PASS" : "FAIL"));
       }
     }
@@ -2128,18 +2176,12 @@ export function main(argv = process.argv.slice(2)): number {
           String(items.length),
       ]),
   );
-  const totalCost = results.reduce((total, result) => {
-    const usage = asRecord(result.usage);
-    return total + (typeof usage.total_cost_usd === "number" ? usage.total_cost_usd : 0);
-  }, 0);
-  const totalInputTokens = results.reduce((total, result) => {
-    const value = asRecord(result.usage).input_tokens;
-    return total + (typeof value === "number" ? value : 0);
-  }, 0);
-  const totalOutputTokens = results.reduce((total, result) => {
-    const value = asRecord(result.usage).output_tokens;
-    return total + (typeof value === "number" ? value : 0);
-  }, 0);
+  const tokenUsage = aggregateTokenUsage(results.map((result) => asRecord(result.usage)));
+  const durationMs = results.reduce(
+    (total, result) =>
+      total + (typeof result.duration_ms === "number" ? result.duration_ms : 0),
+    0,
+  );
   const discoveryByCondition = Object.fromEntries(
     [...byCondition.entries()]
       .sort(([left], [right]) => left.localeCompare(right))
@@ -2196,7 +2238,7 @@ export function main(argv = process.argv.slice(2)): number {
   const experimentManifest = asRecord(asRecord(options.experiment).manifest);
   const taskGroups = asRecord(experimentManifest.task_groups);
   const summary = {
-    runner: "content-paired-v3",
+    runner: "content-paired-v4",
     area: options.area,
     client: options.client,
     model: options.model,
@@ -2214,14 +2256,17 @@ export function main(argv = process.argv.slice(2)): number {
         pairedComparisons(new Set(stringArray(ids))),
       ]),
     ),
-    usage: {
-      input_tokens: totalInputTokens,
-      output_tokens: totalOutputTokens,
-      total_cost_usd:
-        options.client === "claude-code" ? Number(totalCost.toFixed(6)) : null,
-      billing:
-        options.client === "claude-code" ? "API" : "subscription; USD unavailable",
-    },
+    usage: tokenUsage,
+    duration_ms: durationMs,
+    errors: results
+      .filter((result) => result.exit_code !== 0 || result.timed_out === true)
+      .map((result) => ({
+        id: stringValue(result.id),
+        repetition: typeof result.repetition === "number" ? result.repetition : 0,
+        condition: stringValue(result.condition),
+        exit_code: result.exit_code ?? null,
+        timed_out: result.timed_out === true,
+      })),
   };
   writeFileSync(join(runDirectory, "summary.json"), JSON.stringify(summary, null, 2) + "\n");
   console.log(JSON.stringify(summary, null, 2));

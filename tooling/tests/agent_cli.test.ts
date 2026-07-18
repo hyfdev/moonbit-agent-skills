@@ -3,6 +3,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vite-plus/test";
 import {
+  ApiBudgetGuard,
+  aggregateTokenUsage,
   analysisEligibility,
   buildAgentInvocation,
   clientRunSucceeded,
@@ -10,6 +12,7 @@ import {
   parseClaudeStream,
   parseKimiStream,
   readKimiSessionMetadata,
+  sanitizeAgentStreamForPersistence,
 } from "../../evals/lib/agent_cli.ts";
 
 describe("agent CLI stream normalization", () => {
@@ -53,13 +56,14 @@ describe("agent CLI stream normalization", () => {
         }),
         JSON.stringify({
           type: "result",
+          billing: "API",
           subtype: "success",
           is_error: false,
           result: "done",
           num_turns: 1,
           total_cost_usd: 0.01,
           usage: { input_tokens: 10, output_tokens: 2 },
-          modelUsage: { "deepseek-v4-flash": { inputTokens: 10 } },
+          modelUsage: { "deepseek-v4-flash": { inputTokens: 10, costUSD: 0.01 } },
         }),
       ].join("\n"),
     );
@@ -72,6 +76,10 @@ describe("agent CLI stream normalization", () => {
     ]);
     expect(parsed.final_text).toBe("done");
     expect(parsed.result_count).toBe(1);
+    expect(parsed.usage).toEqual({ input_tokens: 10, output_tokens: 2, num_turns: 1 });
+    expect(parsed.model_usage).toEqual({
+      "deepseek-v4-flash": { inputTokens: 10 },
+    });
     expect(clientRunSucceeded("claude-code", parsed, 0, false)).toBe(true);
   });
 
@@ -206,19 +214,17 @@ describe("Kimi session metadata", () => {
         providers: ["kimi"],
         thinkingEfforts: ["max"],
         usage: {
-          inputOther: 5,
-          inputCacheRead: 7,
-          inputCacheCreation: 2,
-          output: 3,
-          input_tokens: 14,
+          input_tokens: 5,
+          cache_read_input_tokens: 7,
+          cache_creation_input_tokens: 2,
           output_tokens: 3,
         },
         modelUsage: {
           "kimi-code/k3": {
-            inputOther: 5,
-            inputCacheRead: 7,
-            inputCacheCreation: 2,
-            output: 3,
+            input_tokens: 5,
+            cache_read_input_tokens: 7,
+            cache_creation_input_tokens: 2,
+            output_tokens: 3,
           },
         },
       });
@@ -230,6 +236,80 @@ describe("Kimi session metadata", () => {
     } finally {
       rmSync(root, { recursive: true, force: true });
     }
+  });
+});
+
+describe("token-only persistence and runtime budget guarding", () => {
+  it("removes money fields and amounts while preserving non-money budgets and similarly named keys", () => {
+    const sanitized = sanitizeAgentStreamForPersistence(
+      [
+        JSON.stringify({
+          type: "assistant",
+          message: {
+            model: "model-a",
+            content: [
+              {
+                type: "tool_use",
+                input: { costume: "keep", turn_budget: 12, token_budget: 100 },
+              },
+            ],
+          },
+        }),
+        JSON.stringify({
+          type: "result",
+          billing: "API",
+          total_cost_usd: 0.2,
+          usage: { input_tokens: 3, output_tokens: 4 },
+          modelUsage: { "model-a": { inputTokens: 3, costUSD: 0.2 } },
+        }),
+        "client error: --max-budget-usd 0.20; total_cost_usd=0.10; $0.30; 0.40 USD",
+      ].join("\n"),
+    );
+
+    expect(sanitized).toContain('"costume":"keep"');
+    expect(sanitized).toContain('"turn_budget":12');
+    expect(sanitized).toContain('"token_budget":100');
+    expect(sanitized).toContain('"input_tokens":3');
+    expect(sanitized).not.toMatch(/total[-_]cost[-_]usd|costUSD|max[-_]budget[-_]usd/i);
+    expect(sanitized).not.toContain('"billing"');
+    expect(sanitized).not.toMatch(/\$0\.30|0\.40 USD/);
+  });
+
+  it("normalizes mixed-provider token totals without counting cache tokens twice", () => {
+    expect(
+      aggregateTokenUsage([
+        {
+          input_tokens: 5,
+          cache_read_input_tokens: 7,
+          cache_creation_input_tokens: 2,
+          output_tokens: 3,
+        },
+        {
+          input_tokens: 11,
+          cache_read_input_tokens: 13,
+          cache_creation_input_tokens: 17,
+          output_tokens: 19,
+        },
+      ]),
+    ).toEqual({
+      input_tokens: 16,
+      cache_read_input_tokens: 20,
+      cache_creation_input_tokens: 19,
+      output_tokens: 22,
+      total_tokens: 77,
+    });
+  });
+
+  it("tracks only the current invocation and fails closed when usage is unavailable", () => {
+    const firstInvocation = new ApiBudgetGuard(1);
+    expect(firstInvocation.remaining()).toBe(1);
+    firstInvocation.recordClaudeStream(JSON.stringify({ type: "result", total_cost_usd: 0.4 }));
+    expect(firstInvocation.remaining()).toBe(0.6);
+
+    const resumedInvocation = new ApiBudgetGuard(0.75);
+    expect(resumedInvocation.remaining()).toBe(0.75);
+    resumedInvocation.recordClaudeStream(JSON.stringify({ type: "assistant" }));
+    expect(() => resumedInvocation.remaining()).toThrow("refusing another model call");
   });
 });
 

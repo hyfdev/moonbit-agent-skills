@@ -20,7 +20,7 @@ Classify every candidate before spending model calls:
 
 | Class | Primary evidence | Model eval policy |
 | --- | --- | --- |
-| Compiler/CLI self-corrects the error | fixture, checked doc, or command smoke test | keep out of the primary paid/subscription score unless measuring efficiency |
+| Compiler/CLI self-corrects the error | fixture, checked doc, or command smoke test | keep out of the primary model score unless measuring efficiency |
 | Wrong behavior can compile or build | hidden runtime, cross-package, or boundary test | include in the primary content eval |
 | Current fact has no diagnostic | exact answer or hidden semantic test | include when training-data staleness is plausible |
 | Only the route changed | controlled routing/discoverability ablation | compare byte-identical skills except for that route |
@@ -47,7 +47,7 @@ A task whose wrong solutions pass is a broken grader, not a model success. Corre
 
 When evaluating an existing skill, compare the current version with a purpose-built ablation whenever possible. The two conditions must be byte-identical outside the feature under test. For a top-level `extend` route, remove only the top-level description/index/rule and keep `references/traits-and-generics.mbt.md` byte-identical. A historical skill that already contains the deep syntax cannot isolate the new route.
 
-Pin and hash every condition before the first call. Record the task hash, skill tree, ablation transformation, runner/parser/grader hashes, toolchain components, provider, CLI version, requested model, observed model, repetitions, ordering, time/step limits, and budget rule in `run.json`.
+Pin and hash every condition before the first call. Record the task hash, skill tree, ablation transformation, runner/parser/grader hashes, toolchain components, provider, CLI version, requested model, observed model, repetitions, ordering, and time/step limits in `run.json`.
 
 ## Pair and repeat
 
@@ -60,7 +60,7 @@ Use the task as the unit of inference:
 - show complete pairs, both pass, current only, ablation/baseline only, both fail, missing pairs, and observed-model mismatches;
 - compute each task's pass-rate difference across repetitions, then average task differences;
 - use a task-clustered interval and a task-level exact sign test for exploratory uncertainty;
-- compare duration, steps, tokens, and cost only for pairs where both conditions pass;
+- compare duration, steps, and normalized token counts only for pairs where both conditions pass;
 - keep provider results separate.
 
 Assertions within one scenario are correlated checks, not independent samples. Report a reporting suite with three scenarios as `n=3`, even when it contains twenty-nine assertions.
@@ -80,7 +80,7 @@ Keep a held-out prompt set when tuning descriptions. Run old and new description
 
 ## Budget and stopping rules
 
-Kimi subscription runs use a predeclared maximum cell count, wall timeout, and step limit; report token usage and duration and leave USD unavailable. Claude Code/API runs require an explicit total USD budget before the first call, pass the remaining amount to each child process, and stop before a cell that would exceed the budget.
+Kimi subscription runs use a predeclared maximum cell count, wall timeout, and step limit; report token usage, duration, model/client identity, and errors. Claude Code/API runs additionally require an explicit runtime cap before the first call, pass the remaining in-memory allowance to each child process, and stop before another cell when the allowance is exhausted or the preceding charge cannot be observed. Never persist the cap or charge. On resume, start a new guard from the supplied cap and apply it only to unfinished cells.
 
 Use this sequence:
 
@@ -94,4 +94,4 @@ Do not add model evals to CI. Parser, schema, statistics, and grader-contract te
 
 ## Completion report
 
-State what the experiment can and cannot support. Include tables for task-level outcomes, activation metrics, observed execution signatures, repetitions, invalid pairs, signature-mismatch pairs, token/cost usage, and grader-contract results. Lead with current-only versus baseline/ablation-only tasks. List non-discriminating tasks removed from the primary score and any grader defect that invalidated earlier cells.
+State what the experiment can and cannot support. Include tables for task-level outcomes, activation metrics, observed execution signatures, repetitions, invalid pairs, signature-mismatch pairs, normalized token usage and duration, errors, and grader-contract results. Lead with current-only versus baseline/ablation-only tasks. List non-discriminating tasks removed from the primary score and any grader defect that invalidated earlier cells.

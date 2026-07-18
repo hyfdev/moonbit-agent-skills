@@ -41,7 +41,7 @@ function result(overrides: Partial<ActivationResult> = {}): ActivationResult {
     activated_all: ["moonbit-language"],
     expected: { required: ["moonbit-language"], forbidden: ["moonbit-toolchain"] },
     verdict: { recall_ok: true, no_forbidden: true, exact: true },
-    usage: { total_cost_usd: 0.1 },
+    usage: { input_tokens: 10, output_tokens: 2 },
     model_usage: { "claude-haiku-4-5-20251001": { inputTokens: 10 } },
     num_turns: 1,
     exit_code: 0,
@@ -51,6 +51,7 @@ function result(overrides: Partial<ActivationResult> = {}): ActivationResult {
     stderr: "transcripts/prompt-1.stderr.txt",
     final_text: "done",
     tool_uses: [],
+    duration_ms: 25,
     ...overrides,
   };
 }
@@ -179,7 +180,7 @@ describe("activation eval transcript and metrics", () => {
     expect(parsed.activatedFailed).toEqual([]);
     expect(parsed.finalText).toBe("finished");
     expect(parsed.numTurns).toBe(2);
-    expect(parsed.usage.total_cost_usd).toBe(0.125);
+    expect(parsed.usage).toEqual({ input_tokens: 10, output_tokens: 4, num_turns: 2 });
     expect(Object.keys(parsed.modelUsage)).toEqual(["claude-haiku-4-5-20251001"]);
   });
 
@@ -284,7 +285,7 @@ describe("activation eval transcript and metrics", () => {
         activated: ["moonbit-language"],
         expected: { required: ["moonbit-language", "moonbit-toolchain"], forbidden: [] },
         verdict: { recall_ok: false, no_forbidden: true, exact: false },
-        usage: { total_cost_usd: 0.2 },
+        usage: { input_tokens: 20, output_tokens: 4 },
       }),
       result({
         id: "negative-false-positive",
@@ -293,7 +294,7 @@ describe("activation eval transcript and metrics", () => {
         activated: ["moonbit-toolchain"],
         expected: { required: [], forbidden: ["moonbit-language", "moonbit-toolchain"] },
         verdict: { recall_ok: true, no_forbidden: false, exact: false },
-        usage: { total_cost_usd: 0.3 },
+        usage: { input_tokens: 30, output_tokens: 6 },
       }),
     ];
     const summary = summarize(results, "requested-model", 12, ENVIRONMENT);
@@ -308,7 +309,12 @@ describe("activation eval transcript and metrics", () => {
     });
     expect(summary.resolved_models).toEqual(["claude-haiku-4-5-20251001"]);
     expect(summary.environment).toEqual(ENVIRONMENT);
-    expect(summary.total_cost_usd).toBe(0.6);
+    expect(summary.usage).toEqual({
+      input_tokens: 60,
+      output_tokens: 12,
+      total_tokens: 72,
+    });
+    expect(summary.duration_ms).toBe(75);
   });
 });
 
@@ -456,7 +462,7 @@ console.log(JSON.stringify({
   num_turns: 1,
   total_cost_usd: 0.01,
   usage: { input_tokens: 1, output_tokens: 1 },
-  modelUsage: { "resolved-test-model": { inputTokens: 1 } },
+  modelUsage: { "resolved-test-model": { inputTokens: 1, costUSD: 0.01 } },
 }));
 `,
       );
@@ -487,7 +493,7 @@ console.log(JSON.stringify({
         readFileSync(join(runDirectory, "results.jsonl"), "utf8").trim().split("\n"),
       ).toHaveLength(1);
       expect(JSON.parse(readFileSync(join(runDirectory, "summary.json"), "utf8"))).toMatchObject({
-        runner: "activation-v3",
+        runner: "activation-v4",
         measurement: "prompted-routing-classification",
         model: "requested-test-model",
         resolved_models: ["resolved-test-model"],
@@ -495,7 +501,7 @@ console.log(JSON.stringify({
         routing_exact_accuracy: { "language-only": 1 },
       });
       expect(JSON.parse(readFileSync(join(runDirectory, "run.json"), "utf8"))).toMatchObject({
-        runner: "activation-v3",
+        runner: "activation-v4",
         measurement: "prompted-routing-classification",
         input_snapshot: {
           prompts: { ids: ["lang-extend-ordinary"] },
@@ -508,6 +514,19 @@ console.log(JSON.stringify({
       });
       expect(existsSync(join(runDirectory, "transcripts/lang-extend-ordinary--r01.jsonl"))).toBe(
         true,
+      );
+      for (const artifact of [
+        "results.jsonl",
+        "summary.json",
+        "run.json",
+        "transcripts/lang-extend-ordinary--r01.jsonl",
+        "transcripts/lang-extend-ordinary--r01.stderr.txt",
+      ]) {
+        const persisted = readFileSync(join(runDirectory, artifact), "utf8");
+        expect(persisted).not.toMatch(/total_cost_usd|costUSD|paid_budget_usd|"billing"/);
+      }
+      expect(readFileSync(join(runDirectory, "results.jsonl"), "utf8")).toContain(
+        '"input_tokens":1',
       );
 
       const rejected = spawnSync(process.execPath, command, {
@@ -528,6 +547,18 @@ console.log(JSON.stringify({
       expect(
         readFileSync(join(runDirectory, "results.jsonl"), "utf8").trim().split("\n"),
       ).toHaveLength(1);
+
+      const budgetIndex = command.indexOf("--paid-budget-usd");
+      const commandWithoutBudget = command.filter(
+        (_, index) => index !== budgetIndex && index !== budgetIndex + 1,
+      );
+      const completedResume = spawnSync(process.execPath, [...commandWithoutBudget, "--resume"], {
+        cwd: REPO_ROOT,
+        encoding: "utf8",
+        env: environment,
+      });
+      expect(completedResume.status, completedResume.stderr).toBe(0);
+      expect(completedResume.stdout).toContain("already complete");
 
       const frozenSkill = join(
         runDirectory,

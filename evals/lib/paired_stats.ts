@@ -51,7 +51,9 @@ export interface PairedSummary {
     pairs: number;
     median_duration_ms: Record<string, number | null>;
     median_turns: Record<string, number | null>;
-    median_cost_usd: Record<string, number | null>;
+    median_total_tokens: Record<string, number | null>;
+    median_input_tokens: Record<string, number | null>;
+    median_output_tokens: Record<string, number | null>;
   };
 }
 
@@ -67,6 +69,19 @@ function median(values: number[]): number | null {
 function numberField(record: Record<string, unknown> | undefined, key: string): number | null {
   const value = record?.[key];
   return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function totalTokens(record: Record<string, unknown> | undefined): number | null {
+  const fields = [
+    "input_tokens",
+    "cache_read_input_tokens",
+    "cache_creation_input_tokens",
+    "output_tokens",
+  ];
+  const values = fields
+    .map((key) => numberField(record, key))
+    .filter((value): value is number => value !== null);
+  return values.length === 0 ? null : values.reduce((sum, value) => sum + value, 0);
 }
 
 const SIGNATURE_FIELDS = [
@@ -283,13 +298,17 @@ export function pairedSummary(
         [leftCondition]: median(values(0, (result) => numberField(result.usage, "num_turns"))),
         [rightCondition]: median(values(1, (result) => numberField(result.usage, "num_turns"))),
       },
-      median_cost_usd: {
-        [leftCondition]: median(
-          values(0, (result) => numberField(result.usage, "total_cost_usd")),
-        ),
-        [rightCondition]: median(
-          values(1, (result) => numberField(result.usage, "total_cost_usd")),
-        ),
+      median_total_tokens: {
+        [leftCondition]: median(values(0, (result) => totalTokens(result.usage))),
+        [rightCondition]: median(values(1, (result) => totalTokens(result.usage))),
+      },
+      median_input_tokens: {
+        [leftCondition]: median(values(0, (result) => numberField(result.usage, "input_tokens"))),
+        [rightCondition]: median(values(1, (result) => numberField(result.usage, "input_tokens"))),
+      },
+      median_output_tokens: {
+        [leftCondition]: median(values(0, (result) => numberField(result.usage, "output_tokens"))),
+        [rightCondition]: median(values(1, (result) => numberField(result.usage, "output_tokens"))),
       },
     },
   };

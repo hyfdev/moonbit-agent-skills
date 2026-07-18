@@ -12,8 +12,8 @@
  * Results land in evals/activation/runs/<run-name>/ (gitignored):
  *   run.json       immutable run configuration and environment disclosure
  *   results.jsonl  one line per prompt with activated set, verdict, and usage
- *   summary.json   labeled classification/activation metrics, resolved models, and cost
- *   transcripts/   raw Claude stream-json and stderr per prompt
+ *   summary.json   labeled metrics, token counts, duration, models, client, and errors
+ *   transcripts/   sanitized client stream-json and stderr per prompt
  */
 
 import { spawn } from "node:child_process";
@@ -35,12 +35,16 @@ import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { isDeepStrictEqual, parseArgs } from "node:util";
 import { fileURLToPath } from "node:url";
 import {
+  ApiBudgetGuard,
+  aggregateTokenUsage,
   buildAgentInvocation,
+  claudeBudgetCharge,
   clientExecutable,
   clientRunSucceeded,
   enrichKimiStream,
   parseAgentStream,
   parseClaudeStream,
+  sanitizeAgentStreamForPersistence,
   type AgentClient,
   type ParsedAgentStream,
 } from "../lib/agent_cli.ts";
@@ -165,7 +169,6 @@ interface EnvironmentDisclosure {
   model_environment: Record<string, string>;
   agent_client?: AgentClient;
   provider_origin?: string | null;
-  billing?: string;
 }
 
 export interface ActivationSummary {
@@ -183,7 +186,8 @@ export interface ActivationSummary {
   recall_when_moonbit_not_named: number | null;
   user_ever_needed_to_name_skill: false;
   timely_trigger_recall_overall?: number | null;
-  total_cost_usd: number | null;
+  usage: Record<string, unknown>;
+  duration_ms: number;
   errors: string[];
 }
 
@@ -210,14 +214,13 @@ interface CommandResult {
 }
 
 interface RunConfig {
-  runner: "activation" | "activation-v2" | "activation-v3";
+  runner: "activation" | "activation-v2" | "activation-v3" | "activation-v4";
   client?: AgentClient;
   model: string;
   mode?: ActivationMode;
   measurement?: ActivationMeasurement;
   max_turns: number;
   repetitions?: number;
-  paid_budget_usd?: number | null;
   environment: EnvironmentDisclosure;
   input_snapshot?: ActivationInputManifest;
   runner_files?: Record<string, string>;
@@ -717,17 +720,11 @@ export function summarize(
     multi_skill_accuracy_combined: rate(combined, (result) => result.verdict.exact),
     recall_when_moonbit_not_named: rate(unnamed, (result) => result.verdict.recall_ok),
     user_ever_needed_to_name_skill: false,
-    total_cost_usd:
-      environment.billing?.startsWith("subscription") === true
-        ? null
-        : Number(
-            results
-              .reduce((total, result) => {
-                const cost = result.usage.total_cost_usd;
-                return total + (typeof cost === "number" ? cost : 0);
-              }, 0)
-              .toFixed(6),
-          ),
+    usage: aggregateTokenUsage(results.map((result) => result.usage)),
+    duration_ms: results.reduce(
+      (total, result) => total + (result.duration_ms ?? 0),
+      0,
+    ),
     errors: results.filter((result) => result.exit_code !== 0).map((result) => result.id),
   };
 }
@@ -808,6 +805,11 @@ export function materializePrompt(
   }
 }
 
+interface ActivationInvocationResult {
+  result: ActivationResult;
+  budgetCharge: number | null;
+}
+
 async function runOne(
   prompt: ActivationPrompt,
   model: string,
@@ -818,7 +820,7 @@ async function runOne(
   maxBudgetUsd?: number,
   repetition = 0,
   frozenSkillsSource = SKILLS_SRC,
-): Promise<ActivationResult> {
+): Promise<ActivationInvocationResult> {
   const temporaryRoot = mkdtempSync(join(tmpdir(), "mbtact-"));
   const project = join(temporaryRoot, "project");
   mkdirSync(project);
@@ -873,8 +875,14 @@ async function runOne(
   const artifact = `${prompt.id}--r${String(repetition + 1).padStart(2, "0")}`;
   const transcriptRelative = join("transcripts", `${artifact}.jsonl`);
   const stderrRelative = join("transcripts", `${artifact}.stderr.txt`);
-  writeFileSync(join(runDirectory, transcriptRelative), commandResult.stdout);
-  writeFileSync(join(runDirectory, stderrRelative), commandResult.stderr);
+  writeFileSync(
+    join(runDirectory, transcriptRelative),
+    sanitizeAgentStreamForPersistence(commandResult.stdout),
+  );
+  writeFileSync(
+    join(runDirectory, stderrRelative),
+    sanitizeAgentStreamForPersistence(commandResult.stderr),
+  );
 
   const result: ActivationResult = {
     id: prompt.id,
@@ -914,7 +922,11 @@ async function runOne(
     activated_before_domain_action: decision.activatedBeforeDomainAction,
     duration_ms: commandResult.durationMs ?? 0,
   };
-  return result;
+  return {
+    result,
+    budgetCharge:
+      client === "claude-code" ? claudeBudgetCharge(commandResult.stdout) : 0,
+  };
 }
 
 async function preflight(client: AgentClient): Promise<EnvironmentDisclosure> {
@@ -953,7 +965,6 @@ async function preflight(client: AgentClient): Promise<EnvironmentDisclosure> {
     platform: `${platform()}-${release()}-${arch()}`,
     model_environment: modelEnvironment,
     provider_origin: providerOrigin,
-    billing: client === "claude-code" ? "API" : "subscription; USD unavailable",
   };
 }
 
@@ -1017,7 +1028,11 @@ export async function main(argv = process.argv.slice(2)): Promise<number> {
     console.log(`prompts.jsonl valid: ${prompts.length} prompt(s) selected`);
     return 0;
   }
-  if (options.client === "claude-code" && options.paidBudgetUsd === undefined) {
+  if (
+    options.client === "claude-code" &&
+    options.paidBudgetUsd === undefined &&
+    !options.resume
+  ) {
     throw new Error("Claude Code runs require an explicit --paid-budget-usd total budget");
   }
   if (options.client === "kimi-code" && options.paidBudgetUsd !== undefined) {
@@ -1042,14 +1057,13 @@ export async function main(argv = process.argv.slice(2)): Promise<number> {
   const preparedInputs = prepareActivationInputs(runDirectory, prompts);
   prompts = preparedInputs.prompts;
   const config: RunConfig = {
-    runner: "activation-v3",
+    runner: "activation-v4",
     client: options.client,
     model: options.model,
     mode: options.mode,
     measurement: measurementForMode(options.mode),
     max_turns: options.maxTurns,
     repetitions: options.repetitions,
-    paid_budget_usd: options.paidBudgetUsd ?? null,
     environment,
     input_snapshot: preparedInputs.manifest,
     runner_files: {
@@ -1063,10 +1077,16 @@ export async function main(argv = process.argv.slice(2)): Promise<number> {
   const completed = new Set(
     results.map((result) => JSON.stringify([result.id, result.repetition ?? 0])),
   );
-  let spentUsd = results.reduce((total, result) => {
-    const cost = result.usage.total_cost_usd;
-    return total + (typeof cost === "number" ? cost : 0);
-  }, 0);
+  if (
+    options.client === "claude-code" &&
+    options.paidBudgetUsd === undefined &&
+    completed.size < prompts.length * options.repetitions
+  ) {
+    throw new Error(
+      "Claude Code needs --paid-budget-usd when unfinished cells require model calls",
+    );
+  }
+  const budgetGuard = new ApiBudgetGuard(options.paidBudgetUsd);
   const totalCells = prompts.length * options.repetitions;
   let cellIndex = 0;
   for (let repetition = 0; repetition < options.repetitions; repetition += 1) {
@@ -1080,17 +1100,14 @@ export async function main(argv = process.argv.slice(2)): Promise<number> {
         );
         continue;
       }
-      const remainingBudget =
-        options.paidBudgetUsd === undefined
-          ? undefined
-          : Number((options.paidBudgetUsd - spentUsd).toFixed(6));
+      const remainingBudget = budgetGuard.remaining();
       if (remainingBudget !== undefined && remainingBudget <= 0) {
         throw new Error(
           `paid experiment budget exhausted before ${prompt.id} r${repetition + 1}`,
         );
       }
       console.log(`[${cellIndex}/${totalCells}] ${prompt.id} r${repetition + 1} ...`);
-      const result = await runOne(
+      const invocationResult = await runOne(
         prompt,
         options.model,
         options.maxTurns,
@@ -1101,10 +1118,10 @@ export async function main(argv = process.argv.slice(2)): Promise<number> {
         repetition,
         preparedInputs.skillsDirectory,
       );
+      const result = invocationResult.result;
       results.push(result);
       appendFileSync(resultsPath, `${JSON.stringify(result)}\n`);
-      const cost = result.usage.total_cost_usd;
-      if (typeof cost === "number") spentUsd += cost;
+      budgetGuard.recordCharge(invocationResult.budgetCharge);
       const status = result.verdict.exact ? "OK " : "MISS";
       console.log(
         `    ${status} succeeded=${JSON.stringify(result.activated_succeeded ?? result.activated)} failed=${JSON.stringify(result.activated_failed ?? [])} timely=${JSON.stringify(result.activated_before_domain_action ?? [])}`,
@@ -1114,7 +1131,7 @@ export async function main(argv = process.argv.slice(2)): Promise<number> {
 
   const summary = {
     ...summarize(results, options.model, options.maxTurns, environment, options.mode),
-    runner: "activation-v3",
+    runner: "activation-v4",
     client: options.client,
     mode: options.mode,
     repetitions: options.repetitions,

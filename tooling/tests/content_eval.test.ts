@@ -24,6 +24,7 @@ import {
   parseStream,
   preflight,
   prepareDerivedConditionSnapshots,
+  runTask,
   snapshotFiles,
   type CommandResult,
   type CommandRunner,
@@ -539,6 +540,57 @@ describe("content eval run manifests", () => {
   });
 });
 
+describe("content eval persisted artifacts", () => {
+  it("keeps token usage while removing money from results, transcripts, and stderr", () => {
+    temporary("content-artifact-", (root) => {
+      const runDirectory = join(root, "run");
+      const cacheDirectory = join(root, "cache");
+      mkdirSync(runDirectory);
+      mkdirSync(cacheDirectory);
+      const stdout = [
+        JSON.stringify({
+          type: "assistant",
+          message: { model: "model-a", content: [] },
+        }),
+        JSON.stringify({
+          type: "result",
+          billing: "API",
+          subtype: "success",
+          is_error: false,
+          result: "YES\nIt is block-scoped.",
+          num_turns: 1,
+          total_cost_usd: 0.2,
+          usage: { input_tokens: 3, output_tokens: 4 },
+          modelUsage: { "model-a": { inputTokens: 3, costUSD: 0.2 } },
+        }),
+      ].join("\n");
+      const runner: CommandRunner = () => ({
+        ...commandResult(0, stdout, "--max-budget-usd 0.50"),
+        durationMs: 10,
+      });
+      const result = runTask(
+        join(REPO_ROOT, "evals", "language", "tasks", "lang-defer-exists"),
+        "none",
+        "model-a",
+        12,
+        cacheDirectory,
+        runDirectory,
+        runner,
+        { current: join(REPO_ROOT, "skills") },
+        "claude-code",
+        1,
+      );
+
+      expect(result.usage).toEqual({ input_tokens: 3, output_tokens: 4, num_turns: 1 });
+      expect(JSON.stringify(result)).not.toMatch(/total_cost_usd|costUSD|"billing"/);
+      const transcript = readFileSync(join(runDirectory, String(result.transcript)), "utf8");
+      const stderr = readFileSync(join(runDirectory, String(result.stderr)), "utf8");
+      expect(transcript).not.toMatch(/total_cost_usd|costUSD|"billing"/);
+      expect(stderr).not.toMatch(/max[-_]budget[-_]usd|0\.50/);
+    });
+  });
+});
+
 describe("content eval stream parser", () => {
   it("associates a Bash result with its tool call", () => {
     const events = [
@@ -860,6 +912,23 @@ it("loads a frozen experiment manifest without duplicating CLI configuration", (
   );
   expect(result.status, result.stderr).toBe(0);
   expect(result.stdout).toContain("4 task(s) valid");
+});
+
+it("accepts a runtime-only API budget alongside a frozen experiment", () => {
+  const result = spawnSync(
+    process.execPath,
+    [
+      RUNNER,
+      "--experiment",
+      "evals/experiments/extend-route-deepseek-flash.json",
+      "--paid-budget-usd",
+      "1",
+      "--dry-run",
+    ],
+    { cwd: REPO_ROOT, encoding: "utf8" },
+  );
+  expect(result.status, result.stderr).toBe(0);
+  expect(result.stdout).toContain("2 task(s) valid");
 });
 
 it("rejects runtime overrides of a frozen experiment manifest", () => {

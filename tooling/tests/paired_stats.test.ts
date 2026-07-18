@@ -23,7 +23,13 @@ function result(
     providers: ["kimi"],
     thinking_efforts: ["max"],
     duration_ms: condition === "current" ? 10 : 20,
-    usage: { num_turns: condition === "current" ? 2 : 4 },
+    usage: {
+      num_turns: condition === "current" ? 2 : 4,
+      input_tokens: condition === "current" ? 10 : 20,
+      cache_read_input_tokens: condition === "current" ? 30 : 40,
+      cache_creation_input_tokens: condition === "current" ? 5 : 10,
+      output_tokens: condition === "current" ? 3 : 6,
+    },
   };
 }
 
@@ -89,6 +95,9 @@ describe("paired eval statistics", () => {
         pairs: 2,
         median_duration_ms: { current: 10, ablation: 20 },
         median_turns: { current: 2, ablation: 4 },
+        median_total_tokens: { current: 48, ablation: 76 },
+        median_input_tokens: { current: 10, ablation: 20 },
+        median_output_tokens: { current: 3, ablation: 6 },
       },
     });
     expect(summary.mean_task_pass_rate_difference).toBeCloseTo(-1 / 6);

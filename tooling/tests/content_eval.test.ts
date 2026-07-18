@@ -743,3 +743,30 @@ it("executes the TypeScript content runner directly with Node 24", () => {
   expect(result.stderr).toBe("");
   expect(result.stdout).toContain("1 task(s) valid");
 });
+
+it("loads a frozen experiment manifest without duplicating CLI configuration", () => {
+  const result = spawnSync(
+    process.execPath,
+    [RUNNER, "--experiment", "evals/experiments/extend-route-kimi-k3.json", "--dry-run"],
+    { cwd: REPO_ROOT, encoding: "utf8" },
+  );
+  expect(result.status, result.stderr).toBe(0);
+  expect(result.stdout).toContain("4 task(s) valid");
+});
+
+it("rejects runtime overrides of a frozen experiment manifest", () => {
+  const result = spawnSync(
+    process.execPath,
+    [
+      RUNNER,
+      "--experiment",
+      "evals/experiments/extend-route-kimi-k3.json",
+      "--model",
+      "different-model",
+      "--dry-run",
+    ],
+    { cwd: REPO_ROOT, encoding: "utf8" },
+  );
+  expect(result.status).toBe(2);
+  expect(result.stderr).toContain("--experiment cannot be combined with --model");
+});

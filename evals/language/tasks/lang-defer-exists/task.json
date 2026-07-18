@@ -16,7 +16,7 @@
     },
     {
       "type": "output_not_matches",
-      "regex": "(?:\\bnot\\b|isn['’]?t|never)\\s+(?:actually\\s+)?(?:\\*\\*)?(?:block|lexical)[- ]scoped|function[- ]scoped"
+      "regex": "(?:\\bnot\\b|isn['’]?t|never)\\s+(?:actually\\s+)?(?:\\*\\*)?(?:block|lexical)[- ]scoped"
     }
   ],
   "truth": "defer exists since the 2025-08 update; it is block-scoped, LIFO per block (verified by fixture lang-trap-go-defer-block-scoped)."

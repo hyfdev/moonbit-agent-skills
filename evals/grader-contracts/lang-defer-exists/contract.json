@@ -5,7 +5,7 @@
     {
       "name": "correct-block-scoped-defer",
       "expected": "pass",
-      "final_text": "YES\nMoonBit defer is block-scoped and runs when its enclosing block exits."
+      "final_text": "YES\nMoonBit defer is block-scoped, not function-scoped, and runs when its enclosing block exits."
     },
     {
       "name": "claims-defer-does-not-exist",

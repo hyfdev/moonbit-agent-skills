@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "id": "extend-route-kimi-k3",
+  "runner": "content",
+  "stage": "exploratory",
+  "area": "language",
+  "client": "kimi-code",
+  "model": "kimi-code/k3",
+  "conditions": [
+    "ours",
+    "ours-no-top-level-extend"
+  ],
+  "task_ids": [
+    "lang-discover-selected-trait-method",
+    "lang-discover-default-trait-method",
+    "lang-json-flat-labelled",
+    "lang-defer-block-order"
+  ],
+  "repetitions": 3,
+  "max_turns": 30,
+  "paid_budget_usd": null,
+  "primary_metric": "mean task pass-rate difference for current minus the top-level-extend ablation; the two non-extend tasks are regression controls",
+  "minimum_valuable_difference": 0.15,
+  "stopping_rule": "Run all 24 predeclared cells. Do not claim improvement if no extend task favors current or the task-clustered interval crosses zero. Keep regression-control outcomes separate from the extend effect."
+}

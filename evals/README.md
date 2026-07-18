@@ -2,11 +2,11 @@
 
 Three separate questions get three separate eval families:
 
-1. **Activation** (`activation/`) — can the agent, seeing only the skill catalog (names + descriptions), decide per natural request whether to load moonbit-language, moonbit-toolchain, both, or neither? No eval here ever names a skill in the prompt; the runner rejects prompts that do.
+1. **Activation** (`activation/`) — two distinct modes: `routing` asks for only the initial catalog decision and rejects domain actions; `end-to-end` sends the natural request and measures whether required skills loaded before the first Bash/Edit/Write. No source prompt names a skill; the runner rejects prompts that do.
 2. **Content** (`language/`, `toolchain/`, `integration/`) — once knowledge is available, does the agent finish MoonBit tasks correctly? Conditions compare no skills, the pinned official `moonbitlang/skills` bundle, a pinned historical `baseline`, this repository's catalog-only skills, and force-injected single skills. `forced-language-no-cross-language` is a targeted H4 ablation: it removes the concentrated cross-language rule, route, and reference while retaining the rest of the forced language skill.
 3. **Error reporting** (`reporting/`) — when the installed guidance conflicts with observed behavior, does the agent verify the conflict, fix the task, display a complete privacy-scrubbed issue draft and template link, and stop without invoking GitHub? The same scenarios run with and without the skill.
 
-All runners are TypeScript executed directly by Node.js 24 and need the Claude Code CLI (`claude`) with credentials for paid runs. The content and reporting runners also need `moon` on `PATH`; content additionally needs `git`, and Node executes its JS-target tests. Before its first model call, the content runner verifies its executables, records the Node version, and checks every MoonBit component against `verification/toolchains/current.json`; the reporting runner likewise refuses to run without Node.js 24+, Claude Code, and the exact MoonBit pin. Grading is deterministic — real commands, file/state assertions, hidden behavior tests, and transcript assertions, never an LLM judge.
+All runners are TypeScript executed directly by Node.js 24. Activation and content support Kimi Code (`kimi`) and Claude Code (`claude`) through normalized JSONL adapters; reporting remains Claude-only because it requires a command allowlist equivalent to its outward-action safety boundary. Read [CLIENTS.md](CLIENTS.md) for the locally verified versions, model mappings, stream schemas, isolation, and billing behavior. The content and reporting runners also need `moon` on `PATH`; content additionally needs `git`, and Node executes its JS-target tests. Before its first model call, the content runner verifies its executables, records the Node version, and checks every MoonBit component against `verification/toolchains/current.json`; the reporting runner likewise refuses to run without Node.js 24+, Claude Code, and the exact MoonBit pin. Grading is deterministic — real commands, file/state assertions, hidden behavior tests, and transcript assertions, never an LLM judge.
 
 ## Running
 
@@ -16,20 +16,26 @@ node evals/activation/run_activation.ts --dry-run
 node evals/run_content.ts --area language --condition none --dry-run
 node evals/reporting/run_reporting.ts --dry-run
 
-# Full activation eval.
-node evals/activation/run_activation.ts --model claude-haiku-4-5-20251001
+# Routing-only activation eval on the subscription client.
+node evals/activation/run_activation.ts --client kimi-code --model kimi-code/k3 --mode routing --repetitions 3 --run-name routing-kimi-k3
 
-# Full content matrix, one area per process.
-node evals/run_content.ts --area language --condition none --condition official --condition ours --condition forced-language --max-turns 50
-node evals/run_content.ts --area toolchain --condition none --condition official --condition ours --condition forced-toolchain --max-turns 50
-node evals/run_content.ts --area integration --condition none --condition official --condition ours --max-turns 50
+# Independent paid routing check; the total budget is mandatory.
+node evals/activation/run_activation.ts --client claude-code --model haiku --mode routing --repetitions 1 --paid-budget-usd 3 --run-name routing-deepseek-flash
+
+# Subscription content comparison with paired AB/BA repetitions.
+node evals/run_content.ts --area language --condition baseline --condition ours --client kimi-code --model kimi-code/k3 --repetitions 3 --max-turns 50 --run-name language-kimi-k3
+
+# Preferred: run a checked-in experiment manifest that freezes tasks, conditions, repetitions, primary metric, effect threshold, budget, and stopping rule.
+node evals/run_content.ts --experiment evals/experiments/extend-route-kimi-k3.json
+
+# Prove canonical solutions pass and plausible wrong solutions fail before any model calls.
+node evals/validate_graders.ts
 
 # Discoverability comparison. Use two fresh runs with reversed condition order.
-node evals/run_content.ts --area language --ids lang-discover-selected-trait-method,lang-discover-default-trait-method --condition baseline --condition ours --max-turns 30 --run-name language-reference-discovery-a
-node evals/run_content.ts --area language --ids lang-discover-selected-trait-method,lang-discover-default-trait-method --condition ours --condition baseline --max-turns 30 --run-name language-reference-discovery-b
+node evals/run_content.ts --area language --ids lang-discover-selected-trait-method,lang-discover-default-trait-method --condition ours-no-top-level-extend --condition ours --client kimi-code --model kimi-code/k3 --repetitions 3 --max-turns 30 --run-name language-reference-discovery
 
 # Targeted H4 ablation.
-node evals/run_content.ts --area language --ids lang-fix-rust-habits --condition forced-language-no-cross-language --max-turns 50 --run-name h4-no-cross-language
+node evals/run_content.ts --area language --ids lang-fix-rust-habits --condition forced-language-no-cross-language --client claude-code --model haiku --paid-budget-usd 1 --max-turns 50 --run-name h4-no-cross-language
 
 # Error-reporting behavior comparison.
 node evals/reporting/run_reporting.ts --model claude-haiku-4-5-20251001 --run-name reporting-manual-only
@@ -38,7 +44,7 @@ node evals/reporting/run_reporting.ts --model claude-haiku-4-5-20251001 --run-na
 node evals/reporting/run_reporting.ts --regrade-run reporting-manual-only
 ```
 
-For activation and content, use a fresh `--run-name` for a new measurement. A pre-existing `results.jsonl` is rejected unless `--resume` is given; resume skips completed task/condition pairs and recomputes the summary from old plus new records. These runners write `run.json` before the first task and refuse to resume when the conditions, selected task files, environment, or skill snapshots changed. Paid content runs require committed, clean `skills/`; current and historical skills are materialized once from Git trees into the run cache, and the manifest records commit IDs, tree IDs, every included path, and SHA-256. The preflight also rejects user-level or plugin-provided `moonbit-language` copies that would contaminate the comparison. Reporting runs are smaller one-shot comparisons: always use a fresh name; the runner rejects an existing directory and does not support resume. `--regrade-run` only reapplies the checked-in deterministic scorer to preserved artifacts and makes no model call.
+For activation and content, use a fresh `--run-name` for a new measurement. A pre-existing `results.jsonl` is rejected unless `--resume` is given; resume skips completed prompt/task, repetition, and condition cells and recomputes the summary. These runners write `run.json` before the first task and refuse to resume when conditions, repetitions, selected task files, environment, provider, budget, or skill snapshots changed. Content alternates AB/BA condition order and reports paired task outcomes; pairs with different or unobserved actual models are excluded. Paid Claude runs require an explicit total `--paid-budget-usd`, and the remaining amount is passed to each child process. Kimi subscription runs record tokens, duration, and observed model but leave USD unavailable. Paid content runs require committed, clean `skills/`; current and historical skills are materialized once from Git trees into the run cache, and the manifest records commit IDs, tree IDs, every included path, and SHA-256. Reporting runs are smaller one-shot comparisons: always use a fresh name; the runner rejects an existing directory and does not support resume. `--regrade-run` only reapplies the checked-in deterministic scorer to preserved artifacts and makes no model call.
 
 Results are written to `*/runs/<run-name>/` and gitignored. Activation and content use `run.json`, `results.jsonl`, `summary.json`, `transcripts/`, and, for content failures, `failed-workspaces/`. Reporting stores per-scenario answers, sanitized workspace snapshots, detected GitHub command attempts, transcripts, and deterministic grading under `iteration-1/`, plus a top-level `summary.json`. Checked-in results live in the corresponding `RESULTS.md` snapshots with date, client/model disclosure, corrections, and cost.
 

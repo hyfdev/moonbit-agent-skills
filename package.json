@@ -11,6 +11,7 @@
     "run-activation-eval": "node evals/activation/run_activation.ts",
     "run-checked-docs": "node tooling/run_checked_docs.ts",
     "run-content-eval": "node evals/run_content.ts",
+    "validate-graders": "node evals/validate_graders.ts",
     "run-fixtures": "node tooling/run_fixtures.ts",
     "run-reporting-eval": "node evals/reporting/run_reporting.ts",
     "snapshot-toolchain": "node tooling/snapshot_toolchain.ts",

@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "id": "extend-route-deepseek-flash",
+  "runner": "content",
+  "stage": "confirmatory",
+  "area": "language",
+  "client": "claude-code",
+  "model": "haiku",
+  "conditions": [
+    "ours",
+    "ours-no-top-level-extend"
+  ],
+  "task_ids": [
+    "lang-discover-selected-trait-method",
+    "lang-discover-default-trait-method"
+  ],
+  "repetitions": 1,
+  "max_turns": 30,
+  "paid_budget_usd": 2,
+  "primary_metric": "task-level current-only versus ablation-only functional passes on the frozen extend subset",
+  "minimum_valuable_difference": 0.5,
+  "stopping_rule": "Run exactly four cells with the Claude Code haiku alias. Exclude any pair whose assistant-emitted models differ. Do not add tasks after reading the paid results."
+}

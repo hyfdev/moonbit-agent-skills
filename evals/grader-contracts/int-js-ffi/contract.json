@@ -1,0 +1,29 @@
+{
+  "area": "integration",
+  "task": "int-js-ffi",
+  "cases": [
+    {
+      "name": "correct-dynamic-callable-binding",
+      "expected": "pass",
+      "files": {
+        "lib.mbt": "extern \"js\" fn date_now() -> Int64 = \"() => BigInt(Date.now())\"\n\npub fn now_ms() -> Int64 {\n  date_now()\n}\n"
+      }
+    },
+    {
+      "name": "builds-but-import-is-not-callable",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "extern \"js\" fn date_now() -> Int64 = \"BigInt(Date.now())\"\n\npub fn now_ms() -> Int64 {\n  date_now()\n}\n"
+      },
+      "must_fail_check_types": ["moon"]
+    },
+    {
+      "name": "declares-binding-but-hard-codes-wrapper",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "extern \"js\" fn date_now() -> Int64 = \"() => BigInt(Date.now())\"\n\npub fn now_ms() -> Int64 {\n  0L\n}\n"
+      },
+      "must_fail_check_types": ["moon"]
+    }
+  ]
+}

@@ -19,6 +19,7 @@ import {
   forcedPrompt,
   grade,
   installLanguageAblation,
+  installTopLevelExtendAblation,
   materializeGitSkills,
   parseStream,
   preflight,
@@ -165,7 +166,7 @@ describe("content eval grading", () => {
     });
   });
 
-  it("accepts the single-test package path with a trailing slash", () => {
+  it("accepts only the requested single-test file path", () => {
     const commandCheck = task("toolchain", "tool-single-test-command").grade.find(
       (check) => check.type === "command_matches",
     ) as JsonRecord;
@@ -177,7 +178,7 @@ describe("content eval grading", () => {
           "",
           [
             {
-              command: "moon test utils/",
+              command: "moon test utils/utils_test.mbt",
               is_error: false,
               output: "Total tests: 1, passed: 1, failed: 0.",
             },
@@ -201,6 +202,29 @@ describe("content eval grading", () => {
           [
             {
               command: "moon test utils/utils_test.mbt root_test.mbt",
+              is_error: false,
+              output: "Total tests: 2, passed: 2, failed: 0.",
+            },
+          ],
+          {},
+        ).ok,
+      ).toBe(false);
+    });
+  });
+
+  it("rejects package scope when another test file exists in that package", () => {
+    const commandCheck = task("toolchain", "tool-single-test-command").grade.find(
+      (check) => check.type === "command_matches",
+    ) as JsonRecord;
+    temporary("content-grade-", (project) => {
+      expect(
+        grade(
+          commandCheck,
+          project,
+          "",
+          [
+            {
+              command: "moon test utils/",
               is_error: false,
               output: "Total tests: 2, passed: 2, failed: 0.",
             },
@@ -345,6 +369,28 @@ describe("content eval conditions", () => {
         false,
       );
       expect(existsSync(join(skill, "references", "declarations-and-functions.mbt.md"))).toBe(true);
+    });
+  });
+
+  it("removes top-level extend guidance while preserving the deep reference byte-for-byte", () => {
+    temporary("content-condition-", (root) => {
+      const skills = join(root, "skills");
+      mkdirSync(skills);
+      installTopLevelExtendAblation(skills);
+      const installed = join(skills, "moonbit-language");
+      const skill = readFileSync(join(installed, "SKILL.md"), "utf8");
+      expect(skill).not.toContain("explicit extend/pub extend");
+      expect(skill).not.toContain("Trait implementations do not automatically create dot-call");
+      expect(skill).not.toContain("| Traits; generics; impls;");
+      expect(
+        readFileSync(join(installed, "references", "traits-and-generics.mbt.md"), "utf8"),
+      ).toBe(
+        readFileSync(
+          join(REPO_ROOT, "skills", "moonbit-language", "references", "traits-and-generics.mbt.md"),
+          "utf8",
+        ),
+      );
+      expect(existsSync(join(skills, "moonbit-toolchain", "SKILL.md"))).toBe(true);
     });
   });
 });
@@ -535,6 +581,42 @@ describe("content eval stream parser", () => {
         reference: "references/traits-and-generics.mbt.md",
       }).reference_read_before_action,
     ).toBe(false);
+  });
+
+  it("counts a successful reference read before a knowledge-only final answer", () => {
+    const events = [
+      {
+        type: "assistant",
+        message: {
+          content: [
+            {
+              type: "tool_use",
+              id: "read-1",
+              name: "Read",
+              input: { file_path: "references/types-structs-enums.mbt.md" },
+            },
+          ],
+        },
+      },
+      {
+        type: "user",
+        message: {
+          content: [{ type: "tool_result", tool_use_id: "read-1", content: "JSON layout" }],
+        },
+      },
+      {
+        type: "result",
+        subtype: "success",
+        is_error: false,
+        result: '["Axes",{"x":-1,"y":1}]',
+      },
+    ];
+    const parsed = parseStream(events.map((event) => JSON.stringify(event)).join("\n"));
+    expect(
+      discoveryEvidence(parsed, {
+        reference: "references/types-structs-enums.mbt.md",
+      }).reference_read_before_action,
+    ).toBe(true);
   });
 });
 

@@ -275,6 +275,8 @@ console.log(JSON.stringify({
         "lang-extend-ordinary",
         "--model",
         "requested-test-model",
+        "--paid-budget-usd",
+        "1",
         "--run-name",
         runName,
       ];
@@ -298,7 +300,9 @@ console.log(JSON.stringify({
         n: 1,
         routing_exact_accuracy: { "language-only": 1 },
       });
-      expect(existsSync(join(runDirectory, "transcripts/lang-extend-ordinary.jsonl"))).toBe(true);
+      expect(existsSync(join(runDirectory, "transcripts/lang-extend-ordinary--r01.jsonl"))).toBe(
+        true,
+      );
 
       const rejected = spawnSync(process.execPath, command, {
         cwd: REPO_ROOT,

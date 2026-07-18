@@ -1,0 +1,25 @@
+{
+  "id": "lang-defer-block-order",
+  "risk_class": "silent-semantics",
+  "claim_id": "language.defer.block-scope-lifo",
+  "primary_metric": "exact-execution-order",
+  "prompt": "A MoonBit function appends `body-1`, then enters an inner block that appends `inner-body` and has `defer log.push(\"deferred-inner\")`; after the block it appends `body-2`. The outer block registered `deferred-first` before `body-1` and registers `deferred-second` before `body-2`. What is the exact comma-separated log after the function returns? Put only the sequence on the first line, then briefly explain the scope and order.",
+  "discovery": {
+    "skill": "moonbit-language",
+    "reference": "references/control-flow-and-iteration.mbt.md"
+  },
+  "grade": [
+    {
+      "type": "first_line_is",
+      "value": "body-1,inner-body,deferred-inner,body-2,deferred-second,deferred-first"
+    },
+    {
+      "type": "output_matches",
+      "regex": "block"
+    },
+    {
+      "type": "output_matches",
+      "regex": "LIFO|last[- ]in[- ]first[- ]out"
+    }
+  ]
+}

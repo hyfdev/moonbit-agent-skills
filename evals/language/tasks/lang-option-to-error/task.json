@@ -1,6 +1,6 @@
 {
   "id": "lang-option-to-error",
-  "prompt": "Refactor parse_port to use MoonBit's checked error handling (a dedicated error type that the function raises on invalid input) instead of returning an Option. Update the tests accordingly; moon test must pass.",
+  "prompt": "Refactor parse_port to use MoonBit's checked error handling instead of returning an Option. Define `pub(all) suberror PortError { Invalid }`, make parse_port raise that exact error on invalid input, and update the tests accordingly; moon test must pass.",
   "grader_note": "2026-07-17: require the package, implementation, and updated tests to remain and run nonzero hidden valid/invalid behavior checks; deleting files, leaving an unrecognized package, or weakening the rewritten tests previously could pass.",
   "grade": [
     {"type": "file_exists", "path": "moon.mod"},
@@ -8,6 +8,8 @@
     {"type": "file_exists", "path": "lib.mbt"},
     {"type": "file_exists", "path": "lib_test.mbt"},
     {"type": "file_contains", "path": "lib.mbt", "regex": "pub fn\\s+parse_port"},
+    {"type": "file_contains", "path": "lib.mbt", "regex": "pub\\(all\\)\\s+suberror\\s+PortError\\s*\\{\\s*Invalid\\s*\\}"},
+    {"type": "file_not_contains", "path": "lib.mbt", "regex": "parse_port[^\\n]*Int\\?"},
     {"type": "file_contains", "path": "lib_test.mbt", "regex": "parse_port"},
     {"type": "moon", "args": ["check"]},
     {"type": "moon", "args": ["test"]},
@@ -18,7 +20,7 @@
       "args": ["test"],
       "min_tests": 1,
       "temp_files": {
-        "zz_eval_parse_port_test.mbt": "///|\ntest \"grader preserves parse behavior\" {\n  let valid = try parse_port(\"8080\") catch { _ => -1 }\n  assert_eq(valid, 8080)\n  try parse_port(\"80x0\") catch {\n    _ => ()\n  } noraise {\n    _ => fail(\"expected invalid input to raise\")\n  }\n}\n"
+        "zz_eval_parse_port_test.mbt": "///|\nfn grader_expect_invalid(value : String) -> Unit raise {\n  try parse_port(value) catch {\n    PortError::Invalid => ()\n  } noraise {\n    _ => fail(\"expected PortError::Invalid\")\n  }\n}\n\n///|\ntest \"grader preserves parse behavior and boundaries\" {\n  assert_eq(parse_port(\"1\"), 1)\n  assert_eq(parse_port(\"42\"), 42)\n  assert_eq(parse_port(\"9999\"), 9999)\n  assert_eq(parse_port(\"65535\"), 65535)\n  grader_expect_invalid(\"\")\n  grader_expect_invalid(\"0\")\n  grader_expect_invalid(\"65536\")\n  grader_expect_invalid(\"80x0\")\n}\n"
       }
     }
   ]

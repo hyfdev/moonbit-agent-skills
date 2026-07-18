@@ -10,8 +10,15 @@
   },
   "grade": [
     {
-      "type": "first_line_is",
-      "value": "body-1,inner-body,deferred-inner,body-2,deferred-second,deferred-first"
+      "type": "first_line_csv_is",
+      "value": [
+        "body-1",
+        "inner-body",
+        "deferred-inner",
+        "body-2",
+        "deferred-second",
+        "deferred-first"
+      ]
     },
     {
       "type": "output_matches",

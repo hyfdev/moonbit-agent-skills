@@ -139,6 +139,21 @@ describe("content eval grading", () => {
     });
   });
 
+  it("compares comma-separated answer items without grading separator whitespace", () => {
+    temporary("content-grade-", (project) => {
+      const check = {
+        type: "first_line_csv_is",
+        value: ["body-1", "inner-body", "deferred-inner"],
+      };
+      expect(grade(check, project, "`body-1, inner-body,deferred-inner`\nwhy", [], {}).ok).toBe(
+        true,
+      );
+      expect(
+        grade(check, project, "body-1,inner-body,deferred-inner,alternative\nwhy", [], {}).ok,
+      ).toBe(false);
+    });
+  });
+
   it("matches only observed Bash commands", () => {
     temporary("content-grade-", (project) => {
       const check = { type: "command_matches", regex: "moon\\s+test\\s+utils/" };

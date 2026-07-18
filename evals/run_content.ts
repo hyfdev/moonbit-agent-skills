@@ -1179,6 +1179,20 @@ export function grade(
           : "parse error: " + parseError + "; got " + JSON.stringify(first.slice(0, 80))),
     };
   }
+  if (kind === "first_line_csv_is") {
+    const first = normalizedAnswerLines(finalText)[0] ?? "";
+    const actual = first.split(",").map((item) => item.trim());
+    const expected = stringArray(check.value);
+    const ok = isDeepStrictEqual(actual, expected);
+    return {
+      ok,
+      detail:
+        "first_line_csv_is " +
+        JSON.stringify(expected) +
+        " -> " +
+        JSON.stringify(actual),
+    };
+  }
   throw new Error("unknown check type " + JSON.stringify(kind));
 }
 

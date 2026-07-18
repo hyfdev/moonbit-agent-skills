@@ -1,5 +1,38 @@
 # Content eval results
 
+## 2026-07-18 high-risk language matrix
+
+This frozen Kimi/K3 experiment compared the current skill with the pinned historical language skill on eight high-risk tasks, with three paired repetitions per task. It is the last full K3 matrix: future experiments default to one repetition and may add one final repetition only for tasks that show a difference, failure, or prior instability.
+
+| Condition | PASS | Input tokens | Cache-read input | Cache-creation input | Output tokens | Duration |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Historical baseline | 24/24 | 214,484 | 3,838,208 | 0 | 53,498 | 1h 07m 54.4s |
+| Current skill | 23/24 | 237,322 | 3,260,928 | 0 | 44,273 | 59m 32.5s |
+| **Total** | **47/48** | **451,806** | **7,099,136** | **0** | **97,771** | **2h 07m 26.9s** |
+
+| Task | Historical baseline | Current skill | Paired outcome |
+| --- | ---: | ---: | --- |
+| Block-scoped `defer` order | 3/3 | 3/3 | 3 both pass |
+| Current `defer` availability | 3/3 | 3/3 | 3 both pass |
+| Default trait-method discovery | 3/3 | 3/3 | 3 both pass |
+| Selected trait-method discovery | 3/3 | 3/3 | 3 both pass |
+| Explicit `extend` migration | 3/3 | 3/3 | 3 both pass |
+| Immutable constructor migration | 3/3 | 3/3 | 3 both pass |
+| Flat labelled JSON layout | 3/3 | 3/3 | 3 both pass |
+| Functional `loop` status and replacement | 3/3 | 2/3 | 2 both pass; 1 baseline only |
+
+The run did not establish a correctness improvement: seven tasks tied and the historical baseline won one repetition of one task. The current-minus-baseline mean task pass-rate difference was -4.17 percentage points, with a task-clustered 95% interval of -12.5 to 0 points and an exact task sign-test p-value of 1.0. The single current-skill failure correctly called `loop` deprecated and named multi-binding `for`, but supplied only `nobreak` and omitted the required explicit `break` replacement. The client exited normally, the cell was analysis-eligible, and the frozen grader correctly rejected it.
+
+The current skill did improve reference discovery even though final outcomes were at or near ceiling:
+
+| Discovery metric across four routed tasks | Historical baseline | Current skill |
+| --- | ---: | ---: |
+| Language skill loaded successfully | 3/12 | 6/12 |
+| Target reference read | 7/12 | 11/12 |
+| Target reference read before action | 3/12 | 11/12 |
+
+All 24 pairs were complete and eligible. Every cell emitted `k3` through Kimi Code 0.26.0; model mismatches, execution-signature mismatches, missing pairs, invalid pairs, timeouts, nonzero exits, and summary errors were all zero. Among the 23 both-pass pairs, median duration was 151.5 seconds for the historical baseline and 126.8 seconds for the current skill; median total tokens were 157,332 and 151,397 respectively. These efficiency figures are descriptive because the experiment was powered for large regressions, not small latency or token differences.
+
 ## 2026-07-18 frozen paired runs
 
 The current language skill was compared with a purpose-built route ablation that removes only explicit top-level `extend` guidance while preserving the trait/generics route and every reference byte-for-byte. Tasks, skill trees, the derived ablation, runner files, actual model, and condition order were frozen before calls.
@@ -18,7 +51,7 @@ No run established a task-outcome improvement. The Kimi primary tasks did show a
 | Target reference read | 6/6 | 4/6 | 2 | 0 |
 | Target reference read before action | 5/6 | 2/6 | 3 | 0 |
 
-The top-level route may help Kimi reach the correct reference earlier, but the final tasks hit a 100% ceiling in both conditions. Kimi used 4,378,948 input tokens, including 4,129,024 cache-read tokens, and 56,056 output tokens across 24 cells; total cell time was 58.9 minutes. All cells emitted `k3` through provider Kimi with alias `kimi-code/k3`; there were no missing pairs, model mismatches, timeouts, or nonzero client exits. The four DeepSeek cells used 66,638 input tokens, 468,480 cache-read input tokens, and 14,954 output tokens over 132.5 seconds. They emitted `deepseek-v4-flash` and likewise had no client errors, timeouts, or model exclusions.
+The top-level route may help Kimi reach the correct reference earlier, but the final tasks hit a 100% ceiling in both conditions. The 24 Kimi cells used 249,924 input tokens, 4,129,024 cache-read input tokens, 0 cache-creation input tokens, and 56,056 output tokens; total cell time was 58.9 minutes. All cells emitted `k3` through provider Kimi with alias `kimi-code/k3`; there were no missing pairs, model mismatches, timeouts, or nonzero client exits. The four DeepSeek cells used 66,638 input tokens, 468,480 cache-read input tokens, 0 cache-creation input tokens, and 14,954 output tokens over 132.5 seconds. They emitted `deepseek-v4-flash` and likewise had no client errors, timeouts, or model exclusions.
 
 Before measurement, 11 grader contracts exercised one canonical correct answer and at least two plausible wrong answers per task. After model answers exposed additional valid wording, the final contract suite contains 41/41 passing cases. Measurements affected by an earlier grader or ablation definition are excluded rather than repaired in place.
 

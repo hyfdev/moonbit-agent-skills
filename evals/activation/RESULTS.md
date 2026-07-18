@@ -20,9 +20,8 @@ This four-prompt Kimi/K3 run verifies the real-client path after activation inpu
 | Observed model | `k3` in 4/4 cells |
 | Prompt snapshot | 4 prompts, SHA-256 `7781534b…74060` |
 | Skill snapshot | 33 files, aggregate SHA-256 `a15cb798…9960` |
-| Usage | 157,378 input tokens, including 141,312 cache-read; 931 output tokens |
+| Usage | 16,066 input; 141,312 cache-read input; 0 cache-creation input; 931 output tokens |
 | Total cell time | 110.5 seconds |
-| Access mode | Kimi subscription |
 
 The run manifest also pins the activation runner and shared client parser hashes. All four cells materialized their catalog from the frozen snapshot rather than the live worktree.
 

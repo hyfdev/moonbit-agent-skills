@@ -67,7 +67,7 @@ claude -p "$PROMPT" \
   --max-budget-usd "$REMAINING_API_BUDGET_USD"
 ```
 
-Set the workspace with the TypeScript child-process `cwd` and give every cell a fresh `CLAUDE_CONFIG_DIR`. Do not use `--continue` or `--resume`. Do not use `--safe-mode` or `--disable-slash-commands` in activation/content evals because both disable skills. `--tools` determines which tools exist; `--allowedTools` only pre-approves permission and is not a substitute.
+For activation and content, set the workspace with the TypeScript child-process `cwd`, give every cell a fresh `CLAUDE_CONFIG_DIR`, and do not use `--continue` or `--resume`. Do not use `--safe-mode` or `--disable-slash-commands` because both disable skills. `--tools` determines which tools exist; `--allowedTools` only pre-approves permission and is not a substitute.
 
 Parse these fields separately. Persist only the token, timing, model/client, tool, status, and error fields:
 

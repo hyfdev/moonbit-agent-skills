@@ -45,6 +45,7 @@ Full tables: evals/activation/RESULTS.md and evals/RESULTS.md (runs of 2026-07-1
 - The first forced-content runs exposed a separate harness error: relative reference paths in injected instructions lacked an explicit skill root. Forced language, forced toolchain, and the H4 pair were rerun after the prompt named `.claude/skills/<skill>`; the corrected H4 treatment visibly read the negative guide.
 - Final review tightened command-result, source-isolation, package-preservation, nonzero-test, resume, answer-detail, and hidden-behavior checks after the model calls. Stored final answers and full transcripts were deterministically re-audited; Option and JS FFI workspaces were reconstructed from their edit traces, and migration behavior was checked against the preserved implementation. The JS runtime test changed primary official and Sonnet-requested `ours` from PASS to FAIL; no other classification changed. These post-run checks are audit evidence rather than fresh stochastic samples.
 - Runtime disclosure: this Claude Code environment reported the requested Haiku/Sonnet model and `deepseek-v4-flash` together in `modelUsage`, with visible assistant stream events naming DeepSeek. These are client-stack results, not isolated single-model API results.
+- Frozen Kimi high-risk matrix: the pinned historical baseline passed 24/24 paired cells and the current skill passed 23/24. Seven of eight tasks tied; on one `loop` repetition the current condition correctly said `DEPRECATED` and named multi-binding `for` but omitted the required explicit `break` replacement. All 24 pairs were eligible, with no model/signature mismatch, timeout, or client error. Across four routed tasks, reference-read-before-action increased from 3/12 to 11/12, so the current routing made the intended knowledge substantially easier to find without establishing a final correctness lift.
 
 ## Conclusions
 
@@ -58,6 +59,8 @@ Grounded strictly in the runs above; scope: one client, one full requested-model
 6. **H6 is observationally consistent with the results, but its causal claim is untested.** The no-skill agent used `moon` and passed all nine executable tasks while failing both knowledge-only questions. The prompts themselves required successful checks or builds, and there is no no-tool control, so the run shows self-correction in transcripts but cannot attribute it to the skill's compiler-oracle instruction.
 
 Honest overall read: verified content adds clear value where the ground truth moved and the task does not force an executable check. Compiler and CLI feedback are sufficient for many actionable tasks even without skills. Discovery remains sparse, but its measured consequence is concentrated in the knowledge-only cases that bare-handed execution cannot repair.
+
+The later frozen Kimi matrix narrows that claim: better retrieval is not itself evidence of better task outcomes. The current skill reached the routed reference before action in 11/12 discovery cells versus 3/12 for the historical baseline, while final correctness tied on seven tasks and lost one repetition on the eighth. Future iterations therefore start with one paired repetition only and add at most one second repetition only to tasks that show a difference, failure, or known instability; repeating a full ceilinged matrix does not create evidence of value.
 
 ## Transferability
 

@@ -17,22 +17,22 @@ node evals/run_content.ts --area language --condition none --dry-run
 node evals/reporting/run_reporting.ts --dry-run
 
 # Prompted routing/classification eval on the subscription client.
-node evals/activation/run_activation.ts --client kimi-code --model kimi-code/k3 --mode routing --repetitions 3 --run-name routing-kimi-k3
+node evals/activation/run_activation.ts --client kimi-code --model kimi-code/k3 --mode routing --repetitions 1 --run-name routing-kimi-k1
 
 # Independent API prompted-routing check; pass a runtime-only total budget.
 node evals/activation/run_activation.ts --client claude-code --model haiku --mode routing --repetitions 1 --paid-budget-usd "$EVAL_BUDGET_USD" --run-name routing-deepseek-flash
 
-# Subscription content comparison with paired AB/BA repetitions.
-node evals/run_content.ts --area language --condition baseline --condition ours --client kimi-code --model kimi-code/k3 --repetitions 3 --max-turns 50 --run-name language-kimi-k3
+# Subscription content comparison with paired AB/BA ordering across tasks.
+node evals/run_content.ts --area language --condition baseline --condition ours --client kimi-code --model kimi-code/k3 --repetitions 1 --max-turns 50 --run-name language-kimi-k1
 
-# Preferred: run a checked-in experiment manifest that freezes tasks, task groups, conditions, repetitions, primary metric, effect threshold, and stopping rule.
+# Replay a checked-in frozen historical experiment. Existing K3 manifests preserve old evidence; new experiments default to one repetition and must not exceed two.
 node evals/run_content.ts --experiment evals/experiments/extend-route-kimi-k3.json
 
 # Prove canonical solutions pass and plausible wrong solutions fail before any model calls.
 node evals/validate_graders.ts
 
-# Discoverability comparison. Use two fresh runs with reversed condition order.
-node evals/run_content.ts --area language --ids lang-discover-selected-trait-method,lang-discover-default-trait-method --condition ours-no-top-level-extend --condition ours --client kimi-code --model kimi-code/k3 --repetitions 3 --max-turns 30 --run-name language-reference-discovery
+# Discoverability comparison; the runner alternates condition order across tasks.
+node evals/run_content.ts --area language --ids lang-discover-selected-trait-method,lang-discover-default-trait-method --condition ours-no-top-level-extend --condition ours --client kimi-code --model kimi-code/k3 --repetitions 1 --max-turns 30 --run-name language-reference-discovery
 
 # Targeted H4 ablation.
 node evals/run_content.ts --area language --ids lang-fix-rust-habits --condition forced-language-no-cross-language --client claude-code --model haiku --paid-budget-usd "$EVAL_BUDGET_USD" --max-turns 50 --run-name h4-no-cross-language

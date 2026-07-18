@@ -65,7 +65,9 @@ Use the task as the unit of inference:
 
 Assertions within one scenario are correlated checks, not independent samples. Report a reporting suite with three scenarios as `n=3`, even when it contains twenty-nine assertions.
 
-Two or three repetitions are enough to screen for large effects and regressions, not to establish a small general improvement. Predeclare the smallest difference worth acting on. If the interval crosses zero or no task favors current, say that the result did not establish improvement.
+One repetition per condition is the default. Add one final repetition only for a task whose first pair shows a condition difference, a valid task failure, or instability already established by prior evidence. Two repetitions per task and condition are the hard maximum: never run a third repetition, never repeat unaffected tasks, and do not add repetitions merely because every condition passed or the first pass found no effect. A transport-invalid cell may be resumed to complete its original pair; that is recovery, not an extra repetition.
+
+Two repetitions can screen for large effects and regressions; they cannot establish a small general improvement. Predeclare the smallest difference worth acting on. If the interval crosses zero or no task favors current, say that the result did not establish improvement.
 
 ## Activation protocol
 
@@ -76,7 +78,7 @@ Maintain two activation measurements:
 
 Use realistic near-boundary prompts: FFI declaration versus JS link configuration, a source-level `using` declaration versus package imports, a test block versus selecting a test command, and a task that legitimately needs both product skills. Negative prompts about unrelated languages or moon phases are only sanity checks; they do not test the product boundary well.
 
-Keep a held-out prompt set when tuning descriptions. Run old and new descriptions in the same batch, with the same catalog and actual model, for multiple paired repetitions. A one-off historical snapshot is observation, not attribution.
+Keep a held-out prompt set when tuning descriptions. Run old and new descriptions in the same batch, with the same catalog and actual model. Start with one paired repetition and add at most one second repetition only for prompts with a routing difference, valid failure, or known instability. A one-off historical snapshot is observation, not attribution.
 
 ## Budget and stopping rules
 
@@ -85,10 +87,13 @@ Kimi subscription runs use a predeclared maximum cell count, wall timeout, and s
 Use this sequence:
 
 1. Run all deterministic verification and grader contracts for free.
-2. Use Kimi/K3 once per condition to remove broken, trivial, or universally passing tasks.
-3. Run the retained Kimi paired experiment for two or three repetitions.
-4. Before looking at Claude results, freeze a small cross-check subset and its stopping rule.
-5. Run Claude/DeepSeek Flash on that subset; use Pro only for predeclared disagreements or unstable cells.
+2. Map the changed files and claims to the smallest affected task set. Historical results show regression history but are not a causal baseline; rerun both conditions for each selected task in the same batch.
+3. Use Kimi/K3 once per condition. Stop when valid pairs agree and no task has a predeclared instability signal; universal PASS is a result, not a reason to repeat the matrix.
+4. Add a second and final repetition only to signaled tasks. Do not promote an unaffected task or the entire matrix to a second repetition.
+5. Before looking at Claude results, freeze a small cross-check subset and its stopping rule.
+6. Run Claude/DeepSeek Flash on that subset; use Pro only for predeclared disagreements or unstable cells.
+
+For an ordinary iteration, predeclare at most 12 model cells and an estimated wall time of at most 45 minutes. Derive the estimate from the latest matching local run; if no comparable timing exists, run one task pair as a pilot and re-plan before expanding. If either limit is exceeded, split the experiment and run the highest-risk claims first. A full matrix is reserved for establishing the first baseline, a change spanning multiple task groups, or a release checkpoint, and even then it starts with one repetition rather than a full repeated matrix.
 
 Do not add model evals to CI. Parser, schema, statistics, and grader-contract tests belong in the ordinary TypeScript test suite; stochastic model calls remain explicit local experiments with checked-in result summaries.
 

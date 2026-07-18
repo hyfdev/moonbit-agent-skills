@@ -361,6 +361,22 @@ describe("content eval grading", () => {
     });
   });
 
+  it("accepts equivalent block lifetime wording for defer", () => {
+    const checks = task("language", "lang-defer-exists").grade;
+    temporary("content-grade-", (project) => {
+      const allPass = (text: string): boolean =>
+        checks.every((check) => grade(check, project, text, [], {}).ok);
+      expect(
+        allPass(
+          "YES\nScoping is lexical and block-based, not function-based: a defer runs when its block exits.",
+        ),
+      ).toBe(true);
+      expect(allPass("YES\nIt is not block-based; every defer waits for function return.")).toBe(
+        false,
+      );
+    });
+  });
+
   it("accepts harmless Markdown around an exact first-line answer", () => {
     temporary("content-grade-", (project) => {
       const check = { type: "first_line_is", value: "YES" };

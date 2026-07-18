@@ -1,7 +1,7 @@
 {
   "id": "lang-discover-default-trait-method",
-  "prompt": "`Item` implements the required part of `Describer`; the reusable `describe` body remains on the trait. Expose only that default operation as a public dot-call method for downstream packages, so callers can write `item.describe()`, while `name` stays trait-qualified. I do not know what MoonBit calls the declaration; find the current syntax. Keep the default body on the trait and pass checks/tests with warnings denied.",
-  "grader_note": "2026-07-18: discoverability regression whose clean starter exposes only qualified calls; hidden tests require the public default method while an independent E4015 check proves the required method stays trait-qualified.",
+  "prompt": "`Item` implements the required part of `Describer`; the reusable `describe` body remains on the trait. Expose only that default operation as a public dot-call method for downstream packages, so callers can write `item.describe()`, while `name` stays trait-qualified. I do not know what MoonBit calls the declaration; find the current syntax. Keep the default body, the public `describe_qualified` wrapper, and its existing consumer test unchanged, then pass checks/tests with warnings denied.",
+  "grader_note": "2026-07-18: discoverability regression whose clean starter exposes only qualified calls; hidden tests require the public default method while an independent E4015 check proves the required method stays trait-qualified. The prompt explicitly preserves the qualified wrapper because an earlier discarded cell removed it despite a hidden wrapper check.",
   "discovery": {
     "skill": "moonbit-language",
     "reference": "references/traits-and-generics.mbt.md"

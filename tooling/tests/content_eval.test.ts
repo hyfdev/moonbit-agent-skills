@@ -351,13 +351,11 @@ describe("content eval grading", () => {
       expect(allPass("DEPRECATED\nUse the multi-binding for form with break.")).toBe(true);
       expect(allPass("DEPRECATED\nReplace with for state binders and explicit break.")).toBe(true);
       expect(
-        allPass(
-          "DEPRECATED\nReplacement: `for acc = 0, v = xs { ... }` with explicit `break`.",
-        ),
+        allPass("DEPRECATED\nReplacement: `for acc = 0, v = xs { ... }` with explicit `break`."),
       ).toBe(true);
-      expect(
-        allPass("DEPRECATED\nReplace with `for acc = 0; acc < 10; acc += 1` and break."),
-      ).toBe(false);
+      expect(allPass("DEPRECATED\nReplace with `for acc = 0; acc < 10; acc += 1` and break.")).toBe(
+        false,
+      );
     });
   });
 

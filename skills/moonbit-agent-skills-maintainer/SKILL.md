@@ -5,7 +5,8 @@ license: MIT
 user-invocable: true
 compatibility: Repository-maintenance workflow for hyfdev/moonbit-agent-skills. Needs Git, Node.js 24+, Vite+, and the MoonBit toolchain for executable verification.
 metadata:
-  skill-version: "0.2.1"
+  skill-version: "0.2.2"
+  updated-date: "2026-07-19"
   scope: "repository-maintenance"
   internal: true
 ---
@@ -30,8 +31,9 @@ This workflow exists because testing only written claims cannot detect omitted k
 6. Add checked documentation or fixtures for language behavior, command-manifest entries or fixtures for project behavior, and explicit `Documented, not executed` text plus a direct source for facts the environment cannot execute.
 7. Treat deprecations as migrations: remove the old recommendation, enable the warning, add `--deny-warn`, prove the old form is caught, and prove the replacement passes under the same settings. A documented-only deprecation still needs separate old-form and replacement evidence and the reason execution is unavailable.
 8. Add a deterministic content eval for each change that materially alters agent behavior. Follow `references/evaluation.md`: prove the grader with correct and wrong solutions, prefer silent-semantic risks over compiler-self-correcting tasks, and start with one paired AB/BA pass on DeepSeek Pro. Add at most one second repetition, only when the current-skill cell fails or the pair is unstable; use one Kimi fallback pair only if the current-skill cell fails again. Never run a third repetition or repeat unaffected tasks. When evaluating discoverability, use a clean task that does not expose the answer through compiler diagnostics and compare the current skill with a byte-identical purpose-built ablation of the route under test; use a historical tree only when the whole historical skill is the intended variable. Report the result in two layers: a short user-facing comparison first and the complete technical evidence second.
-9. Run `vp run check-release-coverage` and `vp run check-language-surface`. In update mode, do not change toolchain pins, fixture stamps, skill pins, or README status until both completeness gates close.
-10. Run the full repository check sequence from `AGENTS.md`, all relevant pinned targets, targeted model evals, and the required independent reviews.
+9. Treat each skill's version as its installed content identity. Whenever files inside a skill directory change, increment `metadata.skill-version` using SemVer and set `metadata.updated-date` to the change date: patch for corrections or metadata, minor for new compatible coverage, and major for an incompatible rename or scope change. Change `metadata.verified-date` only after rerunning the pinned verification. Keep the public README status in sync; `validate-skills` checks the metadata format and README projection.
+10. Run `vp run check-release-coverage` and `vp run check-language-surface`. In update mode, do not change toolchain pins, fixture stamps, skill pins, or README status until both completeness gates close.
+11. Run the full repository check sequence from `AGENTS.md`, all relevant pinned targets, targeted model evals, and the required independent reviews.
 
 ## Completion output
 

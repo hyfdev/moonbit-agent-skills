@@ -5,7 +5,8 @@ license: MIT
 user-invocable: false
 compatibility: Verified only against moon 0.1.20260713 and moonrun 0.1.20260713 (MoonBit v0.10.4, 2026-07-13), Linux x86_64. Network needed for dependency and registry operations; Node.js 24+ runs the bundled environment-report helper.
 metadata:
-  skill-version: "0.3.0"
+  skill-version: "0.3.1"
+  updated-date: "2026-07-19"
   moon-version: "0.1.20260713"
   moonrun-version: "0.1.20260713"
   moonbit-release: "0.10.4"

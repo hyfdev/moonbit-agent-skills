@@ -17,10 +17,14 @@ Agent Skills for MoonBit. Help coding agents work with MoonBit and write better 
 
 ## Skills
 
-| Skill | Role | Scope |
-| --- | --- | --- |
-| [moonbit-language](skills/moonbit-language/SKILL.md) | Language reference | Understanding, writing, and fixing MoonBit code: syntax, types, patterns, traits, errors, async, tests, and FFI. |
-| [moonbit-toolchain](skills/moonbit-toolchain/SKILL.md) | Toolchain reference | Creating and operating MoonBit projects: `moon` commands, `moon.mod` / `moon.pkg`, dependencies, targets, testing, workspaces, publishing, and IDE queries. |
+| Skill | Version | Updated | MoonBit | Verified |
+| --- | ---: | ---: | ---: | ---: |
+| [moonbit-language](skills/moonbit-language/SKILL.md) | [`0.3.1`](https://github.com/hyfdev/moonbit-agent-skills/commits/main/skills/moonbit-language) | 2026-07-19 | `0.10.4` | 2026-07-18 |
+| [moonbit-toolchain](skills/moonbit-toolchain/SKILL.md) | [`0.3.1`](https://github.com/hyfdev/moonbit-agent-skills/commits/main/skills/moonbit-toolchain) | 2026-07-19 | `0.10.4` | 2026-07-18 |
+
+`moonbit-language` is the language reference for understanding, writing, and fixing MoonBit code: syntax, types, patterns, traits, errors, async, tests, and FFI.
+
+`moonbit-toolchain` is the toolchain reference for creating and operating MoonBit projects: `moon` commands, `moon.mod` / `moon.pkg`, dependencies, targets, testing, workspaces, publishing, and IDE queries.
 
 ## Install
 
@@ -48,6 +52,22 @@ Clone or download this repository, then copy either or both skill directories in
 - `skills/moonbit-toolchain`
 
 </details>
+
+### Update
+
+Update both globally installed skills:
+
+```sh
+npx skills@latest update moonbit-language moonbit-toolchain -g
+```
+
+For project-level installations:
+
+```sh
+npx skills@latest update moonbit-language moonbit-toolchain -p
+```
+
+Installed `SKILL.md` files carry the same version, update date, and verification date shown above.
 
 ## How to use
 

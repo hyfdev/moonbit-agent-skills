@@ -14,8 +14,15 @@ import {
   parseComponent,
   VERSION_RE,
 } from "../snapshot_toolchain.ts";
-import { NAME_RE, validateSkill } from "../validate_skills.ts";
-import { parseFrontmatter } from "../lib/frontmatter.ts";
+import {
+  isIsoDate,
+  NAME_RE,
+  readmeCatalogProblems,
+  readmeStatusRow,
+  SKILL_VERSION_RE,
+  validateSkill,
+} from "../validate_skills.ts";
+import { parseFrontmatter, stringMap } from "../lib/frontmatter.ts";
 import { parseCliArgs } from "../lib/cli.ts";
 import { normalizeOsName } from "../lib/platform.ts";
 import type { CommandRunner } from "../lib/process.ts";
@@ -120,6 +127,7 @@ describe("frontmatter", () => {
         "description: Does things. Use when things need doing.\n" +
         "metadata:\n" +
         '  skill-version: "0.1.0"\n' +
+        "  updated-date: 2026-07-18\n" +
         "  verified-date: 2026-07-17\n" +
         "---\n" +
         "# Body\n",
@@ -128,6 +136,7 @@ describe("frontmatter", () => {
     expect(parsed.frontmatter.name).toBe("my-skill");
     expect(parsed.frontmatter.metadata).toEqual({
       "skill-version": "0.1.0",
+      "updated-date": "2026-07-18",
       "verified-date": "2026-07-17",
     });
     expect(parsed.body.startsWith("# Body")).toBe(true);
@@ -156,6 +165,32 @@ describe("skill names", () => {
   });
 });
 
+describe("skill freshness metadata", () => {
+  it("accepts SemVer skill versions and real ISO dates", () => {
+    expect(SKILL_VERSION_RE.test("0.3.1")).toBe(true);
+    expect(SKILL_VERSION_RE.test("2026.07.19")).toBe(false);
+    expect(isIsoDate("2026-07-19")).toBe(true);
+    expect(isIsoDate("2026-02-30")).toBe(false);
+  });
+
+  it("keeps the public README status synchronized with installed metadata", () => {
+    const skillDirectories = [
+      join(REPO_ROOT, "skills", "moonbit-language"),
+      join(REPO_ROOT, "skills", "moonbit-toolchain"),
+    ];
+    const readme = readFileSync(join(REPO_ROOT, "README.md"), "utf8");
+    expect(readmeCatalogProblems(readme, skillDirectories)).toEqual([]);
+    const languageSkill = readFileSync(join(skillDirectories[0], "SKILL.md"), "utf8");
+    const metadata = stringMap(parseFrontmatter(languageSkill).frontmatter, "metadata") ?? {};
+    const currentRow = readmeStatusRow("moonbit-language", metadata);
+    const staleRow = currentRow.replace(metadata["skill-version"], "stale");
+    const staleTableWithCorrectRowElsewhere = `${readme.replace(currentRow, staleRow)}\n${currentRow}\n`;
+    expect(readmeCatalogProblems(staleTableWithCorrectRowElsewhere, skillDirectories)).toContain(
+      "README: moonbit-language status does not match SKILL.md metadata",
+    );
+  });
+});
+
 it("requires repository-maintenance skills to stay internal", () => {
   const temporary = mkdtempSync(join(tmpdir(), "internal-skill-test-"));
   try {
@@ -163,7 +198,7 @@ it("requires repository-maintenance skills to stay internal", () => {
     mkdirSync(skill);
     writeFileSync(
       join(skill, "SKILL.md"),
-      "---\nname: release-maintainer\ndescription: Maintain releases.\nmetadata:\n  skill-version: 0.1.0\n  scope: repository-maintenance\n---\n# Maintainer\n",
+      "---\nname: release-maintainer\ndescription: Maintain releases.\nmetadata:\n  skill-version: 0.1.0\n  updated-date: 2026-07-19\n  scope: repository-maintenance\n---\n# Maintainer\n",
     );
     expect(validateSkill(skill)).toContain(
       "release-maintainer: repository-maintenance skills must set metadata.internal: true",
@@ -171,7 +206,7 @@ it("requires repository-maintenance skills to stay internal", () => {
 
     writeFileSync(
       join(skill, "SKILL.md"),
-      "---\nname: release-maintainer\ndescription: Maintain releases.\nmetadata:\n  skill-version: 0.1.0\n  scope: repository-maintenance\n  internal: true\n---\n# Maintainer\n",
+      "---\nname: release-maintainer\ndescription: Maintain releases.\nmetadata:\n  skill-version: 0.1.0\n  updated-date: 2026-07-19\n  scope: repository-maintenance\n  internal: true\n---\n# Maintainer\n",
     );
     expect(validateSkill(skill)).not.toContain(
       "release-maintainer: repository-maintenance skills must set metadata.internal: true",

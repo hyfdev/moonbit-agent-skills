@@ -1,0 +1,37 @@
+{
+  "area": "language",
+  "task": "lang-regex-whole-identifier",
+  "cases": [
+    {
+      "name": "requires-an-empty-prefix-and-suffix",
+      "expected": "pass",
+      "files": {
+        "lib.mbt": "///|\nconst IDENTIFIER = re\"[A-Za-z_][A-Za-z0-9_]*\"\n\n///|\npub fn is_identifier(text : String) -> Bool {\n  guard text =~ (IDENTIFIER, before=head, after=tail) else {\n    return false\n  }\n  head == \"\" && tail == \"\"\n}\n"
+      }
+    },
+    {
+      "name": "accepts-any-matching-substring",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "///|\nconst IDENTIFIER = re\"[A-Za-z_][A-Za-z0-9_]*\"\n\n///|\npub fn is_identifier(text : String) -> Bool {\n  guard text =~ (IDENTIFIER) else { return false }\n  true\n}\n"
+      },
+      "must_fail_check_types": ["moon"]
+    },
+    {
+      "name": "requires-only-an-empty-prefix",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "///|\nconst IDENTIFIER = re\"[A-Za-z_][A-Za-z0-9_]*\"\n\n///|\npub fn is_identifier(text : String) -> Bool {\n  guard text =~ (IDENTIFIER, before=head, after=_) else {\n    return false\n  }\n  head == \"\"\n}\n"
+      },
+      "must_fail_check_types": ["moon"]
+    },
+    {
+      "name": "hard-codes-only-the-visible-valid-examples",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "///|\npub fn is_identifier(text : String) -> Bool {\n  text == \"name\" || text == \"_x2\"\n}\n"
+      },
+      "must_fail_check_types": ["moon"]
+    }
+  ]
+}

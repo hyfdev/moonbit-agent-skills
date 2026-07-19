@@ -55,27 +55,44 @@ Use your coding agent as usual—no special prompts or manual invocation require
 
 ## Evaluation
 
-Results across two content evaluations:
+### MoonBit language
 
-| What the agent had to do | Observed model | Compared with | Comparison | With current skills |
-| --- | --- | --- | ---: | ---: |
-| Complete 8 high-risk MoonBit language tasks | Kimi K3 | Historical skill | **100%** | 96% |
-| Complete 11 language, toolchain, and integration tasks | DeepSeek Flash | No skills | 82% | **100%** |
+#### Current syntax and migration
 
-Each high-risk task ran three times. The current skill tied the historical skill on 7 of 8 tasks and missed one `loop`-replacement run. In the 11-task evaluation, the current skills corrected `defer` availability and the current `loop` replacement; the other 9 tasks tied.
+| What the agent had to do | Without skills | With skills |
+| --- | ---: | ---: |
+| Keep a generic clamp API type-safe | 100% | 100% |
+| Recognize that `defer` is available | 0% | **100%** |
+| Replace Rust-style syntax with MoonBit equivalents | 100% | 100% |
+| Replace deprecated functional `loop` with the current multi-binding `for` form | 0% | **100%** |
+| Convert an `Option`-returning parser to checked errors | 100% | 100% |
+| **Overall** | **60%** | **100%** |
 
-MoonBit v0.10.4 introduced `extend` for explicitly exposing trait methods as dot-call APIs.
+#### Language behavior and public APIs
 
-The focused comparison covered 2 distinct tasks: letting downstream callers use one implemented trait method as a dot call and doing the same for one default trait method. It compared the current skills with the same skills after removing only the top-level `extend` guidance.
+| What the agent had to do | Without skills | With skills |
+| --- | ---: | ---: |
+| Preserve old constructor calls after changing a wrapper into an enum | 100% | 100% |
+| Make an iterator prepare only the items that callers consume | 100% | 100% |
+| Re-export a function, type, and trait without changing their identities | 100% | 100% |
+| Return typed errors for invalid packets and continue decoding | 100% | 100% |
+| **Overall** | **100%** | **100%** |
 
-| What the agent had to do | Observed model | Without top-level `extend` guidance | With current skills |
-| --- | --- | ---: | ---: |
-| Let downstream callers use one implemented trait method as a dot call | Kimi K3 | 100% | 100% |
-| Let downstream callers use one default trait method as a dot call | Kimi K3 | 100% | 100% |
-| Let downstream callers use one implemented trait method as a dot call | DeepSeek Flash | 100% | 100% |
-| Let downstream callers use one default trait method as a dot call | DeepSeek Flash | 100% | 100% |
+The different outcomes were `defer` availability and the current replacement for deprecated functional `loop`.
 
-Across the 6 Kimi runs, the target `extend` reference was read before a later code change 33% of the time without the top-level guidance and 83% with the current skills. This was a discovery improvement; final task success tied. Results use objective graders and preserve failed runs. See the [full content results](evals/RESULTS.md) and [activation results](evals/activation/RESULTS.md).
+### MoonBit toolchain
+
+| What the agent had to do | Without skills | With skills |
+| --- | ---: | ---: |
+| Test every configured backend with `--target all` | 100% | 100% |
+| Generate a MoonBit ESM library that Node can import by named export | 0% | **100%** |
+| Run both on-disk and virtual tests supplied by `--patch-file` | 100% | 100% |
+| Select a virtual-package provider without changing the default consumer | 100% | 100% |
+| **Overall** | **75%** | **100%** |
+
+The ESM named-export task was the only different outcome: without skills it failed, and with skills it passed.
+
+See the [full evaluation results](evals/RESULTS.md) for models, prompts, grading, and run details. Activation is measured [separately](evals/activation/RESULTS.md).
 
 ## FAQ
 

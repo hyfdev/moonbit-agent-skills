@@ -1,0 +1,45 @@
+{
+  "area": "language",
+  "task": "lang-facade-reexport",
+  "cases": [
+    {
+      "name": "reexports-function-type-and-trait",
+      "expected": "pass",
+      "files": {
+        "facade/api.mbt": "pub using @origin {\n  open_handle,\n  type Handle,\n  trait Service,\n}\n\n///|\npub fn facade_service_id(id : Int) -> Int {\n  let handle : Handle = open_handle(id)\n  Service::service_id(handle)\n}\n"
+      }
+    },
+    {
+      "name": "keeps-all-selected-imports-private",
+      "expected": "fail",
+      "files": {
+        "facade/api.mbt": "using @origin {open_handle, trait Service, type Handle}\n\n///|\npub fn facade_service_id(id : Int) -> Int {\n  let handle : Handle = open_handle(id)\n  Service::service_id(handle)\n}\n"
+      },
+      "must_fail_check_types": ["file_contains", "moon"]
+    },
+    {
+      "name": "reexports-only-the-function",
+      "expected": "fail",
+      "files": {
+        "facade/api.mbt": "pub using @origin {open_handle}\nusing @origin {trait Service, type Handle}\n\n///|\npub fn facade_service_id(id : Int) -> Int {\n  let handle : Handle = open_handle(id)\n  Service::service_id(handle)\n}\n"
+      },
+      "must_fail_check_types": ["file_contains", "moon"]
+    },
+    {
+      "name": "leaves-the-trait-private",
+      "expected": "fail",
+      "files": {
+        "facade/api.mbt": "pub using @origin {open_handle, type Handle}\nusing @origin {trait Service}\n\n///|\npub fn facade_service_id(id : Int) -> Int {\n  let handle : Handle = open_handle(id)\n  Service::service_id(handle)\n}\n"
+      },
+      "must_fail_check_types": ["file_contains", "moon"]
+    },
+    {
+      "name": "gates-the-reexport-and-duplicates-the-api",
+      "expected": "fail",
+      "files": {
+        "facade/api.mbt": "#cfg(target=\"js\")\npub using @origin {open_handle, trait Service, type Handle}\n\n///|\n#cfg(not(target=\"js\"))\npub type Handle = @origin.Handle\n\n///|\n#cfg(not(target=\"js\"))\npub trait Service {\n  service_id(Self) -> Int\n}\n\n///|\n#cfg(not(target=\"js\"))\npub impl Service for Handle with service_id(self) {\n  @origin.Service::service_id(self)\n}\n\n///|\n#cfg(not(target=\"js\"))\npub fn open_handle(id : Int) -> Handle {\n  @origin.open_handle(id)\n}\n\n///|\npub fn facade_service_id(id : Int) -> Int {\n  let handle : Handle = open_handle(id)\n  Service::service_id(handle)\n}\n"
+      },
+      "must_fail_check_types": ["file_not_contains", "moon"]
+    }
+  ]
+}

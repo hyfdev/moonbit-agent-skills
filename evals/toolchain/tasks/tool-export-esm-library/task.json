@@ -1,0 +1,59 @@
+{
+  "id": "tool-export-esm-library",
+  "risk_class": "build-success-without-host-export",
+  "claim_id": "toolchain.targets.js-esm-library-export",
+  "primary_metric": "node-imports-generated-named-export",
+  "prompt": "A Node ESM consumer must import the existing MoonBit `add` function as a named export from the generated JS artifact. `moon build --target js` currently exits successfully but does not produce a usable library module. Configure the MoonBit package so the generated artifact exports `add`; do not change `lib.mbt` or add a handwritten JavaScript wrapper.",
+  "discovery": {
+    "skill": "moonbit-toolchain",
+    "reference": "references/targets-and-conditional-builds.md"
+  },
+  "grade": [
+    {
+      "type": "file_contains",
+      "path": "moon.pkg",
+      "regex": "options\\([\\s\\S]*link\\s*:"
+    },
+    {
+      "type": "file_contains",
+      "path": "moon.pkg",
+      "regex": "\\\"exports\\\"\\s*:\\s*\\[\\s*\\\"add\\\"\\s*\\]"
+    },
+    {
+      "type": "file_contains",
+      "path": "moon.pkg",
+      "regex": "\\\"format\\\"\\s*:\\s*\\\"esm\\\""
+    },
+    {
+      "type": "file_contains",
+      "path": "lib.mbt",
+      "regex": "pub fn\\s+add\\(a\\s*:\\s*Int,\\s*b\\s*:\\s*Int\\)\\s*->\\s*Int\\s*\\{\\s*a\\s*\\+\\s*b\\s*\\}"
+    },
+    {
+      "type": "no_file_contains",
+      "glob": "**/*.js",
+      "regex": "[\\s\\S]*"
+    },
+    {
+      "type": "moon",
+      "args": ["check", "--target", "js", "--deny-warn"]
+    },
+    {
+      "type": "moon",
+      "args": ["build", "--target", "js", "--deny-warn"]
+    },
+    {
+      "type": "file_exists",
+      "path": "_build/js/debug/build/esm_library.js"
+    },
+    {
+      "type": "node",
+      "args": [
+        "--input-type=module",
+        "-e",
+        "const m = await import('./_build/js/debug/build/esm_library.js'); const value = m.add(20, 22); console.log(JSON.stringify({ exports: Object.keys(m), value })); if (value !== 42) process.exit(1);"
+      ],
+      "output_regex": "\\\"exports\\\":\\[\\\"add\\\"\\],\\\"value\\\":42"
+    }
+  ]
+}

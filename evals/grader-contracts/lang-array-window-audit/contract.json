@@ -1,0 +1,29 @@
+{
+  "area": "language",
+  "task": "lang-array-window-audit",
+  "cases": [
+    {
+      "name": "owns-window-before-mutation",
+      "expected": "pass",
+      "files": {
+        "lib.mbt": "///|\npub fn replace_and_audit(values : Array[Int], start : Int, end : Int, replacement : Int) -> Int {\n  let selected = values[start:end].to_owned()\n  for i = start; i < end; i = i + 1 {\n    values[i] = replacement\n  }\n  selected.fold(init=0, (sum, value) => sum + value)\n}\n"
+      }
+    },
+    {
+      "name": "sums-aliased-view-after-mutation",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "///|\npub fn replace_and_audit(values : Array[Int], start : Int, end : Int, replacement : Int) -> Int {\n  let selected = values[start:end]\n  for i = start; i < end; i = i + 1 {\n    values[i] = replacement\n  }\n  selected.fold(init=0, (sum, value) => sum + value)\n}\n"
+      },
+      "must_fail_check_types": ["moon"]
+    },
+    {
+      "name": "reports-replacement-total",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "///|\npub fn replace_and_audit(values : Array[Int], start : Int, end : Int, replacement : Int) -> Int {\n  for i = start; i < end; i = i + 1 {\n    values[i] = replacement\n  }\n  (end - start) * replacement\n}\n"
+      },
+      "must_fail_check_types": ["moon"]
+    }
+  ]
+}

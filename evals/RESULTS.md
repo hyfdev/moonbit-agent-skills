@@ -1,5 +1,64 @@
 # Content eval results
 
+## 2026-07-19 primary language behavior and API run
+
+Distinct language tasks: 4
+
+| What the agent had to do | Model | No skills | With current language skill |
+| --- | --- | ---: | ---: |
+| Preserve `Source(text)` callers after `Source` becomes an enum | Kimi K3 | 100% | 100% |
+| Return a job iterator that prepares only the consumed prefix | Kimi K3 | 100% | 100% |
+| Re-export a function, type, and trait through a facade without changing their identities | Kimi K3 | 100% | 100% |
+| Turn empty and unknown packets into recoverable typed errors, then decode later packets | Kimi K3 | 100% | 100% |
+
+With the current language skill, task success was 100%, compared with 100% without skills. This run did not establish a task-success improvement. It does add four source-only regression cases for language behavior that a successful compile alone does not prove: constructor compatibility, iterator evaluation timing, cross-package API identity, and checked-error recovery.
+
+DeepSeek Pro was the default client. Two isolated requests emitted no model result within operational windows of 8 and 10 minutes, so they were stopped and excluded. The predeclared Kimi fallback then ran exactly one pair per task. All eight cells completed, emitted Kimi K3, and were eligible for comparison.
+
+The frozen summary initially recorded the error-recovery task as failed in both conditions. The implementations were correct; the hidden test's fallback branch interpolated `DecodeError`, accidentally requiring the type to implement `Show` when both agents validly narrowed the function annotation to `raise DecodeError`. After replacing that unrelated formatting check, the two preserved workspaces passed all deterministic checks, including 8 and 10 discovered tests. No model cell was rerun, and the frozen raw records remain unchanged. The table reports this deterministic regrade.
+
+Before model execution, 19/19 grader-contract cases accepted the canonical solutions and rejected the declared plausible wrong solutions. The Kimi run used 154,317 input tokens, 3,813,120 cache-read input tokens, 0 cache-creation input tokens, and 64,786 output tokens over 41 minutes 16.6 seconds. In the four current-skill cells, the language skill activated through the client in 1/4, while the target language reference was read in 3/4 and read before a code-changing action in 3/4. All four task pairs tied.
+
+## 2026-07-19 excluded pilot: generated starter state
+
+Result: excluded before publication as product evidence.
+
+| Audit item | Finding |
+| --- | --- |
+| Distinct tasks | 6 |
+| Model cells | 12 frozen cells plus 2 predeclared retry cells |
+| Model | `deepseek-v4-pro` |
+| Exclusion reason | Starter `_build/` directories were copied into model workspaces |
+| Confirmed effect | One no-skill cell read generated interface and test-driver files before passing |
+| Resolution | The runner and grader validator now exclude generated and injected roots when materializing starters |
+
+The pilot covered Unicode character counts, aliased array windows, one-shot iterators, whole-string regex validation, downstream record construction, and externally implementable traits. Its deterministic graders remain useful after corrections, but the model outcomes are not reported as a skill comparison because the intended source-only isolation contract was violated.
+
+The contamination came from local preflight: validating each starter with `moon test` created ignored `_build/` directories inside the task fixtures. `run_content.ts` copied the full directory tree. Most cells did not inspect the generated files, but the first no-skill public-record cell explicitly read the generated `.mi` interface and test drivers before finding `pub(all)`. The same run therefore cannot support a clean paired claim.
+
+The materialization path now drops `.claude`, `.mooncakes`, `_build`, and `target` at the starter root. `validate_graders.ts` uses the same path, and a unit test proves that source files are copied while all four excluded roots are absent. The six generated `_build/` trees were cleaned locally. No model cells were rerun: repeating a contaminated result does not repair it, and the public-record case had already reached the two-run limit.
+
+The discarded cells emitted `deepseek-v4-pro`, used 170,952 input tokens, 1,287,296 cache-read input tokens, 0 cache-creation input tokens, and 41,729 output tokens over 729.3 seconds. These numbers disclose the work performed; they are not effectiveness evidence.
+
+## 2026-07-19 supplemental toolchain silent-success run
+
+Distinct tasks: 4
+
+| What the agent had to do | Model | No skills | With current skills |
+| --- | --- | ---: | ---: |
+| Make `--target all` actually test both configured backends | `deepseek-v4-pro` | 100% | 100% |
+| Generate a MoonBit ESM library that Node can import by named export | `deepseek-v4-pro` | 0% | **100%** |
+| Run both the on-disk test and the virtual test supplied by `--patch-file` | `deepseek-v4-pro` | 100% | 100% |
+| Select the production virtual-package provider without changing the default consumer | `deepseek-v4-pro` | 100% | 100% |
+
+With current skills, task success was 100%, compared with 75% without skills. This is a small supplemental toolchain result, not the repository's primary language evaluation: three tasks tied, and one task favored the current skill.
+
+The discriminating task required a generated JS artifact with a real ESM named export and a successful Node call to `add(20, 22)`. The current-skill cell read `references/targets-and-conditional-builds.md`, wrote the current `moon.pkg` DSL link configuration, and passed in 15 steps. The no-skill cell eventually produced a working runtime artifact, but only after deleting `moon.pkg`, introducing deprecated `moon.pkg.json`, and using 56 steps against the declared limit of 50. It therefore failed the current-configuration checks and the predeclared step limit even though the final Node runtime check passed.
+
+All eight cells were source-only, complete, pair-eligible, and emitted `deepseek-v4-pro`; there were no model-signature mismatches, timeouts, transport failures, or excluded pairs. Four grader contracts accepted one canonical solution and rejected two plausible wrong solutions each: 12/12 contract cases behaved as declared. The run used 151,869 input tokens, 2,627,456 cache-read input tokens, 0 cache-creation input tokens, and 48,051 output tokens over 825.3 seconds.
+
+In the four current-skill cells, the Skill tool loaded successfully in 2/4 and the target reference was read in 4/4. None read the reference before the first Bash/Edit/Write action because each inspected the workspace first. No retry or Kimi fallback ran: every current-skill cell passed on the first DeepSeek Pro pair.
+
 ## 2026-07-18 high-risk language matrix
 
 This frozen Kimi/K3 experiment compared the current skill with the pinned historical language skill on eight high-risk tasks, with three paired repetitions per task. It is the last full K3 matrix: future experiments default to one repetition and may add one final repetition only for tasks that show a difference, failure, or prior instability.

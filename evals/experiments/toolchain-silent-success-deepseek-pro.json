@@ -1,0 +1,34 @@
+{
+  "schema_version": 2,
+  "id": "toolchain-silent-success-deepseek-pro",
+  "runner": "content",
+  "stage": "exploratory",
+  "area": "toolchain",
+  "client": "claude-code",
+  "model": "sonnet",
+  "conditions": [
+    "none",
+    "ours"
+  ],
+  "task_ids": [
+    "tool-enable-backend-matrix",
+    "tool-export-esm-library",
+    "tool-run-virtual-patch",
+    "tool-select-virtual-provider"
+  ],
+  "task_groups": {
+    "silent_execution_scope": [
+      "tool-enable-backend-matrix",
+      "tool-run-virtual-patch"
+    ],
+    "selected_output_and_provider": [
+      "tool-export-esm-library",
+      "tool-select-virtual-provider"
+    ]
+  },
+  "repetitions": 1,
+  "max_turns": 50,
+  "primary_metric": "task-level pass-rate difference for current skills minus no skills across four distinct commands or configurations that can exit successfully without delivering the requested result",
+  "minimum_valuable_difference": 0.25,
+  "stopping_rule": "Run exactly eight source-only cells after all 12 grader-contract cases pass. Do not replace tasks after seeing results. Repeat only a task whose current-skill cell fails, under the repository allocation policy."
+}

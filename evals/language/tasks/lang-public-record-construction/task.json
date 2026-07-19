@@ -1,0 +1,31 @@
+{
+  "id": "lang-public-record-construction",
+  "risk_class": "cross-package-record-visibility",
+  "claim_id": "language.visibility.record-external-construction",
+  "primary_metric": "downstream-record-construction",
+  "prompt": "`Request` is part of this library's public data API. Code in another package must be able to construct it directly with a record literal and read both fields; the current package's own tests already pass. Make the smallest declaration change that enables that downstream use while keeping the public functions and field types unchanged.",
+  "discovery": {
+    "skill": "moonbit-language",
+    "reference": "references/visibility.mbt.md"
+  },
+  "grade": [
+    {
+      "type": "file_contains",
+      "path": "lib.mbt",
+      "regex": "pub\\(all\\)\\s+struct\\s+Request"
+    },
+    {
+      "type": "moon",
+      "args": ["check", "--deny-warn"]
+    },
+    {
+      "type": "moon",
+      "args": ["test", "--deny-warn"],
+      "min_tests": 3,
+      "temp_files": {
+        "zz_eval_consumer/moon.pkg": "import {\n  \"mbteval/public_record_construction\" @api,\n} for \"test\"\n",
+        "zz_eval_consumer/consumer_test.mbt": "///|\ntest \"grader constructs and reads Request downstream\" {\n  let request : @api.Request = { verb: \"POST\", path: \"/items\" }\n  assert_eq(request.verb, \"POST\")\n  assert_eq(request.path, \"/items\")\n  assert_eq(@api.describe_request(request), \"POST /items\")\n}\n"
+      }
+    }
+  ]
+}

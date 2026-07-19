@@ -1,0 +1,29 @@
+{
+  "area": "toolchain",
+  "task": "tool-select-virtual-provider",
+  "cases": [
+    {
+      "name": "consumer-selects-the-existing-provider",
+      "expected": "pass",
+      "files": {
+        "consumer/moon.pkg": "import {\n  \"mbteval/virtual_provider/virtual\",\n} for \"test\"\n\noptions(\n  overrides: [ \"mbteval/virtual_provider/production_provider\" ],\n)\n"
+      }
+    },
+    {
+      "name": "consumer-keeps-the-warning-free-default",
+      "expected": "fail",
+      "files": {
+        "consumer/moon.pkg": "import {\n  \"mbteval/virtual_provider/virtual\",\n} for \"test\"\n"
+      },
+      "must_fail_check_types": ["file_contains", "moon"]
+    },
+    {
+      "name": "consumer-imports-the-implementation-directly",
+      "expected": "fail",
+      "files": {
+        "consumer/moon.pkg": "import {\n  \"mbteval/virtual_provider/production_provider\" @virtual,\n} for \"test\"\n"
+      },
+      "must_fail_check_types": ["file_contains"]
+    }
+  ]
+}

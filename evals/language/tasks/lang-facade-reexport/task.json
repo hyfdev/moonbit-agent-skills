@@ -1,0 +1,48 @@
+{
+  "id": "lang-facade-reexport",
+  "risk_class": "cross-package-api-identity",
+  "claim_id": "language.visibility.source-using-reexport",
+  "primary_metric": "downstream-function-type-and-trait-access",
+  "prompt": "The facade package intentionally imports open_handle, Handle, and Service from origin, and its whitebox test passes. Application packages are allowed to depend only on facade: they need to call open_handle, annotate the returned Handle, and use Service in a generic constraint. Expose those existing imports through the facade without adding wrappers, duplicate declarations, or a direct origin dependency to the consumer. Keep the three API identities unchanged and verify with warnings denied.",
+  "discovery": {
+    "skill": "moonbit-language",
+    "reference": "references/visibility.mbt.md"
+  },
+  "grade": [
+    {
+      "type": "file_contains",
+      "path": "facade/api.mbt",
+      "regex": "(?:^|\\n)[ \\t]*pub[ \\t]+using[ \\t]+@origin[ \\t]*\\{[^}]*\\bopen_handle\\b"
+    },
+    {
+      "type": "file_contains",
+      "path": "facade/api.mbt",
+      "regex": "(?:^|\\n)[ \\t]*pub[ \\t]+using[ \\t]+@origin[ \\t]*\\{[^}]*\\btype[ \\t]+Handle\\b"
+    },
+    {
+      "type": "file_contains",
+      "path": "facade/api.mbt",
+      "regex": "(?:^|\\n)[ \\t]*pub[ \\t]+using[ \\t]+@origin[ \\t]*\\{[^}]*\\btrait[ \\t]+Service\\b"
+    },
+    {
+      "type": "file_not_contains",
+      "path": "facade/api.mbt",
+      "regex": "#cfg\\s*\\([^)]*\\)\\s*pub\\s+using\\s+@origin"
+    },
+    {
+      "type": "moon",
+      "args": ["check", "--deny-warn"]
+    },
+    {
+      "type": "moon",
+      "args": ["test", "--deny-warn"],
+      "min_tests": 3,
+      "temp_files": {
+        "zz_eval_consumer/moon.pkg": "import {\n  \"mbteval/facade_reexport/facade\" @facade,\n} for \"test\"\n",
+        "zz_eval_consumer/consumer_test.mbt": "///|\nfn[T : @facade.Service] generic_service_id(value : T) -> Int {\n  @facade.Service::service_id(value)\n}\n\n///|\ntest \"grader consumes the complete facade surface\" {\n  let handle : @facade.Handle = @facade.open_handle(42)\n  assert_eq(generic_service_id(handle), 42)\n}\n",
+        "zz_eval_identity/moon.pkg": "import {\n  \"mbteval/facade_reexport/facade\" @facade,\n  \"mbteval/facade_reexport/origin\" @origin,\n} for \"test\"\n",
+        "zz_eval_identity/identity_test.mbt": "///|\ntest \"grader preserves type and trait identity\" {\n  let from_facade : @origin.Handle = @facade.open_handle(11)\n  let from_origin : @facade.Handle = @origin.open_handle(12)\n  let facade_service : &@facade.Service = from_facade\n  let origin_service : &@origin.Service = facade_service\n  assert_eq(@origin.Service::service_id(origin_service), 11)\n  assert_eq(@facade.Service::service_id(from_origin), 12)\n}\n"
+      }
+    }
+  ]
+}

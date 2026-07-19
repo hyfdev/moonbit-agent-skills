@@ -1,0 +1,29 @@
+{
+  "area": "language",
+  "task": "lang-unicode-character-count",
+  "cases": [
+    {
+      "name": "counts-moonbit-characters",
+      "expected": "pass",
+      "files": {
+        "lib.mbt": "///|\npub fn within_character_limit(text : String, limit : Int) -> Bool {\n  text.char_length() <= limit\n}\n"
+      }
+    },
+    {
+      "name": "counts-utf16-code-units",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "///|\npub fn within_character_limit(text : String, limit : Int) -> Bool {\n  text.length() <= limit\n}\n"
+      },
+      "must_fail_check_types": ["moon"]
+    },
+    {
+      "name": "treats-any-text-as-within-a-positive-limit",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "///|\npub fn within_character_limit(text : String, limit : Int) -> Bool {\n  text == \"\" || limit > 0\n}\n"
+      },
+      "must_fail_check_types": ["moon"]
+    }
+  ]
+}

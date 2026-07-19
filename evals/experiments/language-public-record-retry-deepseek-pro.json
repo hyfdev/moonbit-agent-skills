@@ -1,0 +1,26 @@
+{
+  "schema_version": 2,
+  "id": "language-public-record-retry-deepseek-pro",
+  "runner": "content",
+  "stage": "exploratory",
+  "area": "language",
+  "client": "claude-code",
+  "model": "sonnet",
+  "conditions": [
+    "none",
+    "ours"
+  ],
+  "task_ids": [
+    "lang-public-record-construction"
+  ],
+  "task_groups": {
+    "cross_package_api": [
+      "lang-public-record-construction"
+    ]
+  },
+  "repetitions": 1,
+  "max_turns": 50,
+  "primary_metric": "paired retry of downstream record construction after the current-skill cell failed in the frozen six-task pilot",
+  "minimum_valuable_difference": 1,
+  "stopping_rule": "Run exactly two unchanged cells. Do not run another DeepSeek retry. Use one frozen Kimi pair only if the current-skill cell fails again."
+}

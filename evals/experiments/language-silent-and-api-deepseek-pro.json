@@ -1,0 +1,38 @@
+{
+  "schema_version": 2,
+  "id": "language-silent-and-api-deepseek-pro",
+  "runner": "content",
+  "stage": "exploratory",
+  "area": "language",
+  "client": "claude-code",
+  "model": "sonnet",
+  "conditions": [
+    "none",
+    "ours"
+  ],
+  "task_ids": [
+    "lang-unicode-character-count",
+    "lang-array-window-audit",
+    "lang-iter-selected-stats",
+    "lang-regex-whole-identifier",
+    "lang-public-record-construction",
+    "lang-open-plugin-trait"
+  ],
+  "task_groups": {
+    "silent_behavior": [
+      "lang-unicode-character-count",
+      "lang-array-window-audit",
+      "lang-iter-selected-stats",
+      "lang-regex-whole-identifier"
+    ],
+    "cross_package_api": [
+      "lang-public-record-construction",
+      "lang-open-plugin-trait"
+    ]
+  },
+  "repetitions": 1,
+  "max_turns": 50,
+  "primary_metric": "task-level pass-rate difference for current skills minus no skills across six distinct silent-behavior and cross-package API tasks",
+  "minimum_valuable_difference": 0.17,
+  "stopping_rule": "Run exactly 12 cells after all 18 grader-contract cases pass. Do not replace or repeat tasks after seeing results. Repeat a failed current-skill pair only in a separate follow-up experiment under the allocation policy."
+}

@@ -1,0 +1,9 @@
+{
+  "drops": [],
+  "patches": [
+    {
+      "name": "virtual_regression_test.mbt",
+      "content": "///|\ntest \"virtual regression\" {\n  assert_eq(shout(\"skill\"), \"SKILL!\")\n}\n"
+    }
+  ]
+}

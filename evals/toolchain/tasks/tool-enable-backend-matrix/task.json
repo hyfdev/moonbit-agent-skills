@@ -1,0 +1,43 @@
+{
+  "id": "tool-enable-backend-matrix",
+  "risk_class": "silent-unsupported-target-skip",
+  "claim_id": "toolchain.targets.module-supported-targets",
+  "primary_metric": "both-configured-backends-execute-tests",
+  "prompt": "`moon test --target all` exits successfully but reports only one test. This module is intended to exercise both its existing JS and wasm-gc implementations. Fix only the project configuration so both existing backend tests run under `--target all`; do not edit any `.mbt` file.",
+  "discovery": {
+    "skill": "moonbit-toolchain",
+    "reference": "references/targets-and-conditional-builds.md"
+  },
+  "grade": [
+    {
+      "type": "file_contains",
+      "path": "moon.mod",
+      "regex": "supported_targets\\s*=\\s*\\[(?=[^\\]]*\\\"js\\\")(?=[^\\]]*\\\"wasm-gc\\\")[^\\]]*\\]"
+    },
+    {
+      "type": "file_contains",
+      "path": "backend_js.mbt",
+      "regex": "pub fn\\s+backend_name\\(\\)\\s*->\\s*String\\s*\\{\\s*\\\"js\\\"\\s*\\}"
+    },
+    {
+      "type": "file_contains",
+      "path": "backend_wasm_gc.mbt",
+      "regex": "pub fn\\s+backend_name\\(\\)\\s*->\\s*String\\s*\\{\\s*\\\"wasm-gc\\\"\\s*\\}"
+    },
+    {
+      "type": "moon",
+      "args": ["test", "--target", "all", "--deny-warn"],
+      "output_regex": "(?=[\\s\\S]*Total tests:\\s*1,\\s*passed:\\s*1,\\s*failed:\\s*0\\.\\s*\\[wasm-gc\\])(?=[\\s\\S]*Total tests:\\s*1,\\s*passed:\\s*1,\\s*failed:\\s*0\\.\\s*\\[js\\])"
+    },
+    {
+      "type": "moon",
+      "args": ["test", "--target", "js", "--deny-warn"],
+      "min_tests": 1
+    },
+    {
+      "type": "moon",
+      "args": ["test", "--target", "wasm-gc", "--deny-warn"],
+      "min_tests": 1
+    }
+  ]
+}

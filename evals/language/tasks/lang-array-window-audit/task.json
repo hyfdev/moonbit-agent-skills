@@ -1,0 +1,25 @@
+{
+  "id": "lang-array-window-audit",
+  "risk_class": "silent-aliasing-semantics",
+  "claim_id": "language.array-view.aliases-parent",
+  "primary_metric": "pre-mutation-window-sum",
+  "prompt": "`replace_and_audit` must return the sum of the selected values before replacing that window in place. Its current test passes, but production audit totals sometimes contain the replacement values instead of the originals. Fix the implementation while preserving the public signature and the in-place mutation. Inputs satisfy `0 <= start <= end <= values.length()`.",
+  "discovery": {
+    "skill": "moonbit-language",
+    "reference": "references/data-types.mbt.md"
+  },
+  "grade": [
+    {
+      "type": "moon",
+      "args": ["check", "--deny-warn"]
+    },
+    {
+      "type": "moon",
+      "args": ["test", "--deny-warn"],
+      "min_tests": 4,
+      "temp_files": {
+        "zz_eval_array_window_test.mbt": "///|\ntest \"grader audits originals before replacement\" {\n  let values = [1, 2, 3, 4]\n  let original_sum = replace_and_audit(values, 1, 3, 9)\n  assert_eq(original_sum, 5)\n  assert_eq(values, [1, 9, 9, 4])\n}\n\n///|\ntest \"grader handles whole and empty windows\" {\n  let whole = [4, 5]\n  assert_eq(replace_and_audit(whole, 0, 2, 0), 9)\n  assert_eq(whole, [0, 0])\n  let unchanged = [7, 8]\n  assert_eq(replace_and_audit(unchanged, 1, 1, 3), 0)\n  assert_eq(unchanged, [7, 8])\n}\n"
+      }
+    }
+  ]
+}

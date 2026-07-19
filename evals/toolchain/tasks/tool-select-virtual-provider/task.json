@@ -1,0 +1,46 @@
+{
+  "id": "tool-select-virtual-provider",
+  "risk_class": "silent-virtual-default-selection",
+  "claim_id": "toolchain.virtual-package.consumer-override",
+  "primary_metric": "consumer-resolves-through-selected-provider",
+  "prompt": "The `consumer` package is intended to use the existing `production_provider` implementation, but it currently resolves the virtual package's warning-free default. Configure only `consumer` to select the production provider. Do not edit `.mbt` files or the virtual default, and keep `default_consumer` using the default implementation.",
+  "discovery": {
+    "skill": "moonbit-toolchain",
+    "reference": "references/project-layout-and-config.md"
+  },
+  "grade": [
+    {
+      "type": "file_contains",
+      "path": "consumer/moon.pkg",
+      "regex": "options\\(\\s*overrides:\\s*\\[\\s*\\\"mbteval/virtual_provider/production_provider\\\"\\s*\\]\\s*,?\\s*\\)"
+    },
+    {
+      "type": "file_not_contains",
+      "path": "default_consumer/moon.pkg",
+      "regex": "overrides"
+    },
+    {
+      "type": "file_contains",
+      "path": "virtual/provider.mbt",
+      "regex": "pub fn\\s+provider_name\\(\\)\\s*->\\s*String\\s*\\{\\s*\\\"default\\\"\\s*\\}"
+    },
+    {
+      "type": "file_contains",
+      "path": "production_provider/provider.mbt",
+      "regex": "pub fn\\s+provider_name\\(\\)\\s*->\\s*String\\s*\\{\\s*\\\"production\\\"\\s*\\}"
+    },
+    {
+      "type": "moon",
+      "args": ["check", "--deny-warn"]
+    },
+    {
+      "type": "moon",
+      "args": ["test", "--deny-warn"],
+      "min_tests": 4,
+      "temp_files": {
+        "consumer/zz_eval_provider_test.mbt": "///|\ntest \"grader consumer selects production provider\" {\n  assert_eq(@virtual.provider_name(), \"production\")\n}\n",
+        "default_consumer/zz_eval_default_test.mbt": "///|\ntest \"grader control keeps virtual default\" {\n  assert_eq(@virtual.provider_name(), \"default\")\n}\n"
+      }
+    }
+  ]
+}

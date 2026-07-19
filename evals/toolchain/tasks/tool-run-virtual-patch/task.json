@@ -1,0 +1,31 @@
+{
+  "id": "tool-run-virtual-patch",
+  "risk_class": "silent-patch-file-ignore",
+  "claim_id": "toolchain.test.patch-file-package-selection",
+  "primary_metric": "virtual-test-is-observed-running",
+  "prompt": "Without editing any file, run the `textutil` package's on-disk test together with the virtual regression test in `patch.json`. Confirm that both tests pass and state the exact command. A successful command that runs only the on-disk test is not sufficient.",
+  "discovery": {
+    "skill": "moonbit-toolchain",
+    "reference": "references/testing-workflows.md"
+  },
+  "grade": [
+    {
+      "type": "command_matches",
+      "regex": "^\\s*(?:\\S*/)?moon\\s+test\\s+(?:-p\\s+(?:mbteval/patch_file/)?textutil\\s+--patch-file\\s+(?:\\./)?patch\\.json|--patch-file\\s+(?:\\./)?patch\\.json\\s+-p\\s+(?:mbteval/patch_file/)?textutil)(?:\\s+2>&1)?\\s*$",
+      "output_regex": "Total tests:\\s*2,\\s*passed:\\s*2,\\s*failed:\\s*0"
+    },
+    {
+      "type": "initial_files_unchanged"
+    },
+    {
+      "type": "moon",
+      "args": ["test", "-p", "mbteval/patch_file/textutil", "--patch-file", "patch.json", "--deny-warn"],
+      "min_tests": 2,
+      "output_regex": "Total tests:\\s*2,\\s*passed:\\s*2,\\s*failed:\\s*0"
+    },
+    {
+      "type": "output_matches",
+      "regex": "moon\\s+test[\\s\\S]*(?:-p[\\s\\S]*--patch-file|--patch-file[\\s\\S]*-p)"
+    }
+  ]
+}

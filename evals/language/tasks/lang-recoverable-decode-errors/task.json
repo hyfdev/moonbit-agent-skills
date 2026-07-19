@@ -1,0 +1,32 @@
+{
+  "id": "lang-recoverable-decode-errors",
+  "risk_class": "panic-failure-versus-domain-error",
+  "claim_id": "language.checked-domain-error-recovery",
+  "primary_metric": "recoverable-decode-error-kind-and-payload",
+  "prompt": "`decode_tag` already handles valid packets, but an empty packet or unknown tag must not terminate the processing loop. Callers need to catch `DecodeError::Empty` and `DecodeError::Unknown(tag)` separately, then continue decoding later packets. Preserve the valid return values and the existing public function and error declarations.",
+  "grader_note": "2026-07-19: Hidden fallback arms no longer interpolate the caught error. The old form accidentally required valid implementations that narrowed the function annotation to `raise DecodeError` to derive `Show`.",
+  "discovery": {
+    "skill": "moonbit-language",
+    "reference": "references/errors-and-error-handling.mbt.md"
+  },
+  "grade": [
+    {
+      "type": "file_contains",
+      "path": "lib.mbt",
+      "regex": "pub\\(all\\)\\s+suberror\\s+DecodeError\\s*\\{[\\s\\S]*Empty[\\s\\S]*Unknown\\(Byte\\)[\\s\\S]*\\}"
+    },
+    {
+      "type": "moon",
+      "args": ["check", "--deny-warn"]
+    },
+    {
+      "type": "moon",
+      "args": ["test", "--deny-warn"],
+      "min_tests": 7,
+      "temp_files": {
+        "zz_eval_consumer/moon.pkg": "import {\n  \"mbteval/recoverable_decode_errors\" @api,\n} for \"test\"\n",
+        "zz_eval_consumer/consumer_test.mbt": "///|\ntest \"grader catches empty packets across the public boundary\" {\n  try @api.decode_tag(b\"\") catch {\n    @api.DecodeError::Empty => ()\n    _ => fail(\"wrong error kind\")\n  } noraise {\n    _ => fail(\"expected DecodeError::Empty\")\n  }\n  assert_eq(@api.decode_tag(b\"\\x01later\"), \"ping\")\n}\n\n///|\ntest \"grader catches one unknown tag with its payload\" {\n  try @api.decode_tag(b\"\\x7fdata\") catch {\n    @api.DecodeError::Unknown(tag) => assert_eq(tag, b'\\x7f')\n    _ => fail(\"wrong error kind\")\n  } noraise {\n    _ => fail(\"expected DecodeError::Unknown\")\n  }\n  assert_eq(@api.decode_tag(b\"\\x02later\"), \"pong\")\n}\n\n///|\ntest \"grader preserves varied unknown-tag payloads\" {\n  try @api.decode_tag(b\"\\x03more\") catch {\n    @api.DecodeError::Unknown(tag) => assert_eq(tag, b'\\x03')\n    _ => fail(\"wrong error kind\")\n  } noraise {\n    _ => fail(\"expected DecodeError::Unknown\")\n  }\n  try @api.decode_tag(b\"\\xfe\") catch {\n    @api.DecodeError::Unknown(tag) => assert_eq(tag, b'\\xfe')\n    _ => fail(\"wrong error kind\")\n  } noraise {\n    _ => fail(\"expected DecodeError::Unknown\")\n  }\n}\n\n///|\ntest \"grader preserves varied valid packets\" {\n  assert_eq(@api.decode_tag(b\"\\x01\"), \"ping\")\n  assert_eq(@api.decode_tag(b\"\\x02payload\"), \"pong\")\n}\n"
+      }
+    }
+  ]
+}

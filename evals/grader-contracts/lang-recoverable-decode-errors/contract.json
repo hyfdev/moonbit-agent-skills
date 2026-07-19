@@ -1,0 +1,45 @@
+{
+  "area": "language",
+  "task": "lang-recoverable-decode-errors",
+  "cases": [
+    {
+      "name": "raises-specific-domain-errors",
+      "expected": "pass",
+      "files": {
+        "lib.mbt": "///|\npub(all) suberror DecodeError {\n  Empty\n  Unknown(Byte)\n} derive(Debug)\n\n///|\npub fn decode_tag(packet : Bytes) -> String raise {\n  match packet {\n    [] => raise DecodeError::Empty\n    [tag, ..] => match tag {\n      b'\\x01' => \"ping\"\n      b'\\x02' => \"pong\"\n      _ => raise DecodeError::Unknown(tag)\n    }\n  }\n}\n"
+      }
+    },
+    {
+      "name": "panics-and-raises-failure",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "///|\npub(all) suberror DecodeError {\n  Empty\n  Unknown(Byte)\n} derive(Debug)\n\n///|\npub fn decode_tag(packet : Bytes) -> String raise {\n  match packet[0] {\n    b'\\x01' => \"ping\"\n    b'\\x02' => \"pong\"\n    tag => fail(\"unknown tag \\{tag}\")\n  }\n}\n"
+      },
+      "must_fail_check_types": ["moon"]
+    },
+    {
+      "name": "uses-failure-for-recoverable-input",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "///|\npub(all) suberror DecodeError {\n  Empty\n  Unknown(Byte)\n} derive(Debug)\n\n///|\npub fn decode_tag(packet : Bytes) -> String raise {\n  match packet {\n    [] => fail(\"empty packet\")\n    [tag, ..] => match tag {\n      b'\\x01' => \"ping\"\n      b'\\x02' => \"pong\"\n      _ => fail(\"unknown tag\")\n    }\n  }\n}\n"
+      },
+      "must_fail_check_types": ["moon"]
+    },
+    {
+      "name": "returns-sentinel-values",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "///|\npub(all) suberror DecodeError {\n  Empty\n  Unknown(Byte)\n} derive(Debug)\n\n///|\npub fn decode_tag(packet : Bytes) -> String raise {\n  match packet {\n    [] => \"empty\"\n    [tag, ..] => match tag {\n      b'\\x01' => \"ping\"\n      b'\\x02' => \"pong\"\n      _ => \"unknown\"\n    }\n  }\n}\n"
+      },
+      "must_fail_check_types": ["moon"]
+    },
+    {
+      "name": "hard-codes-one-unknown-tag-payload",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "///|\npub(all) suberror DecodeError {\n  Empty\n  Unknown(Byte)\n} derive(Debug)\n\n///|\npub fn decode_tag(packet : Bytes) -> String raise {\n  match packet {\n    [] => raise DecodeError::Empty\n    [tag, ..] => match tag {\n      b'\\x01' => \"ping\"\n      b'\\x02' => \"pong\"\n      _ => raise DecodeError::Unknown(b'\\x7f')\n    }\n  }\n}\n"
+      },
+      "must_fail_check_types": ["moon"]
+    }
+  ]
+}

@@ -153,6 +153,10 @@ export function validateSkill(skillDir: string): string[] {
 
 export function readmeCatalogProblems(readme: string, skillDirectories: string[]): string[] {
   const problems: string[] = [];
+  const tableHeader = "| Skill | Version | Updated | MoonBit | Verified |";
+  if (!readme.includes(tableHeader)) {
+    problems.push(`README: missing public skill table header ${repr(tableHeader)}`);
+  }
   for (const skillDirectory of skillDirectories) {
     const skillMd = join(skillDirectory, "SKILL.md");
     if (!isFile(skillMd)) continue;
@@ -160,11 +164,7 @@ export function readmeCatalogProblems(readme: string, skillDirectories: string[]
     const name = scalar(parsed.frontmatter, "name") ?? basename(skillDirectory);
     if (REQUIRED_COMPONENT_KEYS[name] === undefined) continue;
     const metadata = stringMap(parsed.frontmatter, "metadata") ?? {};
-    const heading = `### [${name}](skills/${name}/SKILL.md)`;
-    if (!readme.includes(heading)) {
-      problems.push(`README: missing public skill heading ${repr(heading)}`);
-    }
-    const status = readmeStatusLine(name, metadata);
+    const status = readmeStatusRow(name, metadata);
     if (!readme.includes(status)) {
       problems.push(`README: ${name} status does not match SKILL.md metadata`);
     }
@@ -172,13 +172,13 @@ export function readmeCatalogProblems(readme: string, skillDirectories: string[]
   return problems;
 }
 
-export function readmeStatusLine(name: string, metadata: Record<string, string>): string {
+export function readmeStatusRow(name: string, metadata: Record<string, string>): string {
   return (
-    `Version \`${metadata["skill-version"] ?? ""}\` · ` +
-    `Last updated ${metadata["updated-date"] ?? ""} · ` +
-    `Verified ${metadata["verified-date"] ?? ""} against MoonBit ` +
-    `\`${metadata["moonbit-release"] ?? ""}\` · ` +
-    `[History](https://github.com/hyfdev/moonbit-agent-skills/commits/main/skills/${name})`
+    `| [${name}](skills/${name}/SKILL.md) | ` +
+    `[\`${metadata["skill-version"] ?? ""}\`](https://github.com/hyfdev/moonbit-agent-skills/commits/main/skills/${name}) | ` +
+    `${metadata["updated-date"] ?? ""} | ` +
+    `\`${metadata["moonbit-release"] ?? ""}\` | ` +
+    `${metadata["verified-date"] ?? ""} |`
   );
 }
 

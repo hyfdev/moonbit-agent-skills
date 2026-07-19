@@ -10,7 +10,6 @@ Agent Skills for MoonBit. Help coding agents work with MoonBit and write better 
 
 - [Skills](#skills)
 - [Install](#install)
-- [Update](#update)
 - [How to use](#how-to-use)
 - [Evaluation](#evaluation)
 - [FAQ](#faq)
@@ -18,17 +17,14 @@ Agent Skills for MoonBit. Help coding agents work with MoonBit and write better 
 
 ## Skills
 
-### [moonbit-language](skills/moonbit-language/SKILL.md)
+| Skill | Version | Updated | MoonBit | Verified |
+| --- | ---: | ---: | ---: | ---: |
+| [moonbit-language](skills/moonbit-language/SKILL.md) | [`0.3.1`](https://github.com/hyfdev/moonbit-agent-skills/commits/main/skills/moonbit-language) | 2026-07-19 | `0.10.4` | 2026-07-18 |
+| [moonbit-toolchain](skills/moonbit-toolchain/SKILL.md) | [`0.3.1`](https://github.com/hyfdev/moonbit-agent-skills/commits/main/skills/moonbit-toolchain) | 2026-07-19 | `0.10.4` | 2026-07-18 |
 
-Version `0.3.1` · Last updated 2026-07-19 · Verified 2026-07-18 against MoonBit `0.10.4` · [History](https://github.com/hyfdev/moonbit-agent-skills/commits/main/skills/moonbit-language)
+`moonbit-language` is the language reference for understanding, writing, and fixing MoonBit code: syntax, types, patterns, traits, errors, async, tests, and FFI.
 
-Language reference for understanding, writing, and fixing MoonBit code: syntax, types, patterns, traits, errors, async, tests, and FFI.
-
-### [moonbit-toolchain](skills/moonbit-toolchain/SKILL.md)
-
-Version `0.3.1` · Last updated 2026-07-19 · Verified 2026-07-18 against MoonBit `0.10.4` · [History](https://github.com/hyfdev/moonbit-agent-skills/commits/main/skills/moonbit-toolchain)
-
-Toolchain reference for creating and operating MoonBit projects: `moon` commands, `moon.mod` / `moon.pkg`, dependencies, targets, testing, workspaces, publishing, and IDE queries.
+`moonbit-toolchain` is the toolchain reference for creating and operating MoonBit projects: `moon` commands, `moon.mod` / `moon.pkg`, dependencies, targets, testing, workspaces, publishing, and IDE queries.
 
 ## Install
 
@@ -57,7 +53,7 @@ Clone or download this repository, then copy either or both skill directories in
 
 </details>
 
-## Update
+### Update
 
 Update both globally installed skills:
 

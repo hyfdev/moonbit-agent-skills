@@ -19,10 +19,11 @@ import {
   isIsoDate,
   NAME_RE,
   readmeCatalogProblems,
+  readmeStatusRow,
   SKILL_VERSION_RE,
   validateSkill,
 } from "../validate_skills.ts";
-import { parseFrontmatter } from "../lib/frontmatter.ts";
+import { parseFrontmatter, stringMap } from "../lib/frontmatter.ts";
 import { parseCliArgs } from "../lib/cli.ts";
 import { normalizeOsName } from "../lib/platform.ts";
 import type { CommandRunner } from "../lib/process.ts";
@@ -180,9 +181,13 @@ describe("skill freshness metadata", () => {
     ];
     const readme = readFileSync(join(REPO_ROOT, "README.md"), "utf8");
     expect(readmeCatalogProblems(readme, skillDirectories)).toEqual([]);
-    expect(
-      readmeCatalogProblems(readme.replace(/Version `[^`]+`/, "Version `stale`"), skillDirectories),
-    ).toContain("README: moonbit-language status does not match SKILL.md metadata");
+    const languageSkill = readFileSync(join(skillDirectories[0], "SKILL.md"), "utf8");
+    const metadata = stringMap(parseFrontmatter(languageSkill).frontmatter, "metadata") ?? {};
+    const currentRow = readmeStatusRow("moonbit-language", metadata);
+    const staleRow = currentRow.replace(metadata["skill-version"], "stale");
+    expect(readmeCatalogProblems(readme.replace(currentRow, staleRow), skillDirectories)).toContain(
+      "README: moonbit-language status does not match SKILL.md metadata",
+    );
   });
 
   it("requires changed skill content to carry a newer version and current change date", () => {

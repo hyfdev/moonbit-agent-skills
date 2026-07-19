@@ -55,20 +55,44 @@ Use your coding agent as usual—no special prompts or manual invocation require
 
 ## Evaluation
 
-The primary evaluation tests MoonBit language behavior, not command recall. The latest run used four distinct tasks, with one Kimi K3 run per condition.
+### MoonBit language
 
-| MoonBit language task | No skills | Current language skill |
+#### Current syntax and migration
+
+| What the agent had to do | Without skills | With skills |
+| --- | ---: | ---: |
+| Keep a generic clamp API type-safe | 100% | 100% |
+| Recognize that `defer` is available | 0% | **100%** |
+| Replace Rust-style syntax with MoonBit equivalents | 100% | 100% |
+| Replace deprecated functional `loop` with the current multi-binding `for` form | 0% | **100%** |
+| Convert an `Option`-returning parser to checked errors | 100% | 100% |
+| **Overall** | **60%** | **100%** |
+
+#### Language behavior and public APIs
+
+| What the agent had to do | Without skills | With skills |
 | --- | ---: | ---: |
 | Preserve old constructor calls after changing a wrapper into an enum | 100% | 100% |
 | Make an iterator prepare only the items that callers consume | 100% | 100% |
 | Re-export a function, type, and trait without changing their identities | 100% | 100% |
 | Return typed errors for invalid packets and continue decoding | 100% | 100% |
+| **Overall** | **100%** | **100%** |
 
-Latest language result: 100% with the current language skill, compared with 100% without skills. These harder behavior and API cases found no success-rate difference and now serve as regression tests.
+The different outcomes were `defer` availability and the current replacement for deprecated functional `loop`.
 
-An earlier five-task language evaluation measured 100% with the current skill, compared with 60% without skills. The skill supplied two facts that compiler feedback alone did not reveal: `defer` is available, and deprecated functional `loop` should be replaced with the current multi-binding `for` form. A separate four-task toolchain evaluation measured 100% with the current skill and 75% without skills.
+### MoonBit toolchain
 
-Results use objective graders and preserve failed runs. See the [full content results](evals/RESULTS.md) and [activation results](evals/activation/RESULTS.md).
+| What the agent had to do | Without skills | With skills |
+| --- | ---: | ---: |
+| Test every configured backend with `--target all` | 100% | 100% |
+| Generate a MoonBit ESM library that Node can import by named export | 0% | **100%** |
+| Run both on-disk and virtual tests supplied by `--patch-file` | 100% | 100% |
+| Select a virtual-package provider without changing the default consumer | 100% | 100% |
+| **Overall** | **75%** | **100%** |
+
+The ESM named-export task was the only different outcome: without skills it failed, and with skills it passed.
+
+See the [full evaluation results](evals/RESULTS.md) for models, prompts, grading, and run details. Activation is measured [separately](evals/activation/RESULTS.md).
 
 ## FAQ
 

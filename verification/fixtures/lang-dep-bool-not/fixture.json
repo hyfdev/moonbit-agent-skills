@@ -1,0 +1,31 @@
+{
+  "id": "lang-dep-bool-not",
+  "owner_skill": "moonbit-language",
+  "knowledge": "Function-style Boolean negation emits deprecation warning E0020 in MoonBit 0.10.4; use prefix ! instead.",
+  "expect": "check-fail",
+  "diagnostic_contains": [
+    "[E0020]",
+    "deprecated",
+    "Use !expr instead"
+  ],
+  "fix": "Replace not(value) with !value.",
+  "targets": [
+    "wasm-gc",
+    "wasm",
+    "js",
+    "native"
+  ],
+  "moon_args": [
+    "--deny-warn"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-07-18",
+    "components": {
+      "moon": "0.1.20260713 (75c7e1f 2026-07-13)",
+      "moonc": "v0.10.4+2cc641edf (2026-07-15)",
+      "moonrun": "moonrun 0.1.20260713 (75c7e1f 2026-07-13)"
+    },
+    "platform": "Linux-x86_64"
+  }
+}

@@ -19,7 +19,7 @@ Agent Skills for MoonBit. Help coding agents work with MoonBit and write better 
 
 | Skill | Version | Updated | MoonBit | Verified |
 | --- | ---: | ---: | ---: | ---: |
-| [moonbit-language](skills/moonbit-language/SKILL.md) | [`0.3.1`](https://github.com/hyfdev/moonbit-agent-skills/commits/main/skills/moonbit-language) | 2026-07-19 | `0.10.4` | 2026-07-18 |
+| [moonbit-language](skills/moonbit-language/SKILL.md) | [`0.3.2`](https://github.com/hyfdev/moonbit-agent-skills/commits/main/skills/moonbit-language) | 2026-07-19 | `0.10.4` | 2026-07-18 |
 | [moonbit-toolchain](skills/moonbit-toolchain/SKILL.md) | [`0.3.1`](https://github.com/hyfdev/moonbit-agent-skills/commits/main/skills/moonbit-toolchain) | 2026-07-19 | `0.10.4` | 2026-07-18 |
 
 `moonbit-language` is the language reference for understanding, writing, and fixing MoonBit code: syntax, types, patterns, traits, errors, async, tests, and FFI.

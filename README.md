@@ -10,6 +10,7 @@ Agent Skills for MoonBit. Help coding agents work with MoonBit and write better 
 
 - [Skills](#skills)
 - [Install](#install)
+- [Update](#update)
 - [How to use](#how-to-use)
 - [Evaluation](#evaluation)
 - [FAQ](#faq)
@@ -17,10 +18,17 @@ Agent Skills for MoonBit. Help coding agents work with MoonBit and write better 
 
 ## Skills
 
-| Skill | Role | Scope |
-| --- | --- | --- |
-| [moonbit-language](skills/moonbit-language/SKILL.md) | Language reference | Understanding, writing, and fixing MoonBit code: syntax, types, patterns, traits, errors, async, tests, and FFI. |
-| [moonbit-toolchain](skills/moonbit-toolchain/SKILL.md) | Toolchain reference | Creating and operating MoonBit projects: `moon` commands, `moon.mod` / `moon.pkg`, dependencies, targets, testing, workspaces, publishing, and IDE queries. |
+### [moonbit-language](skills/moonbit-language/SKILL.md)
+
+Version `0.3.1` · Last updated 2026-07-19 · Verified 2026-07-18 against MoonBit `0.10.4` · [History](https://github.com/hyfdev/moonbit-agent-skills/commits/main/skills/moonbit-language)
+
+Language reference for understanding, writing, and fixing MoonBit code: syntax, types, patterns, traits, errors, async, tests, and FFI.
+
+### [moonbit-toolchain](skills/moonbit-toolchain/SKILL.md)
+
+Version `0.3.1` · Last updated 2026-07-19 · Verified 2026-07-18 against MoonBit `0.10.4` · [History](https://github.com/hyfdev/moonbit-agent-skills/commits/main/skills/moonbit-toolchain)
+
+Toolchain reference for creating and operating MoonBit projects: `moon` commands, `moon.mod` / `moon.pkg`, dependencies, targets, testing, workspaces, publishing, and IDE queries.
 
 ## Install
 
@@ -48,6 +56,22 @@ Clone or download this repository, then copy either or both skill directories in
 - `skills/moonbit-toolchain`
 
 </details>
+
+## Update
+
+Update both globally installed skills:
+
+```sh
+npx skills@latest update moonbit-language moonbit-toolchain -g
+```
+
+For project-level installations:
+
+```sh
+npx skills@latest update moonbit-language moonbit-toolchain -p
+```
+
+Installed `SKILL.md` files carry the same version, update date, and verification date shown above.
 
 ## How to use
 

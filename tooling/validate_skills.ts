@@ -8,7 +8,10 @@ const SKILLS_DIR = join(REPO_ROOT, "skills");
 
 export const NAME_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-const REQUIRED_METADATA_KEYS = new Set(["skill-version"]);
+const REQUIRED_METADATA_KEYS = new Set(["skill-version", "updated-date"]);
+
+export const SKILL_VERSION_RE = /^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)$/;
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 const REQUIRED_COMPONENT_KEYS: Record<string, Set<string>> = {
   "moonbit-language": new Set([
@@ -67,6 +70,18 @@ export function validateSkill(skillDir: string): string[] {
   const missing = [...required].filter((key) => !(key in metadata)).sort();
   if (missing.length > 0) {
     problems.push(`metadata missing version-contract keys: ${reprList(missing)}`);
+  }
+  const skillVersion = metadata["skill-version"];
+  if (skillVersion !== undefined && !SKILL_VERSION_RE.test(skillVersion)) {
+    problems.push(`metadata.skill-version ${repr(skillVersion)} must use SemVer x.y.z`);
+  }
+  const updatedDate = metadata["updated-date"];
+  if (updatedDate !== undefined && !isIsoDate(updatedDate)) {
+    problems.push(`metadata.updated-date ${repr(updatedDate)} must use a real YYYY-MM-DD date`);
+  }
+  const verifiedDate = metadata["verified-date"];
+  if (verifiedDate !== undefined && !isIsoDate(verifiedDate)) {
+    problems.push(`metadata.verified-date ${repr(verifiedDate)} must use a real YYYY-MM-DD date`);
   }
   if (name === "moonbit-agent-skills-maintainer" && metadata.scope !== "repository-maintenance") {
     problems.push("metadata.scope must be repository-maintenance");
@@ -136,6 +151,43 @@ export function validateSkill(skillDir: string): string[] {
   return problems.map((problem) => `${skillName}: ${problem}`);
 }
 
+export function readmeCatalogProblems(readme: string, skillDirectories: string[]): string[] {
+  const problems: string[] = [];
+  for (const skillDirectory of skillDirectories) {
+    const skillMd = join(skillDirectory, "SKILL.md");
+    if (!isFile(skillMd)) continue;
+    const parsed = parseFrontmatter(readFileSync(skillMd, "utf8"));
+    const name = scalar(parsed.frontmatter, "name") ?? basename(skillDirectory);
+    if (REQUIRED_COMPONENT_KEYS[name] === undefined) continue;
+    const metadata = stringMap(parsed.frontmatter, "metadata") ?? {};
+    const heading = `### [${name}](skills/${name}/SKILL.md)`;
+    if (!readme.includes(heading)) {
+      problems.push(`README: missing public skill heading ${repr(heading)}`);
+    }
+    const status = readmeStatusLine(name, metadata);
+    if (!readme.includes(status)) {
+      problems.push(`README: ${name} status does not match SKILL.md metadata`);
+    }
+  }
+  return problems;
+}
+
+export function readmeStatusLine(name: string, metadata: Record<string, string>): string {
+  return (
+    `Version \`${metadata["skill-version"] ?? ""}\` · ` +
+    `Last updated ${metadata["updated-date"] ?? ""} · ` +
+    `Verified ${metadata["verified-date"] ?? ""} against MoonBit ` +
+    `\`${metadata["moonbit-release"] ?? ""}\` · ` +
+    `[History](https://github.com/hyfdev/moonbit-agent-skills/commits/main/skills/${name})`
+  );
+}
+
+export function isIsoDate(value: string): boolean {
+  if (!DATE_RE.test(value)) return false;
+  const date = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(date.valueOf()) && date.toISOString().slice(0, 10) === value;
+}
+
 export function main(): number {
   const skillDirectories = readdirSync(SKILLS_DIR, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
@@ -147,6 +199,9 @@ export function main(): number {
   }
 
   const problems = skillDirectories.flatMap(validateSkill);
+  problems.push(
+    ...readmeCatalogProblems(readFileSync(join(REPO_ROOT, "README.md"), "utf8"), skillDirectories),
+  );
   for (const problem of problems) {
     console.error(`FAIL ${problem}`);
   }

@@ -6,6 +6,7 @@
     "check-duplication": "node tooling/check_duplication.ts",
     "check-language-surface": "node tooling/check_language_surface.ts",
     "check-release-coverage": "node tooling/check_release_coverage.ts",
+    "check-skill-versions": "node tooling/check_skill_versions.ts",
     "check-versions": "node tooling/check_versions.ts",
     "compare-toolchain": "node tooling/compare_toolchain.ts",
     "run-activation-eval": "node evals/activation/run_activation.ts",

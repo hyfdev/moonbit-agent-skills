@@ -5,7 +5,8 @@ license: MIT
 user-invocable: false
 compatibility: Verified only against moonc v0.10.4+2cc641edf (MoonBit v0.10.4, 2026-07-15). Needs the moon CLI for verification steps and Node.js 24+ for the bundled helper script.
 metadata:
-  skill-version: "0.3.0"
+  skill-version: "0.3.1"
+  updated-date: "2026-07-19"
   moonc-version: "0.10.4+2cc641edf"
   moonbit-release: "0.10.4"
   verified-date: "2026-07-18"

@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: voidzero-dev/setup-vp@v1
         with:
           node-version: "24"
@@ -23,6 +25,9 @@ jobs:
         run: vp test
       - name: Skill format (repository rules)
         run: vp run validate-skills
+      - name: Changed skills have new versions
+        if: github.event_name == 'pull_request'
+        run: vp run check-skill-versions --base "${{ github.event.pull_request.base.sha }}"
       - name: Cross-skill duplication
         run: vp run check-duplication
       - name: Version consistency

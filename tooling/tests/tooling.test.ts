@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 import { normalizeUnit } from "../check_duplication.ts";
+import { skillRevisionProblems } from "../check_skill_versions.ts";
 import { compareToolchains, main as compareMain } from "../compare_toolchain.ts";
 import { runSkill } from "../run_checked_docs.ts";
 import { checkOne, main as fixturesMain, materialize } from "../run_fixtures.ts";
@@ -14,7 +15,13 @@ import {
   parseComponent,
   VERSION_RE,
 } from "../snapshot_toolchain.ts";
-import { NAME_RE, validateSkill } from "../validate_skills.ts";
+import {
+  isIsoDate,
+  NAME_RE,
+  readmeCatalogProblems,
+  SKILL_VERSION_RE,
+  validateSkill,
+} from "../validate_skills.ts";
 import { parseFrontmatter } from "../lib/frontmatter.ts";
 import { parseCliArgs } from "../lib/cli.ts";
 import { normalizeOsName } from "../lib/platform.ts";
@@ -120,6 +127,7 @@ describe("frontmatter", () => {
         "description: Does things. Use when things need doing.\n" +
         "metadata:\n" +
         '  skill-version: "0.1.0"\n' +
+        "  updated-date: 2026-07-18\n" +
         "  verified-date: 2026-07-17\n" +
         "---\n" +
         "# Body\n",
@@ -128,6 +136,7 @@ describe("frontmatter", () => {
     expect(parsed.frontmatter.name).toBe("my-skill");
     expect(parsed.frontmatter.metadata).toEqual({
       "skill-version": "0.1.0",
+      "updated-date": "2026-07-18",
       "verified-date": "2026-07-17",
     });
     expect(parsed.body.startsWith("# Body")).toBe(true);
@@ -156,6 +165,47 @@ describe("skill names", () => {
   });
 });
 
+describe("skill freshness metadata", () => {
+  it("accepts SemVer skill versions and real ISO dates", () => {
+    expect(SKILL_VERSION_RE.test("0.3.1")).toBe(true);
+    expect(SKILL_VERSION_RE.test("2026.07.19")).toBe(false);
+    expect(isIsoDate("2026-07-19")).toBe(true);
+    expect(isIsoDate("2026-02-30")).toBe(false);
+  });
+
+  it("keeps the public README status synchronized with installed metadata", () => {
+    const skillDirectories = [
+      join(REPO_ROOT, "skills", "moonbit-language"),
+      join(REPO_ROOT, "skills", "moonbit-toolchain"),
+    ];
+    const readme = readFileSync(join(REPO_ROOT, "README.md"), "utf8");
+    expect(readmeCatalogProblems(readme, skillDirectories)).toEqual([]);
+    expect(
+      readmeCatalogProblems(readme.replace(/Version `[^`]+`/, "Version `stale`"), skillDirectories),
+    ).toContain("README: moonbit-language status does not match SKILL.md metadata");
+  });
+
+  it("requires changed skill content to carry a newer version and current change date", () => {
+    const before = skillDocument("0.3.0", "2026-07-18", "old guidance");
+    const unchangedIdentity = skillDocument("0.3.0", "2026-07-18", "new guidance");
+    expect(
+      skillRevisionProblems("moonbit-language", before, unchangedIdentity, "2026-07-19"),
+    ).toEqual([
+      "moonbit-language: changed content must increase metadata.skill-version above '0.3.0' (found '0.3.0')",
+      "moonbit-language: metadata.updated-date must match latest skill change date '2026-07-19' (found '2026-07-18')",
+    ]);
+
+    expect(
+      skillRevisionProblems(
+        "moonbit-language",
+        before,
+        skillDocument("0.3.1", "2026-07-19", "new guidance"),
+        "2026-07-19",
+      ),
+    ).toEqual([]);
+  });
+});
+
 it("requires repository-maintenance skills to stay internal", () => {
   const temporary = mkdtempSync(join(tmpdir(), "internal-skill-test-"));
   try {
@@ -163,7 +213,7 @@ it("requires repository-maintenance skills to stay internal", () => {
     mkdirSync(skill);
     writeFileSync(
       join(skill, "SKILL.md"),
-      "---\nname: release-maintainer\ndescription: Maintain releases.\nmetadata:\n  skill-version: 0.1.0\n  scope: repository-maintenance\n---\n# Maintainer\n",
+      "---\nname: release-maintainer\ndescription: Maintain releases.\nmetadata:\n  skill-version: 0.1.0\n  updated-date: 2026-07-19\n  scope: repository-maintenance\n---\n# Maintainer\n",
     );
     expect(validateSkill(skill)).toContain(
       "release-maintainer: repository-maintenance skills must set metadata.internal: true",
@@ -171,7 +221,7 @@ it("requires repository-maintenance skills to stay internal", () => {
 
     writeFileSync(
       join(skill, "SKILL.md"),
-      "---\nname: release-maintainer\ndescription: Maintain releases.\nmetadata:\n  skill-version: 0.1.0\n  scope: repository-maintenance\n  internal: true\n---\n# Maintainer\n",
+      "---\nname: release-maintainer\ndescription: Maintain releases.\nmetadata:\n  skill-version: 0.1.0\n  updated-date: 2026-07-19\n  scope: repository-maintenance\n  internal: true\n---\n# Maintainer\n",
     );
     expect(validateSkill(skill)).not.toContain(
       "release-maintainer: repository-maintenance skills must set metadata.internal: true",
@@ -192,6 +242,19 @@ it("normalizes duplication units without case or whitespace differences", () => 
     normalizeUnit("errors are raised with `raise`."),
   );
 });
+
+function skillDocument(version: string, updatedDate: string, body: string): string {
+  return (
+    "---\n" +
+    "name: moonbit-language\n" +
+    "description: MoonBit language reference.\n" +
+    "metadata:\n" +
+    `  skill-version: "${version}"\n` +
+    `  updated-date: "${updatedDate}"\n` +
+    "---\n" +
+    `${body}\n`
+  );
+}
 
 describe("toolchain comparison", () => {
   it("reports only missing or mismatched components", () => {

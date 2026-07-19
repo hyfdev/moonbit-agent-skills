@@ -12,7 +12,7 @@ Search these exact official documentation topic names to route a question into t
 
 ## Core values, mutable cells, and failure containers
 
-`Unit` is a real type with one value, `()`, used when no meaningful result is returned. `Boolean` values have type `Bool`, are `true` or `false`, and use `!value` (or `not(value)`) for negation. A `Ref[T]` is a mutable cell: construct it with `Ref(value)` and read or assign its `.val` field. `Option[T]` (`T?`) represents a missing-or-present value; `Result[T, E]` represents `Ok(T)` or `Err(E)`. Checked language errors and conversions between errors, Option and Result are covered in errors-and-error-handling.mbt.md.
+`Unit` is a real type with one value, `()`, used when no meaningful result is returned. Boolean values have type `Bool`, are `true` or `false`, and use prefix `!` for negation. A `Ref[T]` is a mutable cell: construct it with `Ref(value)` and read or assign its `.val` field. `Option[T]` (`T?`) represents a missing-or-present value; `Result[T, E]` represents `Ok(T)` or `Err(E)`. Checked language errors and conversions between errors, Option and Result are covered in errors-and-error-handling.mbt.md.
 
 ```mbt check
 test "core values, Bool, Ref, Option, Result, and Json" {
@@ -30,6 +30,12 @@ test "core values, Bool, Ref, Option, Result, and Json" {
   let object : Json = { "ok": true }
   json_inspect(object, content={ "ok": true })
 }
+```
+
+Function-style Boolean negation is deprecated at the pinned compiler version:
+
+```mbt nocheck
+let disabled = not(true) // DEPRECATED: E0020 — Use !expr instead
 ```
 
 ## Numbers

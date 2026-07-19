@@ -5,7 +5,7 @@ license: MIT
 user-invocable: false
 compatibility: Verified only against moonc v0.10.4+2cc641edf (MoonBit v0.10.4, 2026-07-15). Needs the moon CLI for verification steps and Node.js 24+ for the bundled helper script.
 metadata:
-  skill-version: "0.3.1"
+  skill-version: "0.3.2"
   updated-date: "2026-07-19"
   moonc-version: "0.10.4+2cc641edf"
   moonbit-release: "0.10.4"
@@ -49,7 +49,7 @@ Each row is both a capability map and a search route. Load only the rows relevan
 | Traits; generics; impls; explicit `extend` and `pub extend`; `implicit_impl_as_method`; supertrait dot-call migration; Builtin traits; Deriving builtin traits; operators; trait objects | references/traits-and-generics.mbt.md |
 | `pub`; `pub(all)`; `pub(open)`; `priv`; alias visibility; `pub impl`; source-level `using`; cross-package access and re-export | references/visibility.mbt.md |
 | Error types; `raise`; `try` / `catch` / `noraise`; `Option`; `Result`; deprecated `!Error`, bang calls, and `try?` | references/errors-and-error-handling.mbt.md |
-| `Unit`; `Bool`; `Ref`; `Option`; `Result`; `Json`; Numbers and overloaded literals; strings, bytes, escapes, interpolation, and Choosing a Byte Container; arrays, maps, views; conditional spread; ambiguous `{}`; immutable `Type(array)` / deprecated `from_array`; negative view indices; removed collection aliases and `IterResult`; `Json::empty_object`, String predicates, `Int16` / `UInt16` `lnot` | references/data-types.mbt.md |
+| `Unit`; `Bool`; Boolean negation; `!value`; deprecated `not(value)`; `Ref`; `Option`; `Result`; `Json`; Numbers and overloaded literals; strings, bytes, escapes, interpolation, and Choosing a Byte Container; arrays, maps, views; conditional spread; ambiguous `{}`; immutable `Type(array)` / deprecated `from_array`; negative view indices; removed collection aliases and `IterResult`; `Json::empty_object`, String predicates, `Int16` / `UInt16` `lnot` | references/data-types.mbt.md |
 | `if`; `while`; `for`; list comprehensions; `Iter` and `[\| ... \|]`; deprecated implicit array-to-Iter and `loop`; labels; closures; `defer` | references/control-flow-and-iteration.mbt.md |
 | `test`; snapshots; `inspect`; blackbox and whitebox tests; doc tests; `.mbt.md` | references/tests-and-checked-docs.mbt.md |
 | `async`; task groups; cancellation and cleanup; JavaScript Promise bridge; native/JS/Wasm1 runtime boundaries; `extern "js"`, `extern "wasm"`, `extern "C"`; stable FFI Types; constant enum ABI values; exported functions; FFI ownership and callbacks | references/async-and-ffi.md |

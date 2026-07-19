@@ -154,8 +154,23 @@ export function validateSkill(skillDir: string): string[] {
 export function readmeCatalogProblems(readme: string, skillDirectories: string[]): string[] {
   const problems: string[] = [];
   const tableHeader = "| Skill | Version | Updated | MoonBit | Verified |";
-  if (!readme.includes(tableHeader)) {
+  const sectionStart = readme.indexOf("## Skills\n");
+  const sectionEnd = sectionStart === -1 ? -1 : readme.indexOf("\n## ", sectionStart + 10);
+  const skillsSection =
+    sectionStart === -1
+      ? ""
+      : readme.slice(sectionStart, sectionEnd === -1 ? readme.length : sectionEnd);
+  const sectionLines = skillsSection.split("\n");
+  const headerIndex = sectionLines.indexOf(tableHeader);
+  if (headerIndex === -1) {
     problems.push(`README: missing public skill table header ${repr(tableHeader)}`);
+  }
+  const tableRows = new Set<string>();
+  if (headerIndex !== -1) {
+    for (const line of sectionLines.slice(headerIndex + 2)) {
+      if (!line.startsWith("|")) break;
+      tableRows.add(line);
+    }
   }
   for (const skillDirectory of skillDirectories) {
     const skillMd = join(skillDirectory, "SKILL.md");
@@ -165,7 +180,7 @@ export function readmeCatalogProblems(readme: string, skillDirectories: string[]
     if (REQUIRED_COMPONENT_KEYS[name] === undefined) continue;
     const metadata = stringMap(parsed.frontmatter, "metadata") ?? {};
     const status = readmeStatusRow(name, metadata);
-    if (!readme.includes(status)) {
+    if (!tableRows.has(status)) {
       problems.push(`README: ${name} status does not match SKILL.md metadata`);
     }
   }

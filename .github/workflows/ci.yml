@@ -28,6 +28,9 @@ jobs:
       - name: Changed skills have new versions
         if: github.event_name == 'pull_request'
         run: vp run check-skill-versions --base "${{ github.event.pull_request.base.sha }}"
+      - name: Changed skills have new versions after a main push
+        if: github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
+        run: vp run check-skill-versions --base "${{ github.event.before }}"
       - name: Cross-skill duplication
         run: vp run check-duplication
       - name: Version consistency

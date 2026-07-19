@@ -185,7 +185,8 @@ describe("skill freshness metadata", () => {
     const metadata = stringMap(parseFrontmatter(languageSkill).frontmatter, "metadata") ?? {};
     const currentRow = readmeStatusRow("moonbit-language", metadata);
     const staleRow = currentRow.replace(metadata["skill-version"], "stale");
-    expect(readmeCatalogProblems(readme.replace(currentRow, staleRow), skillDirectories)).toContain(
+    const staleTableWithCorrectRowElsewhere = `${readme.replace(currentRow, staleRow)}\n${currentRow}\n`;
+    expect(readmeCatalogProblems(staleTableWithCorrectRowElsewhere, skillDirectories)).toContain(
       "README: moonbit-language status does not match SKILL.md metadata",
     );
   });
@@ -208,6 +209,15 @@ describe("skill freshness metadata", () => {
         "2026-07-19",
       ),
     ).toEqual([]);
+
+    expect(
+      skillRevisionProblems(
+        "moonbit-language",
+        skillDocument("invalid", "2026-07-18", "old guidance"),
+        skillDocument("0.3.1", "2026-07-19", "new guidance"),
+        "2026-07-19",
+      ),
+    ).toContain("moonbit-language: base metadata.skill-version must be valid before comparison");
   });
 });
 

@@ -27,9 +27,9 @@ export function skillRevisionProblems(
 
   if (previousSkill !== undefined) {
     const previous = skillIdentity(previousSkill);
-    if (
-      previous.version !== undefined &&
-      SKILL_VERSION_RE.test(previous.version) &&
+    if (previous.version === undefined || !SKILL_VERSION_RE.test(previous.version)) {
+      problems.push(`${skillName}: base metadata.skill-version must be valid before comparison`);
+    } else if (
       current.version !== undefined &&
       SKILL_VERSION_RE.test(current.version) &&
       compareSemVer(current.version, previous.version) <= 0
@@ -61,8 +61,13 @@ export function changedSkillRevisionProblems(
   const mergeBase = checkedOutput(runner, "git", ["merge-base", baseRef, "HEAD"], {
     cwd: repository,
   });
-  const changedPaths = lines(
-    checkedOutput(runner, "git", ["diff", "--name-only", mergeBase, "--", "skills"], {
+  const committedPaths = lines(
+    checkedOutput(runner, "git", ["diff", "--name-only", mergeBase, "HEAD", "--", "skills"], {
+      cwd: repository,
+    }),
+  );
+  const dirtyPaths = lines(
+    checkedOutput(runner, "git", ["diff", "--name-only", "HEAD", "--", "skills"], {
       cwd: repository,
     }),
   );
@@ -71,7 +76,7 @@ export function changedSkillRevisionProblems(
       cwd: repository,
     }),
   );
-  const allChangedPaths = [...new Set([...changedPaths, ...untrackedPaths])];
+  const allChangedPaths = [...new Set([...committedPaths, ...dirtyPaths, ...untrackedPaths])];
   const changedSkillNames = [
     ...new Set(
       allChangedPaths
@@ -83,7 +88,7 @@ export function changedSkillRevisionProblems(
   const problems: string[] = [];
   for (const skillName of changedSkillNames) {
     const skillPath = `skills/${skillName}/SKILL.md`;
-    const previousSkill = readGitFile(runner, repository, mergeBase, skillPath);
+    const previousSkill = readGitFile(runner, repository, baseRef, skillPath);
     const currentPath = join(repository, skillPath);
     const currentSkill = existsSync(currentPath) ? readFileSync(currentPath, "utf8") : undefined;
     const committedDates = lines(
@@ -93,11 +98,10 @@ export function changedSkillRevisionProblems(
         ["log", "--format=%aI", `${mergeBase}..HEAD`, "--", `skills/${skillName}`],
         { cwd: repository },
       ),
-    ).map((timestamp) => timestamp.slice(0, 10));
-    const hasWorkingTreeChanges =
-      runner("git", ["diff", "--quiet", "HEAD", "--", `skills/${skillName}`], {
-        cwd: repository,
-      }).exitCode !== 0 || untrackedPaths.some((path) => path.startsWith(`skills/${skillName}/`));
+    ).map(singaporeDate);
+    const hasWorkingTreeChanges = [...dirtyPaths, ...untrackedPaths].some((path) =>
+      path.startsWith(`skills/${skillName}/`),
+    );
     const changeDates = hasWorkingTreeChanges
       ? [...committedDates, workingTreeDate]
       : committedDates;
@@ -180,13 +184,15 @@ function lines(text: string): string[] {
     .filter(Boolean);
 }
 
-function singaporeDate(now = new Date()): string {
+export function singaporeDate(value: string | Date = new Date()): string {
+  const date = typeof value === "string" ? new Date(value) : value;
+  if (Number.isNaN(date.valueOf())) throw new Error(`invalid timestamp ${repr(String(value))}`);
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Singapore",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-  }).formatToParts(now);
+  }).formatToParts(date);
   const values = new Map(parts.map((part) => [part.type, part.value]));
   return `${values.get("year")}-${values.get("month")}-${values.get("day")}`;
 }

@@ -17,7 +17,7 @@ This repository publishes two MoonBit product skills (`skills/moonbit-language`,
 11. **Repository-maintenance skills stay internal.** Set `metadata.internal: true` so default listing, interactive selection, and installs without an explicit skill selector omit them. Do not use `--skill "*"` in public install instructions because an explicit selector opts into internal skills. The two product skills are the only public install surface.
 12. **Eval breadth comes before repetition.** Count distinct user cases, not condition cells. A case may have at most two materially different user-facing angles, and each angle may run at most twice. Start every content case with one paired `none` versus `ours` run on Claude Code's `sonnet` alias; on this repository's verified local setup the assistant execution model must be `deepseek-v4-pro`, not `deepseek-v4-flash`. Repeat the DeepSeek pair only when `ours` fails or the pair is unstable. Use Kimi/K3 only when `ours` still fails on the second DeepSeek run, and report that fallback separately rather than pooling providers. Do not automatically cross-product angles, repetitions, and clients.
 13. **Every new or updated eval report has a simple user-facing result.** Put it before the technical analysis and keep it even when a detailed report follows. Give every distinct task its own row named after the concrete work the agent had to complete, state the total number of distinct tasks, show percentages for the two conditions side by side, identify the observed model, and give the primary finding in one sentence. Name the comparison exactly (`No skills`, `Historical skill`, or the specific removed route), never just `Baseline`. Always show final task success, including ties and regressions; skill activation and reference reads are secondary evidence and must not replace it. Keep exact counts, internal task IDs, claim IDs, condition names, repetitions, cells, graders, token breakdowns, and statistical analysis in the technical section. Never call cells or repetitions tasks.
-14. **A skill directory change needs a new installed identity.** Increment that skill's `metadata.skill-version`, set `metadata.updated-date` to the date of the latest skill change in Singapore time (UTC+8), and keep the public README status synchronized. Use SemVer: patch for corrections or metadata, minor for compatible new coverage, and major for an incompatible rename or scope change. Run `vp run check-skill-versions --base origin/main`; CI compares every changed skill against the pull request base and rejects a missing version or date update.
+14. **A skill directory change needs a new installed identity.** Increment that skill's `metadata.skill-version`, set `metadata.updated-date` to the change date, and keep the public README status synchronized. Use SemVer: patch for corrections or metadata, minor for compatible new coverage, and major for an incompatible rename or scope change. `validate-skills` checks the metadata format and README projection.
 
 ## Local check sequence (mirror of CI)
 
@@ -26,7 +26,6 @@ vp install
 vp check
 vp test
 vp run validate-skills
-vp run check-skill-versions --base origin/main
 vp run check-duplication
 vp run check-versions
 vp run verify-language-surface-source

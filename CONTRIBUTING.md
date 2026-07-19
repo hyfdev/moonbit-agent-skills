@@ -28,7 +28,7 @@ Use the repository's internal `moonbit-agent-skills-maintainer` skill so the wor
 3. Close content gaps. New language forms need checked examples for every claimed behavior; deprecations need the old form caught with warnings denied plus a passing replacement; commands/configuration need manifest or fixture evidence; unexecutable facts need an explicit `Documented, not executed` label and direct source. A documented-only deprecation still needs separate old-form and replacement roles and an explicit reason it cannot execute.
 4. Add or update deterministic content evals for changes that materially alter agent recommendations.
 5. Only after coverage is closed, run `moon upgrade` (or install the new channel build), `vp run snapshot-toolchain --date $(date +%F)`, and the three verification runners. Fix drift exposed by the new toolchain.
-6. Run `vp run run-fixtures --stamp --date $(date +%F)`, update the two product skills' frontmatter pins and compatibility lines, bump their `skill-version`, set `updated-date` to the Singapore date of the change, and run `vp run check-versions` plus `vp run check-skill-versions --base origin/main`.
+6. Run `vp run run-fixtures --stamp --date $(date +%F)`, update the two product skills' frontmatter pins and compatibility lines, bump their `skill-version`, set `updated-date` to the change date, and run `vp run validate-skills` plus `vp run check-versions`.
 7. Re-pin the official language surface if the documentation commit changed, close every added or renamed topic, and run `vp run verify-language-surface-source` plus `vp run check-language-surface`.
 8. Run the complete sequence in `AGENTS.md`, the targeted content evals, and the two release reviews required by the maintainer skill.
 

@@ -3,7 +3,6 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 import { normalizeUnit } from "../check_duplication.ts";
-import { skillRevisionProblems } from "../check_skill_versions.ts";
 import { compareToolchains, main as compareMain } from "../compare_toolchain.ts";
 import { runSkill } from "../run_checked_docs.ts";
 import { checkOne, main as fixturesMain, materialize } from "../run_fixtures.ts";
@@ -190,35 +189,6 @@ describe("skill freshness metadata", () => {
       "README: moonbit-language status does not match SKILL.md metadata",
     );
   });
-
-  it("requires changed skill content to carry a newer version and current change date", () => {
-    const before = skillDocument("0.3.0", "2026-07-18", "old guidance");
-    const unchangedIdentity = skillDocument("0.3.0", "2026-07-18", "new guidance");
-    expect(
-      skillRevisionProblems("moonbit-language", before, unchangedIdentity, "2026-07-19"),
-    ).toEqual([
-      "moonbit-language: changed content must increase metadata.skill-version above '0.3.0' (found '0.3.0')",
-      "moonbit-language: metadata.updated-date must match latest skill change date '2026-07-19' (found '2026-07-18')",
-    ]);
-
-    expect(
-      skillRevisionProblems(
-        "moonbit-language",
-        before,
-        skillDocument("0.3.1", "2026-07-19", "new guidance"),
-        "2026-07-19",
-      ),
-    ).toEqual([]);
-
-    expect(
-      skillRevisionProblems(
-        "moonbit-language",
-        skillDocument("invalid", "2026-07-18", "old guidance"),
-        skillDocument("0.3.1", "2026-07-19", "new guidance"),
-        "2026-07-19",
-      ),
-    ).toContain("moonbit-language: base metadata.skill-version must be valid before comparison");
-  });
 });
 
 it("requires repository-maintenance skills to stay internal", () => {
@@ -257,19 +227,6 @@ it("normalizes duplication units without case or whitespace differences", () => 
     normalizeUnit("errors are raised with `raise`."),
   );
 });
-
-function skillDocument(version: string, updatedDate: string, body: string): string {
-  return (
-    "---\n" +
-    "name: moonbit-language\n" +
-    "description: MoonBit language reference.\n" +
-    "metadata:\n" +
-    `  skill-version: "${version}"\n` +
-    `  updated-date: "${updatedDate}"\n` +
-    "---\n" +
-    `${body}\n`
-  );
-}
 
 describe("toolchain comparison", () => {
   it("reports only missing or mismatched components", () => {

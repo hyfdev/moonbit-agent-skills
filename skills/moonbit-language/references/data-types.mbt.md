@@ -32,7 +32,7 @@ test "core values, Bool, Ref, Option, Result, and Json" {
 }
 ```
 
-Function-style Boolean negation is deprecated at the pinned compiler version:
+Function-style Boolean negation is deprecated in `moonc v0.10.4+2cc641edf`:
 
 ```mbt nocheck
 let disabled = not(true) // DEPRECATED: E0020 — Use !expr instead

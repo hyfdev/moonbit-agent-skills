@@ -63,6 +63,7 @@ These still compile, but only as deprecated legacy syntax (`moon check` passes w
 - `g!()` bang call -> plain `g()` inside a function declaring a compatible `raise`. Warning: ``The syntax `f!(..)` for calling function with error is deprecated``.
 - `-> Int!Error` return annotation -> `-> Int raise` (or `raise SomeError`). Warning: ``The syntax `!Err` for error type annotation is deprecated``.
 - `for { ... }` infinite loop -> `for ;; { ... }`. Warning: ``The syntax `for { ... }` for infinite loop is deprecated``.
+- `loop <payload> { <patterns> }` functional loop -> `for v = <payload> { match v { <arms> } }` with explicit `break` and comma-separated `continue` values without parentheses. Warning: ``deprecated_syntax`` (0027).
 - `type! MyError String` -> `suberror MyError { MyError(String) }`. Warning: ``The syntax `type! A` for declaring suberror type is deprecated``.
 
 ## Silent traps: code that compiles but does something else

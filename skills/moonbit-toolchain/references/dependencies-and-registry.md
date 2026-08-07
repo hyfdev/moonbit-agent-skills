@@ -1,5 +1,9 @@
 # Dependencies and the mooncakes registry
 
+## Official toolchain topic map
+
+Official headings routed here: `moon add`; `moon remove`; `moon install`; `moon tree`; `moon login`; `moon register`; `moon publish`; `moon package`; `moon update`; Use and publish packages; Setup mooncakes.io account; Setup MoonBit project; Add dependencies; Import packages from module; Remove dependencies; Publish your module; Semantic versioning convention; Readme & metadata.
+
 Dependency commands need network access (they talk to mooncakes.io); everything in the first sections was executed at the pin. Registry-account operations at the end are **described, not executed** — they change remote state (the one exception: a single `moon publish --dry-run` probe was run once during verification and aborted at the registry's authorization check; nothing was published).
 
 ## Adding, removing, inspecting

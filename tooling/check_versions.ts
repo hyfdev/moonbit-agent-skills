@@ -42,6 +42,11 @@ export function main(): number {
   const snapshotDate = snapshot.verification_date;
   const snapshotTargets = new Set(snapshot.verified_targets);
   const snapshotPlatform = `${snapshot.platform.os}-${snapshot.platform.arch}`;
+  const compilerVersion = components.get("moonc")?.version ?? "";
+  const snapshotRelease = moonBitReleaseFromCompilerVersion(compilerVersion);
+  if (snapshotRelease === undefined) {
+    throw new Error(`cannot derive MoonBit release from snapshot moonc ${repr(compilerVersion)}`);
+  }
 
   for (const skillDirectory of directories(SKILLS_DIR)) {
     const skillMd = join(skillDirectory, "SKILL.md");
@@ -54,6 +59,12 @@ export function main(): number {
 
     if (!("moonbit-release" in metadata)) {
       continue;
+    }
+
+    if (metadata["moonbit-release"] !== snapshotRelease) {
+      problems.push(
+        `${label}: metadata.moonbit-release=${reprOptional(metadata["moonbit-release"])} != snapshot moonc release ${repr(snapshotRelease)}`,
+      );
     }
 
     for (const [metadataKey, componentName] of Object.entries(COMPONENT_KEY)) {
@@ -137,6 +148,10 @@ export function main(): number {
     console.log("version consistency: OK");
   }
   return problems.length > 0 ? 1 : 0;
+}
+
+export function moonBitReleaseFromCompilerVersion(version: string): string | undefined {
+  return /^(\d+\.\d+\.\d+)(?:[+-].*)?$/.exec(version)?.[1];
 }
 
 function directories(parent: string): string[] {

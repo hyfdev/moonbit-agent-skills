@@ -1,5 +1,9 @@
 # Diagnostics and recovery
 
+## Official toolchain topic map
+
+Official headings routed here: Warning List; Warnings List; Alert Warning.
+
 How to read what moon tells you, and what the common failures actually look like at the pin (all messages below are verbatim from real runs).
 
 ## Reading diagnostics
@@ -47,6 +51,8 @@ moon check --warn-list +unnecessary_annotation
 - `--deny-warn` (also `-d`) turns warnings into errors: exit flips from 0 to 255 and labels become `Error Warning (unused_value): ...`.
 - `--warn-list` takes `+name` or `+id` (verified: `+unnecessary_annotation` and `+73` both enable warning 0073). Names come from the parenthesized label in any rendered warning.
 - These flags exist on check/build/test/run alike.
+
+The current persistent form is `warnings = "..."` in either `moon.mod` or `moon.pkg`. It uses the same concatenated `-name` / `+name` syntax, for example `warnings = "-unused_value+unused_optional_argument"`. Legacy JSON calls this field `"warn-list"`. Older configurations may prefix a warning with `@` to promote it to an error, but that spelling remains only for compatibility; use `--deny-warn` on the CI command instead. The command manifest proves both current DSL locations under `moon check --deny-warn`.
 
 ## Common failures, verbatim
 

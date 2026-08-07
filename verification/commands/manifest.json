@@ -782,6 +782,32 @@
       ]
     },
     {
+      "id": "shell-completion-help",
+      "fixture": "empty",
+      "steps": [
+        {
+          "kind": "moon",
+          "argv": ["moon", "shell-completion", "--help"],
+          "expect": {
+            "output_contains": ["bash", "elvish", "fish", "powershell", "zsh", "stdout"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "generate-build-matrix-help",
+      "fixture": "empty",
+      "steps": [
+        {
+          "kind": "moon",
+          "argv": ["moon", "generate-build-matrix", "--help"],
+          "expect": {
+            "output_contains": ["legacy feature", "--output-dir", "--drow", "--mcol"]
+          }
+        }
+      ]
+    },
+    {
       "id": "runwasm-help",
       "fixture": "empty",
       "steps": [
@@ -985,7 +1011,7 @@
       "steps": [
         {
           "kind": "shell",
-          "script": "printf '\\nsupported_targets = [ \"js\", \"wasm-gc\" ]\\n' >> moon.mod"
+          "script": "printf '\\nsupported_targets = \"+js+wasm-gc\"\\n' >> moon.mod"
         },
         {
           "kind": "moon",
@@ -995,6 +1021,42 @@
               "no work to do"
             ]
           }
+        }
+      ]
+    },
+    {
+      "id": "warnings-module-current-dsl",
+      "fixture": "template",
+      "steps": [
+        {
+          "kind": "shell",
+          "script": "printf '\\nwarnings = \"-unused_value\"\\n' >> moon.mod"
+        },
+        {
+          "kind": "shell",
+          "script": "printf '\\n///|\\nfn unused_module_helper() -> Unit {}\\n' >> lib.mbt"
+        },
+        {
+          "kind": "moon",
+          "argv": ["moon", "check", "--deny-warn"]
+        }
+      ]
+    },
+    {
+      "id": "warnings-package-current-dsl",
+      "fixture": "template",
+      "steps": [
+        {
+          "kind": "shell",
+          "script": "printf 'warnings = \"-unused_value\"\\n' > textutil/moon.pkg"
+        },
+        {
+          "kind": "shell",
+          "script": "printf '\\n///|\\nfn unused_package_helper() -> Unit {}\\n' >> textutil/shout.mbt"
+        },
+        {
+          "kind": "moon",
+          "argv": ["moon", "check", "--deny-warn"]
         }
       ]
     },

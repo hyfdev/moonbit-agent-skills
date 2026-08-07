@@ -31,6 +31,12 @@ jobs:
         run: vp run verify-latest-upstream
       - name: Pinned language surface matches official docs
         run: vp run verify-language-surface-source
+      - name: Pinned toolchain surface matches official docs
+        run: vp run verify-toolchain-surface-source
+      - name: Every official language topic has a route or boundary
+        run: vp run check-language-surface
+      - name: Every official toolchain topic has a route or boundary
+        run: vp run check-toolchain-surface
       - name: Pinned release inventories match upstream Markdown
         run: vp run verify-release-sources
       - name: Every release item has a closed coverage decision

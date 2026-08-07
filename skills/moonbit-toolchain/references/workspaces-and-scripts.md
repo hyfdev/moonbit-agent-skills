@@ -1,5 +1,9 @@
 # Workspaces and script mode
 
+## Official toolchain topic map
+
+Official headings routed here: Rule; Scripts; postadd script; \[Experimental\] Pre-build config script; Input; Output; Build variables; Rule and dev_build; Running `.mbtx` Scripts; Run a `.mbtx` file; Run a `.mbtx` script from stdin; Workspace Support; Initialize a workspace; Add members; Work at workspace root; Sync member versions.
+
 Two ways to work outside a single published module: `moon.work` ties sibling modules together (the official replacement for local path dependencies), and `.mbtx` scripts run without any module at all. Both verified at the pin.
 
 ## moon.work format
@@ -93,3 +97,5 @@ dev_build(
 Migrating a legacy `"pre-build"` JSON field instead produces `options("pre-build": [ { "input": ..., "output": ..., "command": ... } ])`, which also still works.
 
 Security restriction (documented, not executed here): the official docs state that when a package is used as a dependency, its pre-build steps "are not triggered for security reasons, so dependencies do not execute arbitrary commands during builds" — https://docs.moonbitlang.com/en/latest/toolchain/moon/package.html.
+
+**Documented, not executed for module hooks:** a module-level `rule(name: "...", command: "...")` is reusable from package-level `dev_build`; `options(scripts: { "postadd": "..." })` runs after the module is added with the module directory as its working directory. The separate `options("--moonbit-unstable-prebuild": "path")` config-script hook is explicitly experimental, accepts JavaScript or Python, consumes build-environment JSON on stdin, and can execute arbitrary code; use it only for trusted projects and re-check the current schema before adopting it. Source: https://github.com/moonbitlang/moonbit-docs/blob/c86a73f5f60a34f73c4865b837f777368ad52c7a/next/toolchain/moon/module.md#L571-L684.

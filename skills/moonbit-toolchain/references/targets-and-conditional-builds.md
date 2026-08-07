@@ -2,6 +2,10 @@
 
 All executable claims are verified at the pin on Linux x86_64. A debug native build uses MoonBit's new native code generator and the system linker; a release native build still generates C and invokes the system C compiler.
 
+## Official toolchain topic map
+
+Official headings routed here: Preferred Target; Supported Targets; Conditional Compilation; Native Stub Files; Link Options; Wasm Backend Link Options; Common Options; Wasm Linear Backend Link Options; Wasm GC Backend Link Options; JS Backend Link Options; Native Backend Link Options; Default C compiler and compiler flags for the native backend; WebAssembly Integration; Custom Export and Import.
+
 ## Target selection
 
 ```sh
@@ -28,14 +32,14 @@ On the verified Linux x86_64 host, a debug build uses the new native backend by 
 
 ## Restricting targets: supported_targets
 
-Two different shapes at the two levels (verified):
+Both `moon.mod` and `moon.pkg` use the same canonical compact target-set string: `supported_targets = "js"`, `"+js+wasm-gc"`, or `"+all-native"` (`+` adds, `-` subtracts from `all`). The older array form remains accepted for compatibility but is legacy syntax; JSON migration may still emit it. When both a module and one of its packages declare supported targets, the effective set is their intersection.
 
-- **Module level** (moon.mod): an array — `supported_targets = [ "js", "wasm-gc" ]`. Building an unsupported target is **silently skipped**: `moon build --target native` prints `Finished. moon: no work to do` and exits 0. Nothing fails — watch for this in CI matrices.
-- **Package level** (moon.pkg): a top-level key, preferably with a string *expression* — `supported_targets = "js"`, `"js+wasm-gc"`, or `"all-native"` (`+` adds, `-` subtracts from `all`). An array (`supported_targets = [ "js" ]`) also parses and enforces identically — it is what JSON migration emits. Effects differ by how the package is reached (all verified):
+- **Module level** (moon.mod): `supported_targets = "+js+wasm-gc"`. Building an unsupported target is **silently skipped**: `moon build --target native` prints `Finished. moon: no work to do` and exits 0. Nothing fails — watch for this in CI matrices.
+- **Package level** (moon.pkg): the same top-level compact string. Effects differ by how the package is reached (all verified):
   - Whole-module `moon check`/`moon build` on an unsupported backend **silently skips** the package (exit 0, fewer tasks) — same trap as the module level.
   - Naming the package directly (`moon check textutil`) errors: `Package '...' does not support target backend 'wasm-gc'. Supported backends: [js]` (exit 255).
   - Importing it from a package that is built for an unsupported backend errors with `Selected backend 'wasm-gc' is incompatible with the dependency graph. '...' requires '...' which supports [js]` plus the dependency path — the restriction propagates to importers.
-- The older package-level `options("supported-targets": [ ... ])` spelling still parses but emits two deprecation warnings (exact wording not transcribed here; run it to see them). Note `moon fmt` canonicalizes it to `options(supported_targets: [...])` rather than the expression form.
+- The older package-level `options("supported-targets": [ ... ])` spelling still parses but emits two deprecation warnings (exact wording not transcribed here; run it to see them). `moon fmt` may canonicalize it only as far as `options(supported_targets: [...])`; prefer the current top-level compact string in newly written configuration.
 
 ## Per-file conditional compilation
 

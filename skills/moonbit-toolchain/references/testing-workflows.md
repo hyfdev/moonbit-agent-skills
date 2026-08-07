@@ -8,6 +8,8 @@ Use these exact headings from the official language documentation to recognize p
 
 - Benchmarks: Writing Benchmarks; Benchmarking with Test Blocks; Batch Benchmarking; Raw Benchmark Statistics
 
+Official toolchain headings routed here: `moon bench`; `moon coverage`; `moon coverage analyze`; `moon coverage report`; `moon coverage clean`; `moon generate-build-matrix`; Measuring code coverage; Running code coverage in tests; Visualizing the coverage results; Text summary; OCaml Bisect format; Coveralls JSON format; Cobertura XML format; HTML; Skipping coverage; Maximum Concurrent Tests.
+
 ## Selecting what runs
 
 ```sh
@@ -25,6 +27,8 @@ moon test --outline
 - `-i/--index N` picks one test by index within a single file; a range `0-2` runs indices 0 and 1 (right-exclusive). `-i` implies `--include-skipped`.
 - **Trap:** `-f` is `--filter`, a glob on the test **name** — it is *not* a file selector (files go positionally). `-F` is an undocumented alias.
 - `moon test --outline` lists every test (package, file:line, index, name) without running anything — the fastest way to find names and indices.
+
+**Documented, not executed for parallel scheduling:** `options("max-concurrent-tests": 2)` in `moon.pkg` limits how many tests from that package may run concurrently, for example when tests share ports or temporary files. Source: https://github.com/moonbitlang/moonbit-docs/blob/c86a73f5f60a34f73c4865b837f777368ad52c7a/next/toolchain/moon/package.md#L275-L298.
 
 ## Failures, exit codes, machine output
 
@@ -103,3 +107,9 @@ moon bench textutil
 ```
 
 Output reports `time (mean ± σ)` and `range (min … max)` per bench block. Since 0.10.4, `moon bench` accepts a positional package or file path; it also shares `moon test`'s `--target` and `--release` flags. Omitting the core/bench import still works at the pin but emits a `core_package_not_imported` deprecation warning.
+
+```sh
+moon generate-build-matrix --help
+```
+
+`moon generate-build-matrix --help` labels that generator a legacy benchmarking feature. It requires `--output-dir` and can set directory/module row and column counts; prefer ordinary projects and benchmark commands unless reproducing that legacy matrix workflow.

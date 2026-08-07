@@ -2,12 +2,12 @@
 
 This note records the locally verified command contracts used by the eval harness. Re-check it when either CLI version changes; do not infer behavior from the product name or authentication status.
 
-Verified on 2026-07-18:
+The Claude Code contract was re-verified by the 2026-08-07 MoonBit 0.10.6 content runs. Kimi 0.29.1's help surface was checked on 2026-08-07, but its provider and stream contract below was last exercised on 2026-07-18 with 0.26.0; no Kimi fallback was needed for the new runs.
 
-| Client | Version | Local backend | Access mode |
-| --- | --- | --- | --- |
-| Kimi Code CLI | `0.26.0` | provider `kimi`, requested alias `kimi-code/k3`, observed model `k3` | subscription |
-| Claude Code | `2.1.212` | `https://api.deepseek.com`; `haiku` maps to `deepseek-v4-flash`, `sonnet` and `opus` map to `deepseek-v4-pro[1m]` | API |
+| Client | Installed version | Last exercised contract | Local backend | Access mode |
+| --- | --- | --- | --- | --- |
+| Kimi Code CLI | `0.29.1` | provider/stream run: `0.26.0` on 2026-07-18 | provider `kimi`, requested alias `kimi-code/k3`, observed model `k3` | subscription |
+| Claude Code | `2.1.220` | `2.1.220` on 2026-08-07 | `https://api.deepseek.com`; `haiku` maps to `deepseek-v4-flash`, `sonnet` and `opus` map to `deepseek-v4-pro[1m]` | API |
 
 The names above describe this machine, not portable defaults. Every checked result must retain the requested model, observed model, CLI version, and provider origin when available. Subscription versus API remains an operational runner choice, not a per-result field.
 
@@ -23,7 +23,7 @@ kimi \
   --output-format stream-json
 ```
 
-Set the working directory through the TypeScript child-process `cwd`; this version has no `--cwd` option. Do not combine prompt mode with `--auto` or `--yolo`: `-p` already uses auto permission mode, and either combination exits with status 1. Do not use `--continue`, `--session`, or the hidden resume alias.
+Set the working directory through the TypeScript child-process `cwd`; the 0.29.1 help surface still has no `--cwd` option. In the provider/stream contract last exercised on 0.26.0, prompt mode could not be combined with `--auto` or `--yolo`: `-p` already used auto permission mode, and either combination exited with status 1. Do not use `--continue`, `--session`, or the hidden resume alias.
 
 `--skills-dir` replaces automatic user/project skill discovery. Point the no-skill condition at an empty controlled directory and each skill condition at its materialized snapshot. It does not suppress `AGENTS.md`, so use an isolated temporary workspace outside a parent tree with uncontrolled instructions, or keep the same controlled instructions in every condition.
 

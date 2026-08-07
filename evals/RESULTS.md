@@ -1,5 +1,22 @@
 # Content eval results
 
+## 2026-08-07 MoonBit 0.10.6 regression run
+
+Distinct tasks: 2
+
+| What the agent had to do | Observed model | No skills | With frozen 0.10.6 skills |
+| --- | --- | ---: | ---: |
+| Preserve intentional guard termination while clearing the current warning with the minimal guard migration | `deepseek-v4-pro` | 50% (1/2) | 50% (1/2) |
+| Update a bare-build artifact check to the current default wasm target without forcing a target | `deepseek-v4-pro` | 100% (1/1) | 100% (1/1) |
+
+Both conditions tied on both tasks, so this small regression run did not establish a task-success improvement from the frozen skills. It verified the two task contracts, deterministic graders, and current executable behavior for the intentional-termination `guard!` migration and the default `_build/wasm/...` artifact path; because no skill activated, it does not show that skill guidance caused either outcome.
+
+The language pair was repeated once under the predeclared stopping rule because the first current-skill cell failed. In the first pair, both agents replaced the guard with `Option::unwrap()`: the result preserved termination, passed `moon check --deny-warn`, and passed both tests, but it did not satisfy the task's minimal guard-migration criterion requiring `guard!`. In the final allowed repetition, both agents made the one-character `guard` to `guard!` change and passed. The toolchain pair passed on its first run in both conditions.
+
+All six cells completed normally and were eligible for comparison. Every assistant execution emitted `deepseek-v4-pro` through Claude Code 2.1.220 with the requested `sonnet` alias; there were no timeouts, client errors, invalid pairs, execution-signature mismatches, or model mismatches. Across the three frozen-skill cells, neither product skill activated and neither target reference was read, so these outcomes support the executable regression coverage but not an automatic-routing or skill-attribution claim.
+
+The two grader contracts accepted their canonical solutions and rejected two declared plausible wrong solutions each: 6/6 contract cases behaved as declared before model execution. The six model cells used 49,501 input tokens, 224,256 cache-read input tokens, 0 cache-creation input tokens, and 10,620 output tokens over 2 minutes 42.6 seconds. Conditions were frozen at commit `9bbf6301246f31d37d8602c19377d1bac87693b9`; the exact environment was moon `0.1.20260803`, moonc `v0.10.6+80dc50f24`, and moonrun `0.1.20260803`. Adversarial review subsequently added deterministic toolchain-document closure and corrected two configuration forms; those later changes are not represented as model-evaluated skill content.
+
 ## 2026-07-19 primary language behavior and API run
 
 Distinct language tasks: 4

@@ -11,14 +11,14 @@
       "path": "next/language/index.md",
       "sha256": "b6d7df45b48176394db49e78f27c284c4e22662217d731ff1c50768d142bd8b0",
       "version_label": "MoonBit v0.10.6 documentation",
-      "notes": "Mechanical source for verification/language-surface/source.json. Known lag is not treated as executable truth: the official local-types example suppresses deprecated_syntax even though the pinned compiler warns."
+      "notes": "Mechanical source for verification/language-surface/source.json and verification/toolchain-surface/source.json. Known lag is not treated as executable truth: the official local-types example suppresses deprecated_syntax even though the pinned compiler warns."
     },
     {
       "id": "moonbit-release-notes",
       "kind": "release-notes",
       "url": "https://www.moonbitlang.com/updates/",
       "version_label": "release index retrieved 2026-08-07",
-      "notes": "Supplemental discovery index only; its newest article still covers 0.10.4 while the official latest toolchain is 0.10.6. Coverage is never inferred from this label, and the product baseline never waits for an article."
+      "notes": "Supplemental discovery index only; its newest article still covers 0.10.4 while the official latest toolchain is 0.10.6. Coverage is never inferred from this label, and product updates never wait for an article."
     },
     {
       "id": "moonbit-0.10.4-release-source",

@@ -6,6 +6,7 @@
     "check-duplication": "node tooling/check_duplication.ts",
     "check-language-surface": "node tooling/check_language_surface.ts",
     "check-release-coverage": "node tooling/check_release_coverage.ts",
+    "check-toolchain-surface": "node tooling/check_toolchain_surface.ts",
     "check-versions": "node tooling/check_versions.ts",
     "compare-toolchain": "node tooling/compare_toolchain.ts",
     "run-activation-eval": "node evals/activation/run_activation.ts",
@@ -17,10 +18,12 @@
     "snapshot-toolchain": "node tooling/snapshot_toolchain.ts",
     "snapshot-release": "node tooling/snapshot_release.ts",
     "snapshot-language-surface": "node tooling/snapshot_language_surface.ts",
+    "snapshot-toolchain-surface": "node tooling/snapshot_toolchain_surface.ts",
     "validate-skills": "node tooling/validate_skills.ts",
     "verify-release-sources": "node tooling/verify_release_sources.ts",
     "verify-language-surface-source": "node tooling/verify_language_surface_source.ts",
     "verify-latest-upstream": "node tooling/verify_latest_upstream.ts",
+    "verify-toolchain-surface-source": "node tooling/verify_toolchain_surface_source.ts",
     "verify-commands": "node tooling/verify_commands.ts"
   },
   "devDependencies": {

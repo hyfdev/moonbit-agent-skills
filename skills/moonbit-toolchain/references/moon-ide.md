@@ -1,5 +1,9 @@
 # moon ide — semantic code queries
 
+## Official toolchain topic map
+
+Official headings routed here: MoonBit Agent IDE; Overview; Available Commands; Symbol Syntax; `moon ide peek-def` - View Symbol Definitions; Usage; Examples; `moon ide find-references` - Track All Usages; Example; `moon ide outline` - Get Structural Overview; `moon ide doc` - Discover and Explore APIs; Query Syntax.
+
 `moon ide` answers questions with compiler knowledge that grep cannot: where a symbol is *defined* (not merely mentioned), every real *reference* (not string matches), inferred *types* at a position, and the public API of any installed package. Prefer it over grep whenever the question is "what is this / who uses this / what does this package export". All subcommands below were executed at the pin, inside a module.
 
 ## Finding definitions and references

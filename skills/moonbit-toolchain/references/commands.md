@@ -1,5 +1,9 @@
 # Everyday commands
 
+## Official toolchain topic map
+
+Official headings routed here: Command-Line Help for `moon`; `moon`; `moon new`; `moon build`; `moon check`; `moon run`; `moon test`; `moon clean`; `moon fmt`; `moon doc`; `moon info`; `moon upgrade`; `moon shell-completion`; `moon version`.
+
 All commands below were executed against the pinned toolchain. Examples assume a module shaped like the repository's verification template (root package `mbtskills/template` with `lib.mbt`, a `textutil` subpackage, and a `cmd/main` executable).
 
 ## Exit codes (inconsistent — memorize this table)
@@ -127,3 +131,9 @@ moon version --all
 ```
 
 Plain `moon clean` deletes the current project's whole `_build/` directory. The separate `--dep-cache` and `--build-cache` flags delete the global dependency-source or build-artifact cache instead; they are intentionally verified only through `--help`, never executed by this repository. Check the target carefully before using either global-cache flag. `moon version --all` prints moon/moonc/moonrun versions plus a `Feature flags enabled: rr_moon_mod,rr_moon_pkg` line (the DSL config formats sit behind enabled-by-default feature flags); `--json` gives machine-readable output (without the feature-flags line).
+
+```sh
+moon shell-completion --help
+```
+
+`moon shell-completion --help` documents generation for Bash, Elvish, Fish, PowerShell, and Zsh; it writes the completion script to stdout, so choosing and writing an installation path remains the caller's responsibility. `moon upgrade` changes the globally installed toolchain and must not be run without explicit user intent.

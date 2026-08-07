@@ -1,0 +1,1141 @@
+{
+  "schema_version": 1,
+  "source_inventory": "source.json",
+  "routes": [
+    {
+      "source_ids": [
+        "document-index",
+        "document-moon-index"
+      ],
+      "reviewed": {
+        "document-index": "0f1c2db9d51d551f1d396d029fa89cbee909421058a42c8b6f4109ffe3f968df",
+        "document-moon-index": "b95a6d5f3b8abb408e2a7931e35ad7f2c77ac9baab9cd864ae4e1996bdd32730"
+      },
+      "official_topics": [
+        "Toolchains",
+        "Moon Build System"
+      ],
+      "summary": "Toolchain and Moon build-system entry points",
+      "disposition": "routed",
+      "owner_skill": "moonbit-toolchain",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/project-layout-and-config.md",
+        "terms": [
+          "moon.mod",
+          "moon.pkg"
+        ]
+      },
+      "content": {
+        "marker": "# Project layout and configuration",
+        "terms": [
+          "Toolchains",
+          "Moon Build System"
+        ]
+      }
+    },
+    {
+      "source_ids": [
+        "document-moon-commands-moon-bench",
+        "document-moon-commands-moon-coverage",
+        "document-moon-commands-moon-coverage-analyze",
+        "document-moon-commands-moon-coverage-report",
+        "document-moon-commands-moon-coverage-clean",
+        "document-moon-commands-moon-generate-build-matrix"
+      ],
+      "reviewed": {
+        "document-moon-commands-moon-bench": "e58d4bf9f69c7e20783aaa219424d754c0725d416207d80a1a5bdccd0a9a1a4a",
+        "document-moon-commands-moon-coverage": "67a9b9226deb829ca8dec914d3f5b9f3efcdffe38fd6afd28116ab902ab23e2d",
+        "document-moon-commands-moon-coverage-analyze": "61efd79c923b60302f12fdf2a8ecf0299a081cff782b054acc07db2245ae0453",
+        "document-moon-commands-moon-coverage-report": "7704bc6afefaa3458befde17ee04226be37cec45e80459e4882ca10c09e1f519",
+        "document-moon-commands-moon-coverage-clean": "fb8e903657e52a59ef24df59d53faf02dc16e4dd83aeb80890136aa642a1f769",
+        "document-moon-commands-moon-generate-build-matrix": "ac53f5b42bc9e343a6edec54a9537a614bee7d6c2f0fb206f92da87876210fa2"
+      },
+      "official_topics": [
+        "`moon bench`",
+        "`moon coverage`",
+        "`moon coverage analyze`",
+        "`moon coverage report`",
+        "`moon coverage clean`",
+        "`moon generate-build-matrix`"
+      ],
+      "summary": "Coverage, benchmark, and CI matrix commands",
+      "disposition": "routed",
+      "owner_skill": "moonbit-toolchain",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/testing-workflows.md",
+        "terms": [
+          "coverage",
+          "moon bench PATH"
+        ]
+      },
+      "content": {
+        "marker": "# Testing workflows",
+        "terms": [
+          "`moon bench`",
+          "`moon coverage`",
+          "`moon coverage analyze`",
+          "`moon coverage report`",
+          "`moon coverage clean`",
+          "`moon generate-build-matrix`"
+        ]
+      }
+    },
+    {
+      "source_ids": [
+        "document-moon-commands-moon-add",
+        "document-moon-commands-moon-remove",
+        "document-moon-commands-moon-install",
+        "document-moon-commands-moon-tree",
+        "document-moon-commands-moon-login",
+        "document-moon-commands-moon-register",
+        "document-moon-commands-moon-publish",
+        "document-moon-commands-moon-package",
+        "document-moon-commands-moon-update"
+      ],
+      "reviewed": {
+        "document-moon-commands-moon-add": "f9ef11dcd21977771122b255613c21366a42adcf16ed7042703ddd3f85278acc",
+        "document-moon-commands-moon-remove": "0913a9b2931f71023159d1a196002ae0558501eb97569d5c93179fbfdc13c028",
+        "document-moon-commands-moon-install": "4f18e595657aa600535bd58834b4ba8d3d028f525e5b96372b865dc8ee0d1b06",
+        "document-moon-commands-moon-tree": "d6f8435e6438ffddf92f4be518a8d8e916a42dc7578bcaa5db1352818365a172",
+        "document-moon-commands-moon-login": "e2202ca0f4e30fa22b4b3c99161a1bd75f35f74009ea96209d188e90945c7b55",
+        "document-moon-commands-moon-register": "94b2ed7238b1e9f5edd2ef69a555c2b58177afcdc782670643a8a0da5f4bd3c1",
+        "document-moon-commands-moon-publish": "384378a542969456648badca20dc828995de6edbc63068368630174e59a4b821",
+        "document-moon-commands-moon-package": "e3be66b8e5e7b652ca8241fe2f19619d9c7acfb61f3d41717d8a6138d1f6ff5a",
+        "document-moon-commands-moon-update": "a36c4f0671345e43230fa9c80cdb873a344cf83a09827740fbba4e63573ce959"
+      },
+      "official_topics": [
+        "`moon add`",
+        "`moon remove`",
+        "`moon install`",
+        "`moon tree`",
+        "`moon login`",
+        "`moon register`",
+        "`moon publish`",
+        "`moon package`",
+        "`moon update`"
+      ],
+      "summary": "Dependency, installation, registry, and packaging commands",
+      "disposition": "routed",
+      "owner_skill": "moonbit-toolchain",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/dependencies-and-registry.md",
+        "terms": [
+          "Dependencies",
+          "mooncakes registry"
+        ]
+      },
+      "content": {
+        "marker": "# Dependencies and the mooncakes registry",
+        "terms": [
+          "`moon add`",
+          "`moon remove`",
+          "`moon install`",
+          "`moon tree`",
+          "`moon login`",
+          "`moon register`",
+          "`moon publish`",
+          "`moon package`",
+          "`moon update`"
+        ]
+      }
+    },
+    {
+      "source_ids": [
+        "document-moon-commands",
+        "document-moon-commands-moon",
+        "document-moon-commands-moon-new",
+        "document-moon-commands-moon-build",
+        "document-moon-commands-moon-check",
+        "document-moon-commands-moon-run",
+        "document-moon-commands-moon-test",
+        "document-moon-commands-moon-clean",
+        "document-moon-commands-moon-fmt",
+        "document-moon-commands-moon-doc",
+        "document-moon-commands-moon-info",
+        "document-moon-commands-moon-upgrade",
+        "document-moon-commands-moon-shell-completion",
+        "document-moon-commands-moon-version"
+      ],
+      "reviewed": {
+        "document-moon-commands": "cd8c873d9cf64fdde59b6b2ead35dfba0d842d74b02ccd68bded04abb8a4e62e",
+        "document-moon-commands-moon": "43a624fad77dc1d479da8f700ac5262f46ae44630a279f21a83d10521868f1e0",
+        "document-moon-commands-moon-new": "cb4ed84ac65624851bf30350d40e63e15b39b0660dfabc9ad9733a7389da3ace",
+        "document-moon-commands-moon-build": "4edadba9c1f067ccea8ce7d89ecf60c2ee1604cdda691c94836c5ac500d11267",
+        "document-moon-commands-moon-check": "3b5c7abf9cbd4c6a5d7984da30f1d5688b43716968fccfd551209feae2bd57e7",
+        "document-moon-commands-moon-run": "d5603d60453b3fd5559243e35b4da94713fded5f9e6f9819124022931b427cd8",
+        "document-moon-commands-moon-test": "f99f8ce172a68e37368e43b3dd4fe4f56600314a55ad082bf08d99d0b7b8bd23",
+        "document-moon-commands-moon-clean": "558a0d03ffa973332446011bb3baa6b438bdd7201a8f4f19ecc7a65a7a8be5d5",
+        "document-moon-commands-moon-fmt": "994f05448b22b0712dae5b0393af56c093fade387bc0a634a392c97d1ca190fc",
+        "document-moon-commands-moon-doc": "a310030360b5a2a5d15a5d683edcb38936ecbea3f5fa8182a64a6244a5318aff",
+        "document-moon-commands-moon-info": "5552bec6d79d26353ea4ac7c472dd0e8e9ec5ae8534843c1a27d13b73be3d0da",
+        "document-moon-commands-moon-upgrade": "1a9d23a5f84b2927d49182007b7a607b84bf858db60d161ccd3f903430667300",
+        "document-moon-commands-moon-shell-completion": "0b3d19767094542e23cdc63992a359636739a7038a4adee0dbbb5b44093e3838",
+        "document-moon-commands-moon-version": "45e70e9b14bcddc98dbc4c9f7fa9aaec7cf51a5885a73d4abe612f987d07f67f"
+      },
+      "official_topics": [
+        "Command-Line Help for `moon`",
+        "`moon`",
+        "`moon new`",
+        "`moon build`",
+        "`moon check`",
+        "`moon run`",
+        "`moon test`",
+        "`moon clean`",
+        "`moon fmt`",
+        "`moon doc`",
+        "`moon info`",
+        "`moon upgrade`",
+        "`moon shell-completion`",
+        "`moon version`"
+      ],
+      "summary": "Core moon command-line operation",
+      "disposition": "routed",
+      "owner_skill": "moonbit-toolchain",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/commands.md",
+        "terms": [
+          "moon new",
+          "check"
+        ]
+      },
+      "content": {
+        "marker": "# Everyday commands",
+        "terms": [
+          "Command-Line Help for `moon`",
+          "`moon`",
+          "`moon new`",
+          "`moon build`",
+          "`moon check`",
+          "`moon run`",
+          "`moon test`",
+          "`moon clean`",
+          "`moon fmt`",
+          "`moon doc`",
+          "`moon info`",
+          "`moon upgrade`",
+          "`moon shell-completion`",
+          "`moon version`"
+        ]
+      }
+    },
+    {
+      "source_ids": [
+        "document-moon-coverage",
+        "document-moon-coverage-running-code-coverage-in-tests",
+        "document-moon-coverage-visualizing-the-coverage-results",
+        "document-moon-coverage-text-summary",
+        "document-moon-coverage-ocaml-bisect-format",
+        "document-moon-coverage-coveralls-json-format",
+        "document-moon-coverage-cobertura-xml-format",
+        "document-moon-coverage-html",
+        "document-moon-coverage-skipping-coverage"
+      ],
+      "reviewed": {
+        "document-moon-coverage": "08d401b82fa844800848dc93f09ea2275e578551ef685d2b40ac2faf45a1b812",
+        "document-moon-coverage-running-code-coverage-in-tests": "a8a1cb76bfe92469cb166a715b63dba33cc6e4255bcecab2ea38dc0cc7ecf8ae",
+        "document-moon-coverage-visualizing-the-coverage-results": "e6966a9acef3d272bb3bf5fdbc64044b8d103d55d579feeb064a8c8bb2b02168",
+        "document-moon-coverage-text-summary": "b2ed03f873ccb09f456c9e4e9ea050dd8804fc33dd07a91d6d8397f11b9767c6",
+        "document-moon-coverage-ocaml-bisect-format": "aeaeae90e92f4a967a08dc7d1fe700a9ec1449bc3fe0aca1953e1a7f4cecf433",
+        "document-moon-coverage-coveralls-json-format": "b1934ef55600d5f1f9afa471088a77d039a56b7d3359d8148ebdb53f0892ea29",
+        "document-moon-coverage-cobertura-xml-format": "6f773b07e51aca87a6455b8397dd2a7d7ba6d7c5fd7997d13c4e85339a98fb06",
+        "document-moon-coverage-html": "0e0f0773db08085a32e5dcc9b91478d27bdcb35d7961a418ea5a11ff2b76a6f9",
+        "document-moon-coverage-skipping-coverage": "9f8a59bce66c99a1e75b3440d7a50096871b0c6d1b316f8bf0179ca70d73df32"
+      },
+      "official_topics": [
+        "Measuring code coverage",
+        "Running code coverage in tests",
+        "Visualizing the coverage results",
+        "Text summary",
+        "OCaml Bisect format",
+        "Coveralls JSON format",
+        "Cobertura XML format",
+        "HTML",
+        "Skipping coverage"
+      ],
+      "summary": "Coverage collection, reports, and exclusions",
+      "disposition": "routed",
+      "owner_skill": "moonbit-toolchain",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/testing-workflows.md",
+        "terms": [
+          "coverage",
+          "moon bench PATH"
+        ]
+      },
+      "content": {
+        "marker": "## Coverage",
+        "terms": [
+          "Measuring code coverage",
+          "Running code coverage in tests",
+          "Visualizing the coverage results",
+          "Text summary",
+          "OCaml Bisect format",
+          "Coveralls JSON format",
+          "Cobertura XML format",
+          "HTML",
+          "Skipping coverage"
+        ]
+      }
+    },
+    {
+      "source_ids": [
+        "document-moon-module-preferred-target",
+        "document-moon-module-supported-targets"
+      ],
+      "reviewed": {
+        "document-moon-module-preferred-target": "d71c0e6038f2016956affbe728d581fb1966e0c848dee62cbe0d16fc1e1d6a47",
+        "document-moon-module-supported-targets": "7a5a37d84178bfa82918383153de355f5c22c2357e8410543c021ed468355569"
+      },
+      "official_topics": [
+        "Preferred Target",
+        "Supported Targets"
+      ],
+      "summary": "Module target defaults and compatibility declarations",
+      "disposition": "routed",
+      "owner_skill": "moonbit-toolchain",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/targets-and-conditional-builds.md",
+        "terms": [
+          "Target selection",
+          "supported targets"
+        ]
+      },
+      "content": {
+        "marker": "# Targets and conditional builds",
+        "terms": [
+          "Preferred Target",
+          "Supported Targets"
+        ]
+      }
+    },
+    {
+      "source_ids": [
+        "document-moon-module-warning-list"
+      ],
+      "reviewed": {
+        "document-moon-module-warning-list": "6118378abb72633c5947aae5f2c580b34356ba6095772ec90bbfed8415c82a05"
+      },
+      "official_topics": [
+        "Warning List"
+      ],
+      "summary": "Module warning configuration",
+      "disposition": "routed",
+      "owner_skill": "moonbit-toolchain",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/diagnostics-and-recovery.md",
+        "terms": [
+          "warning lists",
+          "--deny-warn"
+        ]
+      },
+      "content": {
+        "marker": "## Warnings: promote, enable, select",
+        "terms": [
+          "Warning List"
+        ]
+      }
+    },
+    {
+      "source_ids": [
+        "document-moon-module-rule",
+        "document-moon-module-scripts",
+        "document-moon-module-postadd-script",
+        "document-moon-module-experimental-pre-build-config-script",
+        "document-moon-module-input",
+        "document-moon-module-output",
+        "document-moon-module-build-variables"
+      ],
+      "reviewed": {
+        "document-moon-module-rule": "d2cbaa13a691e142e0078b9d7eddff23df2ad9c004eabd049be339f7bf22659c",
+        "document-moon-module-scripts": "d10303ecb30b2eba5d87f07ea787fa59991a6caaaa147c69dfd7b04f7618d84e",
+        "document-moon-module-postadd-script": "b79eec080d7a67e990ff6b160fbf14c087a28401e7df2d5a1764aaf02f78f57e",
+        "document-moon-module-experimental-pre-build-config-script": "1d4d01e0df1ce6cf8de794bb03a6116c69064f547633d587bed976025e984257",
+        "document-moon-module-input": "3e55a1b9dc653031fb20f89165c9d385d466ceed6f351b2a38aabc4bccb76708",
+        "document-moon-module-output": "e46e4ebb0547a0dfbcf35cdd3c2b4979570dc52eb11d06fe69e36f6ccee26a5c",
+        "document-moon-module-build-variables": "ae4023a7dd031421c5fc06af60a2d3d080e7beebc6ed571b70b88bd68329f301"
+      },
+      "official_topics": [
+        "Rule",
+        "Scripts",
+        "postadd script",
+        "\\[Experimental\\] Pre-build config script",
+        "Input",
+        "Output",
+        "Build variables"
+      ],
+      "summary": "Module rules and scripts",
+      "disposition": "routed",
+      "owner_skill": "moonbit-toolchain",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/workspaces-and-scripts.md",
+        "terms": [
+          "moon.work",
+          "script mode"
+        ]
+      },
+      "content": {
+        "marker": "## Pre-build rules",
+        "terms": [
+          "Rule",
+          "Scripts",
+          "postadd script",
+          "\\[Experimental\\] Pre-build config script",
+          "Input",
+          "Output",
+          "Build variables"
+        ]
+      }
+    },
+    {
+      "source_ids": [
+        "document-moon-module",
+        "document-moon-module-name",
+        "document-moon-module-version",
+        "document-moon-module-dependency-management",
+        "document-moon-module-meta-information",
+        "document-moon-module-readme",
+        "document-moon-module-repository",
+        "document-moon-module-license",
+        "document-moon-module-keywords",
+        "document-moon-module-description",
+        "document-moon-module-include-and-exclude",
+        "document-moon-module-source-directory"
+      ],
+      "reviewed": {
+        "document-moon-module": "9365f67ad0093d5514785de47e76ea5eee68d754640de8d8aec84c9f3b1305d0",
+        "document-moon-module-name": "a3620c3f41406387f6f26ecd81da7fd26e117a09787791f7bb396b57e435357c",
+        "document-moon-module-version": "ac06b09f785e8019411e149757c6ebc574d76beb7262de162c906fdb9df423b1",
+        "document-moon-module-dependency-management": "7597c719f42b81b3812ae540edfcd6fc0ae24326ed4b481c1da2cf7ff4757ad4",
+        "document-moon-module-meta-information": "1104ce5f9ac98405f7e487fbe475d11a3cab314ae322e9a9c39b40516e82d5ff",
+        "document-moon-module-readme": "7f123eec36b3cc4b25bcb643d9a2d37e3901014dca95885e43fa59897a3800bd",
+        "document-moon-module-repository": "fbaeba9dcdb3cfbb2a7c34e06d8e1e8e337559c92be115060c7e6cf724903a28",
+        "document-moon-module-license": "efa8b0d863395109187e184b41efd0ac860eb22ca21fa8b018ac04a2fdb1731a",
+        "document-moon-module-keywords": "75ce594d4e7d9be87a6f4c359348f38f5c7516c87cdc5e340892f8c5f329a713",
+        "document-moon-module-description": "57c4358fbacdd085f5960a3843f778b7f0c6c1ff51bb9f20800e44311c719976",
+        "document-moon-module-include-and-exclude": "1721de3adb40fea82898264a9008093f4a53297060ed9e5079737dc1f34464ae",
+        "document-moon-module-source-directory": "4767b26ba945a8932fc47fc05b66d84d1f94d770047bd69f4b86898106fd9bcd"
+      },
+      "official_topics": [
+        "Module Configuration",
+        "Name",
+        "Version",
+        "Dependency Management",
+        "Meta Information",
+        "README",
+        "Repository",
+        "License",
+        "Keywords",
+        "Description",
+        "Include and Exclude",
+        "Source directory"
+      ],
+      "summary": "Module configuration",
+      "disposition": "routed",
+      "owner_skill": "moonbit-toolchain",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/project-layout-and-config.md",
+        "terms": [
+          "moon.mod",
+          "moon.pkg"
+        ]
+      },
+      "content": {
+        "marker": "## moon.mod",
+        "terms": [
+          "Module Configuration",
+          "Name",
+          "Version",
+          "Dependency Management",
+          "Meta Information",
+          "README",
+          "Repository",
+          "License",
+          "Keywords",
+          "Description",
+          "Include and Exclude",
+          "Source directory"
+        ]
+      }
+    },
+    {
+      "source_ids": [
+        "document-moon-package-manage-tour",
+        "document-moon-package-manage-tour-setup-mooncakes-io-account",
+        "document-moon-package-manage-tour-setup-moonbit-project",
+        "document-moon-package-manage-tour-add-dependencies",
+        "document-moon-package-manage-tour-import-packages-from-module",
+        "document-moon-package-manage-tour-remove-dependencies",
+        "document-moon-package-manage-tour-publish-your-module",
+        "document-moon-package-manage-tour-semantic-versioning-convention",
+        "document-moon-package-manage-tour-readme-metadata"
+      ],
+      "reviewed": {
+        "document-moon-package-manage-tour": "594af371e2877626d66f44210071ce10cf7df867a27898487ae20bcb7140a21b",
+        "document-moon-package-manage-tour-setup-mooncakes-io-account": "b1d55d7348db8bfd5dd250c911ce163869d3888ff8f34478bdce76f8f735a2a9",
+        "document-moon-package-manage-tour-setup-moonbit-project": "41587e9d1cc65f01bd2ea5548455a26a833c424adb78271865bf16eb7fa547d6",
+        "document-moon-package-manage-tour-add-dependencies": "99e4909fdcdd3c1548284d0bf45b9e0c20bd50f5b30c050039e87eec8a0c76e7",
+        "document-moon-package-manage-tour-import-packages-from-module": "48d1352614108ef56da8ffd6b2b4a96c4db12a63be7bfb1bc5b4a1078f723157",
+        "document-moon-package-manage-tour-remove-dependencies": "da266b7fc9a1178d900226135d70df7c9cddabd56f23f9e0c2ab62cc58fbb5f9",
+        "document-moon-package-manage-tour-publish-your-module": "fe29a38d721ab236065a861a9f47083fe1a0e9a3e8b1f7f731033ca416af1217",
+        "document-moon-package-manage-tour-semantic-versioning-convention": "92f8fe49061dbe91659005819ea04e52930ac92cd0fea8e0f0d9ca8862a02b5b",
+        "document-moon-package-manage-tour-readme-metadata": "c6676093a8f91c4ad294b9bf8674fe59647ab83011573b3d49ccf26c8babc662"
+      },
+      "official_topics": [
+        "Use and publish packages",
+        "Setup mooncakes.io account",
+        "Setup MoonBit project",
+        "Add dependencies",
+        "Import packages from module",
+        "Remove dependencies",
+        "Publish your module",
+        "Semantic versioning convention",
+        "Readme & metadata"
+      ],
+      "summary": "Dependency and publishing workflow",
+      "disposition": "routed",
+      "owner_skill": "moonbit-toolchain",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/dependencies-and-registry.md",
+        "terms": [
+          "Dependencies",
+          "mooncakes registry"
+        ]
+      },
+      "content": {
+        "marker": "# Dependencies and the mooncakes registry",
+        "terms": [
+          "Use and publish packages",
+          "Setup mooncakes.io account",
+          "Setup MoonBit project",
+          "Add dependencies",
+          "Import packages from module",
+          "Remove dependencies",
+          "Publish your module",
+          "Semantic versioning convention",
+          "Readme & metadata"
+        ]
+      }
+    },
+    {
+      "source_ids": [
+        "document-moon-package-maximum-concurrent-tests"
+      ],
+      "reviewed": {
+        "document-moon-package-maximum-concurrent-tests": "cb94d756e74ea72e28575ef99e11f9a138308ebc483fa826889cfd8d3c3301cd"
+      },
+      "official_topics": [
+        "Maximum Concurrent Tests"
+      ],
+      "summary": "Package test concurrency",
+      "disposition": "routed",
+      "owner_skill": "moonbit-toolchain",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/testing-workflows.md",
+        "terms": [
+          "Test path filtering",
+          "coverage"
+        ]
+      },
+      "content": {
+        "marker": "# Testing workflows",
+        "terms": [
+          "Maximum Concurrent Tests"
+        ]
+      }
+    },
+    {
+      "source_ids": [
+        "document-moon-package-conditional-compilation",
+        "document-moon-package-supported-targets",
+        "document-moon-package-native-stub-files",
+        "document-moon-package-link-options",
+        "document-moon-package-wasm-backend-link-options",
+        "document-moon-package-common-options",
+        "document-moon-package-wasm-linear-backend-link-options",
+        "document-moon-package-wasm-gc-backend-link-options",
+        "document-moon-package-js-backend-link-options",
+        "document-moon-package-native-backend-link-options",
+        "document-moon-package-default-c-compiler-and-compiler-flags-for-the-native-backend"
+      ],
+      "reviewed": {
+        "document-moon-package-conditional-compilation": "e61336cead924cf9b07479de4fb988b4fcb29032531bc6e24389c7402c6ee7fe",
+        "document-moon-package-supported-targets": "babb3234e28dea945f85cb2357325d051145b25a69ed15359e7451c405c2a953",
+        "document-moon-package-native-stub-files": "af72318bc608828465eb6c7912becf1ea6181ea1c5c9fd2fb8694eea2fa85e3c",
+        "document-moon-package-link-options": "8d51f75e9e3e46323e2eb603bddaeba6679d7418b515cc16148225ef9cbb393d",
+        "document-moon-package-wasm-backend-link-options": "4f2d848a41229af628eed19965287ac641eca6965241ffb4fb8e8420ee2c6155",
+        "document-moon-package-common-options": "b4809c6df6c68676a3cbfa8e63131f6536e6bdf433534ea6df04bd1fc7bb4616",
+        "document-moon-package-wasm-linear-backend-link-options": "eeb8fbe7c2923252249cc7571143c1081d10c553997825ce28eb6601aa35d875",
+        "document-moon-package-wasm-gc-backend-link-options": "022cdd3ee08e87a5ec0947204ecb08f72bd40bb7d9bd48ae0e7a65a258d0cea4",
+        "document-moon-package-js-backend-link-options": "a0f27167711fb48388bd5b563e12365e10b164b372481feabd5de1bfc4bd735b",
+        "document-moon-package-native-backend-link-options": "73b1ba9aa8f3ec167d1b4f01ddf2188057d9fd96d137261c71b4b0753bb2eb72",
+        "document-moon-package-default-c-compiler-and-compiler-flags-for-the-native-backend": "f022fab9d0a522340ef3b5885e14b1bc36fb8135ca1881b370be2220fb9feb11"
+      },
+      "official_topics": [
+        "Conditional Compilation",
+        "Supported Targets",
+        "Native Stub Files",
+        "Link Options",
+        "Wasm Backend Link Options",
+        "Common Options",
+        "Wasm Linear Backend Link Options",
+        "Wasm GC Backend Link Options",
+        "JS Backend Link Options",
+        "Native Backend Link Options",
+        "Default C compiler and compiler flags for the native backend"
+      ],
+      "summary": "Package target, link, and native-stub configuration",
+      "disposition": "routed",
+      "owner_skill": "moonbit-toolchain",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/targets-and-conditional-builds.md",
+        "terms": [
+          "Target selection",
+          "supported targets"
+        ]
+      },
+      "content": {
+        "marker": "# Targets and conditional builds",
+        "terms": [
+          "Conditional Compilation",
+          "Supported Targets",
+          "Native Stub Files",
+          "Link Options",
+          "Wasm Backend Link Options",
+          "Common Options",
+          "Wasm Linear Backend Link Options",
+          "Wasm GC Backend Link Options",
+          "JS Backend Link Options",
+          "Native Backend Link Options",
+          "Default C compiler and compiler flags for the native backend"
+        ]
+      }
+    },
+    {
+      "source_ids": [
+        "document-moon-package-warnings-list",
+        "document-moon-package-alert-warning"
+      ],
+      "reviewed": {
+        "document-moon-package-warnings-list": "9de2cb3513d99a21cb2880d3717f7ce667754451db2755141aac8e7d9f1c0963",
+        "document-moon-package-alert-warning": "2cf830597de6b2fc21378996458552afe1ecd1a4f8d27bd44994fd74b17da25a"
+      },
+      "official_topics": [
+        "Warnings List",
+        "Alert Warning"
+      ],
+      "summary": "Package warning and alert configuration",
+      "disposition": "routed",
+      "owner_skill": "moonbit-toolchain",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/diagnostics-and-recovery.md",
+        "terms": [
+          "warning lists",
+          "--deny-warn"
+        ]
+      },
+      "content": {
+        "marker": "## Warnings: promote, enable, select",
+        "terms": [
+          "Warnings List",
+          "Alert Warning"
+        ]
+      }
+    },
+    {
+      "source_ids": [
+        "document-moon-package-rule-and-dev-build"
+      ],
+      "reviewed": {
+        "document-moon-package-rule-and-dev-build": "af03d2d026db770375adeea18bc5d30688ab7ec8f67800db46d36d98b3f26b17"
+      },
+      "official_topics": [
+        "Rule and dev_build"
+      ],
+      "summary": "Package development build rules",
+      "disposition": "routed",
+      "owner_skill": "moonbit-toolchain",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/workspaces-and-scripts.md",
+        "terms": [
+          "moon.work",
+          "script mode"
+        ]
+      },
+      "content": {
+        "marker": "## Pre-build rules",
+        "terms": [
+          "Rule and dev_build"
+        ]
+      }
+    },
+    {
+      "source_ids": [
+        "document-moon-package",
+        "document-moon-package-new-format-moon-pkg",
+        "document-moon-package-name",
+        "document-moon-package-formatter",
+        "document-moon-package-package-type",
+        "document-moon-package-is-main-deprecated",
+        "document-moon-package-importing-dependencies",
+        "document-moon-package-import",
+        "document-moon-package-test-import",
+        "document-moon-package-white-box-test-import",
+        "document-moon-package-virtual-package",
+        "document-moon-package-declarations",
+        "document-moon-package-implementations",
+        "document-moon-package-overriding-implementations"
+      ],
+      "reviewed": {
+        "document-moon-package": "ce0092c385a35529a665427fb7f738224a21f4ddfc16a11411479ddd12a78fe9",
+        "document-moon-package-new-format-moon-pkg": "4f5b9491c2800cdd757d0a85deb2993fc5793069a148a3db2502bc101fc9ad1c",
+        "document-moon-package-name": "aab02865e49e82fe77d8a6c234b45466d4417a4f6d22653fb7ebad8eb4a7bd0d",
+        "document-moon-package-formatter": "f796f4377107e4939b1cd5e4e2e22cf3b7a78cce9fc7a9c62ef9c5e0d47b7918",
+        "document-moon-package-package-type": "7c0e7341cd22d9ebef6a3b0f8dc11d567a8b646fbaafdd19b25c07a91cfbb0c5",
+        "document-moon-package-is-main-deprecated": "714e18729426c27ab4245a4b7472a3de937d27737128761020886371a487854c",
+        "document-moon-package-importing-dependencies": "dadc36fcd9e315408299722443ca87072460d8eb9d213a09b293a14a4b7a1158",
+        "document-moon-package-import": "533d55ab843f3059ce65e0a3e2a15bef40e5bf7ef2bf7491568b205fe1b88e86",
+        "document-moon-package-test-import": "c246678eedfd53e101a17326c9429de8df12900c06b47f8889d0264fd8eb2c30",
+        "document-moon-package-white-box-test-import": "63b40f72701775d67be4c39c731668a717f5e62f215d6ed09f470c3a04e9ed70",
+        "document-moon-package-virtual-package": "a99924650b0ecd2ad419e25d40d678687b6c46f8a0703b123389a46b50f36dca",
+        "document-moon-package-declarations": "56b69d009f51fe67e95774019d4782f23f0d6fb45615082b6656137f66ab2166",
+        "document-moon-package-implementations": "e065d697873d0287846a7fb131f0af71e2b47e51d644e7ae3cf01539ac7136aa",
+        "document-moon-package-overriding-implementations": "ee4ccc976bd48818e5beb3e322690a95147633a674531fb71147327ac5a39df7"
+      },
+      "official_topics": [
+        "Package Configuration",
+        "New format (`moon.pkg`)",
+        "Name",
+        "Formatter",
+        "Package type",
+        "is-main (deprecated)",
+        "Importing dependencies",
+        "Import",
+        "Test import",
+        "White-box test import",
+        "Virtual Package",
+        "Declarations",
+        "Implementations",
+        "Overriding implementations"
+      ],
+      "summary": "Package configuration, imports, types, and virtual packages",
+      "disposition": "routed",
+      "owner_skill": "moonbit-toolchain",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/project-layout-and-config.md",
+        "terms": [
+          "moon.mod",
+          "moon.pkg"
+        ]
+      },
+      "content": {
+        "marker": "## moon.pkg",
+        "terms": [
+          "Package Configuration",
+          "New format (`moon.pkg`)",
+          "Name",
+          "Formatter",
+          "Package type",
+          "is-main (deprecated)",
+          "Importing dependencies",
+          "Import",
+          "Test import",
+          "White-box test import",
+          "Virtual Package",
+          "Declarations",
+          "Implementations",
+          "Overriding implementations"
+        ]
+      }
+    },
+    {
+      "source_ids": [
+        "document-moon-script-mode",
+        "document-moon-script-mode-run-a-mbtx-file",
+        "document-moon-script-mode-run-a-mbtx-script-from-stdin"
+      ],
+      "reviewed": {
+        "document-moon-script-mode": "3c3e718a4f1aaeb43b4f2dbd807ac3e1617969c4c5b6edb03e2359e9f3e19ceb",
+        "document-moon-script-mode-run-a-mbtx-file": "d576efca23f28206688df9d3ac6dea5164b5fb4d1bf89721ccc65be86672452d",
+        "document-moon-script-mode-run-a-mbtx-script-from-stdin": "a87f8e8e61ee88b79788fc9900d27161f35d5e94e0605089e076e28226d8e058"
+      },
+      "official_topics": [
+        "Running `.mbtx` Scripts",
+        "Run a `.mbtx` file",
+        "Run a `.mbtx` script from stdin"
+      ],
+      "summary": "MoonBit script mode",
+      "disposition": "routed",
+      "owner_skill": "moonbit-toolchain",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/workspaces-and-scripts.md",
+        "terms": [
+          "moon.work",
+          "script mode"
+        ]
+      },
+      "content": {
+        "marker": "## Script mode: .mbtx",
+        "terms": [
+          "Running `.mbtx` Scripts",
+          "Run a `.mbtx` file",
+          "Run a `.mbtx` script from stdin"
+        ]
+      }
+    },
+    {
+      "source_ids": [
+        "document-moon-tutorial",
+        "document-moon-tutorial-prerequisites",
+        "document-moon-tutorial-creating-a-new-module",
+        "document-moon-tutorial-understanding-the-module-directory-structure",
+        "document-moon-tutorial-working-with-packages",
+        "document-moon-tutorial-choosing-a-target",
+        "document-moon-tutorial-package-importing",
+        "document-moon-tutorial-creating-and-using-a-new-package",
+        "document-moon-tutorial-adding-tests"
+      ],
+      "reviewed": {
+        "document-moon-tutorial": "5f3e8bb7e9897e8a8ae5d7641b6562ec15318653c0fb6a830cd9d40fbd68c7af",
+        "document-moon-tutorial-prerequisites": "938b36f32a11ede418f52442fd5ec4c25a26a1d143b73795eaa0f52db5248ef7",
+        "document-moon-tutorial-creating-a-new-module": "c46566a1ed5cc984add648ccea5e23f1d78a04fd31cbeb7cdaeed3a514ee6902",
+        "document-moon-tutorial-understanding-the-module-directory-structure": "f088a204420f7087d0293f826f757dc96e9a945f4b9628c3779b08e91d7bea21",
+        "document-moon-tutorial-working-with-packages": "61072d2eea70b71d0c5d676b97ae26c02e6a0ec0a8df61e73afadd6683ffa0fc",
+        "document-moon-tutorial-choosing-a-target": "5fac112a4ce71f5f277a7e1b47db1faa5ba07164784ee780ea8f2597f0048fa8",
+        "document-moon-tutorial-package-importing": "673e0ca7b3e17134d40b60b684f3eeb52322c3ee5c0def218bfa4f6fa0aa49b8",
+        "document-moon-tutorial-creating-and-using-a-new-package": "fd71da3772c7075d96519698ed39b9e20875120918c34671e5ad8afd74625ddc",
+        "document-moon-tutorial-adding-tests": "f9ae6a37f8bc1fe433cb4460f6b6f83f81780edc3f985167d125c55df908bd5c"
+      },
+      "official_topics": [
+        "MoonBit's Build System Tutorial",
+        "Prerequisites",
+        "Creating a New Module",
+        "Understanding the Module Directory Structure",
+        "Working with Packages",
+        "Choosing a Target",
+        "Package Importing",
+        "Creating and Using a New Package",
+        "Adding Tests"
+      ],
+      "summary": "Moon build-system project workflow",
+      "disposition": "routed",
+      "owner_skill": "moonbit-toolchain",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/project-layout-and-config.md",
+        "terms": [
+          "moon.mod",
+          "moon.pkg"
+        ]
+      },
+      "content": {
+        "marker": "# Project layout and configuration",
+        "terms": [
+          "MoonBit's Build System Tutorial",
+          "Prerequisites",
+          "Creating a New Module",
+          "Understanding the Module Directory Structure",
+          "Working with Packages",
+          "Choosing a Target",
+          "Package Importing",
+          "Creating and Using a New Package",
+          "Adding Tests"
+        ]
+      }
+    },
+    {
+      "source_ids": [
+        "document-moon-workspace",
+        "document-moon-workspace-initialize-a-workspace",
+        "document-moon-workspace-add-members",
+        "document-moon-workspace-work-at-workspace-root",
+        "document-moon-workspace-sync-member-versions"
+      ],
+      "reviewed": {
+        "document-moon-workspace": "895d781b6c41a76431a8a2a6b4978bac5b5f3578bdb1d6c91c1957f111e314af",
+        "document-moon-workspace-initialize-a-workspace": "1d1fec90d7d32dd53d9ddd9c0b57d174468c4379387db57e30342394bafec26c",
+        "document-moon-workspace-add-members": "2c7181e08c4a3b906bf85660a276c28f243382e942c925ca31a0a8627a5c2bac",
+        "document-moon-workspace-work-at-workspace-root": "010b6b85d2894526a0729025f6ecdacd8764824d31050aaab943b453fe2291ae",
+        "document-moon-workspace-sync-member-versions": "694f125cde1f0c5765d4f54accdbea3bf1f331a7324f18d700324b7893c6df0a"
+      },
+      "official_topics": [
+        "Workspace Support",
+        "Initialize a workspace",
+        "Add members",
+        "Work at workspace root",
+        "Sync member versions"
+      ],
+      "summary": "Workspace creation and operation",
+      "disposition": "routed",
+      "owner_skill": "moonbit-toolchain",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/workspaces-and-scripts.md",
+        "terms": [
+          "moon.work",
+          "script mode"
+        ]
+      },
+      "content": {
+        "marker": "# Workspaces and script mode",
+        "terms": [
+          "Workspace Support",
+          "Initialize a workspace",
+          "Add members",
+          "Work at workspace root",
+          "Sync member versions"
+        ]
+      }
+    },
+    {
+      "source_ids": [
+        "document-moonide-index",
+        "document-moonide-index-overview",
+        "document-moonide-index-available-commands",
+        "document-moonide-index-symbol-syntax",
+        "document-moonide-index-moon-ide-peek-def-view-symbol-definitions",
+        "document-moonide-index-usage",
+        "document-moonide-index-examples",
+        "document-moonide-index-moon-ide-find-references-track-all-usages",
+        "document-moonide-index-usage-2",
+        "document-moonide-index-example",
+        "document-moonide-index-moon-ide-outline-get-structural-overview",
+        "document-moonide-index-usage-3",
+        "document-moonide-index-examples-2",
+        "document-moonide-index-moon-ide-doc-discover-and-explore-apis",
+        "document-moonide-index-usage-4",
+        "document-moonide-index-query-syntax",
+        "document-moonide-index-examples-3"
+      ],
+      "reviewed": {
+        "document-moonide-index": "2edfa1f8ac9df1725d32aeeaf0deac106a3d9399f449c77a4870ba364912f2e0",
+        "document-moonide-index-overview": "4ae04485fa47b462a70352582cbc8b9060c94d514a3f90dd5a9f8efb0dd12941",
+        "document-moonide-index-available-commands": "5bfa73d4a9f88175e1b19af76e94233435aaab2543ab1cfd7d7c33cc6a948988",
+        "document-moonide-index-symbol-syntax": "e68964e3d1f043f60d7fd21f83b819636a7e0fd568a24d74796e12e8227be6f6",
+        "document-moonide-index-moon-ide-peek-def-view-symbol-definitions": "8cf38a47e7acf479178f08698ae556516d17716b922b7ca1882fa8cd1918b84d",
+        "document-moonide-index-usage": "51f6d7375e3552ed6b082b9bc0796f1622892b6dc6b0615bfff0832aa6c6fb08",
+        "document-moonide-index-examples": "0d5c32bd95df943f835eee9bedbd0c3c4b882f575fe37cb907039989c1165832",
+        "document-moonide-index-moon-ide-find-references-track-all-usages": "15c8785597ded3ae580ac57f21bfab9e37b8a8dd77d29bc5a213c02b55b358a6",
+        "document-moonide-index-usage-2": "9627a824995a3009fc5a45dec63e6b2ad46a76c3f0547b8edeeebeb202f13291",
+        "document-moonide-index-example": "fe33d8a84a86ac92d2209e0e876c52b2ab86b43e31f7cc66ef6441df63e54461",
+        "document-moonide-index-moon-ide-outline-get-structural-overview": "81cd2a4504ddf9ba6f1604dfd38c5ecee3dc3a47b2d6636ca4996f2cc67f6526",
+        "document-moonide-index-usage-3": "2733cc24e552ea806280a0e2a973e955751180dc9e870daf84f989aa0118fa01",
+        "document-moonide-index-examples-2": "1efaec0479b444b3ddba408581954c64023f6818a4dc6c23e59569853dd2971d",
+        "document-moonide-index-moon-ide-doc-discover-and-explore-apis": "f777ee6a76c59e9eb217d9eead2d96d60d0dbfdb1241c445aee5e8c17a9f3440",
+        "document-moonide-index-usage-4": "ebb12b06cedf14cfb9cc2351e10afd8b4e4297e4ba49e6aac84da5c74286e962",
+        "document-moonide-index-query-syntax": "d1095d4684258b0bafcdf85a5f3d83edc61a66263da161bbceeb9e073eaf57dc",
+        "document-moonide-index-examples-3": "ed066136f9166108084fc8ece6716551b3fee08c9e88a6682e60984fcaf14bef"
+      },
+      "official_topics": [
+        "MoonBit Agent IDE",
+        "Overview",
+        "Available Commands",
+        "Symbol Syntax",
+        "`moon ide peek-def` - View Symbol Definitions",
+        "Usage",
+        "Examples",
+        "`moon ide find-references` - Track All Usages",
+        "Usage",
+        "Example",
+        "`moon ide outline` - Get Structural Overview",
+        "Usage",
+        "Examples",
+        "`moon ide doc` - Discover and Explore APIs",
+        "Usage",
+        "Query Syntax",
+        "Examples"
+      ],
+      "summary": "MoonBit Agent IDE semantic queries",
+      "disposition": "routed",
+      "owner_skill": "moonbit-toolchain",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/moon-ide.md",
+        "terms": [
+          "peek-def",
+          "outline"
+        ]
+      },
+      "content": {
+        "marker": "# moon ide — semantic code queries",
+        "terms": [
+          "MoonBit Agent IDE",
+          "Overview",
+          "Available Commands",
+          "Symbol Syntax",
+          "`moon ide peek-def` - View Symbol Definitions",
+          "Usage",
+          "Examples",
+          "`moon ide find-references` - Track All Usages",
+          "Usage",
+          "Example",
+          "`moon ide outline` - Get Structural Overview",
+          "Usage",
+          "Examples",
+          "`moon ide doc` - Discover and Explore APIs",
+          "Usage",
+          "Query Syntax",
+          "Examples"
+        ]
+      }
+    },
+    {
+      "source_ids": [
+        "document-vscode-index",
+        "document-vscode-index-commands",
+        "document-vscode-index-actions",
+        "document-vscode-index-code-lens"
+      ],
+      "reviewed": {
+        "document-vscode-index": "d7ad2b70e5edb516dc726962ec816eef4067e9d449707073152233314aac35d9",
+        "document-vscode-index-commands": "22c8b685d5dc6798575cc85976102f2c729b0cb5375854633488ed6e7b269d09",
+        "document-vscode-index-actions": "5a89ddb217f0c0a21d36a26f2309dd7c286d6925da27dbe590cdbdfbae2943f4",
+        "document-vscode-index-code-lens": "dc078b893fd86c8df9ca1a065b0fadfb16d4144d3c4ebdd1aa977a82c7632357"
+      },
+      "official_topics": [
+        "MoonBit VSCode Plugin",
+        "Commands",
+        "Actions",
+        "Code Lens"
+      ],
+      "summary": "VS Code extension UI",
+      "disposition": "out-of-scope",
+      "reason": "Editor-extension UI and interaction are outside the project-operation skill."
+    },
+    {
+      "source_ids": [
+        "document-wasm-component-model-tutorial",
+        "document-wasm-component-model-tutorial-1-install-the-tools",
+        "document-wasm-component-model-tutorial-installing-moonbit",
+        "document-wasm-component-model-tutorial-installing-wasm-toolchain",
+        "document-wasm-component-model-tutorial-2-define-the-interface-wit",
+        "document-wasm-component-model-tutorial-3-generate-moonbit-project-structure",
+        "document-wasm-component-model-tutorial-4-examine-the-generated-code",
+        "document-wasm-component-model-tutorial-5-implement-the-component-logic",
+        "document-wasm-component-model-tutorial-6-configure-the-build",
+        "document-wasm-component-model-tutorial-7-build-the-webassembly-component",
+        "document-wasm-component-model-tutorial-8-testing-the-component",
+        "document-wasm-component-model-tutorial-using-the-example-host",
+        "document-wasm-component-model-tutorial-using-wasmtime",
+        "document-wasm-component-model-tutorial-9-configurations",
+        "document-wasm-component-model-tutorial-derive-eq-derive-show",
+        "document-wasm-component-model-tutorial-derive-error",
+        "document-wasm-component-model-tutorial-ignore-stub",
+        "document-wasm-component-model-tutorial-project-name",
+        "document-wasm-component-model-tutorial-gen-dir",
+        "document-wasm-component-model-tutorial-10-references-and-further-reading"
+      ],
+      "reviewed": {
+        "document-wasm-component-model-tutorial": "38dfbe46bd5992dc02c8ed81eac302c98890864cf529db6812395b15d07ca809",
+        "document-wasm-component-model-tutorial-1-install-the-tools": "8e4b04da59b21e15978978394a6f0f09dcece7bc8d37964925db2d94c0312fcf",
+        "document-wasm-component-model-tutorial-installing-moonbit": "aa609d9e377d29a101ef78a2e9a3e2bca6d2a768d87c91a4472e01a4ca0d0719",
+        "document-wasm-component-model-tutorial-installing-wasm-toolchain": "92f0b0023d7adbe1e245c37be884ae3fdd49d5c2cfc8a44126399aada82767d4",
+        "document-wasm-component-model-tutorial-2-define-the-interface-wit": "65a37202b2b99cdc0cae3fb89756b0a4aa35192b2b3c2c9d03a22b72caf25969",
+        "document-wasm-component-model-tutorial-3-generate-moonbit-project-structure": "dbf6c1e18e9ef6c790b8973072aa38da01855f18128b12e3cad436dcf6cd0da8",
+        "document-wasm-component-model-tutorial-4-examine-the-generated-code": "faa3d107d2432268015a62fdf7714d5e19b6a6654564db9eaefbf783b3d9d888",
+        "document-wasm-component-model-tutorial-5-implement-the-component-logic": "bea043c29c4ae6707d577d67056714f129931aec3ce491d0a8c00f1844b0d99d",
+        "document-wasm-component-model-tutorial-6-configure-the-build": "569cf5895d3de4cdf3cff476a24ad81b45f19e574ecf176f0edfb88c985606e2",
+        "document-wasm-component-model-tutorial-7-build-the-webassembly-component": "ede95c6b06664bbb8924c7e8ebf138223e982547a614e67c17edaefc482f3fc2",
+        "document-wasm-component-model-tutorial-8-testing-the-component": "757ffafc0fd9a6641dafc0654222557670c171ebc0d94df89c84d0df6ed39ddb",
+        "document-wasm-component-model-tutorial-using-the-example-host": "8be5b91b2d04f351c3b66f921aba1ad043703c43f4623e44f190071bb9f7018f",
+        "document-wasm-component-model-tutorial-using-wasmtime": "d4ad0ee3cab73a0db5ef71c45ff5bd5383b9196c57691132d75116518005fd28",
+        "document-wasm-component-model-tutorial-9-configurations": "32cc346db66aaccf090e8c00f12f5d7d2b448d13696d37beee9996844ca13845",
+        "document-wasm-component-model-tutorial-derive-eq-derive-show": "c31c0f3738395ec7e4735c4e2ad129252027dc246b2dabef36fb855d6690f90c",
+        "document-wasm-component-model-tutorial-derive-error": "65bdfa563315cb0a10845094f69fbb2d632a002d0be9bb7773aef970d80420a2",
+        "document-wasm-component-model-tutorial-ignore-stub": "e12e9e6613b82aa793e16d3b0d5c1e692d6121cfd981e25dd7c6f39c4a8bd49c",
+        "document-wasm-component-model-tutorial-project-name": "13d09786e13bf0761a62472d90d67461fd781194b6ce7f6ef4308e5c49de1527",
+        "document-wasm-component-model-tutorial-gen-dir": "5c1f68f9e307882e4dcca5e05ca971fd0c0766ba0994f2796dce3f92f9e33869",
+        "document-wasm-component-model-tutorial-10-references-and-further-reading": "712f9029ace0700b5b52a74ff0aec09bf9b57b1ca9dad53b0acd095353452c65"
+      },
+      "official_topics": [
+        "MoonBit for Component Model",
+        "1. Install the Tools",
+        "Installing MoonBit",
+        "Installing Wasm toolchain",
+        "2. Define the Interface (WIT)",
+        "3. Generate MoonBit Project Structure",
+        "4. Examine the Generated Code",
+        "5. Implement the Component Logic",
+        "6. Configure the Build",
+        "7. Build the WebAssembly Component",
+        "8. Testing the Component",
+        "Using the Example Host",
+        "Using Wasmtime",
+        "9. Configurations",
+        "--derive-eq --derive-show",
+        "--derive-error",
+        "--ignore-stub",
+        "--project-name",
+        "--gen-dir",
+        "10. References and Further Reading"
+      ],
+      "summary": "External WebAssembly Component Model workflow",
+      "disposition": "out-of-scope",
+      "reason": "WIT tooling, component hosts, and external Wasm tool installation are outside the MoonBit project-operation skill."
+    },
+    {
+      "source_ids": [
+        "document-wasm-index",
+        "document-wasm-index-custom-export-and-import"
+      ],
+      "reviewed": {
+        "document-wasm-index": "0005b71ef8c95681ea513adbf1e4b61c6a627078ffb1056fea7b0288f38231fb",
+        "document-wasm-index-custom-export-and-import": "00c8095d1af81f17c458ffc3a820117b9009d3f8b0e0c94abcafebd65b0949e8"
+      },
+      "official_topics": [
+        "WebAssembly Integration",
+        "Custom Export and Import"
+      ],
+      "summary": "WebAssembly export and import configuration",
+      "disposition": "routed",
+      "owner_skill": "moonbit-toolchain",
+      "route": {
+        "section": "Feature index",
+        "reference": "references/targets-and-conditional-builds.md",
+        "terms": [
+          "conditional builds",
+          "link options"
+        ]
+      },
+      "content": {
+        "marker": "## Link options per backend",
+        "terms": [
+          "WebAssembly Integration",
+          "Custom Export and Import"
+        ]
+      }
+    },
+    {
+      "source_ids": [
+        "document-wasm-index-component-model",
+        "document-wasm-index-q-a"
+      ],
+      "reviewed": {
+        "document-wasm-index-component-model": "c73bb108d62ecec08fb72f69df6efbed86f28b409dd34212fd7b9cdb25241119",
+        "document-wasm-index-q-a": "da3514b0b71100b31a8d7286f1f3185ebedffb6a62feccc13433ec59c7552359"
+      },
+      "official_topics": [
+        "Component Model",
+        "Q&A"
+      ],
+      "summary": "WebAssembly integration topics outside project configuration",
+      "disposition": "out-of-scope",
+      "reason": "Component-model guidance and the general Wasm Q&A are outside the MoonBit project-operation skill."
+    }
+  ]
+}

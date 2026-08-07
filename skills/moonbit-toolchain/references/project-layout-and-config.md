@@ -9,6 +9,8 @@ Use these exact headings from the official language documentation to recognize p
 - Package and module operation: Managing Projects with Packages; Packages and modules; Internal Packages
 - Virtual packages: Virtual Packages; Defining a virtual package; Implementing a virtual package; Using a virtual package; Overriding a virtual package
 
+Official toolchain headings routed here: Toolchains; Moon Build System; Module Configuration; Name; Version; Dependency Management; Meta Information; README; Repository; License; Keywords; Description; Include and Exclude; Source directory; Package Configuration; New format (`moon.pkg`); Formatter; Package type; is-main (deprecated); Importing dependencies; Import; Test import; White-box test import; Virtual Package; Declarations; Implementations; Overriding implementations; MoonBit's Build System Tutorial; Prerequisites; Creating a New Module; Understanding the Module Directory Structure; Working with Packages; Choosing a Target; Package Importing; Creating and Using a New Package; Adding Tests.
+
 ## Module and package model
 
 - A **module** is a directory with a `moon.mod` file (or legacy `moon.mod.json`). It is the unit of versioning and publishing, named `user/name`.
@@ -46,7 +48,7 @@ description = ""
 Other verified top-level keys:
 
 - `source = "src"` — packages then live under `src/`, but import paths do **not** include the prefix; `moon run` still takes the real directory path (`moon run src/cmd/main`, not `cmd/main`).
-- `supported_targets = [ "js", "wasm-gc" ]` — an array at module level (see references/targets-and-conditional-builds.md).
+- `supported_targets = "+js+wasm-gc"` — the canonical compact target-set string at module level; the older array form remains accepted for compatibility (see references/targets-and-conditional-builds.md).
 
 At package level, 0.10.4 also promotes formatter configuration to a top-level declaration:
 
@@ -116,7 +118,8 @@ The virtual package's public declarations are the interface; the implementation 
 | `"targets": {...}` | `options(targets: { ... })` |
 | `"link": {...}` | `options(link: { ... })` |
 | `"native-stub": [...]` | `options("native-stub": [ ... ])` |
-| `"supported-targets": [...]` | `supported_targets = [ ... ]` at either level (packages also accept the newer `"<expr>"` string form) |
+| `"supported-targets": [...]` | `supported_targets = "+js+wasm-gc"` at module or package level; legacy arrays still parse but are no longer the canonical shape |
+| `"warn-list": "-unused_value"` | `warnings = "-unused_value"` in `moon.mod` or `moon.pkg`; use command-level `--deny-warn` instead of the legacy `@` promotion prefix |
 | `"pre-build": [...]` | `options("pre-build": [ ... ])` |
 
 ## Migration behavior (verified)
@@ -130,4 +133,4 @@ moon fmt
 - `moon fmt` **is** the migration tool: inside a legacy module it converts `moon.mod.json` → `moon.mod` and every `moon.pkg.json` → `moon.pkg`, printing `Warning: Migrating to moon.mod ... deprecated moon.mod.json is removed.` per file. **It deletes the JSON originals** — commit or back up before running it.
 - Migration output is not always fmt-clean in one pass (e.g. a missing trailing newline), so the next `moon fmt --check` can still report a diff.
 - A legacy module with a path dependency fails migration loudly and gracefully: `moon fmt` errors, nothing is deleted, and the module keeps working on JSON.
-- Feeding a legacy config through `moon fmt` is the fastest way to learn a working DSL spelling of any field — most of the mapping table above was produced that way (migration output can lag the newest syntax, e.g. it emits the array form of package-level `supported_targets`, not the string-expression form).
+- Feeding a legacy config through `moon fmt` is the fastest way to learn a working DSL spelling of any field — most of the mapping table above was produced that way. Migration output can lag the newest canonical syntax; for example, it may emit the legacy array form of `supported_targets`, which still parses but should be rewritten as a compact string in new configuration.

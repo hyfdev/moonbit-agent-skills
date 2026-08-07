@@ -1,6 +1,6 @@
 # Targets and conditional builds
 
-All verified at the pin on Linux x86_64 (native backend uses the system C compiler).
+All executable claims are verified at the pin on Linux x86_64. A debug native build uses MoonBit's new native code generator and the system linker; a release native build still generates C and invokes the system C compiler.
 
 ## Target selection
 
@@ -11,14 +11,16 @@ moon check --target all
 moon run --target native cmd/main
 ```
 
-- `--target` values: `wasm`, `wasm-gc` (default), `js`, `native`, `llvm`, `all`. It exists on check/build/run/test/bench.
+- `--target` values: `wasm` (default), `wasm-gc`, `js`, `native`, `llvm`, `all`. It exists on check/build/run/test/bench.
 - `all` = wasm + wasm-gc + js + native. It does **not** include llvm.
 - **`llvm` depends on the install channel** (both outcomes verified 2026-07-17): on the stable/latest channel it prints `Warning: LLVM backend is experimental and only supported on nightly moonbit toolchain for now`, then dies with an internal-compiler-error banner (exit 255 — a required prelude file ships only on nightly); on the nightly channel the same command builds successfully, keeping the experimental warning.
 - Per-target artifact paths and names: see the table in references/commands.md (`_build/<target>/<debug|release>/build/...`; native executables are `*.exe` even on macOS; js builds also emit `.d.ts` files).
 
-## Native backend selection in 0.10.4
+## Native backend selection
 
-**Documented, not executed across the full platform matrix:** the [0.10.4 release notes](https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release) say the new native backend supports macOS Apple Silicon and x86-64 Linux, with Windows MSVC support on nightly. Debug builds on macOS Apple Silicon use it by default; set `MOONBIT_NEW_NATIVE=0` to force the C backend. Other platforms default to the C backend and opt into the new debug backend with `MOONBIT_NEW_NATIVE=1`. Release builds still use the C backend with `-O2`. Do not assume a successful `--target native` build identifies which backend was selected.
+On the verified Linux x86_64 host, a debug build uses the new native backend by default: `moon build --target native --dry-run` links a native object emitted by `moonc`. `MOONBIT_NEW_NATIVE=0` switches that debug build back to generated C. Release builds still use the C backend with `-O2`.
+
+**Documented, not executed across the full platform matrix:** the [current toolchain source](https://github.com/moonbitlang/moon/commit/92ee596a647448c825c385c9513663221c45bb4e) enables the new debug backend by default on macOS Apple Silicon and Linux x86_64. Other supported platforms may keep the C default or differ by install channel; inspect `--dry-run` output before diagnosing backend-specific behavior. `MOONBIT_NEW_NATIVE=1` opts into the new debug backend where available, and `MOONBIT_NEW_NATIVE=0` forces C. Do not assume a successful `--target native` build identifies which backend was selected.
 
 ## Default target: preferred_target
 

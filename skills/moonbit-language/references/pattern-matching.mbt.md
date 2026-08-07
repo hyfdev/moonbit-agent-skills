@@ -35,7 +35,7 @@ test "match arms: guards, or-patterns, ranges" {
 }
 ```
 
-Since 0.10.4, an or-pattern may provide defaults with `with` for branches that do not bind every variable. This keeps shared handling in one arm. Enclose the entire branch carrying defaults in parentheses; separate multiple assignments with commas: `A(a, b) | (B with a = 0, b = 0) => ...`.
+An or-pattern may provide defaults with `with` for branches that do not bind every variable. This keeps shared handling in one arm. Enclose the entire branch carrying defaults in parentheses; separate multiple assignments with commas: `A(a, b) | (B with a = 0, b = 0) => ...`. A default can be a general expression evaluated in the surrounding scope, but it cannot refer to a binder from the complete pattern or contain control flow such as `return`, `break`, `continue`, or `raise`.
 
 ```mbt check
 enum ReleasePair {
@@ -43,15 +43,15 @@ enum ReleasePair {
   NoPair
 }
 
-fn sum_release_pair(value : ReleasePair) -> Int {
+fn sum_release_pair(value : ReleasePair, fallback : Int) -> Int {
   match value {
-    Pair(a, b) | (NoPair with a = 0, b = 0) => a + b
+    Pair(a, b) | (NoPair with a = (fallback + 1), b = (fallback + 2)) => a + b
   }
 }
 
 test "or-pattern defaults with multiple binders" {
-  assert_eq(sum_release_pair(Pair(2, 3)), 5)
-  assert_eq(sum_release_pair(NoPair), 0)
+  assert_eq(sum_release_pair(Pair(2, 3), 10), 5)
+  assert_eq(sum_release_pair(NoPair, 10), 23)
 }
 ```
 
@@ -138,7 +138,7 @@ test "map patterns: required and optional keys" {
 
 ## Bitstring and `Json` patterns
 
-Bitstring patterns decode fixed-width fields from `Bytes` and bind the remaining view with `.. rest`; suffixes such as `u16be` state width, signedness, and byte order. `Json` patterns use object and array shapes directly. Keep `..` in object patterns when extra fields are allowed.
+Bitstring patterns decode fixed-width fields from byte containers and bind the remaining view with `.. rest`; suffixes such as `u16be` state width, signedness, and byte order. At a byte-aligned offset, `v128le(pattern)` extracts a 128-bit little-endian value of type `V128`. `Json` patterns use object and array shapes directly. Keep `..` in object patterns when extra fields are allowed.
 
 ```mbt check
 test "bitstring and Json patterns" {
@@ -154,8 +154,15 @@ test "bitstring and Json patterns" {
     fail("JSON shape not found")
   }
   assert_true(items is [1, 2])
+
+  let vector_bytes = b"\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0A\x0B\x0C\x0D\x0E\x0F"
+  guard! vector_bytes is [v128le(vector)]
+  let extracted : V128 = vector
+  ignore(extracted)
 }
 ```
+
+The `v128le` example is verified on Linux across wasm-gc, wasm, JavaScript, and native. **Documented, not executed on Windows native:** the current official [Bitstring Pattern reference](https://docs.moonbitlang.com/en/latest/language/fundamentals.html#bitstring-pattern) records a C-backend fallback issue for that platform.
 
 ## Regex literals and match expressions
 
@@ -243,7 +250,7 @@ test "is expressions bind into conditions and branches" {
 
 ## guard statements
 
-`guard cond else { ... }` and `guard x is Pattern else { ... }` are early exits: on failure the `else` block runs, and it may end with an expression (returned from the enclosing function) or an explicit `return`. A `guard x is Pattern` **without** `else` aborts the program when the pattern does not match — only drop the `else` when a mismatch is a genuine bug.
+`guard cond else { ... }` and `guard x is Pattern else { ... }` are early exits: on failure the `else` block runs, and it may end with an expression (returned from the enclosing function) or an explicit `return`. An ordinary guard without `else` must be provably exhaustive; otherwise it emits E0087 because failure would implicitly terminate the program. Write `guard!` when termination on failure is intentional; it cannot have an `else`. On an exhaustive condition or pattern, use plain `guard` without `else`: a redundant bang emits E0088 and a redundant `else` emits E0089.
 
 ```mbt check
 test "guard: boolean and pattern forms" {
@@ -257,9 +264,15 @@ test "guard: boolean and pattern forms" {
     n
   }
 
+  fn require_some(value : Int?) -> Int {
+    guard! value is Some(result)
+    result
+  }
+
   assert_eq(first_or([9, 8], 0), 9)
   assert_eq(first_or([], 0), 0)
   assert_eq(positive_or_zero(5), 5)
   assert_eq(positive_or_zero(-4), 0)
+  assert_eq(require_some(Some(7)), 7)
 }
 ```

@@ -1,7 +1,6 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { basename, join, resolve, sep } from "node:path";
 import { exitWith, isMain } from "./lib/cli.ts";
-import { parseFrontmatter, stringMap } from "./lib/frontmatter.ts";
 import { REPO_ROOT } from "./lib/repo.ts";
 import { validateSkillRoute, type SkillRoute } from "./lib/skill_route.ts";
 
@@ -82,7 +81,6 @@ export function releaseCoverageProblems(repoRoot = REPO_ROOT): string[] {
     return ["missing verification/releases directory"];
   }
 
-  const currentSkillReleases = readCurrentSkillReleases(repoRoot, problems);
   const coverageFiles = readdirSync(releasesDirectory, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .map((entry) => join(releasesDirectory, entry.name, "coverage.json"))
@@ -136,14 +134,6 @@ export function releaseCoverageProblems(repoRoot = REPO_ROOT): string[] {
     problems.push(
       `expected exactly one current release coverage file, found ${currentCoverages.length}`,
     );
-  }
-  if (currentSkillReleases.size === 1 && currentCoverages.length === 1) {
-    const skillRelease = [...currentSkillReleases][0];
-    if (currentCoverages[0] !== skillRelease) {
-      problems.push(
-        `current release coverage ${repr(currentCoverages[0])} does not match skill release ${repr(skillRelease)}`,
-      );
-    }
   }
   return problems;
 }
@@ -574,35 +564,6 @@ function markerInsideDocumentedLabel(text: string, marker: string): boolean {
   return text
     .split(/\r?\n\s*\r?\n/)
     .some((paragraph) => paragraph.includes(marker) && /Documented, not executed/i.test(paragraph));
-}
-
-function readCurrentSkillReleases(repoRoot: string, problems: string[]): Set<string> {
-  const releases = new Set<string>();
-  const skillsDirectory = join(repoRoot, "skills");
-  if (!isDirectory(skillsDirectory)) {
-    problems.push("missing skills directory");
-    return releases;
-  }
-  for (const entry of readdirSync(skillsDirectory, { withFileTypes: true })) {
-    if (!entry.isDirectory()) {
-      continue;
-    }
-    const skillMd = join(skillsDirectory, entry.name, "SKILL.md");
-    if (!isFile(skillMd)) {
-      continue;
-    }
-    const parsed = parseFrontmatter(readFileSync(skillMd, "utf8"));
-    const release = stringMap(parsed.frontmatter, "metadata")?.["moonbit-release"];
-    if (release !== undefined) {
-      releases.add(release);
-    }
-  }
-  if (releases.size === 0) {
-    problems.push("no skill declares metadata.moonbit-release");
-  } else if (releases.size > 1) {
-    problems.push(`skills disagree on moonbit-release: ${[...releases].sort().join(", ")}`);
-  }
-  return releases;
 }
 
 function readManifestIds(repoRoot: string, problems: string[]): Set<string> {

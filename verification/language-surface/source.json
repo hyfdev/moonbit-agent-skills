@@ -9,13 +9,13 @@
     {
       "id": "document-fundamentals",
       "path": "next/language/fundamentals.md",
-      "sha256": "ccf360d2c91762ff829f4ccbe500bea915a1b3f029f988e9c80014a345de3b19",
+      "sha256": "0b0d0dccde6d96c142016169dd4b7d0c8d2b9e54e59fb409df75f1973c3ff46e",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/fundamentals.html"
     },
     {
       "id": "document-methods",
       "path": "next/language/methods.md",
-      "sha256": "aed6939fbbcd815709b8ca76cde0537452d85998966f663f9b0885456eb31b0c",
+      "sha256": "43914840ed13e95b18a8b3636f9c262f5b65a3434428f0cfb93703c88aa570f2",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/methods.html"
     },
     {
@@ -33,13 +33,13 @@
     {
       "id": "document-packages",
       "path": "next/language/packages.md",
-      "sha256": "318c30667465b96efe36c879bae34d29bdca0efb52b0532f215939ab88c065b1",
+      "sha256": "49e65da54048d8ef47deb277672cb24835369ef3681c9d3b2c3c87e6b2671e7b",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/packages.html"
     },
     {
       "id": "document-tests",
       "path": "next/language/tests.md",
-      "sha256": "3a1f03b1c07ec5059e4c4a47a85b7c1faf381ce04e868fd1fc75265f77af6e14",
+      "sha256": "cffd8d33015d2999c19613bbd29f93a57f5af8bc335132452831f711abfecf27",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/tests.html"
     },
     {
@@ -57,7 +57,7 @@
     {
       "id": "document-attributes-deprecated",
       "path": "next/language/attributes/deprecated.md",
-      "sha256": "9c37e91dbb518af17cd15fbd3b4a3d183977db9c4105ac2a5b9ed3b9f91431d5",
+      "sha256": "3946bab218719a91374278adfa56b1df995e6091b898d6b8b7fe8ce78b8c26fd",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/deprecated.html"
     },
     {
@@ -87,7 +87,7 @@
     {
       "id": "document-attributes-internal",
       "path": "next/language/attributes/internal.md",
-      "sha256": "f3926be50a63ae0efe82ab5767a665f48408387523ab87fb343af4b09c616632",
+      "sha256": "6600e2670a37686ba70f7a3d810fa0480400f9af5e7880e68aeeebb2a5a61b90",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/internal.html"
     },
     {
@@ -127,6 +127,12 @@
       "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/borrow_and_owned.html"
     },
     {
+      "id": "document-attributes-unsafe_cycle_free",
+      "path": "next/language/attributes/unsafe_cycle_free.md",
+      "sha256": "8c15765d754b6c88e20cc52e896b7145d2cd9fc5daf277e745a6905652c660a1",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/unsafe_cycle_free.html"
+    },
+    {
       "id": "document-attributes-as_free_fn",
       "path": "next/language/attributes/as_free_fn.md",
       "sha256": "abce91c9652cb3527e08e745d9a7425351aaf733148c704a857558d72c3e45fe",
@@ -163,15 +169,39 @@
       "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/module.html"
     },
     {
+      "id": "document-attributes-export_name",
+      "path": "next/language/attributes/export_name.md",
+      "sha256": "69c7f89c9f9b32d3b68e4028ffffb28ba22224c20b3b98552e3b905fdb65f358",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/export_name.html"
+    },
+    {
+      "id": "document-attributes-proof_pure",
+      "path": "next/language/attributes/proof_pure.md",
+      "sha256": "45431be9bc9ef58139e67cf73a774cd90a1f1ddf134af60072486ed39f7ab132",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/proof_pure.html"
+    },
+    {
+      "id": "document-attributes-proof_external",
+      "path": "next/language/attributes/proof_external.md",
+      "sha256": "1751282bc5e80f7aeac76d41517caf6862c0b2a5b283c9faaacb582eef845364",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/proof_external.html"
+    },
+    {
+      "id": "document-attributes-proof_import",
+      "path": "next/language/attributes/proof_import.md",
+      "sha256": "531995150fd1b1815e4e1aeb9cae5b708cd8a89c022cf7e2ec7698614b9577d7",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/proof_import.html"
+    },
+    {
       "id": "document-attributes",
       "path": "next/language/attributes.md",
-      "sha256": "a0d9e0629946878da3a034ca5d5ec42197f1230765f569cb80800713332dec93",
+      "sha256": "42403cd315f4e87ab29dd985d418c25adc4b0d6368787ea1ca2aa3b84069d177",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes.html"
     },
     {
       "id": "document-ffi",
       "path": "next/language/ffi.md",
-      "sha256": "5ddb29f1f9660bbee05d3a6033e4192bd4f38dccda99310e7feda18bb3febf96",
+      "sha256": "3f94c34611d4ec6214afb99ce5329833e66d756fb60bdcdd9c157209c4a42f60",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/ffi.html"
     },
     {
@@ -183,7 +213,7 @@
     {
       "id": "document-verification",
       "path": "next/language/verification.md",
-      "sha256": "646308d589164d96d1047873f0035a9e6b5fc31c98be7a143d28e74a95f27f62",
+      "sha256": "405fcea870df7328c5c17c8f492ed7a1d90c4f89447c57748a755282f2b0364e",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/verification.html"
     },
     {
@@ -357,25 +387,25 @@
     {
       "id": "document-error_codes-e0029",
       "path": "next/language/error_codes/E0029.md",
-      "sha256": "77126316c3689258392bed02d768f1d3931b5bd33a97437e5010bab5c43c99f3",
+      "sha256": "ba0e95d84bc5b3ea5a5d29648a9c3b98e5645b1688685fc4f37ef8430d50145d",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0029.html"
     },
     {
       "id": "document-error_codes-e0030",
       "path": "next/language/error_codes/E0030.md",
-      "sha256": "581b339153e98d3f457e68f3968614f0bebe2c0127f8520561e85f752f2f4d4d",
+      "sha256": "60c30f3312607e97cf3983e96e5c118fd229c57e530abede7594bbf572088cb4",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0030.html"
     },
     {
       "id": "document-error_codes-e0031",
       "path": "next/language/error_codes/E0031.md",
-      "sha256": "044b84e953c70cf6f1a2504dafdc64060072f212d40a0d5c11c428fa9940f126",
+      "sha256": "988982b0dcc422b90df87227467c84b8b09093cf0a444ad6a7dff75176a5ed66",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0031.html"
     },
     {
       "id": "document-error_codes-e0032",
       "path": "next/language/error_codes/E0032.md",
-      "sha256": "d92645021709e6f9c5308570b83583d876009f6fa1da9a790fbc0a7acfbc9608",
+      "sha256": "04b8bc9270443f9ac132dd69fa7f33c37b666e70dd0cdcd717b31ca9110c2575",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0032.html"
     },
     {
@@ -387,7 +417,7 @@
     {
       "id": "document-error_codes-e0034",
       "path": "next/language/error_codes/E0034.md",
-      "sha256": "46d9625e5323a7b52526716ba2f8b967ad14a48a92ba40cfac6d0ca19d8824ee",
+      "sha256": "6df14d2e79771ece7ada6775ab3a75099f5c73d0b714953a5fdb59d65b6faf3d",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0034.html"
     },
     {
@@ -447,7 +477,7 @@
     {
       "id": "document-error_codes-e0044",
       "path": "next/language/error_codes/E0044.md",
-      "sha256": "cccaa8fa5cbd008cbd65fe715b484bf7c00b93718701ac318bea8b06d3bb69d7",
+      "sha256": "bcb6923e37d4a53730b9831e806f2d64aa4c0bdd9a0952476dc842a4bc51a1ac",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0044.html"
     },
     {
@@ -471,7 +501,7 @@
     {
       "id": "document-error_codes-e0049",
       "path": "next/language/error_codes/E0049.md",
-      "sha256": "3092235b728d94f5eac1dcc2afa9c23cac141b2367f6e6c546f80e6b96647bae",
+      "sha256": "f61598d824a2debe6de8c5402cabc01df42db508d674362f9961945a81ee51e5",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0049.html"
     },
     {
@@ -645,7 +675,7 @@
     {
       "id": "document-error_codes-e0079",
       "path": "next/language/error_codes/E0079.md",
-      "sha256": "bf0476cb2b918bd19d9d5d56bbe605c8872332c871e35b063d2786a9bdafb671",
+      "sha256": "d164dad8d75b5b3f04bfb05dba33a5830cfd6c32d61e39a89f36cb8bed4b7fcb",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0079.html"
     },
     {
@@ -671,6 +701,42 @@
       "path": "next/language/error_codes/E0083.md",
       "sha256": "9025d858440cda870981cc37160dddf34e35ba931f3c4be92459e0fa93dd665d",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0083.html"
+    },
+    {
+      "id": "document-error_codes-e0084",
+      "path": "next/language/error_codes/E0084.md",
+      "sha256": "d1b3592486da1bd9747a42077574ac29652609bc46f5b21555a5c8980eafb539",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0084.html"
+    },
+    {
+      "id": "document-error_codes-e0085",
+      "path": "next/language/error_codes/E0085.md",
+      "sha256": "09601a81c07fb6a287c7f27ba73c6d53cc511f951c59af9f86ce79b2885e1362",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0085.html"
+    },
+    {
+      "id": "document-error_codes-e0086",
+      "path": "next/language/error_codes/E0086.md",
+      "sha256": "d781334cae3a2dc9b95bcedd252baa4677ed3123dbda9d082ada6482f9f3da9a",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0086.html"
+    },
+    {
+      "id": "document-error_codes-e0087",
+      "path": "next/language/error_codes/E0087.md",
+      "sha256": "44e9ebd74ba992cc889481e2c54d2021a071f258a9f60f0c752831230d4b1271",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0087.html"
+    },
+    {
+      "id": "document-error_codes-e0088",
+      "path": "next/language/error_codes/E0088.md",
+      "sha256": "e6a138922f81aa131c1974649424feac9b58dd43f459a913796ad056b09e65f6",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0088.html"
+    },
+    {
+      "id": "document-error_codes-e0089",
+      "path": "next/language/error_codes/E0089.md",
+      "sha256": "87e04ddc1816b63257caa5cb5df9841457d72c3bfbd102091284e607cdff2628",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0089.html"
     },
     {
       "id": "document-error_codes-e1000",
@@ -795,13 +861,13 @@
     {
       "id": "document-error_codes-e3021",
       "path": "next/language/error_codes/E3021.md",
-      "sha256": "6cf8d4e41fe188b9caa1cc90bde940ab9c45795c175f6fd47f7aab55c7f6873c",
+      "sha256": "4f5465fe64f34de15826c8235944762fbac515e2c115d036c5f409fd0bb15e4e",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E3021.html"
     },
     {
       "id": "document-error_codes-e3022",
       "path": "next/language/error_codes/E3022.md",
-      "sha256": "440b6d45a3b77d5e692c293d2124a84d51af3711b2abcac6c86b00e8238c9aa6",
+      "sha256": "0ab41b35545aedf37312a05db6b73f1e336808f1f1bb9672a7de7387e8b1c9ef",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E3022.html"
     },
     {
@@ -815,6 +881,18 @@
       "path": "next/language/error_codes/E3024.md",
       "sha256": "7923f0aac9e539679e77a0ae924a98fcdc34826a2c3dc1d7800076098c9d2783",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E3024.html"
+    },
+    {
+      "id": "document-error_codes-e3026",
+      "path": "next/language/error_codes/E3026.md",
+      "sha256": "f1440f689813c219b4135479e0ea6c2d76f4fdd6d5b3a01b95aa170e4eda170d",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E3026.html"
+    },
+    {
+      "id": "document-error_codes-e3027",
+      "path": "next/language/error_codes/E3027.md",
+      "sha256": "0afbbd5d2dd8c924f2faca9c3c61151e97aa3c17a1f605de17b27fb25cecf0b0",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E3027.html"
     },
     {
       "id": "document-error_codes-e3100",
@@ -939,7 +1017,7 @@
     {
       "id": "document-error_codes-e4020",
       "path": "next/language/error_codes/E4020.md",
-      "sha256": "b1a7a47bcc439c7590babdd4b12ca025eda1aa27cce247f9bb2649498d29ac61",
+      "sha256": "9fc16f90b9378cf6e2f574d037b43a71e04e579d16cd6a23e967d4bf4ad37abb",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4020.html"
     },
     {
@@ -1243,6 +1321,12 @@
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4082.html"
     },
     {
+      "id": "document-error_codes-e4083",
+      "path": "next/language/error_codes/E4083.md",
+      "sha256": "1b376ef1066de324a1ed91ce6c9e34bc2491a700007e96dd4f4da5914919d5d6",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4083.html"
+    },
+    {
       "id": "document-error_codes-e4084",
       "path": "next/language/error_codes/E4084.md",
       "sha256": "11117a9382a9247a2693eb468afe05723318a4f2fcc1a8f02f299a408ada9387",
@@ -1371,13 +1455,13 @@
     {
       "id": "document-error_codes-e4111",
       "path": "next/language/error_codes/E4111.md",
-      "sha256": "30465205ca14c6b42c1fd3cb9847273fa83d5fe7fc5c3a43b2009b3885d2fea2",
+      "sha256": "0dcee99c9302dc6ac5fee0acd4495bb36d80720e0efb71fb1596095a85e0654c",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4111.html"
     },
     {
       "id": "document-error_codes-e4112",
       "path": "next/language/error_codes/E4112.md",
-      "sha256": "5f9b9a852b809cabc7aa05cd7a5853fb05cfce813154d13676f383ff7dfc01bc",
+      "sha256": "601ad8a9dccb739e89a07431f9dac29848f8044cabe616e5df4642e84fc72ea7",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4112.html"
     },
     {
@@ -1593,7 +1677,7 @@
     {
       "id": "document-error_codes-e4156",
       "path": "next/language/error_codes/E4156.md",
-      "sha256": "cea6a60994e702a3deaaf9e44207b912759c28ef7525b064ef33bd01e965f7b8",
+      "sha256": "092a44cf9d34e3f02247733d16937e4541b0cac0e5def791c317dee44833be43",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4156.html"
     },
     {
@@ -1923,7 +2007,7 @@
     {
       "id": "document-error_codes-e4219",
       "path": "next/language/error_codes/E4219.md",
-      "sha256": "c33e3bd93a4a06479acbe508110ea9838a8a460fc3afd2f1ff0a6f12c6d7ac3b",
+      "sha256": "d727c5bb360f6c7bd997bc72deca7a154ed3017c672249b4951bab8fedcb5871",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4219.html"
     },
     {
@@ -2029,7 +2113,7 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "ccf360d2c91762ff829f4ccbe500bea915a1b3f029f988e9c80014a345de3b19",
+      "fingerprint": "0b0d0dccde6d96c142016169dd4b7d0c8d2b9e54e59fb409df75f1973c3ff46e",
       "id": "document-fundamentals",
       "kind": "document",
       "level": 1,
@@ -2280,7 +2364,7 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "efebd247b6f0e90ae1b6b9dff3b4dc7179283cf8b27deb5a9905cc5c613761c9",
+      "fingerprint": "04c3ac071b9dcee98bd62bb0c55957bd956cf0dd7c359c44794a45de77a8610b",
       "id": "document-fundamentals-control-structures",
       "kind": "heading",
       "level": 2,
@@ -2307,7 +2391,7 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "9cb8dfc9f201abdf2025026ed6b8bc4421e306f3e9d4310861c342648f71e4b5",
+      "fingerprint": "89e89aec4ee78bdcba6d73f5dc47cea6f3504f9b7b7d6a654d2f18f41791a52f",
       "id": "document-fundamentals-guard-statement",
       "kind": "heading",
       "level": 3,
@@ -2316,7 +2400,7 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "99fb599d6fdbb3818d0794bd8a68b7d2ba78d2ac434895525eba72599995d3af",
+      "fingerprint": "1a4e09811fcaf16c764f11f8cfcb8aba80c2eb006bd84e5ea86248b6c5de68b1",
       "id": "document-fundamentals-guard-statement-and-is-expression",
       "kind": "heading",
       "level": 4,
@@ -2370,12 +2454,21 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "03848ae840518286baee2cfd427a1fd974bbeda761c6aea2b76c122ee4804880",
+      "fingerprint": "e35a5f10d1d912b31cd75662383bfdd6718906f76d8ee5828e744cb0a73c26fd",
       "id": "document-fundamentals-labelled-continue-break",
       "kind": "heading",
       "level": 3,
       "parent": "document-fundamentals-control-structures",
       "text": "Labelled Continue/Break"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "fingerprint": "f9dfe78cc95a3e747aa80138515d6ed874726a556a22af4a4f45eb83bb41d672",
+      "id": "document-fundamentals-labelled-blocks",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-control-structures",
+      "text": "Labelled Blocks"
     },
     {
       "document_id": "document-fundamentals",
@@ -2397,7 +2490,7 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "ab8509bd9919030c8232f7d12ade81f12340aab2d21f87eb2d2c3cdc38b7f14e",
+      "fingerprint": "beeb801d7d72a2b30410e26d5355c4e6d897a78b8c06006b2b488700c05abef6",
       "id": "document-fundamentals-custom-data-types",
       "kind": "heading",
       "level": 2,
@@ -2406,7 +2499,7 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "92c4e9f39617553cef358e827672bb4664028f94e7897c2b78b6e63bb153df50",
+      "fingerprint": "384fdf5f1ebb71a39477a0860c54e0dc0cf3177d57cfe7670502918fb3474caf",
       "id": "document-fundamentals-struct",
       "kind": "heading",
       "level": 3,
@@ -2415,7 +2508,7 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "2cca040f15ff339d1485e882ad624fe3c71bf1eec185f4e966978f798ca0deef",
+      "fingerprint": "1e0ae8ab6a118ae197c856777b45668a6733b503a1068fd7c0374257ba5f5c04",
       "id": "document-fundamentals-constructing-struct-with-shorthand",
       "kind": "heading",
       "level": 4,
@@ -2505,7 +2598,7 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "bc96e357485a5c9182e574de42366f623e224a4f24b22e79cbb9d7d6dc5a03ab",
+      "fingerprint": "b0a36cbadce8b85be6ba681f306fe999273506a51282bfd9b5b3a0005881c83f",
       "id": "document-fundamentals-pattern-matching",
       "kind": "heading",
       "level": 2,
@@ -2532,7 +2625,7 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "fe84b4fa46d5d11103af74707ba228e4c42e0a79001a7f4576d0c62f82a0c976",
+      "fingerprint": "8a2272d41623e456eec77faaa7a693ec71390e2c89e41d57bc212a8d2a0a1854",
       "id": "document-fundamentals-bitstring-pattern",
       "kind": "heading",
       "level": 3,
@@ -2568,7 +2661,7 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "82a761184de03e22b456736bec66da0f7f9e36257cfcc14c74806f0da0b9f5ac",
+      "fingerprint": "a1a9647e1fe5a80f2ac0fd85d3e2eb5c14ff9a831cc45b14779337238255dd33",
       "id": "document-fundamentals-default-bindings-in-or-patterns",
       "kind": "heading",
       "level": 3,
@@ -2595,7 +2688,7 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "a699c79aa1d3685b7f4a75f8301cf2e6656f0a92b45ef2c67db47643c4247f00",
+      "fingerprint": "10c32ad6fd6ffc31882af4a04b1462d12b10e6c01df157b34f3b89e2dbcb1b2e",
       "id": "document-fundamentals-special-syntax",
       "kind": "heading",
       "level": 2,
@@ -2622,7 +2715,7 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "59b9f86329074d89bf9941df716bad123a9da801e6ed2987e1000063a0ecb4dd",
+      "fingerprint": "8db3bd078084dfc26778506de81598c9e5d142badefb360e72f840c882e2e663",
       "id": "document-fundamentals-is-expression",
       "kind": "heading",
       "level": 3,
@@ -2649,7 +2742,7 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "2029762b667a777eb632681b750154c03620ceb5539f93cf6c1184a818b30e92",
+      "fingerprint": "df8b5c0962c83e00e08885f5e49a76a52a3d087eee5344bc2f3bdaafc5782d1d",
       "id": "document-fundamentals-lexscan",
       "kind": "heading",
       "level": 3,
@@ -2685,7 +2778,7 @@
     },
     {
       "document_id": "document-methods",
-      "fingerprint": "aed6939fbbcd815709b8ca76cde0537452d85998966f663f9b0885456eb31b0c",
+      "fingerprint": "43914840ed13e95b18a8b3636f9c262f5b65a3434428f0cfb93703c88aa570f2",
       "id": "document-methods",
       "kind": "document",
       "level": 1,
@@ -2729,7 +2822,7 @@
     },
     {
       "document_id": "document-methods",
-      "fingerprint": "f6d31155e9b971ccb7eb39149855566274d74d1d1bef9a4ce59eedfd9f5fc9ab",
+      "fingerprint": "1525bb9d74e89b274aed8bf273fb7f97b04899303e2d239259ecb4b816efb80a",
       "id": "document-methods-trait-system",
       "kind": "heading",
       "level": 2,
@@ -2747,7 +2840,7 @@
     },
     {
       "document_id": "document-methods",
-      "fingerprint": "5466e97791bb83617f592c7a98629a446c74b2e7d7fad5fc18627cae8a4cec44",
+      "fingerprint": "cec373187dbfbb009b6c97b3eddc5922bfab0fd40aaf6d9d3bd8b9f08efd2d30",
       "id": "document-methods-implementing-traits",
       "kind": "heading",
       "level": 3,
@@ -2756,7 +2849,7 @@
     },
     {
       "document_id": "document-methods",
-      "fingerprint": "cf86a3c78e5103e39320ddcc0674bb2521f45fcbdcf7a3b34bcdfbd73e8238ba",
+      "fingerprint": "854301c5a8268992e90d4f75996750a153426d8fd133d632f4115e3f4567cb98",
       "id": "document-methods-attaching-trait-methods-with-extend",
       "kind": "heading",
       "level": 4,
@@ -3006,7 +3099,7 @@
     },
     {
       "document_id": "document-packages",
-      "fingerprint": "318c30667465b96efe36c879bae34d29bdca0efb52b0532f215939ab88c065b1",
+      "fingerprint": "49e65da54048d8ef47deb277672cb24835369ef3681c9d3b2c3c87e6b2671e7b",
       "id": "document-packages",
       "kind": "document",
       "level": 1,
@@ -3014,7 +3107,7 @@
     },
     {
       "document_id": "document-packages",
-      "fingerprint": "711249184123f645c320465cc871e30ad7138f302daeaf7ba46cfbf13aed89a0",
+      "fingerprint": "87e1b404a1fdf58e9aff8e66b2edee582c97dc3d2c81b5b0b0d5d660310294c7",
       "id": "document-packages-packages-and-modules",
       "kind": "heading",
       "level": 2,
@@ -3149,7 +3242,7 @@
     },
     {
       "document_id": "document-tests",
-      "fingerprint": "3a1f03b1c07ec5059e4c4a47a85b7c1faf381ce04e868fd1fc75265f77af6e14",
+      "fingerprint": "cffd8d33015d2999c19613bbd29f93a57f5af8bc335132452831f711abfecf27",
       "id": "document-tests",
       "kind": "document",
       "level": 1,
@@ -3157,7 +3250,7 @@
     },
     {
       "document_id": "document-tests",
-      "fingerprint": "8e6429b9ab580840e678630ecd5b161b59209c7f70d06572240a6c492661a347",
+      "fingerprint": "aacd2318550141577e227bd430d4e4767459aebb35a7d6f8d737e14a6ee327f3",
       "id": "document-tests-test-blocks",
       "kind": "heading",
       "level": 2,
@@ -3281,7 +3374,7 @@
     },
     {
       "document_id": "document-attributes-deprecated",
-      "fingerprint": "9c37e91dbb518af17cd15fbd3b4a3d183977db9c4105ac2a5b9ed3b9f91431d5",
+      "fingerprint": "3946bab218719a91374278adfa56b1df995e6091b898d6b8b7fe8ce78b8c26fd",
       "id": "document-attributes-deprecated",
       "kind": "document",
       "level": 1,
@@ -3321,7 +3414,7 @@
     },
     {
       "document_id": "document-attributes-internal",
-      "fingerprint": "f3926be50a63ae0efe82ab5767a665f48408387523ab87fb343af4b09c616632",
+      "fingerprint": "6600e2670a37686ba70f7a3d810fa0480400f9af5e7880e68aeeebb2a5a61b90",
       "id": "document-attributes-internal",
       "kind": "document",
       "level": 1,
@@ -3376,6 +3469,14 @@
       "text": "Borrow and Owned Attribute"
     },
     {
+      "document_id": "document-attributes-unsafe_cycle_free",
+      "fingerprint": "8c15765d754b6c88e20cc52e896b7145d2cd9fc5daf277e745a6905652c660a1",
+      "id": "document-attributes-unsafe_cycle_free",
+      "kind": "document",
+      "level": 1,
+      "text": "Unsafe Cycle-Free Attribute"
+    },
+    {
       "document_id": "document-attributes-as_free_fn",
       "fingerprint": "abce91c9652cb3527e08e745d9a7425351aaf733148c704a857558d72c3e45fe",
       "id": "document-attributes-as_free_fn",
@@ -3424,8 +3525,40 @@
       "text": "Module attribute"
     },
     {
+      "document_id": "document-attributes-export_name",
+      "fingerprint": "69c7f89c9f9b32d3b68e4028ffffb28ba22224c20b3b98552e3b905fdb65f358",
+      "id": "document-attributes-export_name",
+      "kind": "document",
+      "level": 1,
+      "text": "Export Name Attribute"
+    },
+    {
+      "document_id": "document-attributes-proof_pure",
+      "fingerprint": "45431be9bc9ef58139e67cf73a774cd90a1f1ddf134af60072486ed39f7ab132",
+      "id": "document-attributes-proof_pure",
+      "kind": "document",
+      "level": 1,
+      "text": "Proof Pure Attribute"
+    },
+    {
+      "document_id": "document-attributes-proof_external",
+      "fingerprint": "1751282bc5e80f7aeac76d41517caf6862c0b2a5b283c9faaacb582eef845364",
+      "id": "document-attributes-proof_external",
+      "kind": "document",
+      "level": 1,
+      "text": "Proof External Attribute"
+    },
+    {
+      "document_id": "document-attributes-proof_import",
+      "fingerprint": "531995150fd1b1815e4e1aeb9cae5b708cd8a89c022cf7e2ec7698614b9577d7",
+      "id": "document-attributes-proof_import",
+      "kind": "document",
+      "level": 1,
+      "text": "Proof Import Attribute"
+    },
+    {
       "document_id": "document-attributes",
-      "fingerprint": "a0d9e0629946878da3a034ca5d5ec42197f1230765f569cb80800713332dec93",
+      "fingerprint": "42403cd315f4e87ab29dd985d418c25adc4b0d6368787ea1ca2aa3b84069d177",
       "id": "document-attributes",
       "kind": "document",
       "level": 1,
@@ -3433,7 +3566,7 @@
     },
     {
       "document_id": "document-ffi",
-      "fingerprint": "5ddb29f1f9660bbee05d3a6033e4192bd4f38dccda99310e7feda18bb3febf96",
+      "fingerprint": "3f94c34611d4ec6214afb99ce5329833e66d756fb60bdcdd9c157209c4a42f60",
       "id": "document-ffi",
       "kind": "document",
       "level": 1,
@@ -3495,7 +3628,7 @@
     },
     {
       "document_id": "document-ffi",
-      "fingerprint": "e0a00d395748e72a57f9462d4eda5380e09e918600444a5d72d4edfb543ee710",
+      "fingerprint": "c2de573d52508fe8fcc8fb073834b19a1a489f7fb2318042f57cbb50d4f7a74f",
       "id": "document-ffi-export-functions",
       "kind": "heading",
       "level": 2,
@@ -3629,7 +3762,7 @@
     },
     {
       "document_id": "document-verification",
-      "fingerprint": "646308d589164d96d1047873f0035a9e6b5fc31c98be7a143d28e74a95f27f62",
+      "fingerprint": "405fcea870df7328c5c17c8f492ed7a1d90c4f89447c57748a755282f2b0364e",
       "id": "document-verification",
       "kind": "document",
       "level": 1,
@@ -3637,7 +3770,7 @@
     },
     {
       "document_id": "document-verification",
-      "fingerprint": "270c441a49f529fbc122b3e4fcdd0ad42c364608d9b405bed0bf6ab4b02e8c31",
+      "fingerprint": "87a33d5271369eb27c36252eee45bf9a422c95da3dfacfe45537a276cbc13792",
       "id": "document-verification-overview-example-binary-search",
       "kind": "heading",
       "level": 2,
@@ -3718,7 +3851,7 @@
     },
     {
       "document_id": "document-verification",
-      "fingerprint": "27fbb1ef91d5609a741d71078024638f0abf64143d2bd42c7550f6e524171270",
+      "fingerprint": "cef46134cabb711266adc6953fc059ea750aaecfb2e5442b47ffc982da35c9e6",
       "id": "document-verification-writing-specifications-and-proofs",
       "kind": "heading",
       "level": 2,
@@ -3745,12 +3878,21 @@
     },
     {
       "document_id": "document-verification",
-      "fingerprint": "2668528b00a8b1ce2ee79742934fbfa621bd681b15c07435374f6f15a22e8a3b",
+      "fingerprint": "1d304a886c8aec1debfa164c1981c15abf5da4af3fe13ee070169529dcc20311",
       "id": "document-verification-proof-pure",
       "kind": "heading",
       "level": 3,
       "parent": "document-verification-writing-specifications-and-proofs",
       "text": "`#proof_pure`"
+    },
+    {
+      "document_id": "document-verification",
+      "fingerprint": "212c22dac00c5a1371df17227a56510806243e3f819714c71297f74aedb2147f",
+      "id": "document-verification-external-theories-proof-external-and-proof-import",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-verification-writing-specifications-and-proofs",
+      "text": "External Theories: `#proof_external` and `#proof_import`"
     },
     {
       "document_id": "document-verification",
@@ -3835,7 +3977,7 @@
     },
     {
       "document_id": "document-verification",
-      "fingerprint": "438243ff8247661ce6f31d3a1f2101824ee472f9777acf160df64f4afe77dea2",
+      "fingerprint": "d6eaf882431ca72b7cae74d112c1648e1166909aa113f2c9660ea5bf4f1afeb8",
       "id": "document-verification-trust-model-and-limitations",
       "kind": "heading",
       "level": 2,
@@ -3844,7 +3986,7 @@
     },
     {
       "document_id": "document-verification",
-      "fingerprint": "4b748188d3e97885dc90d7e9da00a4bb961ac8c6e80a3f61191732e0206b6df5",
+      "fingerprint": "45549de22892874760d9d1453be1f21a82cf0c6cdd70ed9d495f3f86769687a7",
       "id": "document-verification-trusted-assumptions",
       "kind": "heading",
       "level": 3,
@@ -4635,7 +4777,7 @@
     },
     {
       "document_id": "document-error_codes-e0029",
-      "fingerprint": "77126316c3689258392bed02d768f1d3931b5bd33a97437e5010bab5c43c99f3",
+      "fingerprint": "ba0e95d84bc5b3ea5a5d29648a9c3b98e5645b1688685fc4f37ef8430d50145d",
       "id": "document-error_codes-e0029",
       "kind": "document",
       "level": 1,
@@ -4643,7 +4785,7 @@
     },
     {
       "document_id": "document-error_codes-e0029",
-      "fingerprint": "8c4348f5694f02db31322dc2ce5b5ca26fc33a55dbc7a4d8efb71cee206df87d",
+      "fingerprint": "659c3a39b8e0640e6f76a4eccfb0f92f49c3ebb36cb02d487ff173dbf712e0ec",
       "id": "document-error_codes-e0029-erroneous-example",
       "kind": "heading",
       "level": 2,
@@ -4661,7 +4803,7 @@
     },
     {
       "document_id": "document-error_codes-e0030",
-      "fingerprint": "581b339153e98d3f457e68f3968614f0bebe2c0127f8520561e85f752f2f4d4d",
+      "fingerprint": "60c30f3312607e97cf3983e96e5c118fd229c57e530abede7594bbf572088cb4",
       "id": "document-error_codes-e0030",
       "kind": "document",
       "level": 1,
@@ -4669,7 +4811,7 @@
     },
     {
       "document_id": "document-error_codes-e0030",
-      "fingerprint": "afa36eafd808b19c3b135ba588e1f85707060ff47949dc50652d209e6bc94a52",
+      "fingerprint": "181aaaea9afd25230d8f23caa9870db10bd6562818b15a04529923e72233346b",
       "id": "document-error_codes-e0030-erroneous-example",
       "kind": "heading",
       "level": 2,
@@ -4678,7 +4820,7 @@
     },
     {
       "document_id": "document-error_codes-e0030",
-      "fingerprint": "58b37800c111ad30e28763b0b18c5a36af67397a22c2bf1520a996f585ff2975",
+      "fingerprint": "7fe272a2ce5bb1c9338cf024b0a679df95fc5a3e81cdecd82788ba9e2bb21a31",
       "id": "document-error_codes-e0030-suggestion",
       "kind": "heading",
       "level": 2,
@@ -4687,7 +4829,7 @@
     },
     {
       "document_id": "document-error_codes-e0031",
-      "fingerprint": "044b84e953c70cf6f1a2504dafdc64060072f212d40a0d5c11c428fa9940f126",
+      "fingerprint": "988982b0dcc422b90df87227467c84b8b09093cf0a444ad6a7dff75176a5ed66",
       "id": "document-error_codes-e0031",
       "kind": "document",
       "level": 1,
@@ -4695,7 +4837,7 @@
     },
     {
       "document_id": "document-error_codes-e0031",
-      "fingerprint": "c5e8371b31f186b8a8f465521323d5fca0bfcb8fa6cb2803e465a6f0e497bd73",
+      "fingerprint": "77905bcea1c2e739c0b2a10be02842dc0b031b924d5ba2b66845a9ed5099f41f",
       "id": "document-error_codes-e0031-erroneous-example",
       "kind": "heading",
       "level": 2,
@@ -4713,7 +4855,7 @@
     },
     {
       "document_id": "document-error_codes-e0032",
-      "fingerprint": "d92645021709e6f9c5308570b83583d876009f6fa1da9a790fbc0a7acfbc9608",
+      "fingerprint": "04b8bc9270443f9ac132dd69fa7f33c37b666e70dd0cdcd717b31ca9110c2575",
       "id": "document-error_codes-e0032",
       "kind": "document",
       "level": 1,
@@ -4721,7 +4863,7 @@
     },
     {
       "document_id": "document-error_codes-e0032",
-      "fingerprint": "6d67b63d6467e191a226b82cda734aa29ebe228993defb6e490f88660a3eb3be",
+      "fingerprint": "d65ded578520c0e6d65ed6c6f461cd8bd80f6ee331804bb0876f1bc1c85ce68f",
       "id": "document-error_codes-e0032-erroneous-example",
       "kind": "heading",
       "level": 2,
@@ -4747,29 +4889,11 @@
     },
     {
       "document_id": "document-error_codes-e0034",
-      "fingerprint": "46d9625e5323a7b52526716ba2f8b967ad14a48a92ba40cfac6d0ca19d8824ee",
+      "fingerprint": "6df14d2e79771ece7ada6775ab3a75099f5c73d0b714953a5fdb59d65b6faf3d",
       "id": "document-error_codes-e0034",
       "kind": "document",
       "level": 1,
       "text": "E0034"
-    },
-    {
-      "document_id": "document-error_codes-e0034",
-      "fingerprint": "11f2a04e1927c4cf9542dec1e44ede9374cec9a576fcc00d59373f161e65b086",
-      "id": "document-error_codes-e0034-erroneous-example",
-      "kind": "heading",
-      "level": 2,
-      "parent": "document-error_codes-e0034",
-      "text": "Erroneous example"
-    },
-    {
-      "document_id": "document-error_codes-e0034",
-      "fingerprint": "1bb98e40f030308513f727d044fd433581c0f3635eaad98b296585ed9f6be6cb",
-      "id": "document-error_codes-e0034-suggestion",
-      "kind": "heading",
-      "level": 2,
-      "parent": "document-error_codes-e0034",
-      "text": "Suggestion"
     },
     {
       "document_id": "document-error_codes-e0035",
@@ -5007,7 +5131,7 @@
     },
     {
       "document_id": "document-error_codes-e0044",
-      "fingerprint": "cccaa8fa5cbd008cbd65fe715b484bf7c00b93718701ac318bea8b06d3bb69d7",
+      "fingerprint": "bcb6923e37d4a53730b9831e806f2d64aa4c0bdd9a0952476dc842a4bc51a1ac",
       "id": "document-error_codes-e0044",
       "kind": "document",
       "level": 1,
@@ -5024,7 +5148,7 @@
     },
     {
       "document_id": "document-error_codes-e0044",
-      "fingerprint": "aa26fafee00240f1fcb1cb8aa6b7d4a52498a883f7ac0fef5c637c483e36b242",
+      "fingerprint": "061dc447d926606b68b631fe0514c32ac62302488fafdc4b04e645f3c28a26cf",
       "id": "document-error_codes-e0044-suggestion",
       "kind": "heading",
       "level": 2,
@@ -5066,7 +5190,7 @@
     },
     {
       "document_id": "document-error_codes-e0049",
-      "fingerprint": "3092235b728d94f5eac1dcc2afa9c23cac141b2367f6e6c546f80e6b96647bae",
+      "fingerprint": "f61598d824a2debe6de8c5402cabc01df42db508d674362f9961945a81ee51e5",
       "id": "document-error_codes-e0049",
       "kind": "document",
       "level": 1,
@@ -5074,7 +5198,7 @@
     },
     {
       "document_id": "document-error_codes-e0049",
-      "fingerprint": "931de6a8454f16acd22afa2122011b443a8c7e1b434ffc67fc0280332adc655b",
+      "fingerprint": "953b8469d3ab5100d467e9b7ed5b5fa771da5d8c3ac66aac1334ad1e0e243a48",
       "id": "document-error_codes-e0049-erroneous-example",
       "kind": "heading",
       "level": 2,
@@ -5802,7 +5926,7 @@
     },
     {
       "document_id": "document-error_codes-e0079",
-      "fingerprint": "bf0476cb2b918bd19d9d5d56bbe605c8872332c871e35b063d2786a9bdafb671",
+      "fingerprint": "d164dad8d75b5b3f04bfb05dba33a5830cfd6c32d61e39a89f36cb8bed4b7fcb",
       "id": "document-error_codes-e0079",
       "kind": "document",
       "level": 1,
@@ -5819,7 +5943,7 @@
     },
     {
       "document_id": "document-error_codes-e0079",
-      "fingerprint": "fc01720775373a64a3f92b247dd183b69391493b0007fb58b7cc53cd08aa1a2f",
+      "fingerprint": "b97da044f98adc81faeee263c80730e8b3ee135d8c3c8b001364f4076890f295",
       "id": "document-error_codes-e0079-suggestion",
       "kind": "heading",
       "level": 2,
@@ -5928,6 +6052,162 @@
       "kind": "heading",
       "level": 2,
       "parent": "document-error_codes-e0083",
+      "text": "Suggestion"
+    },
+    {
+      "document_id": "document-error_codes-e0084",
+      "fingerprint": "d1b3592486da1bd9747a42077574ac29652609bc46f5b21555a5c8980eafb539",
+      "id": "document-error_codes-e0084",
+      "kind": "document",
+      "level": 1,
+      "text": "E0084"
+    },
+    {
+      "document_id": "document-error_codes-e0084",
+      "fingerprint": "96828b02a0d8351e7da75c57760c5781d88ce1064bf077e5a2308c93e7cafb12",
+      "id": "document-error_codes-e0084-erroneous-example",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e0084",
+      "text": "Erroneous example"
+    },
+    {
+      "document_id": "document-error_codes-e0084",
+      "fingerprint": "f7f5510b21ac745caa7f25e65eeaf184487e4a762c0d3307a23802df82103448",
+      "id": "document-error_codes-e0084-suggestion",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e0084",
+      "text": "Suggestion"
+    },
+    {
+      "document_id": "document-error_codes-e0085",
+      "fingerprint": "09601a81c07fb6a287c7f27ba73c6d53cc511f951c59af9f86ce79b2885e1362",
+      "id": "document-error_codes-e0085",
+      "kind": "document",
+      "level": 1,
+      "text": "E0085"
+    },
+    {
+      "document_id": "document-error_codes-e0085",
+      "fingerprint": "39185e62716d4d83e12eb20512521e5480ecde230c7b0f34cd504b5507197ded",
+      "id": "document-error_codes-e0085-erroneous-example",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e0085",
+      "text": "Erroneous example"
+    },
+    {
+      "document_id": "document-error_codes-e0085",
+      "fingerprint": "fccbbda2d2e5aef223fe187c6309a318ea496f4345573c5a9ab0ca5c4ceb8eda",
+      "id": "document-error_codes-e0085-suggestion",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e0085",
+      "text": "Suggestion"
+    },
+    {
+      "document_id": "document-error_codes-e0086",
+      "fingerprint": "d781334cae3a2dc9b95bcedd252baa4677ed3123dbda9d082ada6482f9f3da9a",
+      "id": "document-error_codes-e0086",
+      "kind": "document",
+      "level": 1,
+      "text": "E0086"
+    },
+    {
+      "document_id": "document-error_codes-e0086",
+      "fingerprint": "aaf5a0881e2cf7a39c863140467519fee1b7eab014e446772a443ef8d03f3da1",
+      "id": "document-error_codes-e0086-erroneous-example",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e0086",
+      "text": "Erroneous example"
+    },
+    {
+      "document_id": "document-error_codes-e0086",
+      "fingerprint": "7d960bb09ec5e791f3b0ce7f9c04cc6faa0477c0e68542cd9d7fe46b621a8308",
+      "id": "document-error_codes-e0086-suggestion",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e0086",
+      "text": "Suggestion"
+    },
+    {
+      "document_id": "document-error_codes-e0087",
+      "fingerprint": "44e9ebd74ba992cc889481e2c54d2021a071f258a9f60f0c752831230d4b1271",
+      "id": "document-error_codes-e0087",
+      "kind": "document",
+      "level": 1,
+      "text": "E0087"
+    },
+    {
+      "document_id": "document-error_codes-e0087",
+      "fingerprint": "fec183f2bb87b428d3361286ad48c845b3844d10acc12176774738942e17ede5",
+      "id": "document-error_codes-e0087-erroneous-example",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e0087",
+      "text": "Erroneous example"
+    },
+    {
+      "document_id": "document-error_codes-e0087",
+      "fingerprint": "a60c7297a175e7a1e4e71e136d11858e61a5c207df4ad3ac3334e0605fc77364",
+      "id": "document-error_codes-e0087-suggestion",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e0087",
+      "text": "Suggestion"
+    },
+    {
+      "document_id": "document-error_codes-e0088",
+      "fingerprint": "e6a138922f81aa131c1974649424feac9b58dd43f459a913796ad056b09e65f6",
+      "id": "document-error_codes-e0088",
+      "kind": "document",
+      "level": 1,
+      "text": "E0088"
+    },
+    {
+      "document_id": "document-error_codes-e0088",
+      "fingerprint": "89203ed3d0703832f7937e7a8ab9898d71d6421f005ff256b9e2d3f2e09ad79d",
+      "id": "document-error_codes-e0088-erroneous-example",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e0088",
+      "text": "Erroneous example"
+    },
+    {
+      "document_id": "document-error_codes-e0088",
+      "fingerprint": "c4b6d76a3a0a0b48beca4db34c74971fd9fdbb9b84d3d5871794fbf0f0fb0318",
+      "id": "document-error_codes-e0088-suggestion",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e0088",
+      "text": "Suggestion"
+    },
+    {
+      "document_id": "document-error_codes-e0089",
+      "fingerprint": "87e04ddc1816b63257caa5cb5df9841457d72c3bfbd102091284e607cdff2628",
+      "id": "document-error_codes-e0089",
+      "kind": "document",
+      "level": 1,
+      "text": "E0089"
+    },
+    {
+      "document_id": "document-error_codes-e0089",
+      "fingerprint": "ab061e33bfc619fb28f9280b8681d4173dce2f5432b4b0bf04480575a0784c86",
+      "id": "document-error_codes-e0089-erroneous-example",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e0089",
+      "text": "Erroneous example"
+    },
+    {
+      "document_id": "document-error_codes-e0089",
+      "fingerprint": "0a5cb19809ea8c4a46437c2df204729fb67ba31edf31be489c6f4932889e0e98",
+      "id": "document-error_codes-e0089-suggestion",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e0089",
       "text": "Suggestion"
     },
     {
@@ -6416,7 +6696,7 @@
     },
     {
       "document_id": "document-error_codes-e3021",
-      "fingerprint": "6cf8d4e41fe188b9caa1cc90bde940ab9c45795c175f6fd47f7aab55c7f6873c",
+      "fingerprint": "4f5465fe64f34de15826c8235944762fbac515e2c115d036c5f409fd0bb15e4e",
       "id": "document-error_codes-e3021",
       "kind": "document",
       "level": 1,
@@ -6442,7 +6722,7 @@
     },
     {
       "document_id": "document-error_codes-e3022",
-      "fingerprint": "440b6d45a3b77d5e692c293d2124a84d51af3711b2abcac6c86b00e8238c9aa6",
+      "fingerprint": "0ab41b35545aedf37312a05db6b73f1e336808f1f1bb9672a7de7387e8b1c9ef",
       "id": "document-error_codes-e3022",
       "kind": "document",
       "level": 1,
@@ -6516,6 +6796,58 @@
       "kind": "heading",
       "level": 2,
       "parent": "document-error_codes-e3024",
+      "text": "Suggestion"
+    },
+    {
+      "document_id": "document-error_codes-e3026",
+      "fingerprint": "f1440f689813c219b4135479e0ea6c2d76f4fdd6d5b3a01b95aa170e4eda170d",
+      "id": "document-error_codes-e3026",
+      "kind": "document",
+      "level": 1,
+      "text": "E3026"
+    },
+    {
+      "document_id": "document-error_codes-e3026",
+      "fingerprint": "6ac044c2aa49b67245d90c1f12bd78f2469d1f05b960853e264fbd4444165410",
+      "id": "document-error_codes-e3026-erroneous-example",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e3026",
+      "text": "Erroneous example"
+    },
+    {
+      "document_id": "document-error_codes-e3026",
+      "fingerprint": "dc0cf248a4a709421645103dcfda9b84749d83b8b04d481891534a51090cb2ab",
+      "id": "document-error_codes-e3026-suggestion",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e3026",
+      "text": "Suggestion"
+    },
+    {
+      "document_id": "document-error_codes-e3027",
+      "fingerprint": "0afbbd5d2dd8c924f2faca9c3c61151e97aa3c17a1f605de17b27fb25cecf0b0",
+      "id": "document-error_codes-e3027",
+      "kind": "document",
+      "level": 1,
+      "text": "E3027"
+    },
+    {
+      "document_id": "document-error_codes-e3027",
+      "fingerprint": "eae876b20d573b82a3f08e1bc01aadb93c5232404da2e2750c0721afcaa9c51b",
+      "id": "document-error_codes-e3027-erroneous-example",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e3027",
+      "text": "Erroneous example"
+    },
+    {
+      "document_id": "document-error_codes-e3027",
+      "fingerprint": "7f04c4a0714fd7f8581ea5e508e95121478aec9434a509051d15f12e3f536b98",
+      "id": "document-error_codes-e3027-suggestion",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e3027",
       "text": "Suggestion"
     },
     {
@@ -7040,7 +7372,7 @@
     },
     {
       "document_id": "document-error_codes-e4020",
-      "fingerprint": "b1a7a47bcc439c7590babdd4b12ca025eda1aa27cce247f9bb2649498d29ac61",
+      "fingerprint": "9fc16f90b9378cf6e2f574d037b43a71e04e579d16cd6a23e967d4bf4ad37abb",
       "id": "document-error_codes-e4020",
       "kind": "document",
       "level": 1,
@@ -7057,7 +7389,7 @@
     },
     {
       "document_id": "document-error_codes-e4020",
-      "fingerprint": "da7243801d46a10b1613d512dea2efded02e94df861553fc5d0a01b09a2dccee",
+      "fingerprint": "9e87be0461c79cb970ec1df33d5dbf893a3b4a6e821bc2b8110128d9ddbb5601",
       "id": "document-error_codes-e4020-suggestion",
       "kind": "heading",
       "level": 2,
@@ -8284,6 +8616,32 @@
       "text": "Suggestion"
     },
     {
+      "document_id": "document-error_codes-e4083",
+      "fingerprint": "1b376ef1066de324a1ed91ce6c9e34bc2491a700007e96dd4f4da5914919d5d6",
+      "id": "document-error_codes-e4083",
+      "kind": "document",
+      "level": 1,
+      "text": "E4083"
+    },
+    {
+      "document_id": "document-error_codes-e4083",
+      "fingerprint": "30c6af5c0b32230fbf9f1fe323bfbd286e5228a9f6f19d66743afb51ef7a93f8",
+      "id": "document-error_codes-e4083-erroneous-example",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e4083",
+      "text": "Erroneous example"
+    },
+    {
+      "document_id": "document-error_codes-e4083",
+      "fingerprint": "19151938d0c76c5a8c75c2b8fa074572d36eafcd584775e9533b95926bb9f9af",
+      "id": "document-error_codes-e4083-suggestion",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e4083",
+      "text": "Suggestion"
+    },
+    {
       "document_id": "document-error_codes-e4084",
       "fingerprint": "11117a9382a9247a2693eb468afe05723318a4f2fcc1a8f02f299a408ada9387",
       "id": "document-error_codes-e4084",
@@ -8813,7 +9171,7 @@
     },
     {
       "document_id": "document-error_codes-e4111",
-      "fingerprint": "30465205ca14c6b42c1fd3cb9847273fa83d5fe7fc5c3a43b2009b3885d2fea2",
+      "fingerprint": "0dcee99c9302dc6ac5fee0acd4495bb36d80720e0efb71fb1596095a85e0654c",
       "id": "document-error_codes-e4111",
       "kind": "document",
       "level": 1,
@@ -8830,7 +9188,7 @@
     },
     {
       "document_id": "document-error_codes-e4111",
-      "fingerprint": "8b3fa15e84979570cbf1896aa855d3c97a2e0c7e72bce0885ba85badbce4965f",
+      "fingerprint": "96f3396cdbb934923cf54f907b2f8a893bf62b5fe9b2f77e6dc8bf8b86e14bf6",
       "id": "document-error_codes-e4111-suggestion",
       "kind": "heading",
       "level": 2,
@@ -8839,7 +9197,7 @@
     },
     {
       "document_id": "document-error_codes-e4112",
-      "fingerprint": "5f9b9a852b809cabc7aa05cd7a5853fb05cfce813154d13676f383ff7dfc01bc",
+      "fingerprint": "601ad8a9dccb739e89a07431f9dac29848f8044cabe616e5df4642e84fc72ea7",
       "id": "document-error_codes-e4112",
       "kind": "document",
       "level": 1,
@@ -8856,7 +9214,7 @@
     },
     {
       "document_id": "document-error_codes-e4112",
-      "fingerprint": "e8c3043f10226b7b355891e61c783c38e1cc0bf22cef3cb60e68bdc6d8603c66",
+      "fingerprint": "29dd5787791da245c5411e5c551e76628d8ec90f77da6b0cc3c0fd76729bda78",
       "id": "document-error_codes-e4112-suggestion",
       "kind": "heading",
       "level": 2,
@@ -9757,7 +10115,7 @@
     },
     {
       "document_id": "document-error_codes-e4156",
-      "fingerprint": "cea6a60994e702a3deaaf9e44207b912759c28ef7525b064ef33bd01e965f7b8",
+      "fingerprint": "092a44cf9d34e3f02247733d16937e4541b0cac0e5def791c317dee44833be43",
       "id": "document-error_codes-e4156",
       "kind": "document",
       "level": 1,
@@ -9774,7 +10132,7 @@
     },
     {
       "document_id": "document-error_codes-e4156",
-      "fingerprint": "5c9fed2f30936acc4df931399a018392c5d58ea0f505eab3f7563dcb5a1aa72c",
+      "fingerprint": "4d799254bf591b587928deb514c8fab20eb24d9d252a2d72f2cce0ae734b278f",
       "id": "document-error_codes-e4156-suggestion",
       "kind": "heading",
       "level": 2,
@@ -11169,7 +11527,7 @@
     },
     {
       "document_id": "document-error_codes-e4219",
-      "fingerprint": "c33e3bd93a4a06479acbe508110ea9838a8a460fc3afd2f1ff0a6f12c6d7ac3b",
+      "fingerprint": "d727c5bb360f6c7bd997bc72deca7a154ed3017c672249b4951bab8fedcb5871",
       "id": "document-error_codes-e4219",
       "kind": "document",
       "level": 1,
@@ -11256,7 +11614,7 @@
   ],
   "schema_version": 2,
   "source": {
-    "commit": "0a910e151998d92dcf8c7cd84acafe12aac2870e",
+    "commit": "c86a73f5f60a34f73c4865b837f777368ad52c7a",
     "index_path": "next/language/index.md",
     "index_sha256": "b6d7df45b48176394db49e78f27c284c4e22662217d731ff1c50768d142bd8b0",
     "index_web_url": "https://docs.moonbitlang.com/en/latest/language/",

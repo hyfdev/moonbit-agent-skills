@@ -6,7 +6,7 @@ Every `mbt check` block in this file is compiled and run by the repository's ver
 
 Search these exact official documentation topic names to route a question into this reference. A listed name is a discoverability route; the verification labels in the surrounding reference still determine whether its claim was executed or is documentation-only.
 
-- Control structures and iteration: Control Structures; Conditional Expressions; Match Expression; Guard Statement; Guard statement and is expression; While loop; For Loop; `for .. in` loop; Range expression in `for .. in` loop; List comprehension; Labelled Continue/Break; `defer` expression; Iterator
+- Control structures and iteration: Control Structures; Conditional Expressions; Match Expression; Guard Statement; Guard statement and is expression; While loop; For Loop; `for .. in` loop; Range expression in `for .. in` loop; List comprehension; Labelled Continue/Break; Labelled Blocks; `defer` expression; Iterator
 
 ## `if` and `match` are expressions
 
@@ -152,9 +152,9 @@ test "control flow: where records invariants" {
 }
 ```
 
-## Infinite and labeled loops
+## Infinite loops, labelled loops, and labelled blocks
 
-The infinite loop is `for ;; { ... }` (bare `for { }` is not valid); `break value` gives it a value. Loop labels are written `name~:` before the loop, targeted by `break name~` / `continue name~` (not Rust's `'label`).
+The infinite loop is `for ;; { ... }` (bare `for { }` is not valid); `break value` gives it a value. Loop labels are written `name~:` before the loop, targeted by `break name~` / `continue name~` (not Rust's `'label`). Once a loop has a label, even a directly nested `break` or `continue` that targets it must name the label; leaving it implicit emits E0085 or E0086.
 
 ```mbt check
 test "control flow: infinite and labeled loops" {
@@ -180,7 +180,23 @@ test "control flow: infinite and labeled loops" {
   }
   debug_inspect(hits, content="[(0, 0), (1, 0), (1, 1), (2, 0)]")
 }
+
+test "control flow: labelled blocks return early from nested control flow" {
+  fn absolute(value : Int) -> Int {
+    result~: {
+      if value < 0 {
+        break result~ -value
+      }
+      value
+    }
+  }
+
+  assert_eq(absolute(-4), 4)
+  assert_eq(absolute(3), 3)
+}
 ```
+
+A labelled block uses the same `name~: { ... }` prefix. `break name~ value` exits that block and makes `value` its result without returning from the enclosing function. An unlabelled `break` cannot exit or pass through a labelled block, and `continue` can target only a loop.
 
 ## The deprecated `loop`
 
@@ -191,7 +207,7 @@ loop (0, xs) { (acc, [x, .. rest]) => continue (acc + x, rest); (acc, []) => bre
 
 ## `guard` (recap)
 
-`guard cond else { ... }` and `guard x is Pattern else { ... }` are early exits, and a `guard ... is` **without** `else` panics on mismatch — see pattern-matching.mbt.md for the full treatment.
+`guard cond else { ... }` and `guard x is Pattern else { ... }` are handled early exits. A possibly failing guard without `else` emits E0087; write `guard!` only when implicit termination is intentional. Exhaustive guards need neither `!` nor `else`, and redundant forms emit E0088 or E0089. See pattern-matching.mbt.md for the full treatment.
 
 ## Closures
 

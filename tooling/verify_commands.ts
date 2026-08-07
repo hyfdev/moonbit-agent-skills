@@ -40,7 +40,7 @@ export interface ShellStep extends BaseStep {
 
 export interface MoonStep extends BaseStep {
   kind: "moon";
-  argv: ["moon" | "moonrun", ...string[]];
+  argv: ["moon" | "moonrun" | "moonx", ...string[]];
 }
 
 export interface DocumentedShellStep extends BaseStep {
@@ -237,13 +237,13 @@ function parseStep(value: unknown, context: string): Step {
     const argv = stringArray(record.argv, `${context}.argv`, {
       nonEmpty: true,
     });
-    if (argv[0] !== "moon" && argv[0] !== "moonrun") {
-      fail(`${context}.argv[0] must be "moon" or "moonrun"`);
+    if (argv[0] !== "moon" && argv[0] !== "moonrun" && argv[0] !== "moonx") {
+      fail(`${context}.argv[0] must be "moon", "moonrun", or "moonx"`);
     }
     assertMoonLiteralPathsStayInFixture(argv.slice(1), `${context}.argv`);
     return {
       kind,
-      argv: argv as ["moon" | "moonrun", ...string[]],
+      argv: argv as ["moon" | "moonrun" | "moonx", ...string[]],
       ...base,
     };
   }
@@ -400,7 +400,7 @@ const ASSIGNMENT_RE = /^[A-Za-z_][A-Za-z0-9_]*=/;
 const WINDOWS_ABSOLUTE_PATH_RE = /^(?:[A-Za-z]:[\\/]|\\\\)/;
 const BRACE_EXPANSION_RE = /\{[^{}]*(?:,|\.\.)[^{}]*\}/;
 const MOON_COMMAND_FRAGMENT_RE =
-  /(?:^|[\s`"';&|()])(?:[^\s`"';&|()]*[\\/])?(?:moon|moonrun)(?=$|[\s`"';&|()])/;
+  /(?:^|[\s`"';&|()])(?:[^\s`"';&|()]*[\\/])?(?:moon|moonrun|moonx)(?=$|[\s`"';&|()])/;
 
 function executableName(word: string): string {
   return word.split(/[\\/]/).at(-1) ?? word;
@@ -408,7 +408,7 @@ function executableName(word: string): string {
 
 function isMoonExecutable(word: string): boolean {
   const name = executableName(word);
-  return name === "moon" || name === "moonrun";
+  return name === "moon" || name === "moonrun" || name === "moonx";
 }
 
 function stringContainsPotentialMoonCommand(word: string): boolean {
@@ -537,7 +537,7 @@ function validateSetupShell(script: string, context: string): void {
   const commands = commandLinesOutsideHeredocs(script, context);
   if (commands.some((command) => tokensContainPotentialMoonCommand(parseShellTokens(command)))) {
     fail(
-      `${context}.script contains a possible moon or moonrun command; use kind "moon" or "documented-shell"`,
+      `${context}.script contains a possible Moon command; use kind "moon" or "documented-shell"`,
     );
   }
   if (commands.length !== 1) {
@@ -750,7 +750,7 @@ function analyzeDocumentedShell(source: string, context: string): boolean {
 
 function validateDocumentedShell(source: string, context: string): void {
   if (!analyzeDocumentedShell(source, context)) {
-    fail(`${context} must execute a moon or moonrun command`);
+    fail(`${context} must execute a moon, moonrun, or moonx command`);
   }
 }
 

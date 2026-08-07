@@ -16,7 +16,7 @@ vp run snapshot-language-surface --commit <40-hex-commit> --output verification/
 
 The generator starts from `next/language/index.md`; recursively follows root and nested toctrees, expands globs against the pinned repository tree, and follows `{include}` pages; records each file hash; extracts document roots and H2-H4 headings with section-body fingerprints; rejects unsafe, duplicate, or structurally unknown entries; and writes stable JSON. It inventories the complete error-code subtree too; the coverage decision, not source filtering, places that exhaustive catalog outside the product promise.
 
-Run `vp run verify-language-surface-source` to re-fetch the pinned files and prove the committed inventory is mechanical. A newer upstream commit does not make the pin stale by itself; re-pin deliberately when auditing current documentation or upgrading the product baseline.
+Run `vp run verify-language-surface-source` to re-fetch the pinned files and prove the committed inventory is mechanical. The product always follows current official docs, so a newer `moonbitlang/moonbit-docs` `main` commit makes the pin stale; `vp run verify-latest-upstream` enforces this in CI.
 
 ## Close every topic
 

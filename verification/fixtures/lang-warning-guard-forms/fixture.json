@@ -1,0 +1,34 @@
+{
+  "id": "lang-warning-guard-forms",
+  "owner_skill": "moonbit-language",
+  "knowledge": "A possibly failing guard needs else or guard!, while exhaustive guards need neither a bang nor an else clause.",
+  "expect": "check-fail",
+  "diagnostic_contains": [
+    "[E0087]",
+    "guard_inexhaustive",
+    "[E0088]",
+    "guard_redundant_bang",
+    "[E0089]",
+    "guard_redundant_else"
+  ],
+  "fix": "Use guard ... else for handled failure, guard! for intentional termination, and plain guard for an exhaustive condition or pattern.",
+  "targets": [
+    "wasm-gc",
+    "wasm",
+    "js",
+    "native"
+  ],
+  "moon_args": [
+    "--deny-warn"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-08-07",
+    "components": {
+      "moon": "0.1.20260803 (c19f78e 2026-08-03)",
+      "moonc": "v0.10.6+80dc50f24 (2026-08-04)",
+      "moonrun": "moonrun 0.1.20260803 (c19f78e 2026-08-03)"
+    },
+    "platform": "Linux-x86_64"
+  }
+}

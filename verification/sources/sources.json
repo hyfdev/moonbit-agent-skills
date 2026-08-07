@@ -1,24 +1,24 @@
 {
   "_comment": "Pinned upstream sources this repository's content was checked against. Update alongside verification/toolchains/current.json when re-verifying. Hand-maintained; tooling/check_versions.ts checks internal consistency.",
-  "retrieved": "2026-07-18",
+  "retrieved": "2026-08-07",
   "sources": [
     {
       "id": "moonbit-docs",
       "kind": "documentation",
       "url": "https://docs.moonbitlang.com/en/latest/",
-      "commit": "0a910e151998d92dcf8c7cd84acafe12aac2870e",
-      "commit_date": "2026-07-17",
+      "commit": "c86a73f5f60a34f73c4865b837f777368ad52c7a",
+      "commit_date": "2026-08-06",
       "path": "next/language/index.md",
       "sha256": "b6d7df45b48176394db49e78f27c284c4e22662217d731ff1c50768d142bd8b0",
-      "version_label": "MoonBit v0.10.4 documentation",
+      "version_label": "MoonBit v0.10.6 documentation",
       "notes": "Mechanical source for verification/language-surface/source.json. Known lag is not treated as executable truth: the official local-types example suppresses deprecated_syntax even though the pinned compiler warns."
     },
     {
       "id": "moonbit-release-notes",
       "kind": "release-notes",
       "url": "https://www.moonbitlang.com/updates/",
-      "version_label": "release index retrieved 2026-07-17",
-      "notes": "Discovery index only. Coverage is never inferred from this label; each release requires a pinned Markdown source inventory and coverage file under verification/releases/."
+      "version_label": "release index retrieved 2026-08-07",
+      "notes": "Supplemental discovery index only; its newest article still covers 0.10.4 while the official latest toolchain is 0.10.6. Coverage is never inferred from this label, and the product baseline never waits for an article."
     },
     {
       "id": "moonbit-0.10.4-release-source",

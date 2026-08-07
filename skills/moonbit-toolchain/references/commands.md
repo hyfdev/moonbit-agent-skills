@@ -11,7 +11,8 @@ All commands below were executed against the pinned toolchain. Examples assume a
 | `moon test` with failing tests | 2 |
 | `moon fmt --check` with formatting differences | 255 |
 | `moon check --deny-warn` when any warning exists | 255 |
-| `moon doc` in a new-DSL module (broken, see below) | 255 |
+| `moon doc` in a current `moon.mod` module | 0 |
+| `moon doc` in a legacy-JSON module | 255 |
 | `moon test -p` with a nonexistent `--patch-file` (compiler crash) | 1 |
 
 ## new
@@ -32,6 +33,14 @@ moon check lib.mbt
 
 Accepts no argument (whole module), a package directory, or a single `.mbt`/`.mbt.md` file. `-q` silences the `Finished.` line. Diagnostics flags (`--deny-warn`, `--warn-list`, `--output-json`, `--no-render`) are covered in references/diagnostics-and-recovery.md. `--target {wasm,wasm-gc,js,native,llvm,all}` selects backends.
 
+## Global working-directory option
+
+```sh
+moon -C app run cmd/main
+```
+
+`-C <DIR>` must appear before the subcommand. Moon changes to that directory before doing anything else, and interprets relative paths in later options and arguments from there. The former `--manifest-path` option has been removed; use `-C` to select a project directory.
+
 ## build and the `_build` layout
 
 ```sh
@@ -40,11 +49,11 @@ moon build --target js
 moon build --release
 ```
 
-The build directory is **`_build/`** (not `target/`). Default target is wasm-gc (or the module's `preferred_target`); default mode is debug. Layout: `_build/<target>/<debug|release>/build/<pkg-path>/`. Verified artifacts per target for `cmd/main`:
+The build directory is **`_build/`** (not `target/`). Default target is wasm (or the module's `preferred_target`); default mode is debug. Layout: `_build/<target>/<debug|release>/build/<pkg-path>/`. Verified artifacts per target for `cmd/main`:
 
 ```
-_build/wasm-gc/debug/build/cmd/main/main.wasm   (+ main.wasm.map in debug)
 _build/wasm/debug/build/cmd/main/main.wasm
+_build/wasm-gc/debug/build/cmd/main/main.wasm   (+ main.wasm.map in debug)
 _build/js/debug/build/cmd/main/main.js          (+ main.js.map, main.d.ts, moonbit.d.ts)
 _build/native/debug/build/cmd/main/main.exe     (named .exe even on macOS)
 ```
@@ -101,19 +110,20 @@ moon info
 
 Writes a `pkg.generated.mbti` public-API summary into every package directory (source tree, not `_build/`; intended to be committed). Parameter names are dropped (`pub fn add(Int, Int) -> Int`). `-p <name>` limits regeneration; names match by path segment.
 
-## doc — broken for new-DSL modules
+## doc
 
 ```sh
 moon doc
 ```
 
-**Verified broken at the pin:** in a module using the current `moon.mod` DSL, `moon doc` crashes — the doc generator still hard-requires `moon.mod.json` (`Fatal error: exception Sys_error(".../moon.mod.json: No such file or directory")`, then exit 255). Partial files may appear under `_build/doc/` anyway; their presence does not mean it worked. The only working path is a legacy-JSON module, where output lands in `_build/doc/<user>/<module>/` (HTML per file, `members.md`, JSON indexes). `moon doc` also refuses to run while the project has *any* warnings. `--serve` (default 127.0.0.1:3000) exists but was not executed here. For API lookup, prefer `moon ide doc` (references/moon-ide.md) — passing a symbol to `moon doc` is itself marked deprecated.
+Current `moon.mod` / `moon.pkg` modules generate successfully under `_build/doc/<user>/<module>/` (HTML per file, `members.md`, and JSON indexes). Legacy `moon.mod.json` modules are now rejected, so migrate them with `moon fmt` before generating docs. `moon doc` still refuses to run while the project has warnings. `--serve` defaults to 127.0.0.1:3000 and was not executed here. For API lookup, prefer `moon ide doc` (references/moon-ide.md) — passing a symbol to `moon doc` is itself marked deprecated.
 
 ## clean, version
 
 ```sh
 moon clean
+moon clean --help
 moon version --all
 ```
 
-`moon clean` deletes the whole `_build/` directory. `moon version --all` prints moon/moonc/moonrun versions plus a `Feature flags enabled: rr_moon_mod,rr_moon_pkg` line (the DSL config formats sit behind enabled-by-default feature flags); `--json` gives machine-readable output (without the feature-flags line).
+Plain `moon clean` deletes the current project's whole `_build/` directory. The separate `--dep-cache` and `--build-cache` flags delete the global dependency-source or build-artifact cache instead; they are intentionally verified only through `--help`, never executed by this repository. Check the target carefully before using either global-cache flag. `moon version --all` prints moon/moonc/moonrun versions plus a `Feature flags enabled: rr_moon_mod,rr_moon_pkg` line (the DSL config formats sit behind enabled-by-default feature flags); `--json` gives machine-readable output (without the feature-flags line).

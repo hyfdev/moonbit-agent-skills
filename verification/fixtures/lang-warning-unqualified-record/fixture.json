@@ -1,0 +1,32 @@
+{
+  "id": "lang-warning-unqualified-record",
+  "owner_skill": "moonbit-language",
+  "knowledge": "A struct literal bound directly by let should carry its T:: prefix; enable unqualified_record and deny warnings to enforce the current form.",
+  "expect": "check-fail",
+  "diagnostic_contains": [
+    "[E0084]",
+    "unqualified_record"
+  ],
+  "fix": "Write let value = T::{ ... } even when a binding annotation already identifies T.",
+  "targets": [
+    "wasm-gc",
+    "wasm",
+    "js",
+    "native"
+  ],
+  "moon_args": [
+    "--warn-list",
+    "+unqualified_record",
+    "--deny-warn"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-08-07",
+    "components": {
+      "moon": "0.1.20260803 (c19f78e 2026-08-03)",
+      "moonc": "v0.10.6+80dc50f24 (2026-08-04)",
+      "moonrun": "moonrun 0.1.20260803 (c19f78e 2026-08-03)"
+    },
+    "platform": "Linux-x86_64"
+  }
+}

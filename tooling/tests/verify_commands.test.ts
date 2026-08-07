@@ -104,7 +104,7 @@ describe("manifest schema v2", () => {
           },
         ],
       }),
-    ).toThrow(/restricted documented-shell grammar|must execute a moon or moonrun command/);
+    ).toThrow(/restricted documented-shell grammar|must execute a moon, moonrun, or moonx command/);
   });
 
   it("rejects Moon commands hidden in an ordinary shell step", () => {
@@ -153,6 +153,7 @@ describe("manifest schema v2", () => {
     "command moon check",
     "time moon check",
     "/opt/moon/bin/moon check",
+    "moonx moonbitlang/parser/cmd/moonfmt",
   ])("rejects a hidden Moon invocation in setup shell: %s", (script) => {
     expect(() =>
       parseManifest({
@@ -165,7 +166,22 @@ describe("manifest schema v2", () => {
           },
         ],
       }),
-    ).toThrow(/contains a possible moon or moonrun command/);
+    ).toThrow(/contains a possible Moon command/);
+  });
+
+  it("accepts moonx as a directly executable toolchain step", () => {
+    expect(() =>
+      parseManifest({
+        schema_version: 2,
+        entries: [
+          {
+            id: "moonx-help",
+            fixture: "empty",
+            steps: [{ kind: "moon", argv: ["moonx", "--help"] }],
+          },
+        ],
+      }),
+    ).not.toThrow();
   });
 
   it("rejects compound setup shell instead of allowing a later success to mask failure", () => {
@@ -242,7 +258,7 @@ describe("manifest schema v2", () => {
           },
         ],
       }),
-    ).toThrow(/possible moon|does not allow|not allowed/);
+    ).toThrow(/possible Moon|does not allow|not allowed/);
   });
 
   it("requires a quoted heredoc delimiter so its body cannot execute substitutions", () => {

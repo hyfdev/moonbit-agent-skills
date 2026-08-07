@@ -1,0 +1,32 @@
+{
+  "id": "lang-warning-labelled-loop-control",
+  "owner_skill": "moonbit-language",
+  "knowledge": "Once a loop has a label, direct break and continue statements that target it must name the label.",
+  "expect": "check-fail",
+  "diagnostic_contains": [
+    "[E0085]",
+    "unlabelled_break_in_labelled_loop",
+    "[E0086]",
+    "unlabelled_continue_in_labelled_loop"
+  ],
+  "fix": "Use break label~ and continue label~ for every control transfer that targets a labelled loop.",
+  "targets": [
+    "wasm-gc",
+    "wasm",
+    "js",
+    "native"
+  ],
+  "moon_args": [
+    "--deny-warn"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-08-07",
+    "components": {
+      "moon": "0.1.20260803 (c19f78e 2026-08-03)",
+      "moonc": "v0.10.6+80dc50f24 (2026-08-04)",
+      "moonrun": "moonrun 0.1.20260803 (c19f78e 2026-08-03)"
+    },
+    "platform": "Linux-x86_64"
+  }
+}

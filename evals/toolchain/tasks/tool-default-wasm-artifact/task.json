@@ -1,0 +1,43 @@
+{
+  "id": "tool-default-wasm-artifact",
+  "risk_class": "silent-default-target-artifact-path",
+  "claim_id": "toolchain.default-target.wasm",
+  "primary_metric": "bare-build-current-default-artifact",
+  "prompt": "The CI helper runs a bare `moon build`, but it still checks the old default backend's artifact path and now fails after a successful build. Update only `check-default.ts` so it verifies the current default artifact. Do not add an explicit target and do not change MoonBit source or project configuration.",
+  "discovery": {
+    "skill": "moonbit-toolchain",
+    "reference": "references/commands.md"
+  },
+  "grade": [
+    {
+      "type": "file_contains",
+      "path": "check-default.ts",
+      "regex": "_build/wasm/debug/build/cmd/main/main\\.wasm"
+    },
+    {
+      "type": "file_not_contains",
+      "path": "check-default.ts",
+      "regex": "wasm-gc"
+    },
+    {
+      "type": "file_not_contains",
+      "path": "check-default.ts",
+      "regex": "--target"
+    },
+    {
+      "type": "file_contains",
+      "path": "cmd/main/main.mbt",
+      "regex": "println\\(42\\)"
+    },
+    {
+      "type": "file_not_contains",
+      "path": "moon.mod",
+      "regex": "preferred_target"
+    },
+    {
+      "type": "node",
+      "args": ["check-default.ts"],
+      "output_regex": "default artifact ok"
+    }
+  ]
+}

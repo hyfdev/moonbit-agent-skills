@@ -33,11 +33,10 @@ moon work sync
 `moon check` / `moon test` / `moon build` at the workspace root operate across all members. Running inside a member directory also works and still resolves sibling members through the workspace:
 
 ```sh
-cd app
-moon run cmd/main
+moon -C app run cmd/main
 ```
 
-(There is no global `-C` flag on `moon` at the pin — change directory instead.)
+The global `-C <DIR>` option must appear before the subcommand and makes later relative paths resolve from that directory. Use it instead of scripting a directory change; the old `--manifest-path` option no longer exists.
 
 **Documented, not executed from a nested package:** the [0.10.4 release notes](https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release) say test and pre-build working directories are now the **module root**, even when the package is nested, and pre-build paths are relative to that root. Scripts that assumed the package directory as the current directory must be updated.
 

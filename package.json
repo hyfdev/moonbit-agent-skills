@@ -20,6 +20,7 @@
     "validate-skills": "node tooling/validate_skills.ts",
     "verify-release-sources": "node tooling/verify_release_sources.ts",
     "verify-language-surface-source": "node tooling/verify_language_surface_source.ts",
+    "verify-latest-upstream": "node tooling/verify_latest_upstream.ts",
     "verify-commands": "node tooling/verify_commands.ts"
   },
   "devDependencies": {

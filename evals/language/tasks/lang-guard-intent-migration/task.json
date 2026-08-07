@@ -1,0 +1,37 @@
+{
+  "id": "lang-guard-intent-migration",
+  "risk_class": "intentional-termination-migration",
+  "claim_id": "language.guard.intentional-termination-bang",
+  "primary_metric": "warning-free-guard-preserves-termination",
+  "prompt": "`require_code(None)` must still terminate because a missing code is an invariant violation, but the current compiler rejects this package under `--deny-warn`. Make the smallest source change that expresses that intent in current MoonBit. Do not add a fallback or suppress the warning.",
+  "discovery": {
+    "skill": "moonbit-language",
+    "reference": "references/pattern-matching.mbt.md"
+  },
+  "grade": [
+    {
+      "type": "file_contains",
+      "path": "lib.mbt",
+      "regex": "guard!\\s+value\\s+is\\s+Some\\(code\\)"
+    },
+    {
+      "type": "file_not_contains",
+      "path": "lib.mbt",
+      "regex": "#warnings"
+    },
+    {
+      "type": "file_not_contains",
+      "path": "lib.mbt",
+      "regex": "guard[^\\n]*else"
+    },
+    {
+      "type": "moon",
+      "args": ["check", "--deny-warn"]
+    },
+    {
+      "type": "moon",
+      "args": ["test", "--deny-warn"],
+      "min_tests": 2
+    }
+  ]
+}

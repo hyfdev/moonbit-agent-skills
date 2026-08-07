@@ -1,0 +1,29 @@
+{
+  "area": "language",
+  "task": "lang-guard-intent-migration",
+  "cases": [
+    {
+      "name": "marks-intentional-termination-with-guard-bang",
+      "expected": "pass",
+      "files": {
+        "lib.mbt": "///|\npub fn require_code(value : Int?) -> Int {\n  guard! value is Some(code)\n  code\n}\n"
+      }
+    },
+    {
+      "name": "changes-the-invariant-violation-into-a-fallback",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "///|\npub fn require_code(value : Int?) -> Int {\n  guard value is Some(code) else { 0 }\n  code\n}\n"
+      },
+      "must_fail_check_types": ["file_contains", "file_not_contains", "moon"]
+    },
+    {
+      "name": "suppresses-the-warning-without-migrating",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "///|\n#warnings(\"-guard_inexhaustive\")\npub fn require_code(value : Int?) -> Int {\n  guard value is Some(code)\n  code\n}\n"
+      },
+      "must_fail_check_types": ["file_contains", "file_not_contains"]
+    }
+  ]
+}

@@ -32,7 +32,7 @@ test "core values, Bool, Ref, Option, Result, and Json" {
 }
 ```
 
-Function-style Boolean negation is deprecated in `moonc v0.10.4+2cc641edf`:
+Function-style Boolean negation is deprecated at the pinned compiler:
 
 ```mbt nocheck
 let disabled = not(true) // DEPRECATED: E0020 — Use !expr instead
@@ -209,7 +209,7 @@ test "data types: StringBuilder and streaming macros" {
   inspect(out.to_string(), content="value=3")
   let some : StringBuilder? = Some(StringBuilder())
   some <? "n=\{7}" // written; a None target would be skipped
-  guard some is Some(w)
+  guard! some is Some(w)
   inspect(w.to_string(), content="n=7")
 }
 
@@ -289,7 +289,7 @@ test "data types: arrays, spread, combinators, and views" {
 
 ## Maps and sets
 
-`{ "k": v }` is a `Map` literal. `m.get(k)` returns an `Option`; `m[k]` in read position **panics** on a missing key (like Python's `dict[k]`), and `m[k] = v` inserts or updates. Membership is `contains`, not `contains_key`. Iteration and `.keys()` keep insertion order. An empty map is `Map([])` — a bare `{}` now warns (ambiguous among map, block, struct, and JSON). Use `Json::empty_object()` for an empty JSON object, `Type::{}` for an empty record value, and `()` (or remove a redundant empty block) when the intended value is Unit. `Set[T]` is in the prelude (no `{1, 2}` literal); construct it as `Set([...])`, which deduplicates and keeps insertion order.
+`{ "k": v }` is a `Map` literal. `m.get(k)` returns an `Option`; `m[k]` in read position **panics** on a missing key (like Python's `dict[k]`), and `m[k] = v` inserts or updates. Membership is `contains`, not `contains_key`. Iteration and `.keys()` keep insertion order. An empty map is `Map([])` — an unconstrained bare `{}` now produces E0013 (`unresolved_type_variable`), and related ambiguity warnings can appear in more constrained contexts. Do not depend on suggestion text: use `Json::empty_object()` for an empty JSON object, `Type::{}` for an empty record value, and `()` (or remove a redundant empty block) when the intended value is Unit. `Set[T]` is in the prelude (no `{1, 2}` literal); construct it as `Set([...])`, which deduplicates and keeps insertion order.
 
 ```mbt check
 priv struct EmptyDataRecord {}

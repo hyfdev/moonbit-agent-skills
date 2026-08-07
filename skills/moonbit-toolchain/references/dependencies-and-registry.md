@@ -39,6 +39,22 @@ moon install username/module
 
 Installs a tool binary globally (source may be a registry name, local path, or git URL per `--help`). Not executed by this repository's CI — it writes outside the project. Bare `moon install` (no args) is deprecated and only prints a pointer to `moon install <package>` / `moon build`.
 
+## Running registry tools without installing
+
+```sh
+moonx --help
+moon runwasm --help
+```
+
+The latest toolchain includes `moonx`, a separate registry runner, and `moon runwasm`, which can run either a local executable package as Wasm or a prebuilt Wasm asset from Mooncakes. Their coordinate forms are:
+
+```text
+moonx user/module/package[@version|@latest] [program arguments...]
+moon runwasm user/module/package[@version|@latest] [program arguments...]
+```
+
+For both commands, an explicit version is pinned, `@latest` refreshes the registry index before resolving, and an unpinned coordinate uses the latest version already known locally (refreshing only when the module is absent). `moonx` defaults to wasm and also accepts `--target native`; `moon runwasm` runs Wasm and caches fetched assets under `$MOON_HOME/registry/cache/assets`. These rules are verified from the executed current `--help` output; CI does not download or execute a registry package.
+
 ## Packaging
 
 ```sh

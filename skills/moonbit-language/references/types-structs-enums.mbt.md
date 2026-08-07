@@ -11,7 +11,7 @@ Search these exact official documentation topic names to route a question into t
 
 ## Structs
 
-Fields are newline-separated — no commas. `mut` marks a mutable field. Three construction forms: qualified `Pixel::{ ... }` (supports field punning), a plain literal `{ x: 1, ... }` where the expected type is already known, and spread-update `{ ..base, y: 9 }` — the spread comes **first**, not last as in Rust. Mutating a `mut` field goes through any binding; no `let mut` needed.
+Fields are newline-separated — no commas. `mut` marks a mutable field. Qualify a struct literal bound directly by `let` as `Pixel::{ ... }`, including spread updates such as `Pixel::{ ..base, y: 9 }`; leaving the literal unqualified emits opt-in warning E0084 (`unqualified_record`) even when the binding has a type annotation. Contextual `{ x: 1, ... }` literals still work where an expected type comes from an argument, return, or other surrounding expression. A spread comes **first**, not last as in Rust. Mutating a `mut` field goes through any binding; no `let mut` needed.
 
 ```mbt check
 priv struct Pixel {
@@ -20,13 +20,13 @@ priv struct Pixel {
   mut tag : String
 } derive(Eq, Debug)
 
-test "struct construction: punning, plain literal, spread update" {
+test "struct construction: qualified punning and spread update" {
   let x = 1
   let y = 2
   let a = Pixel::{ x, y, tag: "a" } // punning: local x, y fill same-named fields
-  let b : Pixel = { x: 1, y: 2, tag: "a" }
+  let b = Pixel::{ x: 1, y: 2, tag: "a" }
   assert_eq(a, b)
-  let c = { ..a, y: 9 } // spread FIRST, then overrides
+  let c = Pixel::{ ..a, y: 9 } // spread FIRST, then overrides
   assert_eq(c.y, 9)
   c.tag = "c" // mut field: the binding itself needs no `let mut`
   assert_eq(c.tag, "c")

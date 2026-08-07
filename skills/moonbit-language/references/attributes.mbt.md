@@ -6,7 +6,7 @@ Every `mbt check` block in this file is compiled and run by the repository's ver
 
 Search these exact official documentation topic names to route a question into this reference. A listed name is a discoverability route; the verification labels in the surrounding reference still determine whether its claim was executed or is documentation-only.
 
-- Language attributes: Deprecated Attribute; Alert Attribute; Alias Attribute; `label_migration` Attribute; Visibility Attribute; Internal Attribute; Doc Hidden Attribute; Warnings Attribute; Must Implement One Attribute; Inline Attribute; `as_free_fn` Attribute; Skip Attribute; Coverage Skip Attribute; Configuration attribute; Module attribute; Attribute
+- Language attributes: Deprecated Attribute; Alert Attribute; Alias Attribute; `label_migration` Attribute; Visibility Attribute; Internal Attribute; Doc Hidden Attribute; Warnings Attribute; Must Implement One Attribute; Inline Attribute; Unsafe Cycle-Free Attribute; `as_free_fn` Attribute; Skip Attribute; Coverage Skip Attribute; Configuration attribute; Module attribute; Export Name Attribute; Attribute
 
 ## The catalog
 
@@ -31,6 +31,26 @@ Search these exact official documentation topic names to route a question into t
 | `#module` | name the JavaScript module that supplies an `extern "js"` binding |
 | `#must_implement_one` | require a trait implementation to replace at least one default method |
 | `#visibility` | warn about uses that a planned `readonly` or `abstract` change will invalidate |
+| `#unsafe_cycle_free` | assert that a struct, enum, or newtype can never participate in a reference cycle |
+| `#export_name` | assign a stable foreign-library export symbol (see async-and-ffi) |
+
+## `#unsafe_cycle_free`: a trusted optimization assertion
+
+`#unsafe_cycle_free` applies to a struct, enum, or newtype declaration. It tells the compiler's cycle-capability analysis that values of that type never participate in reference cycles; the compiler trusts this claim and does not verify it.
+
+```mbt check
+#unsafe_cycle_free
+priv struct AttrCycleFreeNode {
+  next : AttrCycleFreeNode?
+}
+
+test "attr unsafe_cycle_free syntax" {
+  let node = AttrCycleFreeNode::{ next: None }
+  assert_true(node.next is None)
+}
+```
+
+**Danger:** use this only when the program guarantees the invariant. A wrong assertion can cause cycles involving the annotated type to be treated as impossible and therefore never reclaimed.
 
 ## Migration, exposure, and trait-contract attributes
 

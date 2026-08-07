@@ -1,0 +1,21 @@
+{
+  "schema_version": 2,
+  "id": "moonbit-0.10.6-language-deepseek-pro",
+  "runner": "content",
+  "stage": "exploratory",
+  "area": "language",
+  "client": "claude-code",
+  "model": "sonnet",
+  "conditions": [
+    "none",
+    "ours"
+  ],
+  "task_ids": [
+    "lang-guard-intent-migration"
+  ],
+  "repetitions": 1,
+  "max_turns": 30,
+  "primary_metric": "task success when migrating an intentionally terminating guard without changing failure semantics",
+  "minimum_valuable_difference": 1,
+  "stopping_rule": "Run one paired AB/BA pass. Repeat only if the current-skill cell fails or the pair is unstable, following the repository allocation policy."
+}

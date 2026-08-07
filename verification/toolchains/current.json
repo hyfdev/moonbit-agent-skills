@@ -2,25 +2,25 @@
   "_generated_by": "tooling/snapshot_toolchain.ts (do not edit by hand)",
   "components": [
     {
-      "build_date": "2026-07-13",
-      "commit": "75c7e1f",
+      "build_date": "2026-08-03",
+      "commit": "c19f78e",
       "name": "moon",
-      "raw": "0.1.20260713 (75c7e1f 2026-07-13)",
-      "version": "0.1.20260713"
+      "raw": "0.1.20260803 (c19f78e 2026-08-03)",
+      "version": "0.1.20260803"
     },
     {
-      "build_date": "2026-07-15",
+      "build_date": "2026-08-04",
       "commit": "",
       "name": "moonc",
-      "raw": "v0.10.4+2cc641edf (2026-07-15)",
-      "version": "0.10.4+2cc641edf"
+      "raw": "v0.10.6+80dc50f24 (2026-08-04)",
+      "version": "0.10.6+80dc50f24"
     },
     {
-      "build_date": "2026-07-13",
-      "commit": "75c7e1f",
+      "build_date": "2026-08-03",
+      "commit": "c19f78e",
       "name": "moonrun",
-      "raw": "moonrun 0.1.20260713 (75c7e1f 2026-07-13)",
-      "version": "0.1.20260713"
+      "raw": "moonrun 0.1.20260803 (c19f78e 2026-08-03)",
+      "version": "0.1.20260803"
     }
   ],
   "platform": {
@@ -28,8 +28,8 @@
     "os": "Linux",
     "os_version": "6.18.25-x64v3-xanmod1"
   },
-  "raw_version_all": "moon 0.1.20260713 (75c7e1f 2026-07-13) <MOON_HOME>/bin/moon\nmoonc v0.10.4+2cc641edf (2026-07-15) <MOON_HOME>/bin/moonc\nmoonrun 0.1.20260713 (75c7e1f 2026-07-13) <MOON_HOME>/bin/moonrun\n\nFeature flags enabled: rr_moon_mod,rr_moon_pkg",
-  "verification_date": "2026-07-18",
+  "raw_version_all": "moon 0.1.20260803 (c19f78e 2026-08-03) ~/.moon/bin/moon\nmoonc v0.10.6+80dc50f24 (2026-08-04) ~/.moon/bin/moonc\nmoonrun 0.1.20260803 (c19f78e 2026-08-03) ~/.moon/bin/moonrun\n\nFeature flags enabled: rr_moon_mod,rr_moon_pkg",
+  "verification_date": "2026-08-07",
   "verified_targets": [
     "js",
     "native",

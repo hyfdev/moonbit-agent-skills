@@ -6,7 +6,7 @@
 
 The importer records every numbered item, prose paragraph, bullet, and fenced code block under Language Updates, Toolchain Updates, and Standard Library Updates. It fails instead of silently skipping an unknown level-two section, a repeated section, or content before a section's first numbered item. The checker requires every generated source ID to appear exactly once across coverage decisions.
 
-## Import a release
+## Import a published release article
 
 Find the release Markdown in `https://github.com/moonbitlang/website`, resolve a full commit, and run:
 
@@ -15,6 +15,8 @@ vp run snapshot-release --release <version> --date <YYYY-MM-DD> --commit <40-hex
 ```
 
 The command fetches the file from the pinned commit, hashes the complete Markdown, parses the three release sections, rejects structural drift, verifies contiguous top-level numbering, and writes stable JSON. Re-run with `--check` during review to prove the committed inventory still matches upstream. If upstream adds or renames a section, update and test the importer before making coverage judgments.
+
+The website publishes curated release articles less frequently than the `latest` toolchain channel. An absent article is not an absent release and must not hold the product baseline back. Always re-pin from the official latest toolchain manifest and latest docs first; import this supplemental inventory whenever an article exists. In coverage files, `status: "current"` identifies the newest published website article only and does not constrain `metadata.moonbit-release`.
 
 ## Coverage decision schema
 
@@ -95,7 +97,7 @@ Use the exact evidence roles `deprecated-form` and `replacement`. If the release
 
 ## Re-pin gate
 
-For audit mode, leave the current snapshot and skill frontmatter unchanged. For update mode, complete coverage first, then follow the repository re-pin steps. `vp run check-release-coverage` requires exactly one current coverage file and its release must equal every product skill's `metadata.moonbit-release`.
+For audit mode, leave the current snapshot and skill frontmatter unchanged. For update mode, close every available article inventory and the current language surface, then follow the repository re-pin steps. `vp run check-release-coverage` requires exactly one newest published article to have `status: "current"`; that status is supplemental coverage and is deliberately independent of every product skill's `metadata.moonbit-release`.
 
 ## Review split
 

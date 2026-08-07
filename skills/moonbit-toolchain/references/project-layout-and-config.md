@@ -1,6 +1,6 @@
 # Project layout and configuration
 
-Everything below was executed against the pinned toolchain (moon 0.1.20260713 / moonc v0.10.4). The current config format is the `moon.mod` / `moon.pkg` DSL; `moon.mod.json` / `moon.pkg.json` are the deprecated JSON predecessors, which still parse at the pin.
+Everything below was executed against the pinned toolchain. The current config format is the `moon.mod` / `moon.pkg` DSL; `moon.mod.json` / `moon.pkg.json` are deprecated JSON predecessors. They still parse for several build and migration workflows at this pin, but `moon doc` now rejects a legacy-JSON module.
 
 ## Official topic map
 
@@ -39,7 +39,7 @@ readme = "README.mbt.md"
 repository = ""
 license = "Apache-2.0"
 keywords = []
-preferred_target = "wasm-gc"
+preferred_target = "wasm"
 description = ""
 ```
 
@@ -96,7 +96,7 @@ pkgtype(kind: "executable")
 
 Executable packages: both `pkgtype(kind: "executable")` and `options("is-main": true)` are accepted at the pin, and `moon fmt` rewrites the options form **into** `pkgtype` — treat `pkgtype` as canonical. Valid kinds (from the error on an invalid kind): `library`, `executable`, `foreign_library`. Option keys inside `options()` are quoted kebab-case strings (`"is-main"`), unlike moon.mod's snake_case top-level keys.
 
-For a `pkgtype(kind: "foreign_library")` package, `#export_name("symbol")` on a public function selects its generated Wasm/JS/C symbol name. **Documented, not executed end-to-end:** the [0.10.4 release notes](https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release) state that only functions declared in that foreign-library package are exported, not functions from dependencies; native static/dynamic library output was still being polished, so prefer this feature for Wasm/JS at this pin.
+For a `pkgtype(kind: "foreign_library")` package, `#export_name("symbol")` on a public function selects its generated Wasm/JS/C symbol name. **Documented, not executed end-to-end:** the current official [FFI reference](https://docs.moonbitlang.com/en/latest/language/ffi.html#export-functions) requires a package-unique valid C identifier on every backend and disallows generic functions, optional-argument functions, methods, and declarations without a body. Prefer `#export_name` over backend link `exports` for new cross-backend exports; use link configuration when the set differs by backend. Exports are package-scoped, so wrap dependency functionality in the exporting package instead of expecting re-export. Native `foreign_library` artifacts remain unsupported; use Wasm or JavaScript for exported libraries.
 
 ## Virtual packages and overrides
 

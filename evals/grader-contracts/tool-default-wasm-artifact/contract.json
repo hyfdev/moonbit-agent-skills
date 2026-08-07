@@ -1,0 +1,29 @@
+{
+  "area": "toolchain",
+  "task": "tool-default-wasm-artifact",
+  "cases": [
+    {
+      "name": "checks-the-current-bare-build-wasm-artifact",
+      "expected": "pass",
+      "files": {
+        "check-default.ts": "import { spawnSync } from \"node:child_process\";\nimport { existsSync } from \"node:fs\";\n\nconst build = spawnSync(\"moon\", [\"build\"], { encoding: \"utf8\" });\nif (build.status !== 0) process.exit(build.status ?? 1);\nconst artifact = \"_build/wasm/debug/build/cmd/main/main.wasm\";\nif (!existsSync(artifact)) throw new Error(`missing default artifact: ${artifact}`);\nconsole.log(\"default artifact ok\");\n"
+      }
+    },
+    {
+      "name": "keeps-checking-the-old-wasm-gc-default",
+      "expected": "fail",
+      "files": {
+        "check-default.ts": "import { spawnSync } from \"node:child_process\";\nimport { existsSync } from \"node:fs\";\n\nconst build = spawnSync(\"moon\", [\"build\"], { encoding: \"utf8\" });\nif (build.status !== 0) process.exit(build.status ?? 1);\nconst artifact = \"_build/wasm-gc/debug/build/cmd/main/main.wasm\";\nif (!existsSync(artifact)) throw new Error(`missing default artifact: ${artifact}`);\nconsole.log(\"default artifact ok\");\n"
+      },
+      "must_fail_check_types": ["file_contains", "file_not_contains", "node"]
+    },
+    {
+      "name": "forces-the-old-target-to-make-the-stale-path-pass",
+      "expected": "fail",
+      "files": {
+        "check-default.ts": "import { spawnSync } from \"node:child_process\";\nimport { existsSync } from \"node:fs\";\n\nconst build = spawnSync(\"moon\", [\"build\", \"--target\", \"wasm-gc\"], { encoding: \"utf8\" });\nif (build.status !== 0) process.exit(build.status ?? 1);\nconst artifact = \"_build/wasm-gc/debug/build/cmd/main/main.wasm\";\nif (!existsSync(artifact)) throw new Error(`missing default artifact: ${artifact}`);\nconsole.log(\"default artifact ok\");\n"
+      },
+      "must_fail_check_types": ["file_contains", "file_not_contains"]
+    }
+  ]
+}

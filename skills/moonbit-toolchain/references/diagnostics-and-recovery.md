@@ -82,4 +82,4 @@ moon check --frozen
 moon version --all --json
 ```
 
-Check the versions first — this skill is verified only at moon 0.1.20260713 / moonc v0.10.4 (`moon version --all` also prints `Feature flags enabled: rr_moon_mod,rr_moon_pkg`). On a different version, trust `moon <cmd> --help` over any reference file, re-verify load-bearing behavior in a scratch module (`moon new probe --user tmp`), and say so in your answer. `moon upgrade` moves the installed toolchain forward (never run it unprompted — it changes global state).
+Check the versions first — this skill is verified only at moon 0.1.20260803 / moonc v0.10.6 (`moon version --all` also prints `Feature flags enabled: rr_moon_mod,rr_moon_pkg`). On a different version, trust `moon <cmd> --help` over any reference file, re-verify load-bearing behavior in a scratch module (`moon new probe --user tmp`), and say so in your answer. `moon upgrade` moves the installed toolchain forward (never run it unprompted — it changes global state).

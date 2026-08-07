@@ -21,6 +21,15 @@
               "hello/AGENTS.md"
             ]
           }
+        },
+        {
+          "kind": "shell",
+          "script": "grep -F 'preferred_target = \"wasm\"' hello/moon.mod",
+          "expect": {
+            "output_contains": [
+              "preferred_target = \"wasm\""
+            ]
+          }
         }
       ]
     },
@@ -68,6 +77,53 @@
       ]
     },
     {
+      "id": "global-change-directory",
+      "fixture": "empty",
+      "steps": [
+        {
+          "kind": "shell",
+          "script": "mkdir -p app/cmd/main"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > app/moon.mod <<'MBTEOF'\nname = \"mbtskills/change_dir\"\nversion = \"0.1.0\"\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > app/cmd/main/moon.pkg <<'MBTEOF'\npkgtype(kind: \"executable\")\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > app/cmd/main/main.mbt <<'MBTEOF'\nfn main {\n  println(42)\n}\nMBTEOF"
+        },
+        {
+          "kind": "moon",
+          "argv": ["moon", "-C", "app", "run", "cmd/main"],
+          "expect": {
+            "output_contains": [
+              "42"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "manifest-path-removed",
+      "fixture": "template",
+      "steps": [
+        {
+          "kind": "moon",
+          "argv": ["moon", "--manifest-path", "moon.mod", "check"],
+          "expect": {
+            "exit": 2,
+            "output_contains": [
+              "unexpected argument '--manifest-path'"
+            ]
+          }
+        }
+      ]
+    },
+    {
       "id": "build-default",
       "fixture": "template",
       "steps": [
@@ -76,7 +132,7 @@
           "argv": ["moon", "build"],
           "expect": {
             "paths_exist": [
-              "_build/wasm-gc/debug/build/cmd/main/main.wasm"
+              "_build/wasm/debug/build/cmd/main/main.wasm"
             ]
           }
         }
@@ -125,7 +181,7 @@
           "argv": ["moon", "build", "--release"],
           "expect": {
             "paths_exist": [
-              "_build/wasm-gc/release/build/cmd/main/main.wasm"
+              "_build/wasm/release/build/cmd/main/main.wasm"
             ]
           }
         }
@@ -192,6 +248,55 @@
           "expect": {
             "output_contains": [
               "42"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "native-debug-new-backend-linux",
+      "fixture": "template",
+      "steps": [
+        {
+          "kind": "moon",
+          "argv": ["moon", "build", "--target", "native", "--dry-run"],
+          "expect": {
+            "output_contains": [
+              "-target x86_64-unknown-linux-gnu",
+              "__moonbit_link_core__/main.o"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "native-debug-c-fallback-linux",
+      "fixture": "template",
+      "steps": [
+        {
+          "kind": "documented-shell",
+          "script": "MOONBIT_NEW_NATIVE=0 moon build --target native --dry-run",
+          "expect": {
+            "output_contains": [
+              "-target native",
+              "/main.c"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "native-release-c-backend-linux",
+      "fixture": "template",
+      "steps": [
+        {
+          "kind": "moon",
+          "argv": ["moon", "build", "--target", "native", "--release", "--dry-run"],
+          "expect": {
+            "output_contains": [
+              "-target native",
+              "/main.c",
+              "-O2"
             ]
           }
         }
@@ -583,24 +688,22 @@
       ]
     },
     {
-      "id": "doc-broken-new-dsl",
+      "id": "doc-current-dsl-works",
       "fixture": "template",
       "steps": [
         {
           "kind": "moon",
           "argv": ["moon", "doc"],
           "expect": {
-            "exit": 255,
-            "output_contains": [
-              "moon.mod.json",
-              "failed when checking project"
+            "paths_exist": [
+              "_build/doc/mbtskills/template/members.md"
             ]
           }
         }
       ]
     },
     {
-      "id": "doc-legacy-works",
+      "id": "doc-legacy-rejected",
       "fixture": "empty",
       "steps": [
         {
@@ -619,8 +722,9 @@
           "kind": "moon",
           "argv": ["moon", "doc"],
           "expect": {
-            "paths_exist": [
-              "_build/doc/mbtskills/legacydoc/members.md"
+            "exit": 255,
+            "output_contains": [
+              "moon.mod"
             ]
           }
         }
@@ -658,6 +762,56 @@
         {
           "kind": "shell",
           "script": "test ! -d _build"
+        }
+      ]
+    },
+    {
+      "id": "clean-cache-help",
+      "fixture": "empty",
+      "steps": [
+        {
+          "kind": "moon",
+          "argv": ["moon", "clean", "--help"],
+          "expect": {
+            "output_contains": [
+              "--dep-cache",
+              "--build-cache"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "runwasm-help",
+      "fixture": "empty",
+      "steps": [
+        {
+          "kind": "moon",
+          "argv": ["moon", "runwasm", "--help"],
+          "expect": {
+            "output_contains": [
+              "PACKAGE[@VERSION]",
+              "@latest"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "moonx-help",
+      "fixture": "empty",
+      "steps": [
+        {
+          "kind": "moon",
+          "argv": ["moonx", "--help"],
+          "expect": {
+            "output_contains": [
+              "PACKAGE",
+              "wasm",
+              "native",
+              "@latest"
+            ]
+          }
         }
       ]
     },

@@ -5,8 +5,8 @@ license: MIT
 user-invocable: true
 compatibility: Repository-maintenance workflow for hyfdev/moonbit-agent-skills. Needs Git, Node.js 24+, Vite+, and the MoonBit toolchain for executable verification.
 metadata:
-  skill-version: "0.2.2"
-  updated-date: "2026-07-19"
+  skill-version: "0.3.0"
+  updated-date: "2026-08-07"
   scope: "repository-maintenance"
   internal: true
 ---
@@ -24,7 +24,7 @@ This workflow exists because testing only written claims cannot detect omitted k
 ## Required workflow
 
 1. Read the repository's `AGENTS.md`, `references/release-maintenance.md`, and `references/language-surface-maintenance.md` completely. When a change is expected to alter activation, retrieval, or task outcomes, also read `references/evaluation.md` and `evals/CLIENTS.md` before selecting tasks or a client.
-2. Choose the inventory before judging content. For a release, pin the matching `moonbitlang/website` Markdown and run `vp run snapshot-release`. For a general language/reference audit, pin `moonbitlang/moonbit-docs` and run `vp run snapshot-language-surface`; never hand-author or filter either source inventory.
+2. Start from the official latest baseline: read `https://cli.moonbitlang.com/version.json`, re-pin the exact installed latest toolchain, resolve the current `moonbitlang/moonbit-docs` `main` commit, and run `vp run snapshot-language-surface`. If a matching `moonbitlang/website` release article exists, also run `vp run snapshot-release`; an absent article never delays the product update. Never hand-author or filter a source inventory.
 3. Read every generated source item. Close each exactly once in the matching `coverage.json`. Release decisions use verified/documented/out-of-scope/not-actionable claims and evidence; language-surface items use routed/out-of-scope because that inventory proves topic handling, not semantic truth.
 4. For every user-visible item, search both product skills and existing evidence before classifying it. Assign one product owner and make the route explicit in that skill's `Feature index`, with the reference path and exact feature/diagnostic terms on one physical line.
 5. Treat official documentation as a discovery source, not a compiler oracle. Inspect upstream warning configuration and run an isolated minimal POC with warnings enabled; the official local-type example is a known case that passes only because its package suppresses `deprecated_syntax`.
@@ -32,7 +32,7 @@ This workflow exists because testing only written claims cannot detect omitted k
 7. Treat deprecations as migrations: remove the old recommendation, enable the warning, add `--deny-warn`, prove the old form is caught, and prove the replacement passes under the same settings. A documented-only deprecation still needs separate old-form and replacement evidence and the reason execution is unavailable.
 8. Add a deterministic content eval for each change that materially alters agent behavior. Follow `references/evaluation.md`: prove the grader with correct and wrong solutions, prefer silent-semantic risks over compiler-self-correcting tasks, and start with one paired AB/BA pass on DeepSeek Pro. Add at most one second repetition, only when the current-skill cell fails or the pair is unstable; use one Kimi fallback pair only if the current-skill cell fails again. Never run a third repetition or repeat unaffected tasks. When evaluating discoverability, use a clean task that does not expose the answer through compiler diagnostics and compare the current skill with a byte-identical purpose-built ablation of the route under test; use a historical tree only when the whole historical skill is the intended variable. Report the result in two layers: a short user-facing comparison first and the complete technical evidence second.
 9. Treat each skill's version as its installed content identity. Whenever files inside a skill directory change, increment `metadata.skill-version` using SemVer and set `metadata.updated-date` to the change date: patch for corrections or metadata, minor for new compatible coverage, and major for an incompatible rename or scope change. Change `metadata.verified-date` only after rerunning the pinned verification. Keep the public README status in sync; `validate-skills` checks the metadata format and README projection.
-10. Run `vp run check-release-coverage` and `vp run check-language-surface`. In update mode, do not change toolchain pins, fixture stamps, skill pins, or README status until both completeness gates close.
+10. Run `vp run verify-latest-upstream`, `vp run check-language-surface`, and `vp run check-release-coverage`. In update mode, close the current language surface and every published release inventory before changing fixture stamps, skill pins, or README status. When the latest compiler has no website article, the exact toolchain and language-surface pins remain authoritative.
 11. Run the full repository check sequence from `AGENTS.md`, all relevant pinned targets, targeted model evals, and the required independent reviews.
 
 ## Completion output

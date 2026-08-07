@@ -170,13 +170,13 @@ E*
     expect(validateLanguageSurfaceInventory(inventory, "source.json")).toEqual([]);
   });
 
-  it("accepts the committed 324-document, 1,070-item recursive inventory", () => {
+  it("accepts the committed 338-document, 1,102-item recursive inventory", () => {
     const inventory = JSON.parse(
       readFileSync(join(REPO_ROOT, "verification/language-surface/source.json"), "utf8"),
     ) as LanguageSurfaceInventory;
     expect(inventory.schema_version).toBe(2);
-    expect(inventory.documents).toHaveLength(324);
-    expect(inventory.items).toHaveLength(1070);
+    expect(inventory.documents).toHaveLength(338);
+    expect(inventory.items).toHaveLength(1102);
     expect(validateLanguageSurfaceInventory(inventory, "source.json")).toEqual([]);
   });
 });

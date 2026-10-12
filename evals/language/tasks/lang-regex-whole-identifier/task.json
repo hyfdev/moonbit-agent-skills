@@ -18,7 +18,7 @@
       "args": ["test", "--deny-warn"],
       "min_tests": 3,
       "temp_files": {
-        "zz_eval_regex_test.mbt": "///|\ntest \"grader accepts fresh complete identifiers\" {\n  assert_true(is_identifier(\"Z\"))\n  assert_true(is_identifier(\"value_42\"))\n  assert_true(is_identifier(\"__\"))\n}\n\n///|\ntest \"grader rejects surrounding and invalid text\" {\n  assert_false(is_identifier(\"\"))\n  assert_false(is_identifier(\"!name?\"))\n  assert_false(is_identifier(\"name!\"))\n  assert_false(is_identifier(\"x-y\"))\n  assert_false(is_identifier(\" name \"))\n}\n"
+        "zz_eval_regex_test.mbt": "///|\ntest \"grader accepts fresh complete identifiers\" {\n  assert_true(@regex_whole_identifier.is_identifier(\"Z\"))\n  assert_true(@regex_whole_identifier.is_identifier(\"value_42\"))\n  assert_true(@regex_whole_identifier.is_identifier(\"__\"))\n}\n\n///|\ntest \"grader rejects surrounding and invalid text\" {\n  assert_false(@regex_whole_identifier.is_identifier(\"\"))\n  assert_false(@regex_whole_identifier.is_identifier(\"!name?\"))\n  assert_false(@regex_whole_identifier.is_identifier(\"name!\"))\n  assert_false(@regex_whole_identifier.is_identifier(\"x-y\"))\n  assert_false(@regex_whole_identifier.is_identifier(\" name \"))\n}\n"
       }
     }
   ]

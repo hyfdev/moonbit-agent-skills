@@ -1777,6 +1777,940 @@
         "moon install username/module"
       ],
       "reason": "Installs a binary globally into the toolchain home, outside the CI working directory; networky and not sandboxed by the temp workdir."
+    },
+    {
+      "id": "registry-discovery-live",
+      "fixture": "empty",
+      "network": true,
+      "steps": [
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "search",
+            "html markdown",
+            "--limit",
+            "1",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "\"status\":\"success\"",
+              "\"results\":"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "view",
+            "moonbitlang/async@0.21.3",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "\"status\":\"success\"",
+              "\"module\":\"moonbitlang/async\"",
+              "\"version\":\"0.21.3\""
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "view",
+            "moonbitlang/async",
+            "--versions",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "\"status\":\"success\"",
+              "\"result\":[",
+              "\"version\":\"0.21.3\""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "registry-discovery-help",
+      "fixture": "empty",
+      "steps": [
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "view",
+            "--help"
+          ],
+          "expect": {
+            "output_contains": [
+              "--my",
+              "No login is required"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "deprecate",
+            "--help"
+          ],
+          "expect": {
+            "output_contains": [
+              "all existing versions",
+              "--reason",
+              "--undo",
+              "Deprecation does not affect version selection"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "dependency-graph-json",
+      "fixture": "template",
+      "steps": [
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "tree",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "\"modules\":[",
+              "\"name\":\"mbtskills/template\"",
+              "\"edges\":[]"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "tree",
+            "--package"
+          ],
+          "expect": {
+            "output_contains": [
+              "[cmd/main]",
+              "lib -> mbtskills/template"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "tree",
+            "--package",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "\"nodes\":[",
+              "\"rel\":\"cmd/main\"",
+              "\"alias\":\"lib\"",
+              "\"kinds\":[\"source\"]"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "publishing-moonignore-migration",
+      "fixture": "empty",
+      "steps": [
+        {
+          "kind": "shell",
+          "script": "mkdir -p '.' 'fixtures' '.well-known' '_build' 'nested/_build' 'nested' 'fallback'"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'moon.mod' <<'MBTEOF'\nname = \"mbtskills/packaging\"\nversion = \"0.1.0\"\nreadme = \"README.md\"\nrepository = \"https://example.com/mbtskills/packaging\"\nlicense = \"MIT\"\noptions(include: [\"moon.mod\", \"moon.pkg\", \"lib.mbt\", \".hidden\", \"moon-only.txt\", \"_build/**\"], exclude: [\"moon-only.txt\"])\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'moon.pkg' <<'MBTEOF'\n\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'lib.mbt' <<'MBTEOF'\npub fn answer() -> Int { 42 }\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'README.md' <<'MBTEOF'\npackaging probe\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > '.gitignore' <<'MBTEOF'\ngit-only.txt\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > '.moonignore' <<'MBTEOF'\nmoon-only.txt\n*.log\n!fixtures/expected.log\n!/.well-known/\n!/.well-known/**\n!/_build/\n!/_build/**\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'git-only.txt' <<'MBTEOF'\nkept\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'moon-only.txt' <<'MBTEOF'\ndropped\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'unexpected.log' <<'MBTEOF'\ndropped\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > '.hidden' <<'MBTEOF'\ndropped\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'fixtures/expected.log' <<'MBTEOF'\nkept\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > '.well-known/config.txt' <<'MBTEOF'\nkept\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > '_build/forbidden.txt' <<'MBTEOF'\ndropped\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'nested/_build/data.bin' <<'MBTEOF'\nkept\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'nested/.gitignore' <<'MBTEOF'\ngit-only.txt\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'nested/.moonignore' <<'MBTEOF'\nmoon-only.txt\n!rescued.log\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'nested/git-only.txt' <<'MBTEOF'\nkept\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'nested/moon-only.txt' <<'MBTEOF'\ndropped\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'nested/rescued.log' <<'MBTEOF'\nkept\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'nested/dropped.log' <<'MBTEOF'\ndropped\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'fallback/.gitignore' <<'MBTEOF'\nfallback-only.txt\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'fallback/fallback-only.txt' <<'MBTEOF'\ndropped\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'fallback/keep.txt' <<'MBTEOF'\nkept\nMBTEOF"
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "check",
+            "--deny-warn"
+          ],
+          "expect": {
+            "output_contains": [
+              "`include` and `exclude`",
+              "are deprecated",
+              "Finished."
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "package",
+            "--list"
+          ],
+          "expect": {
+            "output_contains": [
+              "\n.hidden\n",
+              "\nmoon-only.txt\n",
+              "\nmoon.mod\n",
+              "\nmoon.pkg\n",
+              "\nlib.mbt\n"
+            ],
+            "output_not_contains": [
+              "\ngit-only.txt\n",
+              "\nREADME.md\n",
+              "\n_build/forbidden.txt\n"
+            ]
+          }
+        },
+        {
+          "kind": "shell",
+          "script": "mkdir -p '.'"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'moon.mod' <<'MBTEOF'\nname = \"mbtskills/packaging\"\nversion = \"0.1.0\"\nreadme = \"README.md\"\nrepository = \"https://example.com/mbtskills/packaging\"\nlicense = \"MIT\"\nMBTEOF"
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "check",
+            "--deny-warn"
+          ],
+          "expect": {
+            "output_not_contains": [
+              "`include` and `exclude`",
+              "are deprecated"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "package",
+            "--list"
+          ],
+          "expect": {
+            "output_contains": [
+              "\n.well-known/config.txt\n",
+              "\nfixtures/expected.log\n",
+              "\ngit-only.txt\n",
+              "\nnested/git-only.txt\n",
+              "\nnested/rescued.log\n",
+              "\nnested/_build/data.bin\n",
+              "\nfallback/keep.txt\n"
+            ],
+            "output_not_contains": [
+              "\n.hidden\n",
+              "\nmoon-only.txt\n",
+              "\nunexpected.log\n",
+              "\nnested/moon-only.txt\n",
+              "\nnested/dropped.log\n",
+              "\n_build/forbidden.txt\n",
+              "\nfallback/fallback-only.txt\n"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "runwasm-migration",
+      "fixture": "template",
+      "steps": [
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "runwasm",
+            "cmd/main"
+          ],
+          "expect": {
+            "output_contains": [
+              "`moon runwasm` is deprecated",
+              "42"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "run",
+            "--target",
+            "wasm",
+            "cmd/main"
+          ],
+          "expect": {
+            "output_contains": [
+              "42"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "script-import-all-and-ide",
+      "fixture": "empty",
+      "steps": [
+        {
+          "kind": "shell",
+          "script": "mkdir -p '.'"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'moon.mod' <<'MBTEOF'\nname = \"mbtskills/scripts\"\nversion = \"0.1.0\"\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'moon.pkg' <<'MBTEOF'\n\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'import-all.mbtx' <<'MBTEOF'\nimport { \"moonbitlang/core/queue\" @q * }\nfn main { let a = Queue([1, 2, 3]); let b = @q.Queue([4, 5]); println(a.length() + b.length()) }\nMBTEOF"
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "run",
+            "import-all.mbtx",
+            "--deny-warn"
+          ],
+          "expect": {
+            "output_contains": [
+              "5"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moonx",
+            "import-all.mbtx"
+          ],
+          "expect": {
+            "output_contains": [
+              "5"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "ide",
+            "outline",
+            "import-all.mbtx"
+          ],
+          "expect": {
+            "output_contains": [
+              "fn main"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "ide",
+            "peek-def",
+            "--loc",
+            "import-all.mbtx:2:48",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "queue/queue.mbt",
+              "\"range\""
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "ide",
+            "hover",
+            "--loc",
+            "import-all.mbtx:2:48",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "@q.Queue",
+              "\"contents\""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "script-unpinned-import",
+      "fixture": "empty",
+      "network": true,
+      "steps": [
+        {
+          "kind": "shell",
+          "script": "mkdir -p '.'"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'unpinned.mbtx' <<'MBTEOF'\nimport { \"moonbitlang/x/stack\" }\nfn main { let s : @stack.Stack[Int] = @stack.new(); s.push(42); println(s.peek().unwrap()) }\nMBTEOF"
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "run",
+            "unpinned.mbtx",
+            "--deny-warn"
+          ],
+          "expect": {
+            "output_contains": [
+              "42"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "script-test-selection",
+      "fixture": "empty",
+      "steps": [
+        {
+          "kind": "shell",
+          "script": "mkdir -p '.'"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'moon.mod' <<'MBTEOF'\nname = \"mbtskills/script_tests\"\nversion = \"0.1.0\"\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'moon.pkg' <<'MBTEOF'\n\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'pkg_test.mbt' <<'MBTEOF'\ntest \"package only\" { assert_eq(1, 2) }\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'script.mbtx' <<'MBTEOF'\nfn main { abort(\"main must not run during tests\") }\ntest \"script only\" { assert_eq(2, 2) }\nMBTEOF"
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "test",
+            "script.mbtx",
+            "--deny-warn"
+          ],
+          "expect": {
+            "output_contains": [
+              "Total tests: 1, passed: 1, failed: 0."
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "test",
+            "--deny-warn"
+          ],
+          "expect": {
+            "exit": 2,
+            "output_contains": [
+              "package only",
+              "Total tests: 1, passed: 0, failed: 1."
+            ]
+          }
+        },
+        {
+          "kind": "shell",
+          "script": "mkdir -p '.'"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'pkg_test.mbt' <<'MBTEOF'\ntest \"package only\" { assert_eq(1, 1) }\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'script.mbtx' <<'MBTEOF'\nfn main { abort(\"main must not run during tests\") }\ntest \"script only\" { assert_eq(2, 3) }\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'no-main.mbtx' <<'MBTEOF'\ntest { assert_eq(1, 1) }\nMBTEOF"
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "test",
+            "--deny-warn"
+          ],
+          "expect": {
+            "output_contains": [
+              "Total tests: 1, passed: 1, failed: 0."
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "test",
+            "script.mbtx",
+            "--deny-warn"
+          ],
+          "expect": {
+            "exit": 2,
+            "output_contains": [
+              "script only",
+              "Total tests: 1, passed: 0, failed: 1."
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "test",
+            "no-main.mbtx",
+            "--deny-warn"
+          ],
+          "expect": {
+            "exit": 1,
+            "output_contains": [
+              "Missing main function"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "script-policy-file-access",
+      "fixture": "empty",
+      "network": true,
+      "steps": [
+        {
+          "kind": "shell",
+          "script": "mkdir -p '.'"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'policy.mbtx' <<'MBTEOF'\n// policy:\n//   fs:\n//     read: []\n\nimport {\n  \"moonbitlang/async@0.21.3\",\n  \"moonbitlang/async@0.21.3/fs\",\n}\nasync fn main {\n  println(@fs.read_file(\"input.txt\").text())\n}\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'input.txt' <<'MBTEOF'\npolicy-sentinel\nMBTEOF"
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moonx",
+            "policy.mbtx"
+          ],
+          "expect": {
+            "exit": 1,
+            "output_contains": [
+              "Sandbox policy blocked file read",
+              "Permission denied"
+            ]
+          }
+        },
+        {
+          "kind": "shell",
+          "script": "mkdir -p '.'"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'policy.mbtx' <<'MBTEOF'\nimport {\n  \"moonbitlang/async@0.21.3\",\n  \"moonbitlang/async@0.21.3/fs\",\n}\nasync fn main {\n  println(@fs.read_file(\"input.txt\").text())\n}\nMBTEOF"
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moonx",
+            "policy.mbtx"
+          ],
+          "expect": {
+            "output_contains": [
+              "policy-sentinel"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "experimental-prebuild-mbtx-environment",
+      "fixture": "empty",
+      "steps": [
+        {
+          "kind": "shell",
+          "script": "mkdir -p '.'"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'moon.mod' <<'MBTEOF'\nname = \"mbtskills/prebuild_env\"\nversion = \"0.1.0\"\noptions(\"--moonbit-unstable-prebuild\": \"hook.mbtx\")\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'moon.pkg' <<'MBTEOF'\npkgtype(kind: \"executable\")\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'main.mbt' <<'MBTEOF'\nfn main { println(42) }\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'hook.mbtx' <<'MBTEOF'\nimport { \"moonbitlang/core/env\" }\nfn main {\n  guard @env.get_env_var(\"MOON_BACKEND\") == Some(\"native\") else { abort(\"backend must be native\") }\n  guard @env.get_env_var(\"MOON_PROFILE\") == Some(\"debug\") else { abort(\"profile must be debug\") }\n  for key in [\"MOON_MOD\", \"MOON_BUILD_DIR\", \"MOON_HOST_OS\", \"MOON_HOST_ARCH\", \"MOON_JOBS\"] {\n    guard @env.get_env_var(key) is Some(value) && value.length() > 0 else { abort(\"missing build environment\") }\n  }\n  println(\"{}\")\n}\nMBTEOF"
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "build",
+            "--target",
+            "native",
+            "--deny-warn"
+          ]
+        },
+        {
+          "kind": "shell",
+          "script": "mkdir -p '.'"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'hook.mbtx' <<'MBTEOF'\nfn main { abort(\"prebuild reached\") }\nMBTEOF"
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "build",
+            "--target",
+            "native",
+            "--deny-warn"
+          ],
+          "expect": {
+            "exit": 255,
+            "output_contains": [
+              "Failed to run prebuild script",
+              "hook.mbtx"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "build",
+            "--target",
+            "js",
+            "--deny-warn"
+          ]
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "build",
+            "--target",
+            "wasm",
+            "--deny-warn"
+          ]
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "build",
+            "--target",
+            "wasm-gc",
+            "--deny-warn"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ide-navigation-json-and-locations",
+      "fixture": "template",
+      "steps": [
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "ide",
+            "peek-def",
+            "--help"
+          ],
+          "expect": {
+            "output_contains": [
+              "Trait::method for Type"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "ide",
+            "find-references",
+            "--help"
+          ],
+          "expect": {
+            "output_contains": [
+              "Trait::method for Type",
+              "--include-definition"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "ide",
+            "find-references",
+            "shout",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "shout_test.mbt",
+              "\"is_test\":true"
+            ],
+            "output_not_contains": [
+              "shout.mbt",
+              "\"is_test\":false"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "ide",
+            "find-references",
+            "shout",
+            "--include-definition",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "shout.mbt",
+              "shout_test.mbt"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "ide",
+            "peek-def",
+            "add",
+            "--loc",
+            "lib.mbt",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "\"range\":\"2:8-2:11\""
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "ide",
+            "peek-def",
+            "--loc",
+            "lib.mbt:3:3",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "\"range\":\"2:12-2:13\""
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "ide",
+            "find-references",
+            "--loc",
+            "lib.mbt:3:3",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "\"range\":\"3:3-3:4\"",
+              "\"is_test\":false"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "ide",
+            "hover",
+            "--loc",
+            "cmd/main/main.mbt:3:16",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "\"contents\"",
+              "add"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "ide",
+            "workspace-symbols",
+            "shout",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "\"name\":\"pub fn shout\"",
+              "\"kind\":\"Function\""
+            ]
+          }
+        },
+        {
+          "kind": "documented-shell",
+          "script": "moon ide workspace-symbols '' --json",
+          "expect": {
+            "output_contains": [
+              "\"name\":\"pub fn shout\"",
+              "\"name\":\"pub fn add\""
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "ide",
+            "codelens",
+            "textutil/shout.mbt"
+          ],
+          "expect": {
+            "output_contains": [
+              "\"is_test\":true",
+              "Local: 1 (1 in test)",
+              "moonbit.executeReferenceProvider"
+            ]
+          }
+        }
+      ]
     }
   ]
 }

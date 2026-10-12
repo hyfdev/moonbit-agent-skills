@@ -17,7 +17,7 @@ Habits carried over from Rust, TypeScript, and Go, plus outdated MoonBit syntax,
 - `mod geometry { ... }` -> a package is a directory with a `moon.pkg` file; there are no in-file namespaces. Rejected: `unexpected token id (lowercase start)`.
 - Lifetimes and borrows (`<'a>`, `&'a String`, `&Int`, `*x`, `&str`) -> MoonBit is garbage-collected; pass `String` and other values directly (`&X` is trait-object syntax, so `&Int` fails with `The type Int is not a trait`). Rejected: `unrecognized character "'"`.
 - `#[derive(Debug, Clone)]` above the type -> `derive(...)` after the type body's closing brace: `struct Point { ... } derive(Debug, Eq)`. Rejected: `unrecognized character "#"`.
-- `println!("x = {}", x)` -> `println("x = \{x}")` — println is a plain function and formatting is string interpolation. Rejected: ``The attribute `!` cannot be used on application``.
+- `println!("x = {}", x)` -> `println("x = \{x}")` — println is a plain function and formatting is string interpolation. Rejected: ``unexpected `f!(..)` ``.
 - `let mut arr = ...` just to call `arr.push(..)` -> plain `let` — Arrays, Maps, and `mut` fields mutate through ordinary bindings, and an unused `mut` is a hard error: `The mutability of 'arr' is never used`. `let mut` is only for reassigning the variable itself.
 - Assigning `c.count = ...` because the binding "is mutable" -> the field itself must be declared `mut count : Int` in the struct. Rejected: `The record field count is immutable`.
 - `String::from("hi")` -> just write `"hi"`; a string literal already is a `String`. Rejected: `Type String has no method from`.
@@ -52,6 +52,11 @@ Habits carried over from Rust, TypeScript, and Go, plus outdated MoonBit syntax,
 
 These no longer parse:
 
+- `g!()` -> plain `g()` in a raising context; `type! MyError String` -> `suberror MyError { MyError(String) }`.
+- Local type declarations -> top-level `struct` / `enum` declarations.
+- `fnalias` / `typealias` declarations -> `#alias` / `type NewName = OldName`.
+- Bare `for { ... }` infinite loop -> `for ;; { ... }`; the bare braces are parsed as a for-in pattern and require `in`.
+
 - Bare `init { ... }` block -> `fn init { ... }` (or `fn main { ... }` in an is-main package). Rejected: `unexpected token id (lowercase start)`.
 - `"value is \(x)"` interpolation -> `"value is \{x}"`. Rejected: ``Use `\{x}` for string interpolation``.
 - `pub(readonly)` -> plain `pub` (already readonly from outside the package); `pub(all)` to also allow external construction. Rejected: `The pub(readonly) modifier is not supported here`.
@@ -60,11 +65,10 @@ These no longer parse:
 
 These still compile, but only as deprecated legacy syntax (`moon check` passes with a warning) — never write them:
 
-- `g!()` bang call -> plain `g()` inside a function declaring a compatible `raise`. Warning: ``The syntax `f!(..)` for calling function with error is deprecated``.
 - `-> Int!Error` return annotation -> `-> Int raise` (or `raise SomeError`). Warning: ``The syntax `!Err` for error type annotation is deprecated``.
-- `for { ... }` infinite loop -> `for ;; { ... }`. Warning: ``The syntax `for { ... }` for infinite loop is deprecated``.
 - `loop <payload> { <patterns> }` functional loop -> `for v = <payload> { match v { <arms> } }` with explicit `break` and comma-separated `continue` values without parentheses. Warning: ``deprecated_syntax`` (0027).
-- `type! MyError String` -> `suberror MyError { MyError(String) }`. Warning: ``The syntax `type! A` for declaring suberror type is deprecated``.
+
+- `var x = value` -> `let mut x = value`; the recovery syntax emits `deprecated_syntax`.
 
 ## Silent traps: code that compiles but does something else
 
@@ -73,6 +77,9 @@ These still compile, but only as deprecated legacy syntax (`moon check` passes w
 - `"abc"[0]` is the number `97` (a `UInt16` code unit), not the string `"a"` -> use `s.get_char(0)`, which returns `Char?`.
 - `"Hello ${name}"` compiles with zero warnings and keeps `${name}` as literal text -> MoonBit interpolation is `"Hello \{name}"`.
 - `defer` exists, but it runs at the end of the enclosing block, not at function return as in Go; within one block, defers run LIFO at that block's end.
+
+- Slice syntax `a[i:j]` clamps bounds; negative bounds are zero, not offsets from the end. For strict validation use `get_view` or `exact_view`.
+- `catch` does not intercept async cancellation. Resource cleanup belongs in `defer` / `errdefer`; cancellation is independent of `noraise`.
 
 ---
 

@@ -1,0 +1,56 @@
+{
+  "id": "lang-error-cleanup-order",
+  "risk_class": "silent-error-cleanup-scope-and-order",
+  "claim_id": "language.errdefer.failure-only-block-scope-lifo",
+  "primary_metric": "exact-cleanup-log-across-success-and-propagated-failure",
+  "prompt": "Inspect the MoonBit code without changing any workspace files. What arrays does trace(false, false), trace(true, false), and trace(false, true) return? Put a single JSON object on the first line with keys \"success\", \"inner_error\", and \"outer_error\", whose values are the respective arrays of strings. Then briefly explain which cleanup registrations run and in what order.",
+  "discovery": {
+    "skill": "moonbit-language",
+    "reference": "references/control-flow-and-iteration.mbt.md"
+  },
+  "grade": [
+    {
+      "type": "first_line_json_is",
+      "value": {
+        "success": [
+          "inner-body",
+          "inner-always",
+          "after-inner",
+          "done",
+          "outer-always"
+        ],
+        "inner_error": [
+          "inner-body",
+          "inner-always",
+          "inner-error",
+          "outer-always",
+          "outer-error-first",
+          "caught"
+        ],
+        "outer_error": [
+          "inner-body",
+          "inner-always",
+          "after-inner",
+          "outer-error-second",
+          "outer-always",
+          "outer-error-first",
+          "caught"
+        ]
+      }
+    },
+    {
+      "type": "initial_files_unchanged"
+    },
+    {
+      "type": "moon",
+      "args": [
+        "test",
+        "--deny-warn"
+      ],
+      "min_tests": 3,
+      "temp_files": {
+        "zz_eval_cleanup_test.mbt": "///|\ntest \"grader confirms success cleanup\" {\n  assert_eq(@cleanup_order.trace(false, false), [\"inner-body\", \"inner-always\", \"after-inner\", \"done\", \"outer-always\"])\n}\n\n///|\ntest \"grader confirms early propagated error cleanup\" {\n  assert_eq(@cleanup_order.trace(true, false), [\"inner-body\", \"inner-always\", \"inner-error\", \"outer-always\", \"outer-error-first\", \"caught\"])\n}\n\n///|\ntest \"grader confirms error after successful inner block\" {\n  assert_eq(@cleanup_order.trace(false, true), [\"inner-body\", \"inner-always\", \"after-inner\", \"outer-error-second\", \"outer-always\", \"outer-error-first\", \"caught\"])\n}\n"
+      }
+    }
+  ]
+}

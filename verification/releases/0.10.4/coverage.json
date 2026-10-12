@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "release": "0.10.4",
-  "status": "current",
+  "status": "archived",
   "source_inventory": "source.json",
   "decisions": [
     {

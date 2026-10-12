@@ -40,12 +40,12 @@ describe("official toolchain surface snapshot", () => {
     expect(after[1].fingerprint).not.toBe(before[1].fingerprint);
   });
 
-  it("accepts the committed 14-document, 162-item inventory and coverage", () => {
+  it("accepts the committed 14-document, 165-item inventory and coverage", () => {
     const inventory = JSON.parse(
       readFileSync(join(REPO_ROOT, "verification/toolchain-surface/source.json"), "utf8"),
     ) as ToolchainSurfaceInventory;
     expect(inventory.documents).toHaveLength(14);
-    expect(inventory.items).toHaveLength(162);
+    expect(inventory.items).toHaveLength(165);
     expect(validateToolchainSurfaceInventory(inventory, "source.json")).toEqual([]);
     expect(toolchainSurfaceProblems(REPO_ROOT)).toEqual([]);
   });

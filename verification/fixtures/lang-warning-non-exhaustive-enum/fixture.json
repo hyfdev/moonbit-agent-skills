@@ -1,0 +1,31 @@
+{
+  "id": "lang-warning-non-exhaustive-enum",
+  "owner_skill": "moonbit-language",
+  "knowledge": "A non-exhaustive enum requires Type::.. after all known constructors; an ordinary wildcard hides future additions and Type::.. still warns about omitted known constructors.",
+  "expect": "check-fail",
+  "targets": [
+    "wasm-gc",
+    "wasm",
+    "js",
+    "native"
+  ],
+  "moon_args": [
+    "--deny-warn"
+  ],
+  "diagnostic_contains": [
+    "partial_match",
+    "unused_pattern",
+    "E::..",
+    "Some known cases are not matched"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-10-12",
+    "components": {
+      "moon": "0.1.20260920 (914d7da 2026-09-20)",
+      "moonc": "v0.10.14+7d59c7ec9 (2026-09-18)",
+      "moonrun": "moonrun 0.1.20260920 (914d7da 2026-09-20)"
+    },
+    "platform": "Linux-x86_64"
+  }
+}

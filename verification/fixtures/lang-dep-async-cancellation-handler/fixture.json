@@ -1,0 +1,27 @@
+{
+  "id": "lang-dep-async-cancellation-handler",
+  "owner_skill": "moonbit-language",
+  "knowledge": "The old cancellation API is deprecated; use handle_cancellation for cancellation and defer/errdefer for resource cleanup.",
+  "expect": "check-fail",
+  "targets": [
+    "wasm",
+    "js",
+    "native"
+  ],
+  "moon_args": [
+    "--deny-warn"
+  ],
+  "diagnostic_contains": [
+    "deprecated"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-10-12",
+    "components": {
+      "moon": "0.1.20260920 (914d7da 2026-09-20)",
+      "moonc": "v0.10.14+7d59c7ec9 (2026-09-18)",
+      "moonrun": "moonrun 0.1.20260920 (914d7da 2026-09-20)"
+    },
+    "platform": "Linux-x86_64"
+  }
+}

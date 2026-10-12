@@ -1,0 +1,723 @@
+{
+  "generated_by": "tooling/snapshot_release.ts",
+  "items": [
+    {
+      "id": "language-1",
+      "kind": "heading",
+      "section": "language",
+      "text": "`MySubError::_` pattern"
+    },
+    {
+      "id": "language-1-p1",
+      "kind": "paragraph",
+      "parent": "language-1",
+      "section": "language",
+      "text": "You can now use `T::_` to match suberrors by type without listing every error constructor of that type. This feature can also narrow `Error` to a specific `suberror` type."
+    },
+    {
+      "id": "language-1-c1",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "language-1",
+      "section": "language",
+      "text": "suberror ParseError {\n  Empty\n  InvalidChar(Char)\n}\n\nfn describe(error : Error) -> String {\n  match error {\n    ParseError::_ as e => use_suberror(e) // type of e is ParseError\n    _ => \"Other error\"\n  }\n}\n\nfn use_suberror(_e: ParseError) -> String {\n  \"Parse error\"\n}\n\nfn main {\n  println(describe(ParseError::Empty)) // Parse error\n  println(describe(ParseError::InvalidChar('?'))) // Parse error\n}"
+    },
+    {
+      "id": "language-2",
+      "kind": "heading",
+      "section": "language",
+      "text": "`for... in...` now supports pattern matching"
+    },
+    {
+      "id": "language-2-p1",
+      "kind": "paragraph",
+      "parent": "language-2",
+      "section": "language",
+      "text": "`for... in...` loops can now destructure elements directly during iteration:"
+    },
+    {
+      "id": "language-2-c1",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "language-2",
+      "section": "language",
+      "text": "fn main {\n  let items = [(\"Apple\", 2), (\"Pear\", 3)]\n  for (name, count) in items {\n    println(\"\\{name}: \\{count}\")\n  }\n  // Output:\n  // Apple: 2\n  // Pear: 3\n}"
+    },
+    {
+      "id": "language-3",
+      "kind": "heading",
+      "section": "language",
+      "text": "`#non_exhaustive` annotation for `enum`"
+    },
+    {
+      "id": "language-3-p1",
+      "kind": "paragraph",
+      "parent": "language-3",
+      "section": "language",
+      "text": "An `enum` marked with `#non_exhaustive` may gain new constructors in the future. When matching such an `enum` from another package, you must handle potential future constructors with `TypeName::..` after matching all known constructors. Otherwise, the compiler issues a warning:"
+    },
+    {
+      "id": "language-3-c1",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "language-3",
+      "section": "language",
+      "text": "// @pkg\n#non_exhaustive\nenum E {\n  A\n  B\n}\n\n// In another package:\n\nfn bad(x : @pkg.E) -> Unit {\n  // Compiler warning: matching a `#non_exhaustive` enum requires handling unknown constructors\n  match x {\n    A | B => ...\n  }\n}\n\nfn good(x : @pkg.E) -> Unit {\n  match x {\n    A | B => ...\n    E::.. => println(\"fallback\")\n  }\n}"
+    },
+    {
+      "id": "language-3-p2",
+      "kind": "paragraph",
+      "parent": "language-3",
+      "section": "language",
+      "text": "`E::..` is a construct specifically for handling unknown constructors. If you use `E::..` while some known constructors remain unmatched, the compiler also issues a warning. For example, if @pkg adds a new constructor C to E, the pattern match in good receives a warning that the known constructor C is unmatched. This lets downstream users learn about new upstream constructors through warnings. At runtime, `E::..` matches any value. Until good is updated to handle the new constructor C, the default branch with `E::..` handles C, so the program does not crash."
+    },
+    {
+      "id": "language-3-p3",
+      "kind": "paragraph",
+      "parent": "language-3",
+      "section": "language",
+      "text": "If you only want to match a few specific constructors of a `#non_exhaustive` type, you can use `_`. You can use `_` even when some known constructors remain unmatched, explicitly ignoring all remaining constructors. However, if you use `_` after matching all known constructors, the compiler warns you to use `E::..` instead, because only `E::..` provides a warning when upstream adds new constructors."
+    },
+    {
+      "id": "language-4",
+      "kind": "heading",
+      "section": "language",
+      "text": "Pipeline expression improvements"
+    },
+    {
+      "id": "language-4-p1",
+      "kind": "paragraph",
+      "parent": "language-4",
+      "section": "language",
+      "text": "The anonymous function body on the right side of `lhs |> x => {...}` can now call `async` functions:"
+    },
+    {
+      "id": "language-4-p2",
+      "kind": "paragraph",
+      "parent": "language-4",
+      "section": "language",
+      "text": "`.mbtx script`"
+    },
+    {
+      "id": "language-4-c1",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "language-4",
+      "section": "language",
+      "text": "import {\n  \"moonbitlang/async@0.21.3\",\n}\n\nasync fn main {\n  let result = 21 |> value => {\n    @async.sleep(1)\n    double(value)\n  }\n  println(result) // 42\n}"
+    },
+    {
+      "id": "language-5",
+      "kind": "heading",
+      "section": "language",
+      "text": "Improvements to slicing with `a[i:j]`"
+    },
+    {
+      "id": "language-5-p1",
+      "kind": "paragraph",
+      "parent": "language-5",
+      "section": "language",
+      "text": "Slicing with `a[i:j]` now produces a clamped view, with the slice range restricted to valid bounds."
+    },
+    {
+      "id": "language-5-c1",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "language-5",
+      "section": "language",
+      "text": "fn main {\n  let values = [10, 20, 30]\n  let middle = values[1:10] // The actual range is [1:3], containing 20 and 30\n  println(middle.length()) // 2\n  println(middle[0]) // 20\n  println(values[5:10].length()) // 0, an empty view\n}"
+    },
+    {
+      "id": "language-5-p2",
+      "kind": "paragraph",
+      "parent": "language-5",
+      "section": "language",
+      "text": "The main motivation is to ensure that `a[i:j]` does not crash at runtime, including when taking a view of a String with invalid indices at UTF-16 surrogate boundaries. To use the previous view operation, which could crash, use the new `exact_view` API."
+    },
+    {
+      "id": "language-6",
+      "kind": "heading",
+      "section": "language",
+      "text": "Improved warnings for unused packages. The following two cases now produce warnings:"
+    },
+    {
+      "id": "language-6-b1",
+      "kind": "bullet",
+      "parent": "language-6",
+      "section": "language",
+      "text": "A package from `moonbitlang/core` is explicitly imported with `import` but is not used."
+    },
+    {
+      "id": "language-6-b2",
+      "kind": "bullet",
+      "parent": "language-6",
+      "section": "language",
+      "text": "An `import` is not used explicitly through `@xxx.xxx`, and the imported package's contents are only used indirectly, such as through method calls."
+    },
+    {
+      "id": "language-6-p1",
+      "kind": "paragraph",
+      "parent": "language-6",
+      "section": "language",
+      "text": "In both cases, the `import` is unnecessary, but the compiler previously gave no warning. The compiler now warns in both cases. For example, the following configuration and code in a regular package cause `moon check` to report `unused_package`. Removing the unused math `import` clears the warning."
+    },
+    {
+      "id": "language-6-c1",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "language-6",
+      "section": "language",
+      "text": "import {\n  \"moonbitlang/core/math\", // This package does not use it, so this import can be removed\n}"
+    },
+    {
+      "id": "language-6-c2",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "language-6",
+      "section": "language",
+      "text": "fn main {\n  println(\"Hello, MoonBit!\")\n}"
+    },
+    {
+      "id": "language-7",
+      "kind": "heading",
+      "section": "language",
+      "text": "Improved error recovery for `var x = 10`"
+    },
+    {
+      "id": "language-7-p1",
+      "kind": "paragraph",
+      "parent": "language-7",
+      "section": "language",
+      "text": "Improved diagnostics for var declarations, including those with type annotations. The compiler recognizes them and issues a warning to use `let mut` instead."
+    },
+    {
+      "id": "language-7-c1",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "language-7",
+      "section": "language",
+      "text": "fn main {\n  var count = 0 // Warning: use let mut instead\n  count += 1\n  println(count)\n}"
+    },
+    {
+      "id": "language-8",
+      "kind": "heading",
+      "section": "language",
+      "text": "Deprecated the use of `Array` at JavaScript FFI boundaries"
+    },
+    {
+      "id": "language-8-p1",
+      "kind": "paragraph",
+      "parent": "language-8",
+      "section": "language",
+      "text": "Future versions will change the ABI of MoonBit `Array` on the JavaScript backend, so it will no longer be guaranteed to be equivalent to JavaScript's `Array`. Using `Array` at FFI boundaries is therefore deprecated. Use `FixedArray` instead."
+    },
+    {
+      "id": "language-9",
+      "kind": "heading",
+      "section": "language",
+      "text": "Warning for implicit promotion of `impl` to methods is now enabled by default"
+    },
+    {
+      "id": "language-9-p1",
+      "kind": "paragraph",
+      "parent": "language-9",
+      "section": "language",
+      "text": "Previously, an `impl` defined in the same package as its type was implicitly promoted to methods, allowing calls through dot syntax. We plan to deprecate this behavior in favor of explicit `extend Type with Trait::{f, g}` declarations. The compiler provides a migration warning for every `pub impl` that is implicitly promoted to methods under the current semantics. To migrate:"
+    },
+    {
+      "id": "language-9-b1",
+      "kind": "bullet",
+      "parent": "language-9",
+      "section": "language",
+      "text": "To preserve a method, add an `extend` declaration."
+    },
+    {
+      "id": "language-9-b2",
+      "kind": "bullet",
+      "parent": "language-9",
+      "section": "language",
+      "text": "To deprecate a method, still add an `extend` declaration, but mark it with `#deprecated`."
+    },
+    {
+      "id": "language-9-p2",
+      "kind": "paragraph",
+      "parent": "language-9",
+      "section": "language",
+      "text": "This warning was previously disabled by default. It is now enabled by default, and all users should migrate to explicit `extend` declarations. See the [2026/07/13 release note](../2026-07-13-moonbit-0-10-4-release/index.md) for more details."
+    },
+    {
+      "id": "language-10",
+      "kind": "heading",
+      "section": "language",
+      "text": "Warning for implicit imports in blackbox tests is now enabled by default"
+    },
+    {
+      "id": "language-10-p1",
+      "kind": "paragraph",
+      "parent": "language-10",
+      "section": "language",
+      "text": "In MoonBit, blackbox tests (`_test.mbt` files) test a package's public API and are compiled as a separate package. References to APIs from the tested package should therefore use explicit `@pkg.xxx` syntax. To simplify writing tests, the compiler previously imported all definitions from the tested package implicitly, unless a name was shadowed by a local definition in the test files. We no longer encourage relying on this implicit behavior. The compiler provides the `test_unqualified_package` warning wherever implicitly imported definitions are used. This warning was previously disabled by default and is now enabled by default."
+    },
+    {
+      "id": "toolchain-1",
+      "kind": "heading",
+      "section": "toolchain",
+      "text": "Moon and Runtime"
+    },
+    {
+      "id": "toolchain-1-b1",
+      "kind": "bullet",
+      "parent": "toolchain-1",
+      "section": "toolchain",
+      "text": "Added `moon search` for finding packages. For example, `moon search 'html markdown'` finds packages related to html and markdown."
+    },
+    {
+      "id": "toolchain-1-b2",
+      "kind": "bullet",
+      "parent": "toolchain-1",
+      "section": "toolchain",
+      "text": "Added `moon view` for viewing information such as package versions and packages published by a particular user. Examples include `moon view --my` and `moon view moonbitlang/async --versions`."
+    },
+    {
+      "id": "toolchain-1-b3",
+      "kind": "bullet",
+      "parent": "toolchain-1",
+      "section": "toolchain",
+      "text": "Added `moon deprecate` for marking a package as deprecated. Deprecating individual versions is not yet supported."
+    },
+    {
+      "id": "toolchain-1-b4",
+      "kind": "bullet",
+      "parent": "toolchain-1",
+      "section": "toolchain",
+      "text": "`moon tree [--json]` lists a module's external dependencies. `moon tree --package [--json]` lists package dependencies."
+    },
+    {
+      "id": "toolchain-1-b5",
+      "kind": "bullet",
+      "parent": "toolchain-1",
+      "section": "toolchain",
+      "text": "`moonx` will focus on execution with the Wasm backend. `--target native` is deprecated."
+    },
+    {
+      "id": "toolchain-1-b6",
+      "kind": "bullet",
+      "parent": "toolchain-1",
+      "section": "toolchain",
+      "text": "`moonx` execution policies now support spawning processes based on command prefixes."
+    },
+    {
+      "id": "toolchain-1-b7",
+      "kind": "bullet",
+      "parent": "toolchain-1",
+      "section": "toolchain",
+      "text": "`moonx` execution policies can now be inherited across `moonx` calls."
+    },
+    {
+      "id": "toolchain-1-b8",
+      "kind": "bullet",
+      "parent": "toolchain-1",
+      "section": "toolchain",
+      "text": "`moonx` now supports running `.mbtx` files."
+    },
+    {
+      "id": "toolchain-1-b9",
+      "kind": "bullet",
+      "parent": "toolchain-1",
+      "section": "toolchain",
+      "text": "`.mbtx` files have experimental support for declaring required permissions at the top of the file, with restrictions enforced by the runtime. For example:"
+    },
+    {
+      "id": "toolchain-1-c1",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "toolchain-1",
+      "section": "toolchain",
+      "text": "// policy:\n//   fs:\n//     read: []\n\n///|\nimport {\n  \"moonbitlang/async@0.21.3\",\n  \"moonbitlang/async@0.21.3/fs\",\n}\n\n///|\nasync fn main {\n  // Following operation will be rejected\n  println(@fs.read_file(\"input.txt\").text())\n}"
+    },
+    {
+      "id": "toolchain-1-b10",
+      "kind": "bullet",
+      "parent": "toolchain-1",
+      "section": "toolchain",
+      "text": "`moon runwasm` is deprecated."
+    },
+    {
+      "id": "toolchain-1-b11",
+      "kind": "bullet",
+      "parent": "toolchain-1",
+      "section": "toolchain",
+      "text": "Experimental prebuild scripts now support `.mbtx` and can receive additional environment variables. The existing input mechanism through stdin will be removed."
+    },
+    {
+      "id": "toolchain-1-b12",
+      "kind": "bullet",
+      "parent": "toolchain-1",
+      "section": "toolchain",
+      "text": "Experimental prebuild scripts are restricted to running on the native backend."
+    },
+    {
+      "id": "toolchain-2",
+      "kind": "heading",
+      "section": "toolchain",
+      "text": "Editor Support"
+    },
+    {
+      "id": "toolchain-2-b1",
+      "kind": "bullet",
+      "parent": "toolchain-2",
+      "section": "toolchain",
+      "text": "The language service can now handle multiple backends in the same workspace at the same time."
+    },
+    {
+      "id": "toolchain-2-b2",
+      "kind": "bullet",
+      "parent": "toolchain-2",
+      "section": "toolchain",
+      "text": "`moon ide` now supports `.mbtx` files. Fixed an issue where `import` aliases could be overwritten when a `moon.pkg` file was in the same directory as the script."
+    },
+    {
+      "id": "standard-library-1",
+      "kind": "heading",
+      "section": "standard-library",
+      "text": "`moonbitlang/core`"
+    },
+    {
+      "id": "standard-library-1-b1",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "QuickCheck now supports unbiased random number generation, with improved generation ranges and boundary value coverage for scalar `Arbitrary` instances. The `BigInt` generator is no longer limited to 64 bits and can generate a wider range of values and common boundary values. A unified entry point for shrinkers has also been added."
+    },
+    {
+      "id": "standard-library-1-b2",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "Added `derive(Shrink)` to automatically generate counterexample shrinking logic, helping find smaller, simpler failing cases. Shrinking based on subterms is not yet supported."
+    },
+    {
+      "id": "standard-library-1-b3",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "Added `BigInt` implementations using wide arithmetic for the native and wasm1 backends. Fixed several overflow issues in `immut/vector`."
+    },
+    {
+      "id": "standard-library-1-b4",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "Adjusted how `Array` handles iteration and cleanup. Iteration first obtains the underlying buffer. Operations such as `pop`, `truncate`, and `clear` update the length first, and the original slots may still hold references to elements. The new `fill_unused` function can release these references by filling the slots with a default value."
+    },
+    {
+      "id": "standard-library-1-b5",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "Added percent-encoding helpers that encode characters in %XX form."
+    },
+    {
+      "id": "standard-library-2",
+      "kind": "heading",
+      "section": "standard-library",
+      "text": "moonbitlang/x"
+    },
+    {
+      "id": "standard-library-2-b1",
+      "kind": "bullet",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "Completed and optimized `crypto`."
+    },
+    {
+      "id": "standard-library-2-b2",
+      "kind": "bullet",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "Added the `jwt` package with support for HS256 encoding and decoding."
+    },
+    {
+      "id": "standard-library-2-b3",
+      "kind": "bullet",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "Added the `bcrypt` package for password hashing."
+    },
+    {
+      "id": "standard-library-2-b4",
+      "kind": "bullet",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "Consolidated Unicode implementations into `moonbitlang/x/unicode`. The old APIs are deprecated."
+    },
+    {
+      "id": "standard-library-3",
+      "kind": "heading",
+      "section": "standard-library",
+      "text": "`moonbitlang/async`"
+    },
+    {
+      "id": "standard-library-3-p1",
+      "kind": "paragraph",
+      "parent": "standard-library-3",
+      "section": "standard-library",
+      "text": "The latest version of `moonbitlang/async` is 0.22.1. The main updates since the last monthly report (0.21.0) are:"
+    },
+    {
+      "id": "standard-library-3-b1",
+      "kind": "bullet",
+      "parent": "standard-library-3",
+      "section": "standard-library",
+      "text": "[breaking] Changed cancellation semantics. Previously, when an `async` task was cancelled, it received a special `suberror` as a signal so that the cancelled code could perform cleanup. The cancellation signal is now implemented through a special compiler primitive instead of a `suberror`. Compared with a `suberror`:"
+    },
+    {
+      "id": "standard-library-3-b2",
+      "kind": "bullet",
+      "parent": "standard-library-3",
+      "section": "standard-library",
+      "text": "The new cancellation signal still propagates upward automatically, like an error."
+    },
+    {
+      "id": "standard-library-3-b3",
+      "kind": "bullet",
+      "parent": "standard-library-3",
+      "section": "standard-library",
+      "text": "The cancellation signal can trigger `defer` and `errdefer`."
+    },
+    {
+      "id": "standard-library-3-b4",
+      "kind": "bullet",
+      "parent": "standard-library-3",
+      "section": "standard-library",
+      "text": "The new cancellation signal cannot be caught with `catch`."
+    },
+    {
+      "id": "standard-library-3-p2",
+      "kind": "paragraph",
+      "parent": "standard-library-3",
+      "section": "standard-library",
+      "text": "For guidance on migrating user code, see [https://github.com/moonbitlang/async/releases/tag/v0.22.0](https://github.com/moonbitlang/async/releases/tag/v0.22.0)"
+    },
+    {
+      "id": "standard-library-3-b5",
+      "kind": "bullet",
+      "parent": "standard-library-3",
+      "section": "standard-library",
+      "text": "[breaking] `@async.is_cancellation_error` now always returns `false` and is deprecated, because the cancellation signal is no longer a special error. In a `catch` that uses `@async.is_cancellation_error` to handle cancellation separately, you can delete the cancellation branch if it only skips handling the cancellation signal. Otherwise, use `@async.handle_cancellation` to handle cancellation separately."
+    },
+    {
+      "id": "standard-library-3-b6",
+      "kind": "bullet",
+      "parent": "standard-library-3",
+      "section": "standard-library",
+      "text": "Some APIs now have more precise types. Since cancellation is no longer a special error, cancellability is no longer tied to `raise` at the type level. In the latest version, `async` functions are cancellable by default. Only `async` functions explicitly marked with `nocancel`, such as `@async.protect_from_cancel`, are non-cancellable. Async functions that do not themselves `raise` errors but can be cancelled, such as `@async.sleep`, can now include `noraise` in their signatures."
+    },
+    {
+      "id": "standard-library-3-b7",
+      "kind": "bullet",
+      "parent": "standard-library-3",
+      "section": "standard-library",
+      "text": "[breaking] `@async.TaskGroup::add_defer` now requires the callback passed to it to be `nocancel`."
+    },
+    {
+      "id": "standard-library-3-b8",
+      "kind": "bullet",
+      "parent": "standard-library-3",
+      "section": "standard-library",
+      "text": "`@async.with_cancellation_handler` is deprecated and replaced by a new API, `@async.handle_cancellation`. `@async.handle_cancellation` runs an `async` callback, which remains cancellable at runtime, and returns `None` if the callback is cancelled. It can be used to handle cancellation separately. `@async.handle_cancellation` cannot revoke the current task's cancelled state. Even after a cancellation signal is caught once, subsequent cancellable `async` operations in the current task are still cancelled immediately."
+    },
+    {
+      "id": "standard-library-3-b9",
+      "kind": "bullet",
+      "parent": "standard-library-3",
+      "section": "standard-library",
+      "text": "`@fs.remove` and `@fs.rmdir` are now non-cancellable (`nocancel`)."
+    },
+    {
+      "id": "standard-library-3-b10",
+      "kind": "bullet",
+      "parent": "standard-library-3",
+      "section": "standard-library",
+      "text": "`@socket.TcpServer(..)` has a new option, `reuse_port_lb?: Bool = false`. When enabled, the TCP server can share the same listening address with other servers, and the kernel automatically balances the load across servers sharing that port. This option is only supported on Linux and is ignored on other operating systems."
+    },
+    {
+      "id": "standard-library-3-b11",
+      "kind": "bullet",
+      "parent": "standard-library-3",
+      "section": "standard-library",
+      "text": "Added `@async.platform` to identify the current operating system at runtime. Since the same Wasm binary can run on different operating systems, programs using the Wasm backend can only determine the current operating system at runtime, not at compile time."
+    },
+    {
+      "id": "ecosystem-1",
+      "kind": "heading",
+      "section": "ecosystem",
+      "text": "mooncakes.io"
+    },
+    {
+      "id": "ecosystem-1-b1",
+      "kind": "bullet",
+      "parent": "ecosystem-1",
+      "section": "ecosystem",
+      "text": "The search service is now live, with indexing of package summaries and pre-indexing of existing packages."
+    },
+    {
+      "id": "ecosystem-1-b2",
+      "kind": "bullet",
+      "parent": "ecosystem-1",
+      "section": "ecosystem",
+      "text": "Modules can now be deprecated through `moon deprecate`. The website displays their deprecation status and reason."
+    },
+    {
+      "id": "ecosystem-1-b3",
+      "kind": "bullet",
+      "parent": "ecosystem-1",
+      "section": "ecosystem",
+      "text": "Improved build speed in the build queue."
+    },
+    {
+      "id": "ecosystem-2",
+      "kind": "heading",
+      "section": "ecosystem",
+      "text": "SeekMoon"
+    },
+    {
+      "id": "ecosystem-2-b1",
+      "kind": "bullet",
+      "parent": "ecosystem-2",
+      "section": "ecosystem",
+      "text": "Added web search and mbtx tools. The mbtx tool lets agents run mbtx scripts in a sandbox. Improved error reporting when the edit tool fails."
+    },
+    {
+      "id": "ecosystem-2-b2",
+      "kind": "bullet",
+      "parent": "ecosystem-2",
+      "section": "ecosystem",
+      "text": "Added retries when SSE streams disconnect, reducing interruptions to agent runs caused by network instability."
+    },
+    {
+      "id": "ecosystem-2-b3",
+      "kind": "bullet",
+      "parent": "ecosystem-2",
+      "section": "ecosystem",
+      "text": "Integrated diff algorithms based on MoonBit tokens and ASTs, with support for ignoring differences in tests and comments. Added navigation between blocks and the ability to mark blocks as viewed. Added Git commit history."
+    },
+    {
+      "id": "ecosystem-2-b4",
+      "kind": "bullet",
+      "parent": "ecosystem-2",
+      "section": "ecosystem",
+      "text": "Added support for rendering `.mbti` as SVG and displaying project dependency graphs from `moon.mod`."
+    },
+    {
+      "id": "ecosystem-2-b5",
+      "kind": "bullet",
+      "parent": "ecosystem-2",
+      "section": "ecosystem",
+      "text": "Integrated rg text search and moongrep search. AI can repair moongrep query patterns."
+    },
+    {
+      "id": "ecosystem-2-b6",
+      "kind": "bullet",
+      "parent": "ecosystem-2",
+      "section": "ecosystem",
+      "text": "Added context menus and Cmd+W to close tabs. Improved highlighting of selected text, fonts, and other UI details."
+    },
+    {
+      "id": "ecosystem-2-b7",
+      "kind": "bullet",
+      "parent": "ecosystem-2",
+      "section": "ecosystem",
+      "text": "Improved Windows support."
+    },
+    {
+      "id": "ecosystem-2-b8",
+      "kind": "bullet",
+      "parent": "ecosystem-2",
+      "section": "ecosystem",
+      "text": "`cmd/openseek` now supports running on Wasm."
+    },
+    {
+      "id": "ecosystem-3",
+      "kind": "heading",
+      "section": "ecosystem",
+      "text": "Rabbita and Full-Stack Development"
+    },
+    {
+      "id": "ecosystem-3-p1",
+      "kind": "paragraph",
+      "parent": "ecosystem-3",
+      "section": "ecosystem",
+      "text": "A MoonBit full-stack template is available for web, desktop, and backend development, with debugging and packaging ready to use. No Makefile or scripts in other languages are needed: [https://github.com/moonbit-community/fullstack-moonbit](https://github.com/moonbit-community/fullstack-moonbit)."
+    },
+    {
+      "id": "ecosystem-4",
+      "kind": "heading",
+      "section": "ecosystem",
+      "text": "Proton"
+    },
+    {
+      "id": "ecosystem-4-b1",
+      "kind": "bullet",
+      "parent": "ecosystem-4",
+      "section": "ecosystem",
+      "text": "The desktop development framework proton is open source under the Apache 2.0 license: [https://github.com/moonbit-community/proton](https://github.com/moonbit-community/proton)"
+    },
+    {
+      "id": "ecosystem-4-b2",
+      "kind": "bullet",
+      "parent": "ecosystem-4",
+      "section": "ecosystem",
+      "text": "Internationalization, app icon badges, context menus, and accessibility are now supported."
+    },
+    {
+      "id": "ecosystem-5",
+      "kind": "heading",
+      "section": "ecosystem",
+      "text": "Moonback"
+    },
+    {
+      "id": "ecosystem-5-p1",
+      "kind": "paragraph",
+      "parent": "ecosystem-5",
+      "section": "ecosystem",
+      "text": "The web backend framework Moonback is now open source under the Apache 2.0 license and has moved to moonbitlang/moonback. The mooncakes.io website backend is now powered by moonback."
+    },
+    {
+      "id": "ecosystem-6",
+      "kind": "heading",
+      "section": "ecosystem",
+      "text": "cli Command-Line Tools"
+    },
+    {
+      "id": "ecosystem-6-p1",
+      "kind": "paragraph",
+      "parent": "ecosystem-6",
+      "section": "ecosystem",
+      "text": "`cli/<cmd>` has been published on mooncakes, including the commands already ported by moonbit-jq. Work continues on porting common commands and verifying them across platforms. Versions 0.1.2 to 0.1.4 added missing common options and fixed behavior that differed from the upstream tools."
+    },
+    {
+      "id": "ecosystem-7",
+      "kind": "heading",
+      "section": "ecosystem",
+      "text": "`moonbit-community/sqlite3`"
+    },
+    {
+      "id": "ecosystem-7-p1",
+      "kind": "paragraph",
+      "parent": "ecosystem-7",
+      "section": "ecosystem",
+      "text": "Added experimental `async` support for the native and wasm backends."
+    }
+  ],
+  "release": "0.10.14",
+  "release_date": "2026-09-21",
+  "schema_version": 2,
+  "source": {
+    "commit": "b6d21ad70b1f2b61de640a8978d84b3315084711",
+    "path": "updates/2026-09-21/index.md",
+    "repository": "https://github.com/moonbitlang/website",
+    "sha256": "fff3c8205c71d61982ab7cd3e9da2c33318efb2ca76830abfbc2525a533575f4",
+    "web_url": "https://www.moonbitlang.com/updates/2026/09/21"
+  }
+}

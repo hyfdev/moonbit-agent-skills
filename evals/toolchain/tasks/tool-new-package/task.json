@@ -16,7 +16,7 @@
       "args": ["test"],
       "min_tests": 1,
       "temp_files": {
-        "mathx/zz_eval_square_test.mbt": "///|\ntest \"grader square behavior\" {\n  assert_eq(square(7), 49)\n}\n"
+        "mathx/zz_eval_square_test.mbt": "///|\ntest \"grader square behavior\" {\n  assert_eq(@mathx.square(7), 49)\n}\n"
       }
     },
     {
@@ -24,7 +24,7 @@
       "args": ["test"],
       "min_tests": 1,
       "temp_files": {
-        "zz_eval_root_test.mbt": "///|\ntest \"grader preserves root package\" {\n  assert_eq(hello(), \"hello\")\n}\n"
+        "zz_eval_root_test.mbt": "///|\ntest \"grader preserves root package\" {\n  assert_eq(@withmath.hello(), \"hello\")\n}\n"
       }
     }
   ]

@@ -478,7 +478,7 @@ export function installTopLevelExtendAblation(
   );
   content = replaceExactlyOnce(
     content,
-    "- Trait implementations do not automatically create dot-call methods. Attach intended methods with `extend Type with Trait::{method}`; use `pub extend` when downstream packages need the dot call. Rename identifiers called `extend`, and use qualified `Trait::method(value)` for deprecated supertrait or ambiguous constrained dot calls.\n",
+    "- Implicit promotion of trait implementations to methods warns by default. Attach intended methods with `extend Type with Trait::{method}`; use `pub extend` when downstream packages need the dot call. Rename identifiers called `extend`, and use qualified `Trait::method(value)` for deprecated supertrait or ambiguous constrained dot calls.\n",
     "",
   );
   writeFileSync(skillPath, content);

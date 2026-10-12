@@ -19,7 +19,7 @@
       "args": ["test"],
       "min_tests": 1,
       "temp_files": {
-        "zz_eval_count_even_test.mbt": "///|\ntest \"grader count_even behavior\" {\n  assert_eq(count_even([2, 5, 6, 8]), 3)\n}\n"
+        "zz_eval_count_even_test.mbt": "///|\ntest \"grader count_even behavior\" {\n  assert_eq(@multibug.count_even([2, 5, 6, 8]), 3)\n}\n"
       }
     }
   ]

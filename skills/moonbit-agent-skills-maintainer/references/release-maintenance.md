@@ -4,7 +4,7 @@
 
 `source.json` is a mechanical transcription of a pinned upstream Markdown source. `coverage.json` records repository judgment. Keeping them separate prevents an agent from omitting an upstream item from its own checklist and then declaring that checklist complete.
 
-The importer records every numbered item, prose paragraph, bullet, and fenced code block under Language Updates, Toolchain Updates, and Standard Library Updates. It fails instead of silently skipping an unknown level-two section, a repeated section, or content before a section's first numbered item. The checker requires every generated source ID to appear exactly once across coverage decisions.
+The importer records every numbered item or level-three heading, prose paragraph, bullet, and fenced code block under Language Updates, Toolchain Updates, Standard Library Updates, and the optional Ecosystem and Development Tool Updates section. Each section uses either numbering or headings. It fails instead of silently skipping an unknown level-two section, a repeated section, mixed item styles, or content before a section's first item. The checker requires every generated source ID to appear exactly once across coverage decisions.
 
 ## Import a published release article
 
@@ -14,7 +14,7 @@ Find the release Markdown in `https://github.com/moonbitlang/website`, resolve a
 vp run snapshot-release --release <version> --date <YYYY-MM-DD> --commit <40-hex-commit> --source-path <updates/.../index.md> --web-url <https://www.moonbitlang.com/updates/...> --output verification/releases/<version>/source.json
 ```
 
-The command fetches the file from the pinned commit, hashes the complete Markdown, parses the three release sections, rejects structural drift, verifies contiguous top-level numbering, and writes stable JSON. Re-run with `--check` during review to prove the committed inventory still matches upstream. If upstream adds or renames a section, update and test the importer before making coverage judgments.
+The command fetches the file from the pinned commit, hashes the complete Markdown, parses all supported release sections, rejects structural drift, verifies contiguous top-level numbering, and writes stable JSON. Re-run with `--check` during review to prove the committed inventory still matches upstream. If upstream adds or renames a section, update and test the importer before making coverage judgments.
 
 The website publishes curated release articles less frequently than the `latest` toolchain channel. An absent article is not an absent release and must not hold the product update back. Always re-pin from the official latest toolchain manifest and latest docs first; import this supplemental inventory whenever an article exists. In coverage files, `status: "current"` identifies the newest published website article only and does not constrain `metadata.moonbit-release`. `vp run verify-latest-upstream` reads the live website update directory and fails when a newer article exists without a corresponding current inventory.
 

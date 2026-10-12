@@ -18,7 +18,7 @@
       "args": ["test", "--deny-warn"],
       "min_tests": 6,
       "temp_files": {
-        "zz_eval_unicode_test.mbt": "///|\ntest \"grader counts non-BMP characters once\" {\n  assert_true(within_character_limit(\"a🌙b\", 3))\n  assert_true(within_character_limit(\"𐍈\", 1))\n  assert_false(within_character_limit(\"a🌙b\", 2))\n}\n\n///|\ntest \"grader handles empty and zero limits\" {\n  assert_true(within_character_limit(\"\", 0))\n  assert_false(within_character_limit(\"月\", 0))\n}\n"
+        "zz_eval_unicode_test.mbt": "///|\ntest \"grader counts non-BMP characters once\" {\n  assert_true(@unicode_character_count.within_character_limit(\"a🌙b\", 3))\n  assert_true(@unicode_character_count.within_character_limit(\"𐍈\", 1))\n  assert_false(@unicode_character_count.within_character_limit(\"a🌙b\", 2))\n}\n\n///|\ntest \"grader handles empty and zero limits\" {\n  assert_true(@unicode_character_count.within_character_limit(\"\", 0))\n  assert_false(@unicode_character_count.within_character_limit(\"月\", 0))\n}\n"
       }
     }
   ]

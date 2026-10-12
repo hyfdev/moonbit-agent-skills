@@ -2,12 +2,12 @@
 
 This note records the locally verified command contracts used by the eval harness. Re-check it when either CLI version changes; do not infer behavior from the product name or authentication status.
 
-The Claude Code contract was re-verified by the 2026-08-07 MoonBit 0.10.6 content runs. Kimi 0.29.1's help surface was checked on 2026-08-07, but its provider and stream contract below was last exercised on 2026-07-18 with 0.26.0; no Kimi fallback was needed for the new runs.
+The Claude Code contract was re-verified by the 2026-10-12 MoonBit 0.10.14 content run, including successful skill activation, reference reads, workspace edits, and deterministic grading. Kimi 0.29.1's help surface was checked on 2026-08-07, but its provider and stream contract below was last exercised on 2026-07-18 with 0.26.0; no Kimi fallback was needed for the new run.
 
 | Client | Installed version | Last exercised contract | Local backend | Access mode |
 | --- | --- | --- | --- | --- |
 | Kimi Code CLI | `0.29.1` | provider/stream run: `0.26.0` on 2026-07-18 | provider `kimi`, requested alias `kimi-code/k3`, observed model `k3` | subscription |
-| Claude Code | `2.1.220` | `2.1.220` on 2026-08-07 | `https://api.deepseek.com`; `haiku` maps to `deepseek-v4-flash`, `sonnet` and `opus` map to `deepseek-v4-pro[1m]` | API |
+| Claude Code | `2.1.241` | `2.1.241` on 2026-10-12 | `https://api.deepseek.com`; `haiku` maps to `deepseek-v4-flash`, `sonnet` and `opus` map to `deepseek-v4-pro[1m]` | API |
 
 The names above describe this machine, not portable defaults. Every checked result must retain the requested model, observed model, CLI version, and provider origin when available. Subscription versus API remains an operational runner choice, not a per-result field.
 

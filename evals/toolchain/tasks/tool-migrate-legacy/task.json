@@ -18,7 +18,7 @@
       "args": ["test"],
       "min_tests": 1,
       "temp_files": {
-        "zz_eval_twice_test.mbt": "///|\ntest \"grader preserves twice behavior\" {\n  assert_eq(twice(7), 14)\n}\n"
+        "zz_eval_twice_test.mbt": "///|\ntest \"grader preserves twice behavior\" {\n  assert_eq(@legacy.twice(7), 14)\n}\n"
       }
     }
   ]

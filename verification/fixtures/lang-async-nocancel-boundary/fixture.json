@@ -1,0 +1,28 @@
+{
+  "id": "lang-async-nocancel-boundary",
+  "owner_skill": "moonbit-language",
+  "knowledge": "A nocancel function cannot call a cancellable async operation, even when it is noraise.",
+  "expect": "check-fail",
+  "targets": [
+    "wasm",
+    "js",
+    "native"
+  ],
+  "moon_args": [
+    "--deny-warn"
+  ],
+  "diagnostic_contains": [
+    "E4227",
+    "forbid cancellation"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-10-12",
+    "components": {
+      "moon": "0.1.20260920 (914d7da 2026-09-20)",
+      "moonc": "v0.10.14+7d59c7ec9 (2026-09-18)",
+      "moonrun": "moonrun 0.1.20260920 (914d7da 2026-09-20)"
+    },
+    "platform": "Linux-x86_64"
+  }
+}

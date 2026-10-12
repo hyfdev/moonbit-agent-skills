@@ -14,7 +14,7 @@
       "args": ["test"],
       "min_tests": 1,
       "temp_files": {
-        "zz_eval_clamp_test.mbt": "///|\ntest \"grader clamp boundaries\" {\n  assert_eq(clamp(-3, 0, 10), 0)\n  assert_eq(clamp(4, 0, 10), 4)\n  assert_eq(clamp(13, 0, 10), 10)\n}\n"
+        "zz_eval_clamp_test.mbt": "///|\ntest \"grader clamp boundaries\" {\n  assert_eq(@clamp.clamp(-3, 0, 10), 0)\n  assert_eq(@clamp.clamp(4, 0, 10), 4)\n  assert_eq(@clamp.clamp(13, 0, 10), 10)\n}\n"
       }
     }
   ]

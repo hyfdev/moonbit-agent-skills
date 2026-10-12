@@ -1,24 +1,24 @@
 {
   "_comment": "Pinned upstream sources this repository's content was checked against. Update alongside verification/toolchains/current.json when re-verifying. Hand-maintained; tooling/check_versions.ts checks internal consistency.",
-  "retrieved": "2026-08-07",
+  "retrieved": "2026-10-12",
   "sources": [
     {
       "id": "moonbit-docs",
       "kind": "documentation",
       "url": "https://docs.moonbitlang.com/en/latest/",
-      "commit": "c86a73f5f60a34f73c4865b837f777368ad52c7a",
-      "commit_date": "2026-08-06",
+      "commit": "8d9f3ba206eb17f80ee1836e4c1139068d1351b5",
+      "commit_date": "2026-09-18",
       "path": "next/language/index.md",
       "sha256": "b6d7df45b48176394db49e78f27c284c4e22662217d731ff1c50768d142bd8b0",
-      "version_label": "MoonBit v0.10.6 documentation",
-      "notes": "Mechanical source for verification/language-surface/source.json and verification/toolchain-surface/source.json. Known lag is not treated as executable truth: the official local-types example suppresses deprecated_syntax even though the pinned compiler warns."
+      "version_label": "MoonBit v0.10.14 documentation",
+      "notes": "Mechanical source for the language and toolchain surface inventories. Compiler probes decide executable claims; documentation topic coverage is tracked separately."
     },
     {
       "id": "moonbit-release-notes",
       "kind": "release-notes",
       "url": "https://www.moonbitlang.com/updates/",
-      "version_label": "release index retrieved 2026-08-07",
-      "notes": "Supplemental discovery index only; its newest article still covers 0.10.4 while the official latest toolchain is 0.10.6. Coverage is never inferred from this label, and product updates never wait for an article."
+      "version_label": "release index retrieved 2026-10-12",
+      "notes": "Supplemental discovery index. The newest published article covers 0.10.14; the official latest toolchain and current documentation commit remain authoritative."
     },
     {
       "id": "moonbit-0.10.4-release-source",
@@ -34,9 +34,9 @@
       "id": "moonbitlang-skills",
       "kind": "repository",
       "url": "https://github.com/moonbitlang/skills",
-      "commit": "5caf81c57cb2ae45654b8f99c5c8f68c812beb91",
-      "commit_date": "2026-07-06",
-      "notes": "Official skills bundle (9 skills incl. moonbit-agent-guide, moonbit-orientation). Audited for the incremental-value statement in README."
+      "commit": "8b9f1bad14bc62560dbe3537855379e561a4e066",
+      "commit_date": "2026-09-18",
+      "notes": "Official skills bundle contains nine skills, including a general coding guide and specialized workflows. Source for the README comparison."
     },
     {
       "id": "moonbitlang-moonbit-agent-guide",
@@ -59,6 +59,24 @@
       "url": "https://agentskills.io/specification",
       "version_label": "as retrieved 2026-07-17",
       "notes": "Frontmatter constraints: name <=64 chars lowercase/digits/hyphens matching directory name, no consecutive hyphens; description 1-1024 chars; version lives under metadata; validator: pip install skills-ref, CLI `agentskills validate`."
+    },
+    {
+      "id": "moonbit-0.10.9-release-source",
+      "kind": "release-source",
+      "url": "https://github.com/moonbitlang/website",
+      "commit": "b6d21ad70b1f2b61de640a8978d84b3315084711",
+      "path": "updates/2026-08-19/index.md",
+      "sha256": "a6f586d655a0abe937be453bee60ca991b12669331beee2e5cc95f323d7cc1f1",
+      "notes": "Mechanical source for verification/releases/0.10.9/source.json; CI regenerates this inventory before checking coverage decisions."
+    },
+    {
+      "id": "moonbit-0.10.14-release-source",
+      "kind": "release-source",
+      "url": "https://github.com/moonbitlang/website",
+      "commit": "b6d21ad70b1f2b61de640a8978d84b3315084711",
+      "path": "updates/2026-09-21/index.md",
+      "sha256": "fff3c8205c71d61982ab7cd3e9da2c33318efb2ca76830abfbc2525a533575f4",
+      "notes": "Mechanical source for verification/releases/0.10.14/source.json; CI regenerates this inventory before checking coverage decisions."
     }
   ]
 }

@@ -10,6 +10,7 @@ const SECTION_NAMES: Record<string, string> = {
   "Language Updates": "language",
   "Toolchain Updates": "toolchain",
   "Standard Library Updates": "standard-library",
+  "Ecosystem and Development Tool Updates": "ecosystem",
 };
 
 export interface SourceMetadata {
@@ -23,7 +24,7 @@ export interface SourceMetadata {
 export interface ReleaseSourceItem {
   id: string;
   section: string;
-  kind: "numbered-item" | "paragraph" | "bullet" | "code-block";
+  kind: "numbered-item" | "heading" | "paragraph" | "bullet" | "code-block";
   parent?: string;
   language?: string;
   text: string;
@@ -47,6 +48,7 @@ export interface ReleaseInventory {
 export function extractReleaseItems(markdown: string): ReleaseSourceItem[] {
   const items: ReleaseSourceItem[] = [];
   const seenSections = new Set<string>();
+  const sectionStyle = new Map<string, "numbered-item" | "heading">();
   const nextSuffix = new Map<string, { paragraph: number; bullet: number; code: number }>();
   let section = "";
   let parent = "";
@@ -139,15 +141,25 @@ export function extractReleaseItems(markdown: string): ReleaseSourceItem[] {
     }
 
     const numbered = line.match(/^(\d+)\.\s+(.+?)\s*$/);
-    if (numbered !== null) {
+    const itemHeading = line.match(/^###\s+(.+?)\s*$/);
+    if (numbered !== null || itemHeading !== null) {
       flush();
-      parent = `${section}-${Number(numbered[1])}`;
+      const kind = numbered !== null ? "numbered-item" : "heading";
+      if (sectionStyle.has(section) && sectionStyle.get(section) !== kind) {
+        throw new Error(`release source mixes headings and numbered items in ${section}`);
+      }
+      sectionStyle.set(section, kind);
+      const number =
+        numbered !== null
+          ? Number(numbered[1])
+          : items.filter((item) => item.section === section && item.kind === "heading").length + 1;
+      parent = `${section}-${number}`;
       nextSuffix.set(parent, { paragraph: 0, bullet: 0, code: 0 });
       items.push({
         id: parent,
         section,
-        kind: "numbered-item",
-        text: normalizeText(numbered[2]),
+        kind,
+        text: normalizeText(numbered?.[2] ?? itemHeading![1]),
       });
       continue;
     }
@@ -184,8 +196,15 @@ export function extractReleaseItems(markdown: string): ReleaseSourceItem[] {
   flush();
 
   for (const sectionName of Object.values(SECTION_NAMES)) {
+    if (sectionName === "ecosystem" && !seenSections.has(sectionName)) {
+      continue;
+    }
     const numbers = items
-      .filter((item) => item.section === sectionName && item.kind === "numbered-item")
+      .filter(
+        (item) =>
+          item.section === sectionName &&
+          (item.kind === "numbered-item" || item.kind === "heading"),
+      )
       .map((item) => Number(item.id.slice(item.id.lastIndexOf("-") + 1)))
       .sort((left, right) => left - right);
     if (numbers.length === 0) {

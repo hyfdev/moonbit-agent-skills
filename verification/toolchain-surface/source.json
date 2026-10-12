@@ -27,7 +27,7 @@
     {
       "id": "document-moon-module",
       "path": "next/toolchain/moon/module.md",
-      "sha256": "9365f67ad0093d5514785de47e76ea5eee68d754640de8d8aec84c9f3b1305d0",
+      "sha256": "e2a30edd5f98c96c495af1ed9e52b35de15d98f10140af3b29545c1c26cde8aa",
       "web_url": "https://docs.moonbitlang.com/en/latest/toolchain/moon/module.html"
     },
     {
@@ -39,13 +39,13 @@
     {
       "id": "document-moon-package",
       "path": "next/toolchain/moon/package.md",
-      "sha256": "ce0092c385a35529a665427fb7f738224a21f4ddfc16a11411479ddd12a78fe9",
+      "sha256": "a05f22d63b972d92a7e5412975476dc7ef9bfcaa96d3328b5fac0bd4625791aa",
       "web_url": "https://docs.moonbitlang.com/en/latest/toolchain/moon/package.html"
     },
     {
       "id": "document-moon-script-mode",
       "path": "next/toolchain/moon/script-mode.md",
-      "sha256": "3c3e718a4f1aaeb43b4f2dbd807ac3e1617969c4c5b6edb03e2359e9f3e19ceb",
+      "sha256": "4ef2bb13b2f65b3f68f7219f1d41c345e925078950fb377823aa04841cc915c9",
       "web_url": "https://docs.moonbitlang.com/en/latest/toolchain/moon/script-mode.html"
     },
     {
@@ -63,7 +63,7 @@
     {
       "id": "document-moonide-index",
       "path": "next/toolchain/moonide/index.md",
-      "sha256": "2edfa1f8ac9df1725d32aeeaf0deac106a3d9399f449c77a4870ba364912f2e0",
+      "sha256": "7966a27605cd6c7a5441ce220884e1f74457a54b03bab0ab0af2d7f8c63ada38",
       "web_url": "https://docs.moonbitlang.com/en/latest/toolchain/moonide/index.html"
     },
     {
@@ -445,7 +445,7 @@
     },
     {
       "document_id": "document-moon-module",
-      "fingerprint": "9365f67ad0093d5514785de47e76ea5eee68d754640de8d8aec84c9f3b1305d0",
+      "fingerprint": "e2a30edd5f98c96c495af1ed9e52b35de15d98f10140af3b29545c1c26cde8aa",
       "id": "document-moon-module",
       "kind": "document",
       "level": 1,
@@ -534,12 +534,21 @@
     },
     {
       "document_id": "document-moon-module",
-      "fingerprint": "1721de3adb40fea82898264a9008093f4a53297060ed9e5079737dc1f34464ae",
-      "id": "document-moon-module-include-and-exclude",
+      "fingerprint": "77e4df265ccc1c5e2d2d00077192fb389c2323b42694f8345683e6a43311c4a7",
+      "id": "document-moon-module-publishing-files-with-moonignore",
       "kind": "heading",
       "level": 2,
       "parent": "document-moon-module",
-      "text": "Include and Exclude"
+      "text": "Publishing Files with `.moonignore`"
+    },
+    {
+      "document_id": "document-moon-module",
+      "fingerprint": "f10430278d1be97e597b5b122af2d4cc1a5bea37f89049ab4134d19f6c7bcf90",
+      "id": "document-moon-module-deprecated-include-and-exclude-fields",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-moon-module-publishing-files-with-moonignore",
+      "text": "Deprecated `include` and `exclude` fields"
     },
     {
       "document_id": "document-moon-module",
@@ -570,7 +579,7 @@
     },
     {
       "document_id": "document-moon-module",
-      "fingerprint": "6118378abb72633c5947aae5f2c580b34356ba6095772ec90bbfed8415c82a05",
+      "fingerprint": "f4c7013512fd675568c3a5f3fc392806c78ac3e08ce66f33d6ff3068e23030ce",
       "id": "document-moon-module-warning-list",
       "kind": "heading",
       "level": 2,
@@ -722,7 +731,7 @@
     },
     {
       "document_id": "document-moon-package",
-      "fingerprint": "ce0092c385a35529a665427fb7f738224a21f4ddfc16a11411479ddd12a78fe9",
+      "fingerprint": "a05f22d63b972d92a7e5412975476dc7ef9bfcaa96d3328b5fac0bd4625791aa",
       "id": "document-moon-package",
       "kind": "document",
       "level": 1,
@@ -757,7 +766,7 @@
     },
     {
       "document_id": "document-moon-package",
-      "fingerprint": "7c0e7341cd22d9ebef6a3b0f8dc11d567a8b646fbaafdd19b25c07a91cfbb0c5",
+      "fingerprint": "2b4beb2b26f3e38e865abc30904035b28ad34f387aa9443839a42f2a0e42fd6a",
       "id": "document-moon-package-package-type",
       "kind": "heading",
       "level": 2,
@@ -847,7 +856,7 @@
     },
     {
       "document_id": "document-moon-package",
-      "fingerprint": "8d51f75e9e3e46323e2eb603bddaeba6679d7418b515cc16148225ef9cbb393d",
+      "fingerprint": "1464873a104322cc1a8fff03fce53148271995c037e8fef14493c0da4e2a1811",
       "id": "document-moon-package-link-options",
       "kind": "heading",
       "level": 2,
@@ -901,7 +910,7 @@
     },
     {
       "document_id": "document-moon-package",
-      "fingerprint": "73b1ba9aa8f3ec167d1b4f01ddf2188057d9fd96d137261c71b4b0753bb2eb72",
+      "fingerprint": "64f6f8ac91325247839ff0ec7de496e061320c32c84746052e0f9c49d3e310bb",
       "id": "document-moon-package-native-backend-link-options",
       "kind": "heading",
       "level": 3,
@@ -910,7 +919,7 @@
     },
     {
       "document_id": "document-moon-package",
-      "fingerprint": "f022fab9d0a522340ef3b5885e14b1bc36fb8135ca1881b370be2220fb9feb11",
+      "fingerprint": "5cabb1b40480fd36b54192e54448685bdbdec03e529125fd3f84e3048b9676ea",
       "id": "document-moon-package-default-c-compiler-and-compiler-flags-for-the-native-backend",
       "kind": "heading",
       "level": 4,
@@ -928,7 +937,7 @@
     },
     {
       "document_id": "document-moon-package",
-      "fingerprint": "9de2cb3513d99a21cb2880d3717f7ce667754451db2755141aac8e7d9f1c0963",
+      "fingerprint": "63cb15dcd652f15ea3e0ff39c255933895736377f84ff59ba3bc0f64d30c2a8f",
       "id": "document-moon-package-warnings-list",
       "kind": "heading",
       "level": 2,
@@ -982,7 +991,7 @@
     },
     {
       "document_id": "document-moon-script-mode",
-      "fingerprint": "3c3e718a4f1aaeb43b4f2dbd807ac3e1617969c4c5b6edb03e2359e9f3e19ceb",
+      "fingerprint": "4ef2bb13b2f65b3f68f7219f1d41c345e925078950fb377823aa04841cc915c9",
       "id": "document-moon-script-mode",
       "kind": "document",
       "level": 1,
@@ -990,12 +999,21 @@
     },
     {
       "document_id": "document-moon-script-mode",
-      "fingerprint": "d576efca23f28206688df9d3ac6dea5164b5fb4d1bf89721ccc65be86672452d",
+      "fingerprint": "1b94d6950fdbe9ef3f688718fa172c73b85e1e367ba51d98c0929d68810d4565",
       "id": "document-moon-script-mode-run-a-mbtx-file",
       "kind": "heading",
       "level": 2,
       "parent": "document-moon-script-mode",
       "text": "Run a `.mbtx` file"
+    },
+    {
+      "document_id": "document-moon-script-mode",
+      "fingerprint": "cce711181c890f278b27c3db7dcfe3f21d0c7f96d47c8d039da5a6821ab4a5cc",
+      "id": "document-moon-script-mode-test-a-mbtx-script",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-moon-script-mode",
+      "text": "Test a `.mbtx` script"
     },
     {
       "document_id": "document-moon-script-mode",
@@ -1132,7 +1150,7 @@
     },
     {
       "document_id": "document-moonide-index",
-      "fingerprint": "2edfa1f8ac9df1725d32aeeaf0deac106a3d9399f449c77a4870ba364912f2e0",
+      "fingerprint": "7966a27605cd6c7a5441ce220884e1f74457a54b03bab0ab0af2d7f8c63ada38",
       "id": "document-moonide-index",
       "kind": "document",
       "level": 1,
@@ -1140,7 +1158,7 @@
     },
     {
       "document_id": "document-moonide-index",
-      "fingerprint": "4ae04485fa47b462a70352582cbc8b9060c94d514a3f90dd5a9f8efb0dd12941",
+      "fingerprint": "7d50964bd97847e16b9c0d2a1e1d3a306260e232182f32c6cd4ce0da422f6616",
       "id": "document-moonide-index-overview",
       "kind": "heading",
       "level": 2,
@@ -1149,7 +1167,7 @@
     },
     {
       "document_id": "document-moonide-index",
-      "fingerprint": "5bfa73d4a9f88175e1b19af76e94233435aaab2543ab1cfd7d7c33cc6a948988",
+      "fingerprint": "c093e4de74c1ad8646779f691bbc84108c4ed92f4f7e599f9b73b87dd2102ca2",
       "id": "document-moonide-index-available-commands",
       "kind": "heading",
       "level": 3,
@@ -1158,7 +1176,7 @@
     },
     {
       "document_id": "document-moonide-index",
-      "fingerprint": "e68964e3d1f043f60d7fd21f83b819636a7e0fd568a24d74796e12e8227be6f6",
+      "fingerprint": "e93dc67568545b6e11015fcfe86a51dc29d462a9f7b2fce12c4332f290e4d324",
       "id": "document-moonide-index-symbol-syntax",
       "kind": "heading",
       "level": 2,
@@ -1167,7 +1185,7 @@
     },
     {
       "document_id": "document-moonide-index",
-      "fingerprint": "8cf38a47e7acf479178f08698ae556516d17716b922b7ca1882fa8cd1918b84d",
+      "fingerprint": "63d94059ac408e8d00caed391504b72021ae3a4dce6f4c7bdaf746f69c82e069",
       "id": "document-moonide-index-moon-ide-peek-def-view-symbol-definitions",
       "kind": "heading",
       "level": 2,
@@ -1176,7 +1194,7 @@
     },
     {
       "document_id": "document-moonide-index",
-      "fingerprint": "51f6d7375e3552ed6b082b9bc0796f1622892b6dc6b0615bfff0832aa6c6fb08",
+      "fingerprint": "f293162bf8313692f1400ab4f92f1acd41ea66580a6e5514ca593eb4acf12c42",
       "id": "document-moonide-index-usage",
       "kind": "heading",
       "level": 3,
@@ -1185,7 +1203,7 @@
     },
     {
       "document_id": "document-moonide-index",
-      "fingerprint": "0d5c32bd95df943f835eee9bedbd0c3c4b882f575fe37cb907039989c1165832",
+      "fingerprint": "3c939270b64751c909e11a82b890fbb41a11c2feaf920bb2c8ae2b448a4ad48b",
       "id": "document-moonide-index-examples",
       "kind": "heading",
       "level": 3,
@@ -1194,7 +1212,7 @@
     },
     {
       "document_id": "document-moonide-index",
-      "fingerprint": "15c8785597ded3ae580ac57f21bfab9e37b8a8dd77d29bc5a213c02b55b358a6",
+      "fingerprint": "a062d3f73b10d6460e05e7fcaa261c3cd8f88b52b420bfa41d810e4db2b6b6d6",
       "id": "document-moonide-index-moon-ide-find-references-track-all-usages",
       "kind": "heading",
       "level": 2,
@@ -1203,7 +1221,7 @@
     },
     {
       "document_id": "document-moonide-index",
-      "fingerprint": "9627a824995a3009fc5a45dec63e6b2ad46a76c3f0547b8edeeebeb202f13291",
+      "fingerprint": "9e36e2f8071950057229f8f297f76598cfb72a27cbc6a8988efb5f85d6a52944",
       "id": "document-moonide-index-usage-2",
       "kind": "heading",
       "level": 3,
@@ -1212,12 +1230,21 @@
     },
     {
       "document_id": "document-moonide-index",
-      "fingerprint": "fe33d8a84a86ac92d2209e0e876c52b2ab86b43e31f7cc66ef6441df63e54461",
+      "fingerprint": "d694d63a4e4b879bee9d3b7957831a8ad921412e4d6837980435bdaab6a26274",
       "id": "document-moonide-index-example",
       "kind": "heading",
       "level": 3,
       "parent": "document-moonide-index-moon-ide-find-references-track-all-usages",
       "text": "Example"
+    },
+    {
+      "document_id": "document-moonide-index",
+      "fingerprint": "1999064249bbee0aa3f2cdca342c586dea4a514ecf70fee7f09342c5c04a6227",
+      "id": "document-moonide-index-moon-ide-codelens-get-reference-code-lenses",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-moonide-index",
+      "text": "`moon ide codelens` - Get Reference Code Lenses"
     },
     {
       "document_id": "document-moonide-index",
@@ -1248,7 +1275,7 @@
     },
     {
       "document_id": "document-moonide-index",
-      "fingerprint": "f777ee6a76c59e9eb217d9eead2d96d60d0dbfdb1241c445aee5e8c17a9f3440",
+      "fingerprint": "a33a016026a6cd0502f78c9ddf3a9f7ec51ca13cfaffe24a42b0a8750e8dc815",
       "id": "document-moonide-index-moon-ide-doc-discover-and-explore-apis",
       "kind": "heading",
       "level": 2,
@@ -1266,7 +1293,7 @@
     },
     {
       "document_id": "document-moonide-index",
-      "fingerprint": "d1095d4684258b0bafcdf85a5f3d83edc61a66263da161bbceeb9e073eaf57dc",
+      "fingerprint": "2d8fafd408346c31d4cd146f0b6555edd2ed2d51850668585ff8783e850edcf6",
       "id": "document-moonide-index-query-syntax",
       "kind": "heading",
       "level": 3,
@@ -1534,7 +1561,7 @@
   ],
   "schema_version": 1,
   "source": {
-    "commit": "c86a73f5f60a34f73c4865b837f777368ad52c7a",
+    "commit": "8d9f3ba206eb17f80ee1836e4c1139068d1351b5",
     "repository": "https://github.com/moonbitlang/moonbit-docs",
     "root_path": "next/toolchain",
     "root_web_url": "https://docs.moonbitlang.com/en/latest/toolchain/"

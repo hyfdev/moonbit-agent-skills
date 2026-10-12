@@ -3,24 +3,24 @@ name: moonbit-toolchain
 description: Verified operation of the MoonBit toolchain, pinned to exact moon and moonrun versions - creating modules and packages, moon.mod and moon.pkg configuration (plus legacy moon.mod.json / moon.pkg.json), dependencies and mooncakes packages, moon check, build, run, test, fmt, info, doc, coverage, bench, test filtering and snapshot updates, targets (wasm, wasm-gc, js, native), conditional builds, linking, native stubs, workspaces, publishing, and moon ide API queries. Use when running or explaining moon or moonrun commands, editing moon.mod, moon.pkg, or moon.work files, scaffolding MoonBit modules or packages, adding dependencies, configuring targets or CI, or debugging MoonBit build, test, or dependency-resolution failures. Project operation only - for MoonBit syntax and language semantics use moonbit-language; load both for tasks that change code and configuration together.
 license: MIT
 user-invocable: false
-compatibility: Verified only against moon 0.1.20260803 and moonrun 0.1.20260803 (MoonBit v0.10.6, 2026-08-03), Linux x86_64. Network needed for dependency and registry operations; Node.js 24+ runs the bundled environment-report helper.
+compatibility: Verified only against moon 0.1.20260920 and moonrun 0.1.20260920 (MoonBit v0.10.14, 2026-09-20), Linux x86_64. Network needed for dependency and registry operations; Node.js 24+ runs the bundled environment-report helper.
 metadata:
-  skill-version: "0.4.0"
-  updated-date: "2026-08-07"
-  moon-version: "0.1.20260803"
-  moonrun-version: "0.1.20260803"
-  moonbit-release: "0.10.6"
-  verified-date: "2026-08-07"
+  skill-version: "0.5.0"
+  updated-date: "2026-10-12"
+  moon-version: "0.1.20260920"
+  moonrun-version: "0.1.20260920"
+  moonbit-release: "0.10.14"
+  verified-date: "2026-10-12"
   verified-platform: "Linux-x86_64"
   verified-targets: "wasm-gc,wasm,js,native"
-  source-docs: "https://docs.moonbitlang.com/en/latest/toolchain/ (MoonBit v0.10.6 documentation)"
+  source-docs: "https://docs.moonbitlang.com/en/latest/toolchain/ (MoonBit v0.10.14 documentation)"
 ---
 
 # MoonBit toolchain
 
 ## Verification contract
 
-Every command and configuration shape in this skill was executed for real against **moon 0.1.20260803 / moonrun 0.1.20260803** (MoonBit release 0.10.6, build 2026-08-03) on **2026-08-07**, Linux x86_64, exercising targets wasm-gc, wasm, js, native. MoonBit ships install channels (latest, nightly, pre-release), not pinned historical versions, so re-check the installed version before relying on a cached skill copy.
+Executable command and configuration examples in this skill are checked against **moon 0.1.20260920 / moonrun 0.1.20260920** (MoonBit release 0.10.14, build 2026-09-20) on **2026-10-12**, Linux x86_64, exercising targets wasm-gc, wasm, js, native. Unexecuted account operations, platform behavior, and other boundaries are labeled **Documented, not executed** with a source. MoonBit ships install channels (latest, nightly, pre-release), not pinned historical versions, so re-check the installed version before relying on a cached skill copy.
 
 **Before relying on this skill, run `moon version --all`** (or `node scripts/env_report.ts`, which also checks native-backend prerequisites). If versions differ from the pin:
 
@@ -46,13 +46,13 @@ Load only what the task needs:
 - Module/package layout and Internal Packages; `moon.mod` / `moon.pkg`; deprecated `moon.mod.json` / `moon.pkg.json`; `source`; formatter; `pkgtype`; `#export_name`; virtual packages with `options("virtual")`, `implement`, and `overrides` → references/project-layout-and-config.md
 - Everyday `moon new`, global `-C`, `check`, `build`, `run`, `test`, `fmt`, `info`, `doc`, and local/global-cache `clean`; removed `--manifest-path`; executed-program exit code → references/commands.md
 - Test path filtering, snapshots, doc tests, coverage, `moon bench PATH`, and raw benchmark statistics → references/testing-workflows.md
-- Dependencies, mooncakes registry, `moonx`, `moon runwasm`, publishing, and packaging → references/dependencies-and-registry.md
+- Dependencies; mooncakes registry; `moon search`, `moon view`, `moon tree --package`, and `moon deprecate`; `moonx`, deprecated `moon runwasm` and `--target native`; publishing, packaging, `.moonignore`, and registry name collisions → references/dependencies-and-registry.md
 - Target selection; `preferred-target`; supported targets; native platform matrix; conditional builds; link options; native stubs → references/targets-and-conditional-builds.md
-- Semantic code queries including peek-def, outline, doc search, hover, references, and rename → references/moon-ide.md
-- `moon.work` workspaces, `.mbtx` script mode, module-root test and pre-build execution, and pre-build paths → references/workspaces-and-scripts.md
+- `moon ide` semantic code queries including peek-def, outline, doc search, hover, references with `--include-definition`, rename, `codelens`, `workspace-symbols`, `--loc`, and `.mbtx` navigation → references/moon-ide.md
+- `moon.work` workspaces; `.mbtx` script mode, import-all, script tests, experimental policy, command prefixes and inherited policy; module-root test and pre-build execution; native-only experimental config scripts, `.mbtx` hooks, build environment variables, and pre-build paths → references/workspaces-and-scripts.md
 - Build, test, and dependency diagnostics; `moon explain`; warning lists and `--deny-warn` → references/diagnostics-and-recovery.md
 
-Every `moon ...` command line shown in these references is executed against the pinned toolchain by the source repository's CI — the examples are guaranteed to have run, not just to look plausible.
+Executable command examples are checked against the pinned toolchain by the source repository's CI. Account operations, unsupported platforms, and other unexecuted boundaries are explicitly identified in the references.
 - Toolchain contradicts this skill; minimal reproduction and issue draft → references/reporting-errors.md
 
 ## Boundary

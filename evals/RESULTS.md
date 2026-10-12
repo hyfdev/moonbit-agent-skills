@@ -1,5 +1,58 @@
 # Content eval results
 
+## 2026-10-12 MoonBit 0.10.14 language regression run
+
+Distinct tasks: 2
+
+| What the agent had to do | Observed model | No skills | With frozen 0.10.14 skills |
+| --- | --- | ---: | ---: |
+| Restore strict record-window bounds while preserving clipped previews | `deepseek-v4-pro` | 0% | 100% |
+| Explain cleanup order on success, an inner error, and a later outer error | `deepseek-v4-pro` | 100% | 100% |
+
+Final task success was 100% with the frozen skills and 50% with No skills; the difference was completing the window repair within the declared limit, not finding a correct slicing implementation. Both agents found correct source changes for that task. This two-task run does not establish a general improvement.
+
+### Protocol and task outcomes
+
+The [frozen experiment](experiments/moonbit-0.10.14-language-deepseek-pro.json) used one paired repetition per task, four initial cells, a 30-turn limit per cell, and a 15-minute outer wall bound. The cleanup task ran No skills then current skills; the window task ran current skills then No skills. Conditions, tasks, runner, parser, and grader files were hashed before the first call. The skill snapshot was commit `a89a47d4666f36772d99f4772fb21e81c4fdf46b`, skills tree `019fabb44e9059ec2338266de50bd33b0f2de2e7`.
+
+| Task / declared group | Claim | No skills | Current skills | Paired outcome |
+| --- | --- | ---: | ---: | --- |
+| `lang-window-contract` / `slice_bounds` | `language.slicing.clamped-versus-exact-bounds` | 0/1 | 1/1 | Current only |
+| `lang-error-cleanup-order` / `error_cleanup` | `language.errdefer.failure-only-block-scope-lifo` | 1/1 | 1/1 | Both pass |
+
+There were two complete, eligible pairs: one current-only task, no No-skills-only task, one tie, and no both-fail task. No pair was missing, transport-invalid, timed out, or excluded for an execution-signature mismatch. Both current-skill cells passed on their first attempt, so the stopping rule permitted no repeat merely because No skills failed; no second repetition or Kimi fallback ran. No task was removed from the primary score after observing its result.
+
+| Task | Repetition | Condition | Final success | Analysis eligibility | Observed turns | Duration |
+| --- | ---: | --- | --- | --- | ---: | ---: |
+| `lang-error-cleanup-order` | 1 | `none` | PASS | Completed | 5 | 99.835 s |
+| `lang-error-cleanup-order` | 1 | `ours` | PASS | Completed | 21 | 154.786 s |
+| `lang-window-contract` | 1 | `ours` | PASS | Completed | 16 | 133.045 s |
+| `lang-window-contract` | 1 | `none` | FAIL | Predeclared turn limit | 31 | 202.595 s |
+
+### Failure audit and deterministic evidence
+
+The No-skills window agent changed `record_window` to `values.exact_view(start~, end~).to_owned()`, preserving the preview function. It then spent the remaining turns on a scratch executable inside the project and exited with `error_max_turns` before removing it or returning a final answer. The leftover `tmpbin/main.mbt` used checked `inspect` calls in a non-raising main and deprecated array `Show` formatting, so the complete workspace also failed both warning-denied graders. A normal declared-turn-limit exit is retained as an eligible task failure under the repository protocol, even though this client reported 31 observed turns for its configured limit of 30.
+
+For diagnosis only, its preserved `lib.mbt` was copied into a fresh original starter without the agent-created scratch package: `moon check --deny-warn` passed and all eight behavior tests passed. That replay does not change the failed original outcome. The current-skill agent instead added an explicit bounds guard, tested outside the project, cleaned up its scratch copy, and completed normally. The observed difference therefore concerns completion and workspace integrity; it does not show that No skills lacked the current slicing API.
+
+Both cleanup answers matched the exact logs across all three paths and preserved the supplied workspace. Before model execution, the two new grader contracts passed 8/8 cases: one canonical solution and three plausible wrong solutions per task. All three wrong window implementations compiled warning-free but failed their intended runtime checks; the wrong cleanup answers failed exact structural comparison while the source-level runtime proof remained green. The full existing suite also passed 106/106 cases across 29 contracts after test qualification and explicit-extension migrations. No grader was changed after these model calls.
+
+### Model identity, retrieval, and usage
+
+All four assistant executions emitted `deepseek-v4-pro` through Claude Code `2.1.241`, requested as `sonnet`, with init model `deepseek-v4-pro[1m]` and recorded provider origin `https://api.deepseek.com`. The emitted-model set matched in both pairs. Optional event-level model-alias, provider, and thinking-effort sets were empty in every cell, so none was one-sided missing. The environment recorded the same `max` effort setting throughout. Auxiliary `deepseek-v4-flash[1m]` usage in client bookkeeping is not an assistant execution model. The toolchain was moonc `v0.10.14+7d59c7ec9`, moon `0.1.20260920`, and moonrun `0.1.20260920` on Linux x86_64.
+
+Current skills activated successfully in 2/2 cells and the requested language reference was read in 2/2. The cleanup reference was read before the first domain action; the window reference was read after initial shell inspection, giving 1/2 for reference-before-action. No skills recorded 0/2 on each measure. These are retrieval observations separate from final task success; the run does not isolate the contribution of a particular reference change. Global MoonBit skill directories were temporarily removed from automatic discovery for catalog isolation and restored afterward.
+
+| Condition | Input tokens | Cache-read input | Cache-creation input | Output tokens | Summed model duration |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| No skills | 24,477 | 457,088 | 0 | 16,177 | 302.430 s |
+| Current skills | 42,613 | 536,064 | 0 | 15,953 | 287.831 s |
+| Total | 67,090 | 993,152 | 0 | 32,130 | 590.261 s |
+
+Efficiency comparisons are restricted to the one pair where both conditions passed: cleanup took 99.835 versus 154.786 seconds, 5 versus 21 turns, and 24,936 versus 373,103 total tokens for No skills versus current skills. The successful skill run did additional runtime verification. These single-pair figures do not support a general efficiency claim.
+
+The exploratory task-average success difference was +0.50 for current skills; the task-clustered 95% interval was [0.00, 1.00] and the exact task sign-test p-value was 1.00. With one discordant task, neither a general success advantage nor a semantic-knowledge advantage is established. The local frozen record is `evals/language/runs/moonbit-0.10.14-language-deepseek-pro/` (gitignored). Later lexical-class/routing/naming prose, central diagnostic-version reference, and maintainer wording corrections are outside this model snapshot; the evaluated slicing and cleanup guidance was unchanged.
+
 ## 2026-08-07 MoonBit 0.10.6 regression run
 
 Distinct tasks: 2

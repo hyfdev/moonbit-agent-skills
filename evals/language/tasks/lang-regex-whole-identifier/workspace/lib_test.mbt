@@ -1,5 +1,5 @@
 ///|
 test "accepts identifiers" {
-  assert_true(is_identifier("name"))
-  assert_true(is_identifier("_x2"))
+  assert_true(@regex_whole_identifier.is_identifier("name"))
+  assert_true(@regex_whole_identifier.is_identifier("_x2"))
 }

@@ -1,0 +1,30 @@
+{
+  "schema_version": 2,
+  "id": "moonbit-0.10.14-language-deepseek-pro",
+  "runner": "content",
+  "stage": "exploratory",
+  "area": "language",
+  "client": "claude-code",
+  "model": "sonnet",
+  "conditions": [
+    "none",
+    "ours"
+  ],
+  "task_ids": [
+    "lang-window-contract",
+    "lang-error-cleanup-order"
+  ],
+  "task_groups": {
+    "slice_bounds": [
+      "lang-window-contract"
+    ],
+    "error_cleanup": [
+      "lang-error-cleanup-order"
+    ]
+  },
+  "repetitions": 1,
+  "max_turns": 30,
+  "primary_metric": "task success on silent slicing migration and error-only cleanup scope",
+  "minimum_valuable_difference": 0.5,
+  "stopping_rule": "Run one paired AB/BA pass per task (four initial cells, estimated under 10 minutes from the 2026-08-07 language/toolchain runs). Repeat only a task whose current-skill cell fails or whose pair is unstable, at most once. If current skills fail again, run one frozen Kimi/K3 fallback pair for that task and report it separately. Maximum twelve cells including conditional retries and fallbacks; do not repeat successful stable pairs."
+}

@@ -23,6 +23,7 @@ type JsonRecord = Record<string, unknown>;
 export interface Expectation {
   exit?: number;
   output_contains?: string[];
+  output_not_contains?: string[];
   paths_exist?: string[];
   paths_absent?: string[];
 }
@@ -181,7 +182,11 @@ function optionalPositiveNumber(
 
 function parseExpectation(value: unknown, context: string): Expectation {
   const record = asRecord(value, context);
-  assertOnlyKeys(record, ["exit", "output_contains", "paths_exist", "paths_absent"], context);
+  assertOnlyKeys(
+    record,
+    ["exit", "output_contains", "output_not_contains", "paths_exist", "paths_absent"],
+    context,
+  );
 
   const exit = record.exit;
   if (exit !== undefined && (typeof exit !== "number" || !Number.isInteger(exit) || exit < 0)) {
@@ -194,6 +199,14 @@ function parseExpectation(value: unknown, context: string): Expectation {
       ? {}
       : {
           output_contains: stringArray(record.output_contains, `${context}.output_contains`),
+        }),
+    ...(record.output_not_contains === undefined
+      ? {}
+      : {
+          output_not_contains: stringArray(
+            record.output_not_contains,
+            `${context}.output_not_contains`,
+          ),
         }),
     ...(record.paths_exist === undefined
       ? {}
@@ -1121,6 +1134,13 @@ async function expectationProblems(
     if (!result.output.includes(needle)) {
       problems.push(
         `${prefix}: output missing ${JSON.stringify(needle)}:\n${outputPreview(result.output)}`,
+      );
+    }
+  }
+  for (const needle of expectation.output_not_contains ?? []) {
+    if (result.output.includes(needle)) {
+      problems.push(
+        `${prefix}: output unexpectedly contains ${JSON.stringify(needle)}:\n${outputPreview(result.output)}`,
       );
     }
   }

@@ -16,7 +16,7 @@
       "args": ["test"],
       "min_tests": 1,
       "temp_files": {
-        "zz_eval_sum_positive_test.mbt": "///|\ntest \"grader preserves sum behavior\" {\n  assert_eq(sum_positive([-4, 0, 5, 2]), 7)\n}\n"
+        "zz_eval_sum_positive_test.mbt": "///|\ntest \"grader preserves sum behavior\" {\n  assert_eq(@rustish.sum_positive([-4, 0, 5, 2]), 7)\n}\n"
       }
     }
   ]

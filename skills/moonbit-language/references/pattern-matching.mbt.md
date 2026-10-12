@@ -7,7 +7,7 @@ Every `mbt check` block in this file is compiled and run by the repository's ver
 Search these exact official documentation topic names to route a question into this reference. A listed name is a discoverability route; the verification labels in the surrounding reference still determine whether its claim was executed or is documentation-only.
 
 - Pattern matching forms: Pattern Matching; Simple Patterns; Array Pattern; Bitstring Pattern; Range Pattern; Map Pattern; Json Pattern; Default bindings in or-patterns; Guard condition
-- is, regex, lexscan, and lexmatch: is Expression; Regex Literal Expression; Regex Match Expression; Lexscan; Lexmatch (deprecated)
+- is, regex, lexscan, and lexmatch: is Expression; Regex Literal Expression; Regex Literals; Regex Match Expression; Lexmatch; Lexscan; String scanners; Streaming scanners; Legacy lexical pattern syntax
 
 ## match basics
 
@@ -166,7 +166,7 @@ The `v128le` example is verified on Linux across wasm-gc, wasm, JavaScript, and 
 
 ## Regex literals and match expressions
 
-`re"..."` creates a regex value. `input =~ (...)` searches and pattern-matches a regex composition; `as` binds the match while `before=` and `after=` bind the surrounding text. Use `lexscan` below for multi-case scanner logic.
+`re"..."` creates a regex value. `input =~ (...)` searches and pattern-matches a regex composition; `as` binds the match while `before=` and `after=` bind the surrounding text. Use `lexmatch` below when several regex cases return different values.
 
 ```mbt check
 const PATTERN_IDENT_START = re"[A-Za-z_]"
@@ -187,39 +187,59 @@ test "regex match expression" {
 }
 ```
 
-## `lexscan` for regular-expression scanning
+## `lexmatch` for in-memory regular-expression cases
 
-The experimental `lexmatch` form was deprecated in 0.10.4 and replaced by `lexscan`, which also supports a `with longest` strategy. Its cases may bind the text before and after a regex match. **Documented, not executed for legacy edge cases:** the [0.10.4 release notes](https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release) say `lexscan` does not support Bytes/BytesView inputs or guards, so those old `lexmatch` cases need a manual rewrite.
+Use `lexmatch` for a `String` or `StringView`. Each case uses a regex constant expression; `as` binds matched text and `before=` / `after=` bind the surrounding text. The default `first` strategy chooses the first source-order case that can match, even when its match starts later in the input than a subsequent case's match. `with longest` chooses the longest matching prefix; every regex must start with `^`, and source order breaks equal-length ties.
 
 ```mbt check
 fn pattern_find_eol(s : StringView) -> Int? {
-  lexscan s {
+  lexmatch s {
     (re"\r?\n", before=line, after=_) => Some(line.length())
     _ => None
   }
 }
 
 fn pattern_longest_prefix(s : StringView) -> Int? {
-  lexscan s with longest {
+  lexmatch s with longest {
     (re"^a", after=_) => Some(1)
     (re"^ab", after=_) => Some(2)
     _ => None
   }
 }
 
-test "lexscan finds the prefix before an end-of-line" {
-  let source : StringView = "abc\ndef"[0:7]
-  assert_eq(pattern_find_eol(source), Some(3))
-  let no_eol : StringView = "abc"[0:3]
-  assert_eq(pattern_find_eol(no_eol), None)
-  let overlapping : StringView = "ab"[0:2]
-  assert_eq(pattern_longest_prefix(overlapping), Some(2))
+test "lexmatch finds a line and chooses the longest prefix" {
+  assert_eq(pattern_find_eol("abc\ndef"[:]), Some(3))
+  assert_eq(pattern_find_eol("abc"[:]), None)
+  assert_eq(pattern_longest_prefix("ab"[:]), Some(2))
 }
 ```
 
-```mbt nocheck
-lexmatch source { ... } // DEPRECATED in 0.10.4: migrate to lexscan
+```mbt check
+test "lexmatch case priority and longest" {
+  let selected = lexmatch "ab" {
+    (re"b", before=_, after=_) => 1
+    (re"a", before=_, after=_) => 2
+    _ => 0
+  }
+  assert_eq(selected, 1)
+  let longest = lexmatch "ab" with longest {
+    (re"^a", after=_) => 1
+    (re"^ab", after=_) => 2
+    _ => 0
+  }
+  assert_eq(longest, 2)
+}
 ```
+
+A catch-all is required only when the regex cases leave inputs uncovered. The compiler warns with `unused_lexcase` (E0090) for unreachable cases. Guards, Bytes, and BytesView are unsupported. The fixture `lang-lexmatch-cases` verifies exhaustive cases, rejects an unreachable fallback with warnings denied, and verifies the replacement.
+
+The old string-piece patterns have been removed; `lang-removed-lexical-pattern` proves the replacement. **Documented, not executed for the removed `lexmatch?` boolean form:** the [pinned legacy-syntax reference](https://github.com/moonbitlang/moonbit-docs/blob/8d9f3ba206eb17f80ee1836e4c1139068d1351b5/next/language/fundamentals.md#legacy-lexical-pattern-syntax) records that removal; this fixture covers only string-piece cases. Use regex-case `lexmatch` for case selection and `=~` for a boolean search. The fixture `lang-dep-lexmatch` checks the current String/StringView forms and rejects String inputs to `lexscan`.
+
+## `lexscan` for scanner cursors
+
+`lexscan` accepts `@lexbuf.StringScanner`, `@lexbuf.Lexbuf`, or `@lexbuf.AsyncLexbuf`, from a direct `moonbitlang/core/lexbuf` import. It consumes a token and advances the scanner's cursor. Every regex starts with `^`; `before=` and `after=` are unsupported. `first` and `longest` use the case-selection rules above. An unmatched `_` case does not consume input, so a caller must stop or otherwise advance before retrying.
+
+`StringScanner::{ data: text[:], cursor: 0 }` stores a cursor in UTF-16 code units relative to its data view. `Lexbuf::from_fn` obtains successive `String?` chunks; patterns can span chunk boundaries. The `lang-lexscan-scanners` fixture runs both scanners and proves cursor progress, cross-chunk matches, and EOF behavior. **Documented, not executed for asynchronous chunk sources:** `AsyncLexbuf` uses the same cursor behavior with an async source, so scanning it requires async code; see the [pinned streaming-scanner reference](https://github.com/moonbitlang/moonbit-docs/blob/8d9f3ba206eb17f80ee1836e4c1139068d1351b5/next/language/fundamentals.md#streaming-scanners).
 
 ## `is` expressions
 

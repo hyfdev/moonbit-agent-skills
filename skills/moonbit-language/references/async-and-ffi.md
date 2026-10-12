@@ -1,8 +1,6 @@
 # Async and FFI declarations
 
-> Coverage note: snippets in this file were hand-verified against the pinned toolchain on the targets stated per snippet, but are NOT re-executed by CI (async needs external deps; FFI is target-specific). On any toolchain version mismatch, re-verify before relying on them.
-
-This file is plain Markdown, not a checked `.mbt.md`: its code blocks are illustrative and are **not** run by the verification suite. Every snippet below was verified by hand against the pinned toolchain; each block notes the target it was checked on. Build, link, and dependency wiring (`moon.pkg` imports, `is-main`, `supported_targets`, stub sources, `--target`) is the **moonbit-toolchain** skill — this file covers only what the language accepts.
+This file is plain Markdown; its code fences are illustrative. The `lang-async-cancellation` fixture executes cancellation, cleanup, async pipeline bodies, and `nocancel` examples with `moonbitlang/async` 0.22.1 on Wasm, JavaScript, and native. Target-specific FFI fixtures cover declarations and runtime calls; other external-runtime claims carry an explicit documentation label and source. Build, link, and dependency wiring belong to moonbit-toolchain.
 
 ## Official topic map
 
@@ -20,6 +18,7 @@ The async forms are `async fn f(...)`, `async test "..."`, and the async entry p
 ```moonbit
 // declaration forms; verified on native + js
 async fn aid(x : Int) -> Int {
+  @async.sleep(0)
   x + 1
 }
 
@@ -37,7 +36,7 @@ Declaring async functions is free, but **running** async code — `async test`, 
 
 ```moonbit
 // verified on native (pass) and js (pass); wasm-gc still skips this test because
-// async 0.20.2's experimental WebAssembly support is Wasm1 (`--target wasm`), not wasm-gc
+// moonbitlang/async 0.22.1 supports Wasm1 (`--target wasm`), not wasm-gc
 async test "async sleep and call" {
   @async.sleep(5)
   assert_eq(aid(1), 2)
@@ -46,11 +45,9 @@ async test "async sleep and call" {
 
 Gotcha: a `moon.pkg` `import { ... } for "test"` block applies only to blackbox `*_test.mbt` files. An `async test` in a regular `.mbt` file needs a plain (unscoped) import block instead.
 
-### `moonbitlang/async` 0.20.2 Wasm1 boundary
+### Wasm runtime boundary
 
-**Documented, not executed against the external package:** the [0.10.4 release notes](https://www.moonbitlang.com/updates/2026/07/13/moonbit-0-10-4-release) add experimental Wasm1 support to `moonbitlang/async` 0.20.2 with the same API signatures and behavior as its native backend. These `.wasm` files currently require the latest `moonrun`; other WebAssembly runtimes are not supported. The artifact is otherwise cross-platform wherever that `moonrun` is available, without rebuilding for each operating system or hardware architecture.
-
-**Documented, not executed against the external package:** this is experimental compatibility, not a backward-compatibility promise for binaries built with an older async package. The Wasm1 backend also does not yet support `@websocket`, `@fs.Watcher`, or `@fs.realpath`; the release describes support for those APIs as future work. Check the installed package documentation before relying on a newer runtime or wider API coverage.
+**Documented, not executed as a complete IO compatibility matrix:** `moonbitlang/async` 0.22.1 supports Wasm1 (`--target wasm`), JavaScript, and native. Wasm binaries require the compatible `moonrun` runtime. The [0.10.9 article](https://github.com/moonbitlang/website/blob/b6d21ad70b1f2b61de640a8978d84b3315084711/updates/2026-08-19/index.md) adds Wasm support for `@websocket` and `@fs.realpath`; `@fs.Watcher` remains outside that backend's support. The `lang-async-cancellation` fixture executes the portable runtime subset on all three supported targets, not every IO API.
 
 ### Structured concurrency
 
@@ -77,11 +74,17 @@ The idiomatic spawn closure is a plain arrow `() => { ... }` (async-ness is infe
 
 There is **no** language-level async extern: both `extern "js" async fn ...` and `async extern "js" fn ...` are parse errors. A JS `Promise` cannot be bound directly as an async MoonBit function; host async interop goes through the `moonbitlang/async` runtime, not the extern declaration.
 
-### Cancellation and runtime support
+### Cancellation, `nocancel`, and cleanup
 
-**Documented, not executed against the external package:** the official [async reference](https://docs.moonbitlang.com/en/latest/language/async-experimental.html#cancellation-makes-asynchronous-program-modular) says `with_task_group` returns only after every child has terminated. A child failure cancels the other children and waits for their cleanup. Cancellation is raised as an error at the operation where a task was blocked, so ordinary propagation, `defer`, and error handlers perform cleanup; async operations are cancellable by default.
+Async functions are cancellable by default, independently of ordinary errors. `noraise` excludes ordinary errors; `noraise + nocancel` excludes both error raising and cancellation. A `nocancel` function can call synchronous or other `nocancel` code, but cannot call a cancellable operation such as `@async.sleep` merely because that operation is `noraise`. The `lang-async-nocancel-boundary` fixture proves that rejection.
 
-The native runtime has the broadest IO support, including HTTP(S), files, sockets, and process spawning. JavaScript supports IO-independent APIs such as task groups and timeouts, but not the general IO layer because its host may be a browser; `moonbitlang/async/js_async` is the supported bridge for awaiting a host Promise or exporting a MoonBit async function as a Promise. Wasm1 support and its missing APIs are experimental as described above. Check the installed async package because this runtime API is not stable.
+Cancellation bypasses ordinary `catch` handlers. It propagates through the task and triggers `defer` and `errdefer`. Use those cleanup forms to release resources on cancellation. A cleanup that itself calls cancellable async operations should run them within `@async.protect_from_cancel`. Async expressions are also accepted in pipeline-lambda bodies such as `value |> x => { @async.sleep(1); x * 2 }`.
+
+`@async.handle_cancellation(callback)` returns `None` when its callback is cancelled. It does not clear the task's cancelled state: its next cancellable async operation is cancelled immediately. `@async.protect_from_cancel(callback)` lets the callback complete and returns its result while preserving that cancelled state. The old `resume_on_cancel=false` option is removed in async 0.22.1, as verified by `lang-removed-async-resume-on-cancel`.
+
+`@async.is_cancellation_error` is deprecated and always returns false; `@async.with_cancellation_handler` is also deprecated. Use `handle_cancellation` to distinguish cancellation when needed, or remove obsolete branches that only exclude cancellation from ordinary error handling. The `lang-dep-async-cancellation-error` and `lang-dep-async-cancellation-handler` fixtures reject these old API calls with warnings denied; `lang-async-cancellation` exercises the replacement. `TaskGroup::add_defer` requires a `nocancel` callback, which may use `protect_from_cancel` for async work.
+
+**Documented, not executed as a full runtime API matrix:** the [pinned async reference](https://github.com/moonbitlang/moonbit-docs/blob/8d9f3ba206eb17f80ee1836e4c1139068d1351b5/next/language/async-experimental.md) describes task groups waiting for all children and cancelling siblings after a child failure. Native provides the general IO layer; JavaScript offers portable concurrency APIs and `moonbitlang/async/js_async` for host Promise interop. Wasm support is described above.
 
 ## FFI declarations
 
@@ -113,6 +116,8 @@ extern "js" fn js_floor(x : Double) -> Double = "(x) => Math.floor(x)"
 
 The string body is arbitrary JS evaluated as the function, so host globals like `Math` are available directly.
 
+`Array[T]` in JavaScript FFI signatures is deprecated because its future representation may change. Use `FixedArray[T]`; the `lang-dep-js-array-ffi` fixture enables warnings, rejects the Array form, and verifies the replacement. **Documented, not executed as a future ABI guarantee:** numeric `FixedArray` types may migrate to JavaScript TypedArray representations; see the [pinned FFI Types table](https://github.com/moonbitlang/moonbit-docs/blob/8d9f3ba206eb17f80ee1836e4c1139068d1351b5/next/language/ffi.md#types).
+
 ### `extern "wasm"` and host imports (wasm / wasm-gc)
 
 Wasm FFI has two forms. A host import is a two-string body `pub fn host_pi() -> Double = "env" "get_pi"` (module name, then import name). Inline WebAssembly text uses `extern "wasm"` with a multiline `#|` body, which actually executes under the runtime.
@@ -126,7 +131,7 @@ pub extern "wasm" fn wasm_add(a : Int, b : Int) -> Int =
   #| (i32.add (local.get 0) (local.get 1)))
 ```
 
-`extern "wasm"` and the two-string import are unsupported on js and native, so a package using them needs `supported_targets = "wasm+wasm-gc"` in its `moon.pkg` (the toolchain skill covers that; the expression uses `+`, e.g. `all-js+wasm-gc`, not the word `or`).
+`extern "wasm"` and the two-string import are unsupported on js and native. Use moonbit-toolchain for package target restrictions.
 
 ### `extern "C"` with `#borrow` / `#owned` (native target)
 
@@ -175,6 +180,6 @@ pub fn use_external() -> Int {
 
 ### Exported functions and lifetime boundaries
 
-**Documented, not executed:** the official [FFI reference](https://docs.moonbitlang.com/en/latest/language/ffi.html#export-functions) defines `#export_name("symbol")` on a public function in a `pkgtype(kind: "foreign_library")` package. The symbol must be unique within the package and currently must be a valid C identifier on every backend, even though WebAssembly itself permits broader UTF-8 names. The attribute does not apply to generic functions, optional-argument functions, methods, or body-less declarations. Prefer it over backend link `exports` for new cross-backend exports; use link configuration when the export set differs by backend or the source cannot be annotated. Exports are package-scoped, so a dependency's declaration does not re-export through a downstream artifact; add a wrapper in the exporting package. Native `foreign_library` artifacts remain unsupported. Package type and backend link exports are project configuration owned by moonbit-toolchain.
+**Documented, not executed:** the official [FFI reference](https://docs.moonbitlang.com/en/latest/language/ffi.html#export-functions) defines `#export_name("symbol")` on a public function in a `pkgtype(kind: "foreign_library")` package. The symbol must be unique within the package and currently must be a valid C identifier on every backend, even though WebAssembly itself permits broader UTF-8 names. The attribute does not apply to generic functions, optional-argument functions, methods, or body-less declarations. Prefer it over backend link `exports` for new cross-backend exports; use link configuration when the export set differs by backend or the source cannot be annotated. Exports are package-scoped, so a dependency's declaration does not re-export through a downstream artifact; add a wrapper in the exporting package. Native `foreign_library` artifacts, including shared `.so` and `.dll` libraries, remain unsupported. Package type and backend link exports are project configuration owned by moonbit-toolchain.
 
 **Documented, not executed:** the official [lifetime-management reference](https://docs.moonbitlang.com/en/latest/language/ffi.html#lifetime-management) says Wasm and C backends use reference counting at the foreign boundary, while wasm-gc and JavaScript reuse their host GC. `#borrow(param)` means the callee does not consume that parameter's reference; `#owned(param)` transfers responsibility to the foreign side. External-resource finalization and raw `incref` / `decref` calls are backend ABI concerns: verify them against the generated target and current `moonbit.h`, not from a language-only snippet.

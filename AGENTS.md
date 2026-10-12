@@ -36,6 +36,7 @@ vp run verify-toolchain-surface-source
 vp run check-toolchain-surface
 vp run verify-release-sources
 vp run check-release-coverage
+moon update                               # registry index for dependency fixtures
 vp run run-checked-docs                    # needs moon
 vp run run-fixtures --verbose              # needs moon
 vp run verify-commands                     # needs moon

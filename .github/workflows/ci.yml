@@ -65,6 +65,8 @@ jobs:
           echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
       - name: Compare installed toolchain against the committed snapshot
         run: vp run compare-toolchain
+      - name: Refresh the registry index for dependency fixtures
+        run: moon update
       - name: Checked reference documents (all targets)
         run: vp run run-checked-docs
       - name: Fixtures behave as declared

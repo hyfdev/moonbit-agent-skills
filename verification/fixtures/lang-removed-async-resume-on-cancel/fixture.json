@@ -12,7 +12,8 @@
     "--deny-warn"
   ],
   "diagnostic_contains": [
-    "resume_on_cancel"
+    "E4085",
+    "no parameter with label resume_on_cancel"
   ],
   "source": "observed",
   "verified": {

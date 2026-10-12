@@ -18,3 +18,45 @@ test "QuickCheck check raises when the property fails" {
     _ => fail("check must report the false property")
   }
 }
+
+test "QuickCheck filters before evaluation and bounds discarded inputs" {
+  let mut evaluated = 0
+  let report = @quickcheck.report(
+    (_value : Int) => {
+      evaluated += 1
+      true
+    },
+    filter=_ => false,
+    count=2U,
+    discard_ratio=3U,
+    seed=1UL,
+  )
+  assert_eq(evaluated, 0)
+  debug_inspect(report, content="GaveUp(tests=0, discarded=6)")
+}
+
+test "QuickCheck reports labels, conditional classes, and collected values" {
+  let report = @quickcheck.report(
+    (_value : Unit) => true,
+    count=2U,
+    observe=_ => [
+      @quickcheck.label("valid"),
+      @quickcheck.classify(true, "present"),
+      @quickcheck.classify(false, "absent"),
+      @quickcheck.collect(7),
+    ],
+    seed=1UL,
+  )
+  debug_inspect(
+    report,
+    content=(
+      #|Passed(
+      #|  tests=2,
+      #|  observations={
+      #|    labels: { <List: ["7", "valid"]>: 2 },
+      #|    classes: { "present": 2, "absent": 0 },
+      #|  },
+      #|)
+    ),
+  )
+}

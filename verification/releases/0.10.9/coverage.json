@@ -625,19 +625,141 @@
     },
     {
       "source_ids": [
-        "standard-library-1-b3",
-        "standard-library-1-b4",
-        "standard-library-1-b5",
+        "standard-library-1-b3"
+      ],
+      "summary": "QuickCheck filters generated values and bounds discarded inputs.",
+      "change": "behavior-change",
+      "agent_behavior": "QuickCheck filters generated values and bounds discarded inputs.",
+      "claims": [
+        {
+          "text": "filter rejects generated values before evaluating the property.",
+          "evidence_roles": [
+            "behavior"
+          ]
+        },
+        {
+          "text": "discard_ratio caps rejected inputs per requested test and produces a GaveUp report when exhausted.",
+          "evidence_roles": [
+            "behavior"
+          ]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "discoverability": {
+        "section": "Feature index",
+        "reference": "references/tests-and-checked-docs.mbt.md",
+        "terms": [
+          "QuickCheck"
+        ]
+      },
+      "evidence": [
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-quickcheck-entrypoints/fixture.json",
+          "marker": "lang-quickcheck-entrypoints",
+          "role": "behavior"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "standard-library-1-b4"
+      ],
+      "summary": "QuickCheck Generator combinators compose custom generated values.",
+      "change": "behavior-change",
+      "agent_behavior": "QuickCheck Generator combinators compose custom generated values.",
+      "claims": [
+        {
+          "text": "Generator values can be constructed with pure, transformed with map, and evaluated with sample.",
+          "evidence_roles": [
+            "behavior"
+          ]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "discoverability": {
+        "section": "Feature index",
+        "reference": "references/tests-and-checked-docs.mbt.md",
+        "terms": [
+          "QuickCheck"
+        ]
+      },
+      "evidence": [
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-quickcheck-entrypoints/fixture.json",
+          "marker": "lang-quickcheck-entrypoints",
+          "role": "behavior"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "standard-library-1-b5"
+      ],
+      "summary": "The optional QuickCheck shrink package supplies built-in shrinking algorithms.",
+      "change": "behavior-change",
+      "disposition": "out-of-scope",
+      "reason": "The language reference covers the derived Shrink trait separately; the optional core/quickcheck/shrink package algorithm catalogue is outside its scope."
+    },
+    {
+      "source_ids": [
         "standard-library-1-b6",
         "standard-library-1-b7",
         "standard-library-1-b8",
-        "standard-library-1-b9",
+        "standard-library-1-b9"
+      ],
+      "summary": "QuickCheck observes successful cases with label, classify, and collect.",
+      "change": "behavior-change",
+      "agent_behavior": "QuickCheck observes successful cases with label, classify, and collect.",
+      "claims": [
+        {
+          "text": "observe returns an array of observations aggregated in the structured report.",
+          "evidence_roles": [
+            "behavior"
+          ]
+        },
+        {
+          "text": "label attaches a string label, and classify counts a class when its condition holds.",
+          "evidence_roles": [
+            "behavior"
+          ]
+        },
+        {
+          "text": "collect uses the debug representation of its value as a label.",
+          "evidence_roles": [
+            "behavior"
+          ]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "discoverability": {
+        "section": "Feature index",
+        "reference": "references/tests-and-checked-docs.mbt.md",
+        "terms": [
+          "QuickCheck"
+        ]
+      },
+      "evidence": [
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-quickcheck-entrypoints/fixture.json",
+          "marker": "lang-quickcheck-entrypoints",
+          "role": "behavior"
+        }
+      ]
+    },
+    {
+      "source_ids": [
         "standard-library-1-b10"
       ],
-      "summary": "QuickCheck provides generation, filtering, shrinking, and observation APIs.",
+      "summary": "The QuickCheck documentation link provides further API details.",
       "change": "behavior-change",
-      "disposition": "out-of-scope",
-      "reason": "The skill covers property-test entry points and language derives; it does not catalogue optional package combinators and statistics APIs. Use the installed QuickCheck API documentation."
+      "disposition": "not-actionable",
+      "reason": "This link contains no additional behavior beyond the separately assessed QuickCheck API items."
     },
     {
       "source_ids": [

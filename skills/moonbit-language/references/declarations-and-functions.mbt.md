@@ -49,7 +49,7 @@ pub fn decl_documented_increment(n : Int) -> Int {
 
 ## Names and keywords
 
-Value and function identifiers begin with lowercase `a-z`; types, enum constructors, and constants begin with uppercase `A-Z`. Both forms may continue with letters, digits, underscores, and non-ASCII Unicode characters. Use `snake_case` for values/functions and `PascalCase` or `SCREAMING_SNAKE_CASE` for types/constants.
+Use `snake_case` for values/functions and `PascalCase` or `SCREAMING_SNAKE_CASE` for types/constants. The exact accepted initial and continuing characters, including non-ASCII identifiers, are documented in references/lexical-conventions.md.
 
 Keywords are syntax and cannot be identifiers at this pin: `as`, `else`, `extern`, `fn`, `if`, `let`, `const`, `match`, `using`, `mut`, `type`, `struct`, `enum`, `extenum`, `trait`, `derive`, `while`, `break`, `continue`, `import`, `return`, `throw`, `raise`, `try`, `catch`, `pub`, `priv`, `proof_assert`, `proof_let`, `readonly`, `true`, `false`, `_`, `test`, `loop`, `for`, `in`, `impl`, `with`, `guard`, `async`, `is`, `suberror`, `and`, `letrec`, `enumview`, `noraise`, `nocancel`, `defer`, `errdefer`, `lexmatch`, `lexscan`, `where`, `declare`, and `nobreak`.
 

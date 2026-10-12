@@ -319,7 +319,7 @@
         "document-moon-module-warning-list"
       ],
       "reviewed": {
-        "document-moon-module-warning-list": "6118378abb72633c5947aae5f2c580b34356ba6095772ec90bbfed8415c82a05"
+        "document-moon-module-warning-list": "f4c7013512fd675568c3a5f3fc392806c78ac3e08ce66f33d6ff3068e23030ce"
       },
       "official_topics": [
         "Warning List"
@@ -406,11 +406,10 @@
         "document-moon-module-license",
         "document-moon-module-keywords",
         "document-moon-module-description",
-        "document-moon-module-include-and-exclude",
         "document-moon-module-source-directory"
       ],
       "reviewed": {
-        "document-moon-module": "9365f67ad0093d5514785de47e76ea5eee68d754640de8d8aec84c9f3b1305d0",
+        "document-moon-module": "e2a30edd5f98c96c495af1ed9e52b35de15d98f10140af3b29545c1c26cde8aa",
         "document-moon-module-name": "a3620c3f41406387f6f26ecd81da7fd26e117a09787791f7bb396b57e435357c",
         "document-moon-module-version": "ac06b09f785e8019411e149757c6ebc574d76beb7262de162c906fdb9df423b1",
         "document-moon-module-dependency-management": "7597c719f42b81b3812ae540edfcd6fc0ae24326ed4b481c1da2cf7ff4757ad4",
@@ -420,7 +419,6 @@
         "document-moon-module-license": "efa8b0d863395109187e184b41efd0ac860eb22ca21fa8b018ac04a2fdb1731a",
         "document-moon-module-keywords": "75ce594d4e7d9be87a6f4c359348f38f5c7516c87cdc5e340892f8c5f329a713",
         "document-moon-module-description": "57c4358fbacdd085f5960a3843f778b7f0c6c1ff51bb9f20800e44311c719976",
-        "document-moon-module-include-and-exclude": "1721de3adb40fea82898264a9008093f4a53297060ed9e5079737dc1f34464ae",
         "document-moon-module-source-directory": "4767b26ba945a8932fc47fc05b66d84d1f94d770047bd69f4b86898106fd9bcd"
       },
       "official_topics": [
@@ -434,7 +432,6 @@
         "License",
         "Keywords",
         "Description",
-        "Include and Exclude",
         "Source directory"
       ],
       "summary": "Module configuration",
@@ -461,7 +458,6 @@
           "License",
           "Keywords",
           "Description",
-          "Include and Exclude",
           "Source directory"
         ]
       }
@@ -476,7 +472,9 @@
         "document-moon-package-manage-tour-remove-dependencies",
         "document-moon-package-manage-tour-publish-your-module",
         "document-moon-package-manage-tour-semantic-versioning-convention",
-        "document-moon-package-manage-tour-readme-metadata"
+        "document-moon-package-manage-tour-readme-metadata",
+        "document-moon-module-publishing-files-with-moonignore",
+        "document-moon-module-deprecated-include-and-exclude-fields"
       ],
       "reviewed": {
         "document-moon-package-manage-tour": "594af371e2877626d66f44210071ce10cf7df867a27898487ae20bcb7140a21b",
@@ -487,7 +485,9 @@
         "document-moon-package-manage-tour-remove-dependencies": "da266b7fc9a1178d900226135d70df7c9cddabd56f23f9e0c2ab62cc58fbb5f9",
         "document-moon-package-manage-tour-publish-your-module": "fe29a38d721ab236065a861a9f47083fe1a0e9a3e8b1f7f731033ca416af1217",
         "document-moon-package-manage-tour-semantic-versioning-convention": "92f8fe49061dbe91659005819ea04e52930ac92cd0fea8e0f0d9ca8862a02b5b",
-        "document-moon-package-manage-tour-readme-metadata": "c6676093a8f91c4ad294b9bf8674fe59647ab83011573b3d49ccf26c8babc662"
+        "document-moon-package-manage-tour-readme-metadata": "c6676093a8f91c4ad294b9bf8674fe59647ab83011573b3d49ccf26c8babc662",
+        "document-moon-module-publishing-files-with-moonignore": "77e4df265ccc1c5e2d2d00077192fb389c2323b42694f8345683e6a43311c4a7",
+        "document-moon-module-deprecated-include-and-exclude-fields": "f10430278d1be97e597b5b122af2d4cc1a5bea37f89049ab4134d19f6c7bcf90"
       },
       "official_topics": [
         "Use and publish packages",
@@ -498,7 +498,9 @@
         "Remove dependencies",
         "Publish your module",
         "Semantic versioning convention",
-        "Readme & metadata"
+        "Readme & metadata",
+        "Publishing Files with `.moonignore`",
+        "Deprecated `include` and `exclude` fields"
       ],
       "summary": "Dependency and publishing workflow",
       "disposition": "routed",
@@ -522,7 +524,9 @@
           "Remove dependencies",
           "Publish your module",
           "Semantic versioning convention",
-          "Readme & metadata"
+          "Readme & metadata",
+          "Publishing Files with `.moonignore`",
+          "Deprecated `include` and `exclude` fields"
         ]
       }
     },
@@ -572,14 +576,14 @@
         "document-moon-package-conditional-compilation": "e61336cead924cf9b07479de4fb988b4fcb29032531bc6e24389c7402c6ee7fe",
         "document-moon-package-supported-targets": "babb3234e28dea945f85cb2357325d051145b25a69ed15359e7451c405c2a953",
         "document-moon-package-native-stub-files": "af72318bc608828465eb6c7912becf1ea6181ea1c5c9fd2fb8694eea2fa85e3c",
-        "document-moon-package-link-options": "8d51f75e9e3e46323e2eb603bddaeba6679d7418b515cc16148225ef9cbb393d",
+        "document-moon-package-link-options": "1464873a104322cc1a8fff03fce53148271995c037e8fef14493c0da4e2a1811",
         "document-moon-package-wasm-backend-link-options": "4f2d848a41229af628eed19965287ac641eca6965241ffb4fb8e8420ee2c6155",
         "document-moon-package-common-options": "b4809c6df6c68676a3cbfa8e63131f6536e6bdf433534ea6df04bd1fc7bb4616",
         "document-moon-package-wasm-linear-backend-link-options": "eeb8fbe7c2923252249cc7571143c1081d10c553997825ce28eb6601aa35d875",
         "document-moon-package-wasm-gc-backend-link-options": "022cdd3ee08e87a5ec0947204ecb08f72bd40bb7d9bd48ae0e7a65a258d0cea4",
         "document-moon-package-js-backend-link-options": "a0f27167711fb48388bd5b563e12365e10b164b372481feabd5de1bfc4bd735b",
-        "document-moon-package-native-backend-link-options": "73b1ba9aa8f3ec167d1b4f01ddf2188057d9fd96d137261c71b4b0753bb2eb72",
-        "document-moon-package-default-c-compiler-and-compiler-flags-for-the-native-backend": "f022fab9d0a522340ef3b5885e14b1bc36fb8135ca1881b370be2220fb9feb11"
+        "document-moon-package-native-backend-link-options": "64f6f8ac91325247839ff0ec7de496e061320c32c84746052e0f9c49d3e310bb",
+        "document-moon-package-default-c-compiler-and-compiler-flags-for-the-native-backend": "5cabb1b40480fd36b54192e54448685bdbdec03e529125fd3f84e3048b9676ea"
       },
       "official_topics": [
         "Conditional Compilation",
@@ -628,7 +632,7 @@
         "document-moon-package-alert-warning"
       ],
       "reviewed": {
-        "document-moon-package-warnings-list": "9de2cb3513d99a21cb2880d3717f7ce667754451db2755141aac8e7d9f1c0963",
+        "document-moon-package-warnings-list": "63cb15dcd652f15ea3e0ff39c255933895736377f84ff59ba3bc0f64d30c2a8f",
         "document-moon-package-alert-warning": "2cf830597de6b2fc21378996458552afe1ecd1a4f8d27bd44994fd74b17da25a"
       },
       "official_topics": [
@@ -700,11 +704,11 @@
         "document-moon-package-overriding-implementations"
       ],
       "reviewed": {
-        "document-moon-package": "ce0092c385a35529a665427fb7f738224a21f4ddfc16a11411479ddd12a78fe9",
+        "document-moon-package": "a05f22d63b972d92a7e5412975476dc7ef9bfcaa96d3328b5fac0bd4625791aa",
         "document-moon-package-new-format-moon-pkg": "4f5b9491c2800cdd757d0a85deb2993fc5793069a148a3db2502bc101fc9ad1c",
         "document-moon-package-name": "aab02865e49e82fe77d8a6c234b45466d4417a4f6d22653fb7ebad8eb4a7bd0d",
         "document-moon-package-formatter": "f796f4377107e4939b1cd5e4e2e22cf3b7a78cce9fc7a9c62ef9c5e0d47b7918",
-        "document-moon-package-package-type": "7c0e7341cd22d9ebef6a3b0f8dc11d567a8b646fbaafdd19b25c07a91cfbb0c5",
+        "document-moon-package-package-type": "2b4beb2b26f3e38e865abc30904035b28ad34f387aa9443839a42f2a0e42fd6a",
         "document-moon-package-is-main-deprecated": "714e18729426c27ab4245a4b7472a3de937d27737128761020886371a487854c",
         "document-moon-package-importing-dependencies": "dadc36fcd9e315408299722443ca87072460d8eb9d213a09b293a14a4b7a1158",
         "document-moon-package-import": "533d55ab843f3059ce65e0a3e2a15bef40e5bf7ef2bf7491568b205fe1b88e86",
@@ -766,17 +770,20 @@
       "source_ids": [
         "document-moon-script-mode",
         "document-moon-script-mode-run-a-mbtx-file",
-        "document-moon-script-mode-run-a-mbtx-script-from-stdin"
+        "document-moon-script-mode-run-a-mbtx-script-from-stdin",
+        "document-moon-script-mode-test-a-mbtx-script"
       ],
       "reviewed": {
-        "document-moon-script-mode": "3c3e718a4f1aaeb43b4f2dbd807ac3e1617969c4c5b6edb03e2359e9f3e19ceb",
-        "document-moon-script-mode-run-a-mbtx-file": "d576efca23f28206688df9d3ac6dea5164b5fb4d1bf89721ccc65be86672452d",
-        "document-moon-script-mode-run-a-mbtx-script-from-stdin": "a87f8e8e61ee88b79788fc9900d27161f35d5e94e0605089e076e28226d8e058"
+        "document-moon-script-mode": "4ef2bb13b2f65b3f68f7219f1d41c345e925078950fb377823aa04841cc915c9",
+        "document-moon-script-mode-run-a-mbtx-file": "1b94d6950fdbe9ef3f688718fa172c73b85e1e367ba51d98c0929d68810d4565",
+        "document-moon-script-mode-run-a-mbtx-script-from-stdin": "a87f8e8e61ee88b79788fc9900d27161f35d5e94e0605089e076e28226d8e058",
+        "document-moon-script-mode-test-a-mbtx-script": "cce711181c890f278b27c3db7dcfe3f21d0c7f96d47c8d039da5a6821ab4a5cc"
       },
       "official_topics": [
         "Running `.mbtx` Scripts",
         "Run a `.mbtx` file",
-        "Run a `.mbtx` script from stdin"
+        "Run a `.mbtx` script from stdin",
+        "Test a `.mbtx` script"
       ],
       "summary": "MoonBit script mode",
       "disposition": "routed",
@@ -794,7 +801,8 @@
         "terms": [
           "Running `.mbtx` Scripts",
           "Run a `.mbtx` file",
-          "Run a `.mbtx` script from stdin"
+          "Run a `.mbtx` script from stdin",
+          "Test a `.mbtx` script"
         ]
       }
     },
@@ -920,26 +928,28 @@
         "document-moonide-index-moon-ide-doc-discover-and-explore-apis",
         "document-moonide-index-usage-4",
         "document-moonide-index-query-syntax",
-        "document-moonide-index-examples-3"
+        "document-moonide-index-examples-3",
+        "document-moonide-index-moon-ide-codelens-get-reference-code-lenses"
       ],
       "reviewed": {
-        "document-moonide-index": "2edfa1f8ac9df1725d32aeeaf0deac106a3d9399f449c77a4870ba364912f2e0",
-        "document-moonide-index-overview": "4ae04485fa47b462a70352582cbc8b9060c94d514a3f90dd5a9f8efb0dd12941",
-        "document-moonide-index-available-commands": "5bfa73d4a9f88175e1b19af76e94233435aaab2543ab1cfd7d7c33cc6a948988",
-        "document-moonide-index-symbol-syntax": "e68964e3d1f043f60d7fd21f83b819636a7e0fd568a24d74796e12e8227be6f6",
-        "document-moonide-index-moon-ide-peek-def-view-symbol-definitions": "8cf38a47e7acf479178f08698ae556516d17716b922b7ca1882fa8cd1918b84d",
-        "document-moonide-index-usage": "51f6d7375e3552ed6b082b9bc0796f1622892b6dc6b0615bfff0832aa6c6fb08",
-        "document-moonide-index-examples": "0d5c32bd95df943f835eee9bedbd0c3c4b882f575fe37cb907039989c1165832",
-        "document-moonide-index-moon-ide-find-references-track-all-usages": "15c8785597ded3ae580ac57f21bfab9e37b8a8dd77d29bc5a213c02b55b358a6",
-        "document-moonide-index-usage-2": "9627a824995a3009fc5a45dec63e6b2ad46a76c3f0547b8edeeebeb202f13291",
-        "document-moonide-index-example": "fe33d8a84a86ac92d2209e0e876c52b2ab86b43e31f7cc66ef6441df63e54461",
+        "document-moonide-index": "7966a27605cd6c7a5441ce220884e1f74457a54b03bab0ab0af2d7f8c63ada38",
+        "document-moonide-index-overview": "7d50964bd97847e16b9c0d2a1e1d3a306260e232182f32c6cd4ce0da422f6616",
+        "document-moonide-index-available-commands": "c093e4de74c1ad8646779f691bbc84108c4ed92f4f7e599f9b73b87dd2102ca2",
+        "document-moonide-index-symbol-syntax": "e93dc67568545b6e11015fcfe86a51dc29d462a9f7b2fce12c4332f290e4d324",
+        "document-moonide-index-moon-ide-peek-def-view-symbol-definitions": "63d94059ac408e8d00caed391504b72021ae3a4dce6f4c7bdaf746f69c82e069",
+        "document-moonide-index-usage": "f293162bf8313692f1400ab4f92f1acd41ea66580a6e5514ca593eb4acf12c42",
+        "document-moonide-index-examples": "3c939270b64751c909e11a82b890fbb41a11c2feaf920bb2c8ae2b448a4ad48b",
+        "document-moonide-index-moon-ide-find-references-track-all-usages": "a062d3f73b10d6460e05e7fcaa261c3cd8f88b52b420bfa41d810e4db2b6b6d6",
+        "document-moonide-index-usage-2": "9e36e2f8071950057229f8f297f76598cfb72a27cbc6a8988efb5f85d6a52944",
+        "document-moonide-index-example": "d694d63a4e4b879bee9d3b7957831a8ad921412e4d6837980435bdaab6a26274",
         "document-moonide-index-moon-ide-outline-get-structural-overview": "81cd2a4504ddf9ba6f1604dfd38c5ecee3dc3a47b2d6636ca4996f2cc67f6526",
         "document-moonide-index-usage-3": "2733cc24e552ea806280a0e2a973e955751180dc9e870daf84f989aa0118fa01",
         "document-moonide-index-examples-2": "1efaec0479b444b3ddba408581954c64023f6818a4dc6c23e59569853dd2971d",
-        "document-moonide-index-moon-ide-doc-discover-and-explore-apis": "f777ee6a76c59e9eb217d9eead2d96d60d0dbfdb1241c445aee5e8c17a9f3440",
+        "document-moonide-index-moon-ide-doc-discover-and-explore-apis": "a33a016026a6cd0502f78c9ddf3a9f7ec51ca13cfaffe24a42b0a8750e8dc815",
         "document-moonide-index-usage-4": "ebb12b06cedf14cfb9cc2351e10afd8b4e4297e4ba49e6aac84da5c74286e962",
-        "document-moonide-index-query-syntax": "d1095d4684258b0bafcdf85a5f3d83edc61a66263da161bbceeb9e073eaf57dc",
-        "document-moonide-index-examples-3": "ed066136f9166108084fc8ece6716551b3fee08c9e88a6682e60984fcaf14bef"
+        "document-moonide-index-query-syntax": "2d8fafd408346c31d4cd146f0b6555edd2ed2d51850668585ff8783e850edcf6",
+        "document-moonide-index-examples-3": "ed066136f9166108084fc8ece6716551b3fee08c9e88a6682e60984fcaf14bef",
+        "document-moonide-index-moon-ide-codelens-get-reference-code-lenses": "1999064249bbee0aa3f2cdca342c586dea4a514ecf70fee7f09342c5c04a6227"
       },
       "official_topics": [
         "MoonBit Agent IDE",
@@ -958,7 +968,8 @@
         "`moon ide doc` - Discover and Explore APIs",
         "Usage",
         "Query Syntax",
-        "Examples"
+        "Examples",
+        "`moon ide codelens` - Get Reference Code Lenses"
       ],
       "summary": "MoonBit Agent IDE semantic queries",
       "disposition": "routed",
@@ -990,7 +1001,8 @@
           "`moon ide doc` - Discover and Explore APIs",
           "Usage",
           "Query Syntax",
-          "Examples"
+          "Examples",
+          "`moon ide codelens` - Get Reference Code Lenses"
         ]
       }
     },

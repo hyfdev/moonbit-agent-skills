@@ -191,28 +191,31 @@ export function validateInventory(inventory: ReleaseInventory, label: string): s
     const id = stringValue(item.id);
     const section = stringValue(item.section);
     const kind = stringValue(item.kind);
-    if (!/^(language|toolchain|standard-library)-\d+(?:-[pbc]\d+)?$/.test(id)) {
+    if (!/^(language|toolchain|standard-library|ecosystem)-\d+(?:-[pbc]\d+)?$/.test(id)) {
       fail(`invalid source item id ${repr(id)}`);
     }
     if (ids.has(id)) {
       fail(`duplicate source item id ${repr(id)}`);
     }
     ids.add(id);
-    if (!new Set(["language", "toolchain", "standard-library"]).has(section)) {
+    if (!new Set(["language", "toolchain", "standard-library", "ecosystem"]).has(section)) {
       fail(`${id || "item"}: invalid section ${repr(section)}`);
     }
     if (
       kind !== "numbered-item" &&
+      kind !== "heading" &&
       kind !== "paragraph" &&
       kind !== "bullet" &&
       kind !== "code-block"
     ) {
-      fail(`${id || "item"}: kind must be numbered-item, paragraph, bullet, or code-block`);
+      fail(
+        `${id || "item"}: kind must be numbered-item, heading, paragraph, bullet, or code-block`,
+      );
     }
     if (!nonEmptyString(item.text)) {
       fail(`${id || "item"}: text must be a non-empty string`);
     }
-    if (kind === "numbered-item") {
+    if (kind === "numbered-item" || kind === "heading") {
       if (item.parent !== undefined) {
         fail(`${id}: numbered items must not have parent`);
       }
@@ -230,7 +233,12 @@ export function validateInventory(inventory: ReleaseInventory, label: string): s
       }
     }
   }
-  for (const section of ["language", "toolchain", "standard-library"]) {
+  for (const section of new Set([
+    "language",
+    "toolchain",
+    "standard-library",
+    ...topLevelNumbers.keys(),
+  ])) {
     const numbers = (topLevelNumbers.get(section) ?? []).sort((left, right) => left - right);
     if (numbers.length === 0) {
       fail(`section ${section} has no numbered items`);

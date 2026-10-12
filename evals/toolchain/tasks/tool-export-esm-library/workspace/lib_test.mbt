@@ -1,4 +1,4 @@
 ///|
 test "MoonBit callers can add" {
-  assert_eq(add(20, 22), 42)
+  assert_eq(@esm_library.add(20, 22), 42)
 }

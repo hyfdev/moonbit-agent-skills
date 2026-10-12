@@ -1,0 +1,27 @@
+{
+  "id": "lang-removed-async-resume-on-cancel",
+  "owner_skill": "moonbit-language",
+  "knowledge": "async 0.22.1 removes the resume_on_cancel option; protect_from_cancel returns the protected result.",
+  "expect": "check-fail",
+  "targets": [
+    "wasm",
+    "js",
+    "native"
+  ],
+  "moon_args": [
+    "--deny-warn"
+  ],
+  "diagnostic_contains": [
+    "resume_on_cancel"
+  ],
+  "source": "observed",
+  "verified": {
+    "date": "2026-10-12",
+    "components": {
+      "moon": "0.1.20260920 (914d7da 2026-09-20)",
+      "moonc": "v0.10.14+7d59c7ec9 (2026-09-18)",
+      "moonrun": "moonrun 0.1.20260920 (914d7da 2026-09-20)"
+    },
+    "platform": "Linux-x86_64"
+  }
+}

@@ -1,0 +1,962 @@
+{
+  "schema_version": 2,
+  "release": "0.10.9",
+  "status": "archived",
+  "source_inventory": "source.json",
+  "decisions": [
+    {
+      "source_ids": [
+        "language-1",
+        "language-1-c1"
+      ],
+      "summary": "Parenthesize the branch carrying with defaults in an or-pattern.",
+      "change": "behavior-change",
+      "agent_behavior": "Parenthesize the branch carrying with defaults in an or-pattern.",
+      "claims": [
+        {
+          "text": "Parenthesize the branch carrying with defaults in an or-pattern.",
+          "evidence_roles": [
+            "behavior"
+          ]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "discoverability": {
+        "section": "Feature index",
+        "reference": "references/pattern-matching.mbt.md",
+        "terms": [
+          "with"
+        ]
+      },
+      "evidence": [
+        {
+          "kind": "checked-doc",
+          "path": "skills/moonbit-language/references/pattern-matching.mbt.md",
+          "marker": "or-pattern defaults with multiple binders",
+          "role": "behavior"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "language-2",
+        "language-2-c1"
+      ],
+      "summary": "Use v128le for byte-aligned 128-bit little-endian bitstring extraction.",
+      "change": "new-feature",
+      "agent_behavior": "Use v128le for byte-aligned 128-bit little-endian bitstring extraction.",
+      "claims": [
+        {
+          "text": "Use v128le for byte-aligned 128-bit little-endian bitstring extraction.",
+          "evidence_roles": [
+            "behavior"
+          ]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "discoverability": {
+        "section": "Feature index",
+        "reference": "references/pattern-matching.mbt.md",
+        "terms": [
+          "v128le"
+        ]
+      },
+      "evidence": [
+        {
+          "kind": "checked-doc",
+          "path": "skills/moonbit-language/references/pattern-matching.mbt.md",
+          "marker": "v128le(vector)",
+          "role": "behavior"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "language-3",
+        "language-3-b2",
+        "language-3-b3",
+        "language-3-p1",
+        "language-3-b4",
+        "language-3-b5"
+      ],
+      "summary": "Use lexmatch for String/StringView and lexscan for scanner objects; coverage determines whether a fallback is needed.",
+      "change": "behavior-change",
+      "agent_behavior": "Use lexmatch for String/StringView and lexscan for scanner objects; coverage determines whether a fallback is needed.",
+      "claims": [
+        {
+          "text": "Use lexmatch for String/StringView and lexscan for scanner objects; coverage determines whether a fallback is needed.",
+          "evidence_roles": [
+            "string-cases",
+            "scanner-cursors"
+          ]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "discoverability": {
+        "section": "Feature index",
+        "reference": "references/pattern-matching.mbt.md",
+        "terms": [
+          "lexmatch",
+          "lexscan"
+        ]
+      },
+      "evidence": [
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-lexmatch-cases/fixture.json",
+          "marker": "lang-lexmatch-cases",
+          "role": "string-cases"
+        },
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-lexscan-scanners/fixture.json",
+          "marker": "lang-lexscan-scanners",
+          "role": "scanner-cursors"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "language-3-b1",
+        "language-3-c1"
+      ],
+      "summary": "AsyncLexbuf uses an async chunk source; asynchronous scanning and infinite-stream memory use are not executed by the synchronous scanner fixtures.",
+      "change": "new-feature",
+      "agent_behavior": "AsyncLexbuf uses an async chunk source; asynchronous scanning and infinite-stream memory use are not executed by the synchronous scanner fixtures.",
+      "claims": [
+        {
+          "text": "AsyncLexbuf uses an async chunk source; asynchronous scanning and infinite-stream memory use are not executed by the synchronous scanner fixtures.",
+          "evidence_roles": [
+            "documented"
+          ]
+        }
+      ],
+      "disposition": "documented",
+      "owner_skill": "moonbit-language",
+      "discoverability": {
+        "section": "Feature index",
+        "reference": "references/pattern-matching.mbt.md",
+        "terms": [
+          "AsyncLexbuf"
+        ]
+      },
+      "evidence": [
+        {
+          "kind": "documented",
+          "path": "skills/moonbit-language/references/pattern-matching.mbt.md",
+          "marker": "Documented, not executed for asynchronous chunk sources",
+          "source_url": "https://github.com/moonbitlang/moonbit-docs/blob/8d9f3ba206eb17f80ee1836e4c1139068d1351b5/next/language/fundamentals.md#streaming-scanners",
+          "role": "documented"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "language-4",
+        "language-4-c1",
+        "language-4-p1",
+        "language-4-c2",
+        "language-4-p2",
+        "language-4-p3",
+        "language-4-c3",
+        "language-4-p4",
+        "language-4-c4"
+      ],
+      "summary": "Use errdefer for error-only cleanup within its enclosing block; successful scope exit does not keep the registration alive.",
+      "change": "new-feature",
+      "agent_behavior": "Use errdefer for error-only cleanup within its enclosing block; successful scope exit does not keep the registration alive.",
+      "claims": [
+        {
+          "text": "Use errdefer for error-only cleanup within its enclosing block; successful scope exit does not keep the registration alive.",
+          "evidence_roles": [
+            "scope",
+            "cancellation"
+          ]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "discoverability": {
+        "section": "Feature index",
+        "reference": "references/control-flow-and-iteration.mbt.md",
+        "terms": [
+          "errdefer"
+        ]
+      },
+      "evidence": [
+        {
+          "kind": "checked-doc",
+          "path": "skills/moonbit-language/references/control-flow-and-iteration.mbt.md",
+          "marker": "errdefer normal return and error",
+          "role": "scope"
+        },
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-async-cancellation/fixture.json",
+          "marker": "lang-async-cancellation",
+          "role": "cancellation"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "language-5"
+      ],
+      "summary": "defer and errdefer may raise or call async functions; cleanup errors replace the pending error while remaining cleanups still run.",
+      "change": "behavior-change",
+      "agent_behavior": "defer and errdefer may raise or call async functions; cleanup errors replace the pending error while remaining cleanups still run.",
+      "claims": [
+        {
+          "text": "defer and errdefer may raise or call async functions; cleanup errors replace the pending error while remaining cleanups still run.",
+          "evidence_roles": [
+            "fallible-cleanup",
+            "async-cleanup"
+          ]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "discoverability": {
+        "section": "Feature index",
+        "reference": "references/control-flow-and-iteration.mbt.md",
+        "terms": [
+          "defer",
+          "errdefer"
+        ]
+      },
+      "evidence": [
+        {
+          "kind": "checked-doc",
+          "path": "skills/moonbit-language/references/control-flow-and-iteration.mbt.md",
+          "marker": "errdefer normal return and error",
+          "role": "fallible-cleanup"
+        },
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-async-cancellation/fixture.json",
+          "marker": "lang-async-cancellation",
+          "role": "async-cleanup"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "language-6",
+        "language-6-p1",
+        "language-6-p2",
+        "language-6-p3"
+      ],
+      "summary": "Migrate fragile_catch_all resource cleanup to errdefer so cancellation also releases resources.",
+      "change": "deprecation",
+      "agent_behavior": "Migrate fragile_catch_all resource cleanup to errdefer so cancellation also releases resources.",
+      "claims": [
+        {
+          "text": "Migrate fragile_catch_all resource cleanup to errdefer so cancellation also releases resources.",
+          "evidence_roles": [
+            "deprecated-form",
+            "replacement"
+          ]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "discoverability": {
+        "section": "Feature index",
+        "reference": "references/errors-and-error-handling.mbt.md",
+        "terms": [
+          "catch"
+        ]
+      },
+      "evidence": [
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-dep-fragile-catch-all/fixture.json",
+          "marker": "lang-dep-fragile-catch-all",
+          "role": "deprecated-form"
+        },
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-dep-fragile-catch-all/fixture.json",
+          "marker": "lang-dep-fragile-catch-all",
+          "role": "replacement"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "language-7",
+        "language-7-c1"
+      ],
+      "summary": "Use guard! for intentional termination and guard with else for recovery from an inexhaustive pattern.",
+      "change": "deprecation",
+      "agent_behavior": "Use guard! for intentional termination and guard with else for recovery from an inexhaustive pattern.",
+      "claims": [
+        {
+          "text": "Use guard! for intentional termination and guard with else for recovery from an inexhaustive pattern.",
+          "evidence_roles": [
+            "deprecated-form",
+            "replacement"
+          ]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "discoverability": {
+        "section": "Feature index",
+        "reference": "references/pattern-matching.mbt.md",
+        "terms": [
+          "guard!"
+        ]
+      },
+      "evidence": [
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-warning-guard-forms/fixture.json",
+          "marker": "lang-warning-guard-forms",
+          "role": "deprecated-form"
+        },
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-warning-guard-forms/fixture.json",
+          "marker": "lang-warning-guard-forms",
+          "role": "replacement"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "language-8",
+        "language-8-c1",
+        "language-8-p1",
+        "language-8-c2"
+      ],
+      "summary": "A labelled block returns the value supplied to its labelled break; a directly nested break must state its label.",
+      "change": "new-feature",
+      "agent_behavior": "A labelled block returns the value supplied to its labelled break; a directly nested break must state its label.",
+      "claims": [
+        {
+          "text": "A labelled block returns the value supplied to its labelled break; a directly nested break must state its label.",
+          "evidence_roles": [
+            "behavior"
+          ]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "discoverability": {
+        "section": "Feature index",
+        "reference": "references/control-flow-and-iteration.mbt.md",
+        "terms": [
+          "labelled"
+        ]
+      },
+      "evidence": [
+        {
+          "kind": "checked-doc",
+          "path": "skills/moonbit-language/references/control-flow-and-iteration.mbt.md",
+          "marker": "control flow: labelled blocks return early from nested control flow",
+          "role": "behavior"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "language-9"
+      ],
+      "summary": "Reserve nocancel for async cancellation annotations rather than identifiers.",
+      "change": "new-feature",
+      "agent_behavior": "Reserve nocancel for async cancellation annotations rather than identifiers.",
+      "claims": [
+        {
+          "text": "Reserve nocancel for async cancellation annotations rather than identifiers.",
+          "evidence_roles": [
+            "behavior"
+          ]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "discoverability": {
+        "section": "Feature index",
+        "reference": "references/async-and-ffi.md",
+        "terms": [
+          "nocancel"
+        ]
+      },
+      "evidence": [
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-async-cancellation/fixture.json",
+          "marker": "lang-async-cancellation",
+          "role": "behavior"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "language-10"
+      ],
+      "summary": "Function-level #warnings can suppress deprecated_syntax in that declaration.",
+      "change": "behavior-change",
+      "agent_behavior": "Function-level #warnings can suppress deprecated_syntax in that declaration.",
+      "claims": [
+        {
+          "text": "Function-level #warnings can suppress deprecated_syntax in that declaration.",
+          "evidence_roles": [
+            "behavior"
+          ]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "discoverability": {
+        "section": "Feature index",
+        "reference": "references/attributes.mbt.md",
+        "terms": [
+          "#warnings"
+        ]
+      },
+      "evidence": [
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-syntax-warning-suppression/fixture.json",
+          "marker": "lang-syntax-warning-suppression",
+          "role": "behavior"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "toolchain-1"
+      ],
+      "summary": "The default target is wasm; choose --target explicitly when a different backend is required.",
+      "change": "behavior-change",
+      "agent_behavior": "The default target is wasm; choose --target explicitly when a different backend is required.",
+      "claims": [
+        {
+          "text": "The default target is wasm; choose --target explicitly when a different backend is required.",
+          "evidence_roles": [
+            "behavior"
+          ]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-toolchain",
+      "discoverability": {
+        "section": "Feature index",
+        "reference": "references/targets-and-conditional-builds.md",
+        "terms": [
+          "wasm"
+        ]
+      },
+      "evidence": [
+        {
+          "kind": "command",
+          "entry_id": "build-default",
+          "role": "behavior"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "toolchain-2"
+      ],
+      "summary": "moon prove bundles Why3 resources and uses an installed solver.",
+      "change": "behavior-change",
+      "disposition": "out-of-scope",
+      "reason": "Solver setup and proof-authoring workflows belong to the established formal-verification boundary, outside these everyday language and project-operation references."
+    },
+    {
+      "source_ids": [
+        "toolchain-3",
+        "toolchain-3-c1"
+      ],
+      "summary": "Use moonx to execute a registry binary; choose a version when reproducibility matters. Registry binary execution is documented rather than exercised.",
+      "change": "new-feature",
+      "agent_behavior": "Use moonx to execute a registry binary; choose a version when reproducibility matters. Registry binary execution is documented rather than exercised.",
+      "claims": [
+        {
+          "text": "Use moonx to execute a registry binary; choose a version when reproducibility matters. Registry binary execution is documented rather than exercised.",
+          "evidence_roles": [
+            "documented"
+          ]
+        }
+      ],
+      "disposition": "documented",
+      "owner_skill": "moonbit-toolchain",
+      "discoverability": {
+        "section": "Feature index",
+        "reference": "references/dependencies-and-registry.md",
+        "terms": [
+          "moonx"
+        ]
+      },
+      "evidence": [
+        {
+          "kind": "documented",
+          "path": "skills/moonbit-toolchain/references/dependencies-and-registry.md",
+          "marker": "moonx native replacement",
+          "source_url": "https://www.moonbitlang.com/updates/2026/09/21",
+          "role": "documented"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "toolchain-4",
+        "toolchain-4-b1",
+        "toolchain-4-b2",
+        "toolchain-4-b3",
+        "toolchain-4-b4"
+      ],
+      "summary": "Migrate deprecated include/exclude to .moonignore, which replaces the same-directory .gitignore; the root _build remains excluded. Moon emits the old driver warning even with exit 0 under --deny-warn, so assertions check its presence and absence explicitly.",
+      "change": "deprecation",
+      "agent_behavior": "Migrate deprecated include/exclude to .moonignore, which replaces the same-directory .gitignore; the root _build remains excluded. Moon emits the old driver warning even with exit 0 under --deny-warn, so assertions check its presence and absence explicitly.",
+      "claims": [
+        {
+          "text": "Migrate deprecated include/exclude to .moonignore, which replaces the same-directory .gitignore; the root _build remains excluded. Moon emits the old driver warning even with exit 0 under --deny-warn, so assertions check its presence and absence explicitly.",
+          "evidence_roles": [
+            "deprecated-form",
+            "replacement"
+          ]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-toolchain",
+      "discoverability": {
+        "section": "Feature index",
+        "reference": "references/dependencies-and-registry.md",
+        "terms": [
+          ".moonignore"
+        ]
+      },
+      "evidence": [
+        {
+          "kind": "command",
+          "entry_id": "publishing-moonignore-migration",
+          "role": "deprecated-form"
+        },
+        {
+          "kind": "command",
+          "entry_id": "publishing-moonignore-migration",
+          "role": "replacement"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "toolchain-5"
+      ],
+      "summary": "Registry module names cannot differ only by case.",
+      "change": "behavior-change",
+      "agent_behavior": "Registry module names cannot differ only by case.",
+      "claims": [
+        {
+          "text": "Registry module names cannot differ only by case.",
+          "evidence_roles": [
+            "documented"
+          ]
+        }
+      ],
+      "disposition": "documented",
+      "owner_skill": "moonbit-toolchain",
+      "discoverability": {
+        "section": "Feature index",
+        "reference": "references/dependencies-and-registry.md",
+        "terms": [
+          "mooncakes"
+        ]
+      },
+      "evidence": [
+        {
+          "kind": "documented",
+          "path": "skills/moonbit-toolchain/references/dependencies-and-registry.md",
+          "marker": "registry name collisions",
+          "source_url": "https://www.moonbitlang.com/updates/2026/08/19",
+          "role": "documented"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "standard-library-1",
+        "standard-library-1-b1"
+      ],
+      "summary": "Core and QuickCheck section labels group the separately assessed changes.",
+      "change": "behavior-change",
+      "disposition": "not-actionable",
+      "reason": "These labels contain no additional API behavior."
+    },
+    {
+      "source_ids": [
+        "standard-library-1-b2"
+      ],
+      "summary": "Use QuickCheck check for failure-raising property tests and report for structured results.",
+      "change": "behavior-change",
+      "agent_behavior": "Use QuickCheck check for failure-raising property tests and report for structured results.",
+      "claims": [
+        {
+          "text": "Use QuickCheck check for failure-raising property tests and report for structured results.",
+          "evidence_roles": [
+            "behavior"
+          ]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "discoverability": {
+        "section": "Feature index",
+        "reference": "references/tests-and-checked-docs.mbt.md",
+        "terms": [
+          "QuickCheck"
+        ]
+      },
+      "evidence": [
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-quickcheck-entrypoints/fixture.json",
+          "marker": "lang-quickcheck-entrypoints",
+          "role": "behavior"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "standard-library-1-b3",
+        "standard-library-1-b4",
+        "standard-library-1-b5",
+        "standard-library-1-b6",
+        "standard-library-1-b7",
+        "standard-library-1-b8",
+        "standard-library-1-b9",
+        "standard-library-1-b10"
+      ],
+      "summary": "QuickCheck provides generation, filtering, shrinking, and observation APIs.",
+      "change": "behavior-change",
+      "disposition": "out-of-scope",
+      "reason": "The skill covers property-test entry points and language derives; it does not catalogue optional package combinators and statistics APIs. Use the installed QuickCheck API documentation."
+    },
+    {
+      "source_ids": [
+        "standard-library-1-b11",
+        "standard-library-1-b12",
+        "standard-library-1-b13"
+      ],
+      "summary": "Core adds sequence diff and edit-distance APIs.",
+      "change": "behavior-change",
+      "disposition": "out-of-scope",
+      "reason": "The two references do not catalogue the optional diff package algorithms or API surface."
+    },
+    {
+      "source_ids": [
+        "standard-library-1-b14",
+        "standard-library-1-b15"
+      ],
+      "summary": "lexscan consumes StringScanner and Lexbuf objects, advancing their cursor and refilling a streaming source.",
+      "change": "new-feature",
+      "agent_behavior": "lexscan consumes StringScanner and Lexbuf objects, advancing their cursor and refilling a streaming source.",
+      "claims": [
+        {
+          "text": "lexscan consumes StringScanner and Lexbuf objects, advancing their cursor and refilling a streaming source.",
+          "evidence_roles": [
+            "behavior"
+          ]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "discoverability": {
+        "section": "Feature index",
+        "reference": "references/pattern-matching.mbt.md",
+        "terms": [
+          "lexscan"
+        ]
+      },
+      "evidence": [
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-lexscan-scanners/fixture.json",
+          "marker": "lang-lexscan-scanners",
+          "role": "behavior"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "standard-library-1-b16"
+      ],
+      "summary": "AsyncLexbuf requires an async context; its asynchronous chunk source is documented separately from executed synchronous scanning.",
+      "change": "new-feature",
+      "agent_behavior": "AsyncLexbuf requires an async context; its asynchronous chunk source is documented separately from executed synchronous scanning.",
+      "claims": [
+        {
+          "text": "AsyncLexbuf requires an async context; its asynchronous chunk source is documented separately from executed synchronous scanning.",
+          "evidence_roles": [
+            "documented"
+          ]
+        }
+      ],
+      "disposition": "documented",
+      "owner_skill": "moonbit-language",
+      "discoverability": {
+        "section": "Feature index",
+        "reference": "references/pattern-matching.mbt.md",
+        "terms": [
+          "AsyncLexbuf"
+        ]
+      },
+      "evidence": [
+        {
+          "kind": "documented",
+          "path": "skills/moonbit-language/references/pattern-matching.mbt.md",
+          "marker": "Documented, not executed for asynchronous chunk sources",
+          "source_url": "https://github.com/moonbitlang/moonbit-docs/blob/8d9f3ba206eb17f80ee1836e4c1139068d1351b5/next/language/fundamentals.md#streaming-scanners",
+          "role": "documented"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "standard-library-1-b17"
+      ],
+      "summary": "Replace removed immut/array imports with immut/vector.",
+      "change": "removal",
+      "agent_behavior": "Replace removed immut/array imports with immut/vector.",
+      "claims": [
+        {
+          "text": "Replace removed immut/array imports with immut/vector.",
+          "evidence_roles": [
+            "removed-form",
+            "replacement"
+          ]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "discoverability": {
+        "section": "Feature index",
+        "reference": "references/data-types.mbt.md",
+        "terms": [
+          "immutable"
+        ]
+      },
+      "evidence": [
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-removed-immut-array/fixture.json",
+          "marker": "lang-removed-immut-array",
+          "role": "removed-form"
+        },
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-immut-vector-replacement/fixture.json",
+          "marker": "lang-immut-vector-replacement",
+          "role": "replacement"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "standard-library-1-b18"
+      ],
+      "summary": "Replace deprecated debug.to_repr with the Repr constructor.",
+      "change": "deprecation",
+      "agent_behavior": "Replace deprecated debug.to_repr with the Repr constructor.",
+      "claims": [
+        {
+          "text": "Replace deprecated debug.to_repr with the Repr constructor.",
+          "evidence_roles": [
+            "deprecated-form",
+            "replacement"
+          ]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "discoverability": {
+        "section": "Feature index",
+        "reference": "references/types-structs-enums.mbt.md",
+        "terms": [
+          "derives"
+        ]
+      },
+      "evidence": [
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-dep-debug-to-repr/fixture.json",
+          "marker": "lang-dep-debug-to-repr",
+          "role": "deprecated-form"
+        },
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-debug-repr-constructor/fixture.json",
+          "marker": "lang-debug-repr-constructor",
+          "role": "replacement"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "standard-library-2"
+      ],
+      "summary": "The async section identifies the package version and groups its changes.",
+      "change": "behavior-change",
+      "disposition": "not-actionable",
+      "reason": "The package-version heading adds no behavior beyond its separately assessed children."
+    },
+    {
+      "source_ids": [
+        "standard-library-2-b1",
+        "standard-library-2-p1",
+        "standard-library-2-p2",
+        "standard-library-2-b2",
+        "standard-library-2-p3",
+        "standard-library-2-p4",
+        "standard-library-2-p5"
+      ],
+      "summary": "Async HTTP header and filesystem opening APIs changed.",
+      "change": "behavior-change",
+      "disposition": "out-of-scope",
+      "reason": "Versioned HTTP and filesystem API catalogues are outside the language cancellation/runtime boundary and project-operation scope."
+    },
+    {
+      "source_ids": [
+        "standard-library-2-b3",
+        "standard-library-2-p6",
+        "standard-library-2-p7",
+        "standard-library-2-p8",
+        "standard-library-2-p9",
+        "standard-library-2-p10",
+        "standard-library-2-p11",
+        "standard-library-2-p12",
+        "standard-library-2-p13",
+        "standard-library-2-p14"
+      ],
+      "summary": "protect_from_cancel preserves its result but cannot revoke task cancellation; later cancellable operations still cancel. The deprecated resume_on_cancel option is removed in async 0.22.1.",
+      "change": "removal",
+      "agent_behavior": "protect_from_cancel preserves its result but cannot revoke task cancellation; later cancellable operations still cancel. The deprecated resume_on_cancel option is removed in async 0.22.1.",
+      "claims": [
+        {
+          "text": "protect_from_cancel preserves its result but cannot revoke task cancellation; later cancellable operations still cancel. The deprecated resume_on_cancel option is removed in async 0.22.1.",
+          "evidence_roles": [
+            "removed-form",
+            "replacement"
+          ]
+        }
+      ],
+      "disposition": "verified",
+      "owner_skill": "moonbit-language",
+      "discoverability": {
+        "section": "Feature index",
+        "reference": "references/async-and-ffi.md",
+        "terms": [
+          "cancellation"
+        ]
+      },
+      "evidence": [
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-removed-async-resume-on-cancel/fixture.json",
+          "marker": "lang-removed-async-resume-on-cancel",
+          "role": "removed-form"
+        },
+        {
+          "kind": "fixture",
+          "path": "verification/fixtures/lang-async-cancellation/fixture.json",
+          "marker": "lang-async-cancellation",
+          "role": "replacement"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "standard-library-2-p15"
+      ],
+      "summary": "The article has a horizontal divider.",
+      "change": "behavior-change",
+      "disposition": "not-actionable",
+      "reason": "A Markdown divider carries no user guidance."
+    },
+    {
+      "source_ids": [
+        "standard-library-2-b4",
+        "standard-library-2-p16",
+        "standard-library-2-b5",
+        "standard-library-2-p17",
+        "standard-library-2-p18",
+        "standard-library-2-p19",
+        "standard-library-2-p20"
+      ],
+      "summary": "Async offers configurable deadlock handling and external event-loop integration.",
+      "change": "behavior-change",
+      "disposition": "out-of-scope",
+      "reason": "Application event-loop embedding and deadlock-handler APIs belong to the external runtime package documentation."
+    },
+    {
+      "source_ids": [
+        "standard-library-2-b6",
+        "standard-library-2-b7",
+        "standard-library-2-p21",
+        "standard-library-2-p22",
+        "standard-library-2-b8",
+        "standard-library-2-b10",
+        "standard-library-2-b11",
+        "standard-library-2-p23",
+        "standard-library-2-p24"
+      ],
+      "summary": "Async changes process redirection, HTTP request helpers, and process/signal exit reporting.",
+      "change": "behavior-change",
+      "disposition": "out-of-scope",
+      "reason": "These are package-specific I/O and process API contracts rather than language syntax or moon command behavior."
+    },
+    {
+      "source_ids": [
+        "standard-library-2-b9"
+      ],
+      "summary": "The async Wasm backend supports websocket and realpath; fs.Watcher remains outside that runtime surface.",
+      "change": "behavior-change",
+      "agent_behavior": "The async Wasm backend supports websocket and realpath; fs.Watcher remains outside that runtime surface.",
+      "claims": [
+        {
+          "text": "The async Wasm backend supports websocket and realpath; fs.Watcher remains outside that runtime surface.",
+          "evidence_roles": [
+            "documented"
+          ]
+        }
+      ],
+      "disposition": "documented",
+      "owner_skill": "moonbit-language",
+      "discoverability": {
+        "section": "Feature index",
+        "reference": "references/async-and-ffi.md",
+        "terms": [
+          "Wasm1"
+        ]
+      },
+      "evidence": [
+        {
+          "kind": "documented",
+          "path": "skills/moonbit-language/references/async-and-ffi.md",
+          "marker": "Watcher",
+          "source_url": "https://www.moonbitlang.com/updates/2026/08/19",
+          "role": "documented"
+        }
+      ]
+    },
+    {
+      "source_ids": [
+        "standard-library-3",
+        "standard-library-3-b1",
+        "standard-library-3-b2",
+        "standard-library-3-b3"
+      ],
+      "summary": "External x and sys packages change environment, path, and rational APIs.",
+      "change": "behavior-change",
+      "disposition": "out-of-scope",
+      "reason": "The skills do not catalogue optional x/sys package migrations or platform bug fixes; query the installed package API."
+    }
+  ]
+}

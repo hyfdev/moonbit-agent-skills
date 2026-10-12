@@ -106,6 +106,41 @@ describe("release source inventory", () => {
     expect(() => extractReleaseItems(broken)).toThrow(/non-contiguous numbering in toolchain/);
   });
 
+  it("inventories heading-based releases including the ecosystem section", () => {
+    const markdown =
+      RELEASE_MARKDOWN.replace(/^1\. /gm, "### ") +
+      "\n## Ecosystem and Development Tool Updates\n\n### Package registry\n\n- New registry command.\n\n### Editor\n\nEditor details.\n";
+    const inventory = createReleaseInventory(markdown, SOURCE_METADATA);
+    expect(validateInventory(inventory, "source.json")).toEqual([]);
+    expect(inventory.items.filter((item) => item.section === "ecosystem")).toEqual([
+      { id: "ecosystem-1", section: "ecosystem", kind: "heading", text: "Package registry" },
+      {
+        id: "ecosystem-1-b1",
+        section: "ecosystem",
+        kind: "bullet",
+        parent: "ecosystem-1",
+        text: "New registry command.",
+      },
+      { id: "ecosystem-2", section: "ecosystem", kind: "heading", text: "Editor" },
+      {
+        id: "ecosystem-2-p1",
+        section: "ecosystem",
+        kind: "paragraph",
+        parent: "ecosystem-2",
+        text: "Editor details.",
+      },
+    ]);
+    expect(inventory.items.filter((item) => item.kind === "heading")).toHaveLength(5);
+  });
+
+  it("rejects mixed top-level heading and numbering styles within a section", () => {
+    const markdown = RELEASE_MARKDOWN.replace(
+      "1. Toolchain feature",
+      "### Toolchain feature\n\n1. Another feature",
+    );
+    expect(() => extractReleaseItems(markdown)).toThrow(/mixes headings and numbered items/);
+  });
+
   it("fails closed when a release adds an unknown level-two section", () => {
     const broken = RELEASE_MARKDOWN.replace(
       "## Toolchain Updates",

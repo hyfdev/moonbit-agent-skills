@@ -3,23 +3,23 @@ name: moonbit-language
 description: Verified MoonBit language reference pinned to an exact moonc version. Use when understanding, writing, reviewing, or fixing .mbt and .mbt.md code; resolving syntax, type, pattern, visibility, trait, or error diagnostics; designing APIs; checking whether a feature exists; or translating Rust, TypeScript, or Go habits. Covers functions and labelled/optional/autofill arguments, structs, enums and extenum, bitstring/JSON/regex patterns, traits and explicit extend/pub extend, generics, visibility, checked errors, async, tests, and FFI declarations. Language semantics only - use moonbit-toolchain for commands, configuration, dependencies, targets, or project setup; load both when code and project operation are involved.
 license: MIT
 user-invocable: false
-compatibility: Verified only against moonc v0.10.6+80dc50f24 (MoonBit v0.10.6, 2026-08-04). Needs the moon CLI for verification steps and Node.js 24+ for the bundled helper script.
+compatibility: Verified only against moonc v0.10.14+7d59c7ec9 (MoonBit v0.10.14, 2026-09-18). Needs the moon CLI for verification steps and Node.js 24+ for the bundled helper script.
 metadata:
-  skill-version: "0.4.0"
-  updated-date: "2026-08-07"
-  moonc-version: "0.10.6+80dc50f24"
-  moonbit-release: "0.10.6"
-  verified-date: "2026-08-07"
+  skill-version: "0.5.0"
+  updated-date: "2026-10-12"
+  moonc-version: "0.10.14+7d59c7ec9"
+  moonbit-release: "0.10.14"
+  verified-date: "2026-10-12"
   verified-platform: "Linux-x86_64"
   verified-targets: "wasm-gc,wasm,js,native"
-  source-docs: "https://docs.moonbitlang.com/en/latest/ (MoonBit v0.10.6 documentation)"
+  source-docs: "https://docs.moonbitlang.com/en/latest/ (MoonBit v0.10.14 documentation)"
 ---
 
 # MoonBit language
 
 ## Verification contract
 
-Executable claims in this skill are checked against **moonc v0.10.6+80dc50f24** (MoonBit release 0.10.6, build 2026-08-04) on Linux x86_64. The repository runs every `mbt check` fence on wasm-gc, wasm, js, and native and runs diagnostic fixtures against the same pin. Facts that depend on an external runtime or were not executed are explicitly labeled **Documented, not executed** with an official source. Blocks marked `mbt nocheck` are explanatory rejected or deprecated forms; they are not executed.
+Executable claims in this skill are checked against **moonc v0.10.14+7d59c7ec9** (MoonBit release 0.10.14, build 2026-09-18) on Linux x86_64. The repository runs every `mbt check` fence on wasm-gc, wasm, js, and native and runs diagnostic fixtures against the same pin. Facts that depend on an external runtime or were not executed are explicitly labeled **Documented, not executed** with an official source. Blocks marked `mbt nocheck` are explanatory rejected or deprecated forms; they are not executed.
 
 MoonBit is pre-1.0 and changes quickly. Before relying on a load-bearing claim, run `moon version --all`. If local moonc differs from the pin:
 
@@ -43,28 +43,31 @@ Each row is both a capability map and a search route. Load only the rows relevan
 
 | Need or search terms | Reference |
 | --- | --- |
-| Program structure; `fn main`; `fn init`; naming conventions; Keywords and Reserved Keywords; `//` comments; `///` Doc Comments and doc tests; labelled arguments; optional arguments and forwarding; autofill / `#callsite`; `declare fn`; function aliases / `#alias`; deprecated `fnalias`; `letrec`; lambdas; partial application; pipelines `\|>` and `<\|`; methods; cascades; TODO placeholder `...` | references/declarations-and-functions.mbt.md |
-| Structs; qualified `T::{}` literals; E0084 `unqualified_record`; struct update; enums; mutable enum fields; `extenum`; custom constructors; tuple structs; aliases; opaque types; derives; `Eq` / `Compare` / `Default`; JSON Enum styles; Deriving `Option`; Container, Case, and Field arguments; local type definitions are deprecated | references/types-structs-enums.mbt.md |
-| `match`; `guard!`; E0087/E0088/E0089 guard diagnostics; array, string, map, bitstring, `v128le`, and `Json` patterns; regex literal and `=~`; or-pattern defaults with surrounding expressions; `lexscan`; deprecated `lexmatch` | references/pattern-matching.mbt.md |
+| Program structure; `fn main`; `fn init`; naming conventions; Keywords and Reserved Keywords; `//` comments; `///` Doc Comments and doc tests; labelled arguments; optional arguments and forwarding; autofill / `#callsite`; `declare fn`; function aliases / `#alias`; removed `fnalias`; `letrec`; lambdas; partial application; pipelines `\|>` and `<\|`; methods; cascades; TODO placeholder `...` | references/declarations-and-functions.mbt.md |
+| Structs; qualified `T::{}` literals; E0084 `unqualified_record`; struct update; enums; mutable enum fields; `extenum`; custom constructors; tuple structs; aliases; opaque types; derives; `Eq` / `Compare` / `Default`; JSON Enum styles; Deriving `Option`; Container, Case, and Field arguments; `#non_exhaustive`, `Type::..`, `Shrink`; local type definitions are removed | references/types-structs-enums.mbt.md |
+| `match`; `guard!`; E0087/E0088/E0089 guard diagnostics; array, string, map, bitstring, `v128le`, and `Json` patterns; regex literal and `=~`; or-pattern defaults with surrounding expressions; `lexmatch`; `lexscan`; `StringScanner`, `Lexbuf`, `AsyncLexbuf`; unreachable scanner cases | references/pattern-matching.mbt.md |
 | Traits; generics; impls; explicit `extend` and `pub extend`; `implicit_impl_as_method`; supertrait dot-call migration; Builtin traits; Deriving builtin traits; operators; trait objects | references/traits-and-generics.mbt.md |
 | `pub`; `pub(all)`; `pub(open)`; `priv`; alias visibility; `pub impl`; source-level `using`; cross-package access and re-export | references/visibility.mbt.md |
-| Error types; `raise`; `try` / `catch` / `noraise`; `Option`; `Result`; deprecated `!Error`, bang calls, and `try?` | references/errors-and-error-handling.mbt.md |
-| `Unit`; `Bool`; Boolean negation; `!value`; deprecated `not(value)`; `Ref`; `Option`; `Result`; `Json`; Numbers and overloaded literals; strings, bytes, escapes, interpolation, and Choosing a Byte Container; arrays, maps, views; conditional spread; unresolved or ambiguous `{}`; immutable `Type(array)` / deprecated `from_array`; negative view indices; removed collection aliases and `IterResult`; `Json::empty_object`, String predicates, `Int16` / `UInt16` `lnot` | references/data-types.mbt.md |
-| `if`; `while`; `for`; list comprehensions; `Iter` and `[\| ... \|]`; deprecated implicit array-to-Iter and `loop`; labelled loops and blocks; E0085/E0086 labelled-loop control; closures; `defer` | references/control-flow-and-iteration.mbt.md |
-| `test`; snapshots; `inspect`; blackbox and whitebox tests; doc tests; `.mbt.md` | references/tests-and-checked-docs.mbt.md |
-| `async`; task groups; cancellation and cleanup; JavaScript Promise bridge; native/JS/Wasm1 runtime boundaries; `extern "js"`, `extern "wasm"`, `extern "C"`; stable FFI Types; constant enum ABI values; `#export_name`; exported functions; FFI ownership and callbacks | references/async-and-ffi.md |
-| Attributes including `#cfg`, `#deprecated`, `#alias`, `#as_free_fn`, `#callsite`, `#doc(hidden)`, `#internal`, `#label_migration`, `#module`, `#must_implement_one`, `#unsafe_cycle_free`, `#export_name`, `#visibility`, `#warnings`; deprecated `@` warning switch and `--deny-warn`; derives | references/attributes.mbt.md |
+| Error types; `SubError::_` narrowing; `raise`; `try` / `catch` / `noraise`; `Option`; `Result`; deprecated `!Error` and `try?`; removed bang calls | references/errors-and-error-handling.mbt.md |
+| `Unit`; `Bool`; Boolean negation; `!value`; deprecated `not(value)`; `Ref`; `Option`; `Result`; `Json`; Numbers and overloaded literals; strings, bytes, escapes, interpolation, and Choosing a Byte Container; arrays, maps, views; Array iteration; conditional spread; unresolved or ambiguous `{}`; immutable `Type(array)` / deprecated `from_array`; clamped slicing; `exact_view`; negative view indices; removed collection aliases and `IterResult`; `Json::empty_object`, String predicates, `Int16` / `UInt16` `lnot` | references/data-types.mbt.md |
+| `if`; `while`; `for`; list comprehensions; `Iter` and `[\| ... \|]`; deprecated implicit array-to-Iter and `loop`; labelled loops and blocks; E0085/E0086 labelled-loop control; closures; `for .. in` destructuring; `defer`; `errdefer`; fallible cleanup | references/control-flow-and-iteration.mbt.md |
+| `test`; snapshots; `inspect`; blackbox and whitebox tests; `test_unqualified_package`; QuickCheck; doc tests; `.mbt.md` | references/tests-and-checked-docs.mbt.md |
+| `async`; task groups; cancellation and cleanup; `nocancel`; `handle_cancellation`; async pipelines; JavaScript Promise bridge; native/JS/Wasm1 runtime boundaries; `extern "js"`, `extern "wasm"`, `extern "C"`; stable FFI Types; deprecated JS FFI `Array` and replacement `FixedArray`; constant enum ABI values; `#export_name`; exported functions; FFI ownership and callbacks | references/async-and-ffi.md |
+| Attributes including `#cfg`, `#deprecated`, `#alias`, `#as_free_fn`, `#callsite`, `#doc(hidden)`, `#internal`, `#label_migration`, `#module`, `#must_implement_one`, `#unsafe_cycle_free`, `#non_exhaustive`, `#export_name`, `#visibility`, `#warnings`; syntax warning suppression; `unused_package`; `var`; deprecated `@` warning switch and `--deny-warn`; derives | references/attributes.mbt.md |
 | Rust, TypeScript, Go, and stale MoonBit forms; silent interpolation, `defer`, integer division, and indexing traps | references/cross-language-and-stale-syntax.md |
+| Lexical Conventions; Identifiers; Keywords; Labels; Package Names; Numeric Literals; Dot-Prefixed Tokens; Operators and Delimiters; Automatic Semicolon Insertion; `.mbti` Extensions | references/lexical-conventions.md |
 | Skill guidance contradicts the compiler; minimal reproduction and privacy-scrubbed issue draft | references/reporting-errors.md |
 
 ## Current syntax and migrations
 
 - Entry points are `fn main { }` and `fn init { }`; type parameters precede names (`fn[T] id`); top-level function parameters and results need annotations.
-- Trait implementations do not automatically create dot-call methods. Attach intended methods with `extend Type with Trait::{method}`; use `pub extend` when downstream packages need the dot call. Rename identifiers called `extend`, and use qualified `Trait::method(value)` for deprecated supertrait or ambiguous constrained dot calls.
-- Current checked-error syntax is `suberror`, `-> T raise E`, and `try` / `catch` / `noraise`. The `!Error`, `f!()`, and `try?` forms are deprecated.
+- Implicit promotion of trait implementations to methods warns by default. Attach intended methods with `extend Type with Trait::{method}`; use `pub extend` when downstream packages need the dot call. Rename identifiers called `extend`, and use qualified `Trait::method(value)` for deprecated supertrait or ambiguous constrained dot calls.
+- Current checked-error syntax is `suberror`, `-> T raise E`, and `try` / `catch` / `noraise`. The `!Error` and `try?` forms are deprecated; bang calls such as `f!()` are rejected.
 - `loop` and expected-type conversion from an array literal to `Iter` are deprecated. Use `while true` / `for` and explicit `[| ... |]` respectively.
-- Local type definitions still parse but emit `deprecated_syntax`; move the type to top level. Do not copy the official local-type example without checking warnings.
+- Local type definitions and the `fnalias`, `typealias`, and `traitalias` keywords are rejected. Move types to top level and use current alias forms.
 - `derive(Show)` for debugging is deprecated; use `Debug`. Unnecessary `let mut` is an error. String interpolation is `\{value}`, not `${value}`.
+- Use `lexmatch` for `String`/`StringView` and `lexscan` for scanner objects. Slices clamp their bounds; use `exact_view` when exact bounds are required.
+- Use `errdefer` for cleanup on error or cancellation and `defer` for cleanup on every scope exit. Async cancellation in `moonbitlang/async` 0.22.x bypasses `catch`.
 
 ## Reporting contradictions
 

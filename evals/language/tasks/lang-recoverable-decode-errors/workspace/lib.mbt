@@ -5,6 +5,9 @@ pub(all) suberror DecodeError {
 } derive(Debug)
 
 ///|
+pub extend DecodeError with @debug.Debug::{to_repr}
+
+///|
 pub fn decode_tag(packet : Bytes) -> String raise {
   match packet[0] {
     b'\x01' => "ping"

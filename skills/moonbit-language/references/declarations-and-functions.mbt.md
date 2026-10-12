@@ -51,9 +51,9 @@ pub fn decl_documented_increment(n : Int) -> Int {
 
 Value and function identifiers begin with lowercase `a-z`; types, enum constructors, and constants begin with uppercase `A-Z`. Both forms may continue with letters, digits, underscores, and non-ASCII Unicode characters. Use `snake_case` for values/functions and `PascalCase` or `SCREAMING_SNAKE_CASE` for types/constants.
 
-Keywords are syntax and cannot be identifiers at this pin: `as`, `else`, `extern`, `fn`, `fnalias`, `if`, `let`, `const`, `match`, `using`, `mut`, `type`, `typealias`, `struct`, `enum`, `extenum`, `trait`, `traitalias`, `derive`, `while`, `break`, `continue`, `import`, `return`, `throw`, `raise`, `try`, `catch`, `pub`, `priv`, `proof_assert`, `proof_let`, `readonly`, `true`, `false`, `_`, `test`, `loop`, `for`, `in`, `impl`, `with`, `guard`, `async`, `is`, `suberror`, `and`, `letrec`, `enumview`, `noraise`, `defer`, `lexmatch`, `lexscan`, `where`, `declare`, and `nobreak`.
+Keywords are syntax and cannot be identifiers at this pin: `as`, `else`, `extern`, `fn`, `if`, `let`, `const`, `match`, `using`, `mut`, `type`, `struct`, `enum`, `extenum`, `trait`, `derive`, `while`, `break`, `continue`, `import`, `return`, `throw`, `raise`, `try`, `catch`, `pub`, `priv`, `proof_assert`, `proof_let`, `readonly`, `true`, `false`, `_`, `test`, `loop`, `for`, `in`, `impl`, `with`, `guard`, `async`, `is`, `suberror`, `and`, `letrec`, `enumview`, `noraise`, `nocancel`, `defer`, `errdefer`, `lexmatch`, `lexscan`, `where`, `declare`, and `nobreak`.
 
-Reserved Keywords still parse in some identifier positions but warn because they may become syntax. The pinned official list includes `module`, `move`, `ref`, `static`, `super`, `unsafe`, `use`, `await`, `dyn`, `abstract`, `do`, `final`, `macro`, `override`, `typeof`, `virtual`, `yield`, `local`, `method`, `alias`, `assert`, `package`, `recur`, `isnot`, `define`, `downcast`, `inherit`, `member`, `namespace`, `upcast`, `void`, `lazy`, `include`, `mixin`, `protected`, `sealed`, `constructor`, `atomic`, `volatile`, `anyframe`, `anytype`, `asm`, `comptime`, `errdefer`, `export`, `opaque`, `orelse`, `resume`, `threadlocal`, `unreachable`, `dynclass`, `dynobj`, `dynrec`, `var`, `finally`, `noasync`, `assume`, and `extend`. The compiler is authoritative if that list drifts. In particular, rename an identifier called `extend` and use it only for explicit trait-method attachment; the `lang-dep-extend-identifier` fixture proves the warning and replacement with warnings denied.
+Reserved Keywords still parse in some identifier positions but warn because they may become syntax. The pinned official list includes `module`, `move`, `ref`, `static`, `super`, `unsafe`, `use`, `await`, `dyn`, `abstract`, `do`, `final`, `macro`, `override`, `typeof`, `virtual`, `yield`, `local`, `method`, `alias`, `assert`, `package`, `recur`, `isnot`, `define`, `downcast`, `inherit`, `member`, `namespace`, `upcast`, `void`, `lazy`, `include`, `mixin`, `protected`, `sealed`, `constructor`, `atomic`, `volatile`, `anyframe`, `anytype`, `asm`, `comptime`, `export`, `opaque`, `orelse`, `resume`, `threadlocal`, `unreachable`, `dynclass`, `dynobj`, `dynrec`, `var`, `finally`, `noasync`, `assume`, and `extend`. The compiler is authoritative if that list drifts. In particular, rename an identifier called `extend` and use it only for explicit trait-method attachment; the `lang-dep-extend-identifier` fixture proves the warning and replacement with warnings denied.
 
 ## Top-level bindings
 
@@ -143,10 +143,10 @@ test "labelled, optional, autofill, declare, and letrec" {
 }
 ```
 
-Function aliases use `#alias(other_name)` on the original declaration; the full attribute behavior is owned by attributes.mbt.md. The old standalone `fnalias original as alias` form still parses but is deprecated.
+Function aliases use `#alias(other_name)` on the original declaration; the full attribute behavior is owned by attributes.mbt.md. The old standalone `fnalias original as alias` form is a parse error; the `lang-removed-fnalias` fixture proves rejection and the current alias.
 
 ```mbt nocheck
-fnalias original as alias // DEPRECATED: use #alias(alias) on `original`
+fnalias original as alias // REMOVED: use #alias(alias) on `original`
 ```
 
 ## Pipeline operator
@@ -217,7 +217,7 @@ test "extension method on a builtin" {
 
 ```mbt check
 test "cascade keeps the receiver" {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   buf..write_string("a")..write_string("b").write_string("c")
   assert_eq(buf.to_string(), "abc")
 }

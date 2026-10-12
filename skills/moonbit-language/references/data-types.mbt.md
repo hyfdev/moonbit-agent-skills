@@ -186,7 +186,7 @@ test "literal escape families" {
 }
 ```
 
-Common methods: `has_prefix` (not the deprecated `starts_with`), `trim` with a labeled `chars?`, `contains`, `find` (returns the code-unit index as `Int?`). `s[a:b]` slices by UTF-16 index into a zero-copy `StringView`; `.to_owned()` copies it out. Slicing an invalid boundary **panics**. Build strings with `StringBuilder`; `<+` streams an interpolated template into a builder, and `<?` does the same through an `Option[writer]`, skipping `None`.
+Common methods: `has_prefix` (not the deprecated `starts_with`), `trim` with a labeled `chars?`, `contains`, `find` (returns the code-unit index as `Int?`). `s[a:b]` slices by UTF-16 index into a zero-copy `StringView`; `.to_owned()` copies it out. Slice syntax clamps invalid bounds and snaps surrogate-splitting bounds inward; use `exact_view` when an invalid boundary must panic. Build strings with `StringBuilder`; `<+` streams an interpolated template into a builder, and `<?` does the same through an `Option[writer]`, skipping `None`.
 
 ```mbt check
 test "data types: string methods and views" {
@@ -213,8 +213,8 @@ test "data types: StringBuilder and streaming macros" {
   inspect(w.to_string(), content="n=7")
 }
 
-test "panic data types: slicing a string mid-surrogate" {
-  ignore("🌙x"[0:1]) // panics, not a checked error
+test "panic data types: exact_view rejects a mid-surrogate boundary" {
+  ignore("🌙x".exact_view(end=1))
 }
 ```
 
@@ -262,7 +262,7 @@ b[0] = b'x' // WRONG: "Type Bytes has no method op_set" — Bytes is immutable; 
 
 ## Arrays, views, and FixedArray
 
-`[1, 2, 3]` is a mutable, growable `Array[Int]` with reference semantics: `push` and `a[i] = x` need no `let mut` (that only rebinds the variable). `a.get(i)` returns an `Option`; `a[i]` panics out of bounds. Spread is two dots `..a`; since 0.10.4, `..if condition { values }` conditionally includes a spread. Combinators (`map`, `filter`, `fold`, `search`) are eager and `fold` takes a labeled `init=`. `a[i:j]` gives a zero-copy `ArrayView` that aliases the parent (sees later mutation); `.to_owned()` copies out. View operators no longer accept negative indices in 0.10.4. `FixedArray` has mutable elements but a fixed length.
+`[1, 2, 3]` is a mutable, growable `Array[Int]` with reference semantics: `push` and `a[i] = x` need no `let mut` (that only rebinds the variable). `a.get(i)` returns an `Option`; `a[i]` panics out of bounds. Spread is two dots `..a`; since 0.10.4, `..if condition { values }` conditionally includes a spread. Combinators (`map`, `filter`, `fold`, `search`) are eager and `fold` takes a labeled `init=`. `a[i:j]` gives a zero-copy `ArrayView` that aliases the parent (sees later mutation); `.to_owned()` copies out. Slice bounds clamp to the valid range; negative slice bounds clamp to zero rather than counting backward. `FixedArray` has mutable elements but a fixed length.
 
 ```mbt check
 test "data types: arrays, spread, combinators, and views" {
@@ -348,3 +348,43 @@ test "data types: tuples and Option sugar" {
   assert_true(opt is Some(3))
 }
 ```
+
+## Clamped slices and exact bounds
+
+`a[start:end]` and `a.clamped_view(start=..., end=...)` clamp both bounds and return an empty view for an inverted range. This applies to arrays, array views, bytes, byte views, strings, and string views. A negative bound clamps to zero; it does not select from the end. Use `exact_view` when invalid bounds must abort, or `get_view` when invalid bounds should return `None`. Ordinary indexing `a[i]` still checks bounds and can abort.
+
+String slice offsets count UTF-16 code units. A start that splits a surrogate pair moves forward, and an end inside a pair moves backward, excluding the split character. Concatenating `s[:i]` and `s[i:]` can therefore lose a character when `i` splits a surrogate pair; use `String::split_at` for a lossless split or validate exact boundaries with `get_view`.
+
+```mbt check
+test "clamped slicing" {
+  let values = [10, 20, 30]
+  assert_eq(values[1:10].to_owned(), [20, 30])
+  assert_eq(values.clamped_view(start=1, end=10).to_owned(), [20, 30])
+  assert_eq(values[5:10].length(), 0)
+  assert_eq(values[-1:].to_owned(), [10, 20, 30])
+  assert_eq(values[:][-1:].to_owned(), [10, 20, 30])
+  assert_eq(values[2:1].length(), 0)
+  assert_eq(b"abc"[-1:].to_owned(), b"abc")
+  assert_eq(b"abc"[:][-1:].to_owned(), b"abc")
+  assert_eq("abc"[-1:].to_owned(), "abc")
+  assert_eq("abc"[:][-1:].to_owned(), "abc")
+  assert_eq("a😀b"[:2].to_owned(), "a")
+  assert_eq("a😀b"[2:].to_owned(), "b")
+  let (prefix, suffix) = "a😀b".split_at(2)
+  assert_eq(prefix.to_owned() + suffix.to_owned(), "a😀b")
+  assert_true(values.get_view(start=-1) is None)
+  assert_true("a😀b".get_view(end=2) is None)
+}
+
+test "panic exact view rejects invalid bounds" {
+  ignore([10, 20, 30].exact_view(start=-1))
+}
+```
+
+### Array iteration and retained storage
+
+The array iterator fixes its traversal bounds when it is created. Avoid structurally modifying the array while consuming an iterator; use a separate output array or an index-controlled loop. The `lang-array-iteration-bounds` fixture demonstrates that an appended element is not visited. **Documented, not executed as a storage-reclamation guarantee:** the [0.10.14 article](https://github.com/moonbitlang/website/blob/b6d21ad70b1f2b61de640a8978d84b3315084711/updates/2026-09-21/index.md) describes changed retained-slot behavior and a `fill_unused` API. The installed core 0.10.14+7d59c7ec9 does not expose that name, so do not recommend it without checking the installed API.
+
+## Removed immutable-array package and debug representation constructor
+
+`moonbitlang/core/immut/array` is removed; use `moonbitlang/core/immut/vector` and its `Vector` constructor. The `lang-removed-immut-array` and `lang-immut-vector-replacement` fixtures prove both package boundaries. `@debug.to_repr(value)` is deprecated; use `@debug.Repr(value)`. The `lang-dep-debug-to-repr` and `lang-debug-repr-constructor` fixtures prove both calls under the same warnings-denied settings.

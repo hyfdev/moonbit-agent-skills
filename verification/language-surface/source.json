@@ -3,31 +3,31 @@
     {
       "id": "document-introduction",
       "path": "next/language/introduction.md",
-      "sha256": "82983a8ad8f3560c97b3a065b0faa04f425d7d1d5471bdf51c368d1341c92ee8",
+      "sha256": "71a185e639a76f260467e2ca949e67959c05c88ffa59a7a8c97c6fcc189205d5",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/introduction.html"
     },
     {
       "id": "document-fundamentals",
       "path": "next/language/fundamentals.md",
-      "sha256": "0b0d0dccde6d96c142016169dd4b7d0c8d2b9e54e59fb409df75f1973c3ff46e",
+      "sha256": "9215977ce8667d44bd6701a034d700251edda5ca7bc3771891e8eba86f32b5bf",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/fundamentals.html"
     },
     {
       "id": "document-methods",
       "path": "next/language/methods.md",
-      "sha256": "43914840ed13e95b18a8b3636f9c262f5b65a3434428f0cfb93703c88aa570f2",
+      "sha256": "6fa4888c531a33e682287c283ca586307237bf152eccd7b3c6b5d3c823ca75fc",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/methods.html"
     },
     {
       "id": "document-derive",
       "path": "next/language/derive.md",
-      "sha256": "f8c4e9f8136593baca31a7ff685aa37b699fa676450bda9fafc5041b85ff48c3",
+      "sha256": "ef84bc5fd59dd59f52315dc9e9642785b44de6564a8b186592e6b2c89b602a86",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/derive.html"
     },
     {
       "id": "document-error-handling",
       "path": "next/language/error-handling.md",
-      "sha256": "afc60790fec99c0e5ce2503961a9adfd0ba1a8bafac5de1f7548f62d293e8146",
+      "sha256": "208a035ddb5de039acd6005db943cb06a2dca650d9b015b3ecbceaa673278607",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error-handling.html"
     },
     {
@@ -83,6 +83,12 @@
       "path": "next/language/attributes/visibility.md",
       "sha256": "a5ed829d259a36cd24d1532268ede94f1be5ce34c6f875a829ed1d0c0354490e",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/visibility.html"
+    },
+    {
+      "id": "document-attributes-non_exhaustive",
+      "path": "next/language/attributes/non_exhaustive.md",
+      "sha256": "97032b4a3ec9e466c7ec2695e67d6e5ec082a21b06c75dd52da7071028b97286",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/non_exhaustive.html"
     },
     {
       "id": "document-attributes-internal",
@@ -159,7 +165,7 @@
     {
       "id": "document-attributes-cfg",
       "path": "next/language/attributes/cfg.md",
-      "sha256": "cf742185677042cbca8d894883e9b01e9db60acc06734daf81316510b7b39754",
+      "sha256": "24e00fa15bc565f7e353ea37ac3dc2a19675e9595614236e7800273ab69935f4",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/cfg.html"
     },
     {
@@ -171,7 +177,7 @@
     {
       "id": "document-attributes-export_name",
       "path": "next/language/attributes/export_name.md",
-      "sha256": "69c7f89c9f9b32d3b68e4028ffffb28ba22224c20b3b98552e3b905fdb65f358",
+      "sha256": "67bfd8291e10a67a7b73b57593ed7740711fc2aac57470ad50203e1c6cb327f6",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes/export_name.html"
     },
     {
@@ -195,19 +201,19 @@
     {
       "id": "document-attributes",
       "path": "next/language/attributes.md",
-      "sha256": "42403cd315f4e87ab29dd985d418c25adc4b0d6368787ea1ca2aa3b84069d177",
+      "sha256": "b87f3d4b9b5267fedccd63128a13628e02e8a0c27ff757147a1fc8e8c436a91d",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/attributes.html"
     },
     {
       "id": "document-ffi",
       "path": "next/language/ffi.md",
-      "sha256": "3f94c34611d4ec6214afb99ce5329833e66d756fb60bdcdd9c157209c4a42f60",
+      "sha256": "1a8204d0a8970c465a343d6b4c839c1dbf809a73e5868a6df544b170a8513741",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/ffi.html"
     },
     {
       "id": "document-async-experimental",
       "path": "next/language/async-experimental.md",
-      "sha256": "c1f1798bb1110b74ff99581ec49a2451b30a0ca936ad8e04ba927fd4a37a0877",
+      "sha256": "bcb2264be367dd9edb71f732a64ebc011b885477bfd941645d87744661b6f0da",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/async-experimental.html"
     },
     {
@@ -219,7 +225,7 @@
     {
       "id": "document-lexical-conventions",
       "path": "next/language/lexical-conventions.md",
-      "sha256": "e0d8ed41b579b8960b82573f6e4ca14dc5997e6e34e58dc3aa39979f8ffe2e5d",
+      "sha256": "76cbb2dc2dbf77360d86818fc837448835e4bd4292e25c49d9cf5ecebb5ecf91",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/lexical-conventions.html"
     },
     {
@@ -363,7 +369,7 @@
     {
       "id": "document-error_codes-e0025",
       "path": "next/language/error_codes/E0025.md",
-      "sha256": "153f87c7c84a93c9123c46debc39642bc0aecbcd90cfec967b7f9a04aef95ea4",
+      "sha256": "e1f23ea4d3df017f76274a3609b9d7f4e0f9bce8bef1679ee25c8fca43636ceb",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0025.html"
     },
     {
@@ -375,7 +381,7 @@
     {
       "id": "document-error_codes-e0027",
       "path": "next/language/error_codes/E0027.md",
-      "sha256": "860871a4aecb266e261de670a89dcad20f0355a2d3e6c22706aa44e9b1d9939a",
+      "sha256": "6ab1caae219da2f7f1543726edb031af85577cb062054e43f6f8f10b8fb9af16",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0027.html"
     },
     {
@@ -387,7 +393,7 @@
     {
       "id": "document-error_codes-e0029",
       "path": "next/language/error_codes/E0029.md",
-      "sha256": "ba0e95d84bc5b3ea5a5d29648a9c3b98e5645b1688685fc4f37ef8430d50145d",
+      "sha256": "c4173d2683dbf83289b200c5456286d3b92a10b34905a79c9914e555583d1490",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0029.html"
     },
     {
@@ -429,13 +435,13 @@
     {
       "id": "document-error_codes-e0036",
       "path": "next/language/error_codes/E0036.md",
-      "sha256": "76109cf73d229c3480d7759deda1745fd07680b5823632df76511163860ee99b",
+      "sha256": "99e89311da74ebcc67dd4d6c2e09e3629f111bc797147f23f9405964ea43ccfa",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0036.html"
     },
     {
       "id": "document-error_codes-e0037",
       "path": "next/language/error_codes/E0037.md",
-      "sha256": "a7d7c517e60e965b5c4eed713bd9efe9e7f07d202f08b5a18e0f9aa1c51441ad",
+      "sha256": "b179562103ed7b6197d439310acd6c4e11551049860c03c98f9f3d153a8139e6",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0037.html"
     },
     {
@@ -579,7 +585,7 @@
     {
       "id": "document-error_codes-e0063",
       "path": "next/language/error_codes/E0063.md",
-      "sha256": "3c04bb4ca65901f51f221c40dcd779016c0a850a16c7f78412eaf1298274354a",
+      "sha256": "23a0bb3c20f51661295a5c17aa36875893dcd4b6e41c940620a9bfa6868b685c",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0063.html"
     },
     {
@@ -657,13 +663,13 @@
     {
       "id": "document-error_codes-e0076",
       "path": "next/language/error_codes/E0076.md",
-      "sha256": "6b3f7beac77ea581bb2826a9df05f59bcc98dd1a8751bca43b296d5ea22ace42",
+      "sha256": "26556f9cd5d1d71551503fba410a2cce3a0dcba29062a520cb63905fe29eadfe",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0076.html"
     },
     {
       "id": "document-error_codes-e0077",
       "path": "next/language/error_codes/E0077.md",
-      "sha256": "523e6fc576749583d64244af5aeef560a3dc9229d2003964bde0cbe2fb943aef",
+      "sha256": "79ee7f59d8434aab09aed19bc2cb43409ca1a600629ce80cb760801364ab8449",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0077.html"
     },
     {
@@ -675,19 +681,19 @@
     {
       "id": "document-error_codes-e0079",
       "path": "next/language/error_codes/E0079.md",
-      "sha256": "d164dad8d75b5b3f04bfb05dba33a5830cfd6c32d61e39a89f36cb8bed4b7fcb",
+      "sha256": "b10a43500ffd8ef896ee4acd0317cb1712c584c2174dc81fd7dbbe27c783323b",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0079.html"
     },
     {
       "id": "document-error_codes-e0080",
       "path": "next/language/error_codes/E0080.md",
-      "sha256": "d02ad3a131572be434222f6b965c75b801dfc34308cbefab807116938488389d",
+      "sha256": "e939ac8bbbb6877dca64d3e8212b346d8a542fcbe9d4bf3ea2ecf7006df861d8",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0080.html"
     },
     {
       "id": "document-error_codes-e0081",
       "path": "next/language/error_codes/E0081.md",
-      "sha256": "b21b852ae54ce117597dd69b2f0e4abfdd4af883fd1cdb3d7d6815568b5b1812",
+      "sha256": "144d000ba7aa41bda613163d37997e43d0f4f781a04120eed5e72b13ba1dfd79",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0081.html"
     },
     {
@@ -737,6 +743,30 @@
       "path": "next/language/error_codes/E0089.md",
       "sha256": "87e04ddc1816b63257caa5cb5df9841457d72c3bfbd102091284e607cdff2628",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0089.html"
+    },
+    {
+      "id": "document-error_codes-e0090",
+      "path": "next/language/error_codes/E0090.md",
+      "sha256": "a2ae50bce23bf29538a6f28b77d1452bd7da25f1a56c6e5947b8d7464eb97037",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0090.html"
+    },
+    {
+      "id": "document-error_codes-e0091",
+      "path": "next/language/error_codes/E0091.md",
+      "sha256": "db8e740339153ca7dc72f319d2265a3400d4331001bde61e47caf15052807dc7",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0091.html"
+    },
+    {
+      "id": "document-error_codes-e0092",
+      "path": "next/language/error_codes/E0092.md",
+      "sha256": "93532ae915388fd8dd1f98fb918d383e7b408375b761945f6a58781d9722b55a",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0092.html"
+    },
+    {
+      "id": "document-error_codes-e0093",
+      "path": "next/language/error_codes/E0093.md",
+      "sha256": "7080a00f39029d19407f95c5709bce54b7e477fe43089dbf23508e6cbf3755a2",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E0093.html"
     },
     {
       "id": "document-error_codes-e1000",
@@ -909,7 +939,7 @@
     {
       "id": "document-error_codes-e3800",
       "path": "next/language/error_codes/E3800.md",
-      "sha256": "f28f7a17d52c1ccadcc4d2ae5a09e1538289de96bdaea49ab721b3fa32174dfa",
+      "sha256": "5defe0ecd871e68d0e17364778b4ed6809c038b4f991adfb1cac2cf5790f4f3e",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E3800.html"
     },
     {
@@ -1029,7 +1059,7 @@
     {
       "id": "document-error_codes-e4022",
       "path": "next/language/error_codes/E4022.md",
-      "sha256": "12b5bfa543a16b94ed1aa5338965e2519eac634808409374d3467752d0242679",
+      "sha256": "2b4b6e14d5d92c7d1034494832aa24ce0ccbf5252610479b08bfc0a0b37d4372",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4022.html"
     },
     {
@@ -1173,7 +1203,7 @@
     {
       "id": "document-error_codes-e4051",
       "path": "next/language/error_codes/E4051.md",
-      "sha256": "db41734c75558720e5400a81b6103ba43bc74a33ccafd2307459c2d57b5651cf",
+      "sha256": "91d4fdeff6f11db6dff069e635681603a1928b9a10f55aca12369f4a9b9268ff",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4051.html"
     },
     {
@@ -1185,7 +1215,7 @@
     {
       "id": "document-error_codes-e4053",
       "path": "next/language/error_codes/E4053.md",
-      "sha256": "0218867e51a0fc126fe127cec2026e2b80ccbb2c17e76dd08a5b714118a42d4f",
+      "sha256": "90f437f9394379e733e0fdb22f2c753f98fd8978d70877afa7f20c1bb0d147d6",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4053.html"
     },
     {
@@ -1239,7 +1269,7 @@
     {
       "id": "document-error_codes-e4065",
       "path": "next/language/error_codes/E4065.md",
-      "sha256": "de017c4277dfcddb0552c62776d12b4c95c4c38e559163f362e7d61b36370a55",
+      "sha256": "0c50d65127ab54300b86b09c870964fcf1a921e65dbf02f7835f94bae8d1605e",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4065.html"
     },
     {
@@ -1513,12 +1543,6 @@
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4120.html"
     },
     {
-      "id": "document-error_codes-e4121",
-      "path": "next/language/error_codes/E4121.md",
-      "sha256": "57a1f1a4db5268e7eedb59b93c740c07997a96f5f1538543810fbeb547943786",
-      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4121.html"
-    },
-    {
       "id": "document-error_codes-e4122",
       "path": "next/language/error_codes/E4122.md",
       "sha256": "697720933ce954bd3deaa9656ac0b83ef351c57ef8b27d4e0e86c5d0089c78aa",
@@ -1539,7 +1563,7 @@
     {
       "id": "document-error_codes-e4128",
       "path": "next/language/error_codes/E4128.md",
-      "sha256": "0307061880588937ab82ffdb58296077b8bb8d45af007f3c5d2918f26abfb088",
+      "sha256": "8434f85ac3eb738850470230e151dbb1ab17c0718845c0bea04dcd6904377dc8",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4128.html"
     },
     {
@@ -1565,6 +1589,12 @@
       "path": "next/language/error_codes/E4133.md",
       "sha256": "f1d1613c5809a40988947c5ceb4da81e1c3648dab4d80dafaafa3e3d4a60fbd5",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4133.html"
+    },
+    {
+      "id": "document-error_codes-e4134",
+      "path": "next/language/error_codes/E4134.md",
+      "sha256": "3c32ff045badd62e63f41e2752d87952b0e272d3ab81d2eb64bf0a234c94bc5d",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4134.html"
     },
     {
       "id": "document-error_codes-e4135",
@@ -1671,7 +1701,7 @@
     {
       "id": "document-error_codes-e4155",
       "path": "next/language/error_codes/E4155.md",
-      "sha256": "451766e4f85ea00446e28ded8b686ed49cd6d76a28ee0ae80fa3c7bad46181bc",
+      "sha256": "3bd4f4e7f05469ae7694a9c6e6745f5bfd164d897d469113623f5c88358803b3",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4155.html"
     },
     {
@@ -1749,19 +1779,19 @@
     {
       "id": "document-error_codes-e4171",
       "path": "next/language/error_codes/E4171.md",
-      "sha256": "671d77074ed097a9ea105c03ce8faf74eae990ffa312fff1c3bab5d9e9d14798",
+      "sha256": "85824b029e2ab3242eea48826ed4b454c61d3f699f2eed00957072a479f8cfc8",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4171.html"
     },
     {
       "id": "document-error_codes-e4172",
       "path": "next/language/error_codes/E4172.md",
-      "sha256": "24a5544190f034c590b06d3aeea3829382e0e251b499b869338c2b2b31089ba0",
+      "sha256": "ded061b7cf728c8318bd44a8739a6aa384b006d3c52d89e2aaef1ffa63fa811c",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4172.html"
     },
     {
       "id": "document-error_codes-e4173",
       "path": "next/language/error_codes/E4173.md",
-      "sha256": "6599084ca33a8df7e6e844df1045fadc573b022172a51bf86c8a2e93bea2ce93",
+      "sha256": "1aa7032e1bcba6c4778ca90b3666f30f01af862cf708f0dd9714c7f7f8ab77b8",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4173.html"
     },
     {
@@ -1777,12 +1807,6 @@
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4175.html"
     },
     {
-      "id": "document-error_codes-e4176",
-      "path": "next/language/error_codes/E4176.md",
-      "sha256": "4676f4c984fe7c8e83c6c8323d4e740e54df0c5296a601808aa12f3a156a917f",
-      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4176.html"
-    },
-    {
       "id": "document-error_codes-e4177",
       "path": "next/language/error_codes/E4177.md",
       "sha256": "af707cfa3797f8099e1a75ee4369cc27334d38294a8cd498790434c2ef2193eb",
@@ -1791,44 +1815,14 @@
     {
       "id": "document-error_codes-e4180",
       "path": "next/language/error_codes/E4180.md",
-      "sha256": "b3a213b1fa49a4e7561e98de7d273912d1179e051bb9c4506442764ef797cfac",
+      "sha256": "1588de9fd649300dc727d04d70fb83560cdffadc720c15bd857932ccf90ea9ac",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4180.html"
     },
     {
       "id": "document-error_codes-e4181",
       "path": "next/language/error_codes/E4181.md",
-      "sha256": "54f887424aca2d586cab7d6b3e1bb0fe095369861d9a34fd7c8927822a6c4477",
+      "sha256": "4dfebb30ff2add729bf126228c428361d07ffff92dff9c55e8a9807a3359581e",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4181.html"
-    },
-    {
-      "id": "document-error_codes-e4182",
-      "path": "next/language/error_codes/E4182.md",
-      "sha256": "09a5b72c5579611ead9c2827eace4fc479a1f71a13091121530b4ef467dcdba1",
-      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4182.html"
-    },
-    {
-      "id": "document-error_codes-e4183",
-      "path": "next/language/error_codes/E4183.md",
-      "sha256": "39385e60124c44b2a4875d9a89b773a0a80404cb2c90e7159276d1be40cca836",
-      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4183.html"
-    },
-    {
-      "id": "document-error_codes-e4184",
-      "path": "next/language/error_codes/E4184.md",
-      "sha256": "65ba964910e40e3144786082ccf2e448218d1332662fa607ca4736de7a41da41",
-      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4184.html"
-    },
-    {
-      "id": "document-error_codes-e4185",
-      "path": "next/language/error_codes/E4185.md",
-      "sha256": "214d43a9acf95cf98c355c5d5d0c12b7dc9b0dc2618511892b91950cd8000a31",
-      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4185.html"
-    },
-    {
-      "id": "document-error_codes-e4186",
-      "path": "next/language/error_codes/E4186.md",
-      "sha256": "600bea710bffeab3e80608ad23ce1a8294ee805d582c3dfd7d738f2de309fb3c",
-      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4186.html"
     },
     {
       "id": "document-error_codes-e4187",
@@ -1983,25 +1977,25 @@
     {
       "id": "document-error_codes-e4214",
       "path": "next/language/error_codes/E4214.md",
-      "sha256": "ad4f95e227397e83c220f30362c1dd27e5f07df88de12ff7ca05052e3fc13f6d",
+      "sha256": "09be173e894c1121c9909320fa2eada9f52a8e1a7fa9c0523c5daee4256f5bce",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4214.html"
     },
     {
       "id": "document-error_codes-e4215",
       "path": "next/language/error_codes/E4215.md",
-      "sha256": "e0a26bac281ccef352a92de2ee134dc0a78853709afa3cc2ed9c68b7449df1b9",
+      "sha256": "f4584c0fee987346e66478ce6ffc7d59f0148bf6f4a08812150ee33718e68ec4",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4215.html"
     },
     {
-      "id": "document-error_codes-e4217",
-      "path": "next/language/error_codes/E4217.md",
-      "sha256": "350141210e085d632e2845df886f01a07c7ff53337b3cd23c71c12696965f4c4",
-      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4217.html"
+      "id": "document-error_codes-e4216",
+      "path": "next/language/error_codes/E4216.md",
+      "sha256": "d0e3e8df885387c30e9e651e792350c656cfc12004c07a2ac1d8de4f7d70bc7a",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4216.html"
     },
     {
       "id": "document-error_codes-e4218",
       "path": "next/language/error_codes/E4218.md",
-      "sha256": "0dc49d5c442cc6da559b33f900461cf5842f7dc186ca37fa522e314affbd8429",
+      "sha256": "4119ee63d980246e565b31d3d8b9ee8a727ce0c6ec627af2814f774e6ed7f8f8",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4218.html"
     },
     {
@@ -2013,7 +2007,7 @@
     {
       "id": "document-error_codes-e4220",
       "path": "next/language/error_codes/E4220.md",
-      "sha256": "0e6eae41f7efa98b609f955fb76361d3e687888abc514f00c5f7c5d3814c27e7",
+      "sha256": "a4061ce05adf5ae0e931fcfdd1d555271b10a7f735e8ab28ab5e86f17f69f36d",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4220.html"
     },
     {
@@ -2021,6 +2015,42 @@
       "path": "next/language/error_codes/E4221.md",
       "sha256": "bcdd8d183f8f2f0d34feb059505bbf8951c8bdafbc04ce749217ab10f0643e23",
       "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4221.html"
+    },
+    {
+      "id": "document-error_codes-e4222",
+      "path": "next/language/error_codes/E4222.md",
+      "sha256": "b38c9774788e2952dd393ad10add783398a5a1be59d33a04a7fec157dacea529",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4222.html"
+    },
+    {
+      "id": "document-error_codes-e4224",
+      "path": "next/language/error_codes/E4224.md",
+      "sha256": "8c4123d146ccf855cb92a5305e9bc484c77344d5cd5b2f73393bd0e8b84ebadf",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4224.html"
+    },
+    {
+      "id": "document-error_codes-e4225",
+      "path": "next/language/error_codes/E4225.md",
+      "sha256": "f0ac4f84da1e0f5c8a018de483f4f22542dea5eb564b907d2255b88811e673d4",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4225.html"
+    },
+    {
+      "id": "document-error_codes-e4226",
+      "path": "next/language/error_codes/E4226.md",
+      "sha256": "7cd9bd0d1a97a11b9bc1f74a702f6e00da4abb9149c770810171d277db72183f",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4226.html"
+    },
+    {
+      "id": "document-error_codes-e4227",
+      "path": "next/language/error_codes/E4227.md",
+      "sha256": "8b7261745bc0d080117589eb94ff63f095cc62f491de9078337aa722cbfaac92",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4227.html"
+    },
+    {
+      "id": "document-error_codes-e4228",
+      "path": "next/language/error_codes/E4228.md",
+      "sha256": "adaad652d00fee87d97f1e8af69e202ab754bafa60f089046441acd3c05326da",
+      "web_url": "https://docs.moonbitlang.com/en/latest/language/error_codes/E4228.html"
     },
     {
       "id": "document-error_codes-index",
@@ -2033,7 +2063,7 @@
   "items": [
     {
       "document_id": "document-introduction",
-      "fingerprint": "82983a8ad8f3560c97b3a065b0faa04f425d7d1d5471bdf51c368d1341c92ee8",
+      "fingerprint": "71a185e639a76f260467e2ca949e67959c05c88ffa59a7a8c97c6fcc189205d5",
       "id": "document-introduction",
       "kind": "document",
       "level": 1,
@@ -2059,7 +2089,7 @@
     },
     {
       "document_id": "document-introduction",
-      "fingerprint": "136224fd98e01761c3df16322a3ac84711f39947316daa973967f3c30a104257",
+      "fingerprint": "d552e3b6c77fefd24d80ab67b3bc2afb7c830cf049e04ab1ca75d7531624a381",
       "id": "document-introduction-naming-conventions",
       "kind": "heading",
       "level": 2,
@@ -2068,7 +2098,7 @@
     },
     {
       "document_id": "document-introduction",
-      "fingerprint": "eb91b615222c3901cff10cf6ae3b32c763fcf4414bfa4058f7de5da7ca8b75ef",
+      "fingerprint": "a98868abae6438443d86677c86483c3ed904c0acc0d616da3aeca455bc6aa3f2",
       "id": "document-introduction-keywords",
       "kind": "heading",
       "level": 3,
@@ -2113,7 +2143,7 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "0b0d0dccde6d96c142016169dd4b7d0c8d2b9e54e59fb409df75f1973c3ff46e",
+      "fingerprint": "9215977ce8667d44bd6701a034d700251edda5ca7bc3771891e8eba86f32b5bf",
       "id": "document-fundamentals",
       "kind": "document",
       "level": 1,
@@ -2364,7 +2394,7 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "04c3ac071b9dcee98bd62bb0c55957bd956cf0dd7c359c44794a45de77a8610b",
+      "fingerprint": "bd1e3db38965ceb2ca03f70353916ab2cfec5ed193706edffa99bf811661714e",
       "id": "document-fundamentals-control-structures",
       "kind": "heading",
       "level": 2,
@@ -2427,7 +2457,7 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "5edbdc85b8ef39e434494c688da2fb11df16f6292f1e4560bb82be09bd94ce53",
+      "fingerprint": "981fc99a7e92a0e68da294c32609cf02f94e89efd4022bb6c5a95b1986c6ca74",
       "id": "document-fundamentals-for-in-loop",
       "kind": "heading",
       "level": 3,
@@ -2463,7 +2493,7 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "f9dfe78cc95a3e747aa80138515d6ed874726a556a22af4a4f45eb83bb41d672",
+      "fingerprint": "8c8fd0ebc12f40483c94ea63b220fff8f48df3f46e09c3adf6c398cb74c8ea76",
       "id": "document-fundamentals-labelled-blocks",
       "kind": "heading",
       "level": 3,
@@ -2472,12 +2502,12 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "f7de361de2b943ef0954aadc1f054845b4354b89e5e07cf03d751a0d4a6f69d2",
-      "id": "document-fundamentals-defer-expression",
+      "fingerprint": "b2feee91f348949a55c7511c525536fc83f6bd9ecdf6f94e06396d4236414f09",
+      "id": "document-fundamentals-defer-and-errdefer-expressions",
       "kind": "heading",
       "level": 3,
       "parent": "document-fundamentals-control-structures",
-      "text": "`defer` expression"
+      "text": "`defer` and `errdefer` expressions"
     },
     {
       "document_id": "document-fundamentals",
@@ -2490,7 +2520,7 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "beeb801d7d72a2b30410e26d5355c4e6d897a78b8c06006b2b488700c05abef6",
+      "fingerprint": "df823e5c4c5dd1d0c6d2fb811bbbd421dc7e3ed91021e2cd47806b40ef965f53",
       "id": "document-fundamentals-custom-data-types",
       "kind": "heading",
       "level": 2,
@@ -2535,12 +2565,21 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "c5c1f6f41bb749eb4c239e291c6698c02100284bd35ed07db53e4dbbc2f51fc9",
+      "fingerprint": "acd7339cfb28414073f2f81cfdd803011d71f289ff99750fa445c843bb31a3be",
       "id": "document-fundamentals-enum",
       "kind": "heading",
       "level": 3,
       "parent": "document-fundamentals-custom-data-types",
       "text": "Enum"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "fingerprint": "1a01c135a942ef30165efe68cfc5da7c57c0ff45c565905800dd42ba06413f3c",
+      "id": "document-fundamentals-non-exhaustive-enums",
+      "kind": "heading",
+      "level": 4,
+      "parent": "document-fundamentals-enum",
+      "text": "Non-exhaustive enums"
     },
     {
       "document_id": "document-fundamentals",
@@ -2562,7 +2601,7 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "986c4b3f08225f3eb123f07fac55081d704f7ebea1565297b625fc45645e5313",
+      "fingerprint": "0fc1476a38a282c19243f7d34117e855422d35b776d37ab5c6579395a45c0d5c",
       "id": "document-fundamentals-extensible-enum",
       "kind": "heading",
       "level": 4,
@@ -2580,21 +2619,12 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "03bec7dc2715730e4dcfd247850be9e52d7552a004c7d8e71a47e05b268c0bc5",
+      "fingerprint": "4227a433a588d3cb3ae26e88bd44736c62bc945fc66eed4f15eb6118f6c759ac",
       "id": "document-fundamentals-type-alias",
       "kind": "heading",
       "level": 3,
       "parent": "document-fundamentals-custom-data-types",
       "text": "Type alias"
-    },
-    {
-      "document_id": "document-fundamentals",
-      "fingerprint": "4d70c634539d413f092780a84742ae284ddf4997ee75729190540da80efa493e",
-      "id": "document-fundamentals-local-types",
-      "kind": "heading",
-      "level": 3,
-      "parent": "document-fundamentals-custom-data-types",
-      "text": "Local types"
     },
     {
       "document_id": "document-fundamentals",
@@ -2688,7 +2718,7 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "10c32ad6fd6ffc31882af4a04b1462d12b10e6c01df157b34f3b89e2dbcb1b2e",
+      "fingerprint": "d24e5e5e71fdedbcc475a2e3812583915a00387f9dca4cd2234802c8c4037266",
       "id": "document-fundamentals-special-syntax",
       "kind": "heading",
       "level": 2,
@@ -2733,7 +2763,7 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "9da3b1aca92a76b1de6636cde4d54e17bedfd70c193c1251345ddd90a9645346",
+      "fingerprint": "5a1ba3009a294a4661cd78fb7b8a6e2e370412d003d3aa21171fb0acf2929801",
       "id": "document-fundamentals-regex-match-expression",
       "kind": "heading",
       "level": 3,
@@ -2742,7 +2772,16 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "df8b5c0962c83e00e08885f5e49a76a52a3d087eee5344bc2f3bdaafc5782d1d",
+      "fingerprint": "f28568ab41ea75b95a9f55e2dbfc213c9732f441cec32526e9d96c5c4fd784e3",
+      "id": "document-fundamentals-lexmatch",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-fundamentals-special-syntax",
+      "text": "Lexmatch"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "fingerprint": "e49c024b80f059a8a5c5c8a3200c9770369c1f714bb4e1c9b1b07d839e84bba0",
       "id": "document-fundamentals-lexscan",
       "kind": "heading",
       "level": 3,
@@ -2751,12 +2790,30 @@
     },
     {
       "document_id": "document-fundamentals",
-      "fingerprint": "2378db66b885a36959c262fc745b9991231e54300e782f0aec2d591eae38e488",
-      "id": "document-fundamentals-lexmatch-deprecated",
+      "fingerprint": "e26be770440f2bfd1e4a26c6314278121948a2039ed5d1f00a11bcd6e1e3e2dd",
+      "id": "document-fundamentals-string-scanners",
+      "kind": "heading",
+      "level": 4,
+      "parent": "document-fundamentals-lexscan",
+      "text": "String scanners"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "fingerprint": "fac50af6de2367d92fe5e9fdca88806c609085104ce837dac63638878065facc",
+      "id": "document-fundamentals-streaming-scanners",
+      "kind": "heading",
+      "level": 4,
+      "parent": "document-fundamentals-lexscan",
+      "text": "Streaming scanners"
+    },
+    {
+      "document_id": "document-fundamentals",
+      "fingerprint": "40b19c9fee3ee7e4c035f1dedb227857b67aeac8967b5ee1213a10fb894be70c",
+      "id": "document-fundamentals-legacy-lexical-pattern-syntax",
       "kind": "heading",
       "level": 3,
       "parent": "document-fundamentals-special-syntax",
-      "text": "Lexmatch (deprecated)"
+      "text": "Legacy lexical pattern syntax"
     },
     {
       "document_id": "document-fundamentals",
@@ -2778,7 +2835,7 @@
     },
     {
       "document_id": "document-methods",
-      "fingerprint": "43914840ed13e95b18a8b3636f9c262f5b65a3434428f0cfb93703c88aa570f2",
+      "fingerprint": "6fa4888c531a33e682287c283ca586307237bf152eccd7b3c6b5d3c823ca75fc",
       "id": "document-methods",
       "kind": "document",
       "level": 1,
@@ -2822,7 +2879,7 @@
     },
     {
       "document_id": "document-methods",
-      "fingerprint": "1525bb9d74e89b274aed8bf273fb7f97b04899303e2d239259ecb4b816efb80a",
+      "fingerprint": "4e066a04863d7038568937d4f8b1a69292935ab0f1af07c2e6b0c91fcb23cbb7",
       "id": "document-methods-trait-system",
       "kind": "heading",
       "level": 2,
@@ -2840,7 +2897,7 @@
     },
     {
       "document_id": "document-methods",
-      "fingerprint": "cec373187dbfbb009b6c97b3eddc5922bfab0fd40aaf6d9d3bd8b9f08efd2d30",
+      "fingerprint": "709faabf277665beb12be362807587166484fd175b83681bfddbce23e1a73930",
       "id": "document-methods-implementing-traits",
       "kind": "heading",
       "level": 3,
@@ -2849,7 +2906,7 @@
     },
     {
       "document_id": "document-methods",
-      "fingerprint": "854301c5a8268992e90d4f75996750a153426d8fd133d632f4115e3f4567cb98",
+      "fingerprint": "cd6f9f7b3e379db6041fcc286853c0d1cda7e92517bc1c6aa88dae39c5b9a546",
       "id": "document-methods-attaching-trait-methods-with-extend",
       "kind": "heading",
       "level": 4,
@@ -2858,7 +2915,7 @@
     },
     {
       "document_id": "document-methods",
-      "fingerprint": "2f284760e4911f27ed96b0354dc7b83d924e9d87ff0c1de8af3db45b10a0417c",
+      "fingerprint": "eb3f791731287ccfdca68af384960b39a11078bca1dc4c957bb0c85867b34414",
       "id": "document-methods-using-traits",
       "kind": "heading",
       "level": 3,
@@ -2867,7 +2924,7 @@
     },
     {
       "document_id": "document-methods",
-      "fingerprint": "6535b091501d035576cb5d0b6802897e90c68c266669927ea5d9e20a52170aeb",
+      "fingerprint": "16e4a67754332bd8e3ce04196638e12ae62b37a699d8691bc6ce0b9da084a43a",
       "id": "document-methods-invoke-trait-methods-directly",
       "kind": "heading",
       "level": 4,
@@ -2903,7 +2960,7 @@
     },
     {
       "document_id": "document-derive",
-      "fingerprint": "f8c4e9f8136593baca31a7ff685aa37b699fa676450bda9fafc5041b85ff48c3",
+      "fingerprint": "ef84bc5fd59dd59f52315dc9e9642785b44de6564a8b186592e6b2c89b602a86",
       "id": "document-derive",
       "kind": "document",
       "level": 1,
@@ -2911,7 +2968,7 @@
     },
     {
       "document_id": "document-derive",
-      "fingerprint": "0261255c66ebd8b7ed73a036fe27329dfc49e8aee7215fee428f544f053226f9",
+      "fingerprint": "0bddbfee5028d817e57d73eb9486a85029f0d34f1253f9b617e6384bd444cc61",
       "id": "document-derive-eq-and-compare",
       "kind": "heading",
       "level": 2,
@@ -2920,7 +2977,7 @@
     },
     {
       "document_id": "document-derive",
-      "fingerprint": "e9f0c36322944e6798329358f1aec78726a7bec4cad34a67d7b7002cd6404243",
+      "fingerprint": "009fbfb98f6e826329c81609d50e6f362540e469a8021641ab7ab5780455b99f",
       "id": "document-derive-debug",
       "kind": "heading",
       "level": 2,
@@ -2929,7 +2986,7 @@
     },
     {
       "document_id": "document-derive",
-      "fingerprint": "0c359ebbd97589595a3d7fa17b3d2713aec3670f7e5634ab22c4c5bf7c3239b8",
+      "fingerprint": "82e16aec1f95bdf998a9699b1fc0660bf508638e91974ad01cc3869c6890f52f",
       "id": "document-derive-default",
       "kind": "heading",
       "level": 2,
@@ -2938,7 +2995,7 @@
     },
     {
       "document_id": "document-derive",
-      "fingerprint": "9b8c926ae4296e38430b465d1f3df8f53e2281654cd7fb10e5ee3fecb316ba6d",
+      "fingerprint": "291b41bb0544aba51940f253d89f63949ed3dd55455a184000ddd7942bfba0e4",
       "id": "document-derive-hash",
       "kind": "heading",
       "level": 2,
@@ -2956,7 +3013,16 @@
     },
     {
       "document_id": "document-derive",
-      "fingerprint": "31ebb078284a022ee96974d1a9c2a2bfcf9cfd95e2ddcb275b691a7ead1d26c2",
+      "fingerprint": "8b8c824625be03c5ae8d74a5f0e7e43f4b1be3bee9bf5d593e87567d257e86a5",
+      "id": "document-derive-shrink",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-derive",
+      "text": "Shrink"
+    },
+    {
+      "document_id": "document-derive",
+      "fingerprint": "6d657d337c5c8006d6c3349dae3bb331370ddb961a8fe4c92ba639e6786c589c",
       "id": "document-derive-fromjson-and-tojson",
       "kind": "heading",
       "level": 2,
@@ -3010,7 +3076,7 @@
     },
     {
       "document_id": "document-error-handling",
-      "fingerprint": "afc60790fec99c0e5ce2503961a9adfd0ba1a8bafac5de1f7548f62d293e8146",
+      "fingerprint": "208a035ddb5de039acd6005db943cb06a2dca650d9b015b3ecbceaa673278607",
       "id": "document-error-handling",
       "kind": "document",
       "level": 1,
@@ -3018,7 +3084,7 @@
     },
     {
       "document_id": "document-error-handling",
-      "fingerprint": "f16081e8d47dcb1503bd2b95416503b7991c1bf0e4298ed589cd7168357d247c",
+      "fingerprint": "3f388d6106e5f36c9b2222a197639739a629745df573cc4a62762ae357d88706",
       "id": "document-error-handling-error-types",
       "kind": "heading",
       "level": 2,
@@ -3413,6 +3479,14 @@
       "text": "Visibility Attribute"
     },
     {
+      "document_id": "document-attributes-non_exhaustive",
+      "fingerprint": "97032b4a3ec9e466c7ec2695e67d6e5ec082a21b06c75dd52da7071028b97286",
+      "id": "document-attributes-non_exhaustive",
+      "kind": "document",
+      "level": 1,
+      "text": "Non-exhaustive Enum Attribute"
+    },
+    {
       "document_id": "document-attributes-internal",
       "fingerprint": "6600e2670a37686ba70f7a3d810fa0480400f9af5e7880e68aeeebb2a5a61b90",
       "id": "document-attributes-internal",
@@ -3510,7 +3584,7 @@
     },
     {
       "document_id": "document-attributes-cfg",
-      "fingerprint": "cf742185677042cbca8d894883e9b01e9db60acc06734daf81316510b7b39754",
+      "fingerprint": "24e00fa15bc565f7e353ea37ac3dc2a19675e9595614236e7800273ab69935f4",
       "id": "document-attributes-cfg",
       "kind": "document",
       "level": 1,
@@ -3526,7 +3600,7 @@
     },
     {
       "document_id": "document-attributes-export_name",
-      "fingerprint": "69c7f89c9f9b32d3b68e4028ffffb28ba22224c20b3b98552e3b905fdb65f358",
+      "fingerprint": "67bfd8291e10a67a7b73b57593ed7740711fc2aac57470ad50203e1c6cb327f6",
       "id": "document-attributes-export_name",
       "kind": "document",
       "level": 1,
@@ -3558,7 +3632,7 @@
     },
     {
       "document_id": "document-attributes",
-      "fingerprint": "42403cd315f4e87ab29dd985d418c25adc4b0d6368787ea1ca2aa3b84069d177",
+      "fingerprint": "b87f3d4b9b5267fedccd63128a13628e02e8a0c27ff757147a1fc8e8c436a91d",
       "id": "document-attributes",
       "kind": "document",
       "level": 1,
@@ -3566,7 +3640,7 @@
     },
     {
       "document_id": "document-ffi",
-      "fingerprint": "3f94c34611d4ec6214afb99ce5329833e66d756fb60bdcdd9c157209c4a42f60",
+      "fingerprint": "1a8204d0a8970c465a343d6b4c839c1dbf809a73e5868a6df544b170a8513741",
       "id": "document-ffi",
       "kind": "document",
       "level": 1,
@@ -3592,7 +3666,7 @@
     },
     {
       "document_id": "document-ffi",
-      "fingerprint": "37e752d0aa32852d966568ebf25b19c86d7fd76f9fbe8348ac13a630c6ce9c7c",
+      "fingerprint": "2f606776fd6517b0fa824d416d87cd7ad2adecf3250be4ba2604cbab6275bf7c",
       "id": "document-ffi-declare-foreign-function",
       "kind": "heading",
       "level": 2,
@@ -3601,7 +3675,7 @@
     },
     {
       "document_id": "document-ffi",
-      "fingerprint": "19717baf76e5da7d71411b6b90a62d2899f1689f7481126b0ff4422b9039ae7e",
+      "fingerprint": "4c0ae67426c4197e1fd7e5dd1491f24911bd56d9396684f6013ec9992c9a89b3",
       "id": "document-ffi-types",
       "kind": "heading",
       "level": 3,
@@ -3628,7 +3702,7 @@
     },
     {
       "document_id": "document-ffi",
-      "fingerprint": "c2de573d52508fe8fcc8fb073834b19a1a489f7fb2318042f57cbb50d4f7a74f",
+      "fingerprint": "5e8193d30c8c98401a124dfb0e0fc4e1cc2f1f09c7271a4f2b74961e9416a846",
       "id": "document-ffi-export-functions",
       "kind": "heading",
       "level": 2,
@@ -3691,7 +3765,7 @@
     },
     {
       "document_id": "document-async-experimental",
-      "fingerprint": "c1f1798bb1110b74ff99581ec49a2451b30a0ca936ad8e04ba927fd4a37a0877",
+      "fingerprint": "bcb2264be367dd9edb71f732a64ebc011b885477bfd941645d87744661b6f0da",
       "id": "document-async-experimental",
       "kind": "document",
       "level": 1,
@@ -3708,7 +3782,7 @@
     },
     {
       "document_id": "document-async-experimental",
-      "fingerprint": "2909dd9f0602410550dfd679454f5eb6a26612c39c87c3e91a55a5c9ea091724",
+      "fingerprint": "7d608fc19bad2e15afc2f53b2bc4aab86af267f01185850334b3ed2de48fe089",
       "id": "document-async-experimental-async-function",
       "kind": "heading",
       "level": 2,
@@ -3726,7 +3800,7 @@
     },
     {
       "document_id": "document-async-experimental",
-      "fingerprint": "7a17b0f61b17f84eb5ea5ffe39ef6b23a2a79a04de04a0431d67e99e8d0f1eb0",
+      "fingerprint": "9d1b2196f4af2fd58d32a8805169673246f98cce692be443549148d5cf7c2a03",
       "id": "document-async-experimental-cancellation-makes-asynchronous-program-modular",
       "kind": "heading",
       "level": 2,
@@ -4022,7 +4096,7 @@
     },
     {
       "document_id": "document-lexical-conventions",
-      "fingerprint": "e0d8ed41b579b8960b82573f6e4ca14dc5997e6e34e58dc3aa39979f8ffe2e5d",
+      "fingerprint": "76cbb2dc2dbf77360d86818fc837448835e4bd4292e25c49d9cf5ecebb5ecf91",
       "id": "document-lexical-conventions",
       "kind": "document",
       "level": 1,
@@ -4030,7 +4104,7 @@
     },
     {
       "document_id": "document-lexical-conventions",
-      "fingerprint": "613989dc1e7a5d19c0c555e5306e8420c01d74391eca988b6a23bcba3416551d",
+      "fingerprint": "dc9b1fca6a2558e006d5b7cf32333e4b86cb23d69821a8abeefd02a3b613786c",
       "id": "document-lexical-conventions-common-lexical-classes",
       "kind": "heading",
       "level": 2,
@@ -4039,7 +4113,7 @@
     },
     {
       "document_id": "document-lexical-conventions",
-      "fingerprint": "faabe5b379056dcd760009edf3bbdccc4e644bd883d0d095950a09a39d3183be",
+      "fingerprint": "423712da2a72ed85b0ffe01f4c61ad18b3c69187aad0637efe26b2c8ca4809ee",
       "id": "document-lexical-conventions-string-literals",
       "kind": "heading",
       "level": 2,
@@ -4048,7 +4122,7 @@
     },
     {
       "document_id": "document-lexical-conventions",
-      "fingerprint": "30cea81ae5023619cbbf5ad705d7f824d0ecf86ee17172e38d47d67a97bdb5be",
+      "fingerprint": "7a4dd745cbc5952d4c01a89db6c6094b3e67933ab58c4cc7f3eee2d63275f81b",
       "id": "document-lexical-conventions-interpolation",
       "kind": "heading",
       "level": 3,
@@ -4057,7 +4131,7 @@
     },
     {
       "document_id": "document-lexical-conventions",
-      "fingerprint": "c267b6bd2c76bd51226bd2a80897a8a06bad169d4100a4eba95c18006d6fee81",
+      "fingerprint": "23a0cdf6daaaaebe84fb46d0f8d964fcfae0d2e1900e50470a19aabc9139ba90",
       "id": "document-lexical-conventions-multiline-string-literals",
       "kind": "heading",
       "level": 2,
@@ -4066,7 +4140,7 @@
     },
     {
       "document_id": "document-lexical-conventions",
-      "fingerprint": "5398f0e9bbdcf1e97710ed2377a695677c8848587540c37564c4eb8c479529e0",
+      "fingerprint": "e90642feab548ed8e73afdb3ee63a8972c9abf20ab0da74bdab2b8220eacc052",
       "id": "document-lexical-conventions-bytes-literals",
       "kind": "heading",
       "level": 2,
@@ -4075,7 +4149,16 @@
     },
     {
       "document_id": "document-lexical-conventions",
-      "fingerprint": "6e72c290f86b48950d639f45daf28e1be32603c3f6732862b384dd716a3d8e30",
+      "fingerprint": "d55e010a7de6ca1a60112540c5a731c4f4ddd14c9978c22ae0a695bbeb814224",
+      "id": "document-lexical-conventions-regex-literals",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-lexical-conventions",
+      "text": "Regex Literals"
+    },
+    {
+      "document_id": "document-lexical-conventions",
+      "fingerprint": "d893d46efa8f195a268348edf14515dffbb0746fbd93ce984cd3ae76eb62f09a",
       "id": "document-lexical-conventions-character-literals",
       "kind": "heading",
       "level": 2,
@@ -4084,12 +4167,111 @@
     },
     {
       "document_id": "document-lexical-conventions",
-      "fingerprint": "2b5938aa60cb1b967d2e45fe4cbf65c8d06f9baf0d5af86c8598a64b06e33cc0",
+      "fingerprint": "9f21714fe3f32efa804bda998e478b860a72e4572bdbcbd509ba6085d652fbd5",
       "id": "document-lexical-conventions-byte-literals",
       "kind": "heading",
       "level": 2,
       "parent": "document-lexical-conventions",
       "text": "Byte Literals"
+    },
+    {
+      "document_id": "document-lexical-conventions",
+      "fingerprint": "8d42192bc7bcca6bdfdb379c5131fd453f2ad4b58a85eed7b7b033d40df94cca",
+      "id": "document-lexical-conventions-comments",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-lexical-conventions",
+      "text": "Comments"
+    },
+    {
+      "document_id": "document-lexical-conventions",
+      "fingerprint": "85561b21b48e7839271de6cc2b1f657ac61a45149690a84b5fd7913771d8f547",
+      "id": "document-lexical-conventions-identifiers",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-lexical-conventions",
+      "text": "Identifiers"
+    },
+    {
+      "document_id": "document-lexical-conventions",
+      "fingerprint": "772fd1ec22e298d9db4c04ce673e64dbb0a595667aba63e553f88724804a3bfb",
+      "id": "document-lexical-conventions-keywords",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-lexical-conventions-identifiers",
+      "text": "Keywords"
+    },
+    {
+      "document_id": "document-lexical-conventions",
+      "fingerprint": "cc6ca541c3419596e1fc9992c284fca69dc3164d87373498d16d65060d01bad4",
+      "id": "document-lexical-conventions-labels",
+      "kind": "heading",
+      "level": 3,
+      "parent": "document-lexical-conventions-identifiers",
+      "text": "Labels"
+    },
+    {
+      "document_id": "document-lexical-conventions",
+      "fingerprint": "f2870cbbc49a17d6d015b273bc26c26f0ce7bcb5f5aa5d038eb9e5186aa1d25b",
+      "id": "document-lexical-conventions-package-names",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-lexical-conventions",
+      "text": "Package Names"
+    },
+    {
+      "document_id": "document-lexical-conventions",
+      "fingerprint": "721834e1358d01f6318e633542c3568049f5fbd60995c35da7096e4bbff21e34",
+      "id": "document-lexical-conventions-attributes",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-lexical-conventions",
+      "text": "Attributes"
+    },
+    {
+      "document_id": "document-lexical-conventions",
+      "fingerprint": "ba9145da98bbfdea7097f341c912f5e353dda353527be0380b4192f4aa420869",
+      "id": "document-lexical-conventions-numeric-literals",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-lexical-conventions",
+      "text": "Numeric Literals"
+    },
+    {
+      "document_id": "document-lexical-conventions",
+      "fingerprint": "473368b06c633870e19ae088baa007dc2242dec3cf79fe9a54835d9bdf58dad8",
+      "id": "document-lexical-conventions-dot-prefixed-tokens",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-lexical-conventions",
+      "text": "Dot-Prefixed Tokens"
+    },
+    {
+      "document_id": "document-lexical-conventions",
+      "fingerprint": "6ac058e8627720775edb68d5ee8d9a7eeb5024235bc2492c8ffad2f2894ef6ad",
+      "id": "document-lexical-conventions-operators-and-delimiters",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-lexical-conventions",
+      "text": "Operators and Delimiters"
+    },
+    {
+      "document_id": "document-lexical-conventions",
+      "fingerprint": "9bb882181fed5281c407697428b59c9def4869d0a245194a82c0428a577a3f5d",
+      "id": "document-lexical-conventions-automatic-semicolon-insertion",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-lexical-conventions",
+      "text": "Automatic Semicolon Insertion"
+    },
+    {
+      "document_id": "document-lexical-conventions",
+      "fingerprint": "aab83c7484ead7919e4834a96e0c6b91d81275433557d0aa5d3187e0edc47e40",
+      "id": "document-lexical-conventions-mbti-extensions",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-lexical-conventions",
+      "text": "`.mbti` Extensions"
     },
     {
       "document_id": "document-error_codes-e0001",
@@ -4673,7 +4855,7 @@
     },
     {
       "document_id": "document-error_codes-e0025",
-      "fingerprint": "153f87c7c84a93c9123c46debc39642bc0aecbcd90cfec967b7f9a04aef95ea4",
+      "fingerprint": "e1f23ea4d3df017f76274a3609b9d7f4e0f9bce8bef1679ee25c8fca43636ceb",
       "id": "document-error_codes-e0025",
       "kind": "document",
       "level": 1,
@@ -4725,29 +4907,11 @@
     },
     {
       "document_id": "document-error_codes-e0027",
-      "fingerprint": "860871a4aecb266e261de670a89dcad20f0355a2d3e6c22706aa44e9b1d9939a",
+      "fingerprint": "6ab1caae219da2f7f1543726edb031af85577cb062054e43f6f8f10b8fb9af16",
       "id": "document-error_codes-e0027",
       "kind": "document",
       "level": 1,
       "text": "E0027"
-    },
-    {
-      "document_id": "document-error_codes-e0027",
-      "fingerprint": "13ea71c8d4a3a9977cd98617a0fceee3886bc68611a2d73596366c33cef38a73",
-      "id": "document-error_codes-e0027-erroneous-example",
-      "kind": "heading",
-      "level": 2,
-      "parent": "document-error_codes-e0027",
-      "text": "Erroneous example"
-    },
-    {
-      "document_id": "document-error_codes-e0027",
-      "fingerprint": "ceca7325c6140c4e33e42ca0ef507a9e42345080e7a5f780ef13688a0e480043",
-      "id": "document-error_codes-e0027-suggestion",
-      "kind": "heading",
-      "level": 2,
-      "parent": "document-error_codes-e0027",
-      "text": "Suggestion"
     },
     {
       "document_id": "document-error_codes-e0028",
@@ -4777,7 +4941,7 @@
     },
     {
       "document_id": "document-error_codes-e0029",
-      "fingerprint": "ba0e95d84bc5b3ea5a5d29648a9c3b98e5645b1688685fc4f37ef8430d50145d",
+      "fingerprint": "c4173d2683dbf83289b200c5456286d3b92a10b34905a79c9914e555583d1490",
       "id": "document-error_codes-e0029",
       "kind": "document",
       "level": 1,
@@ -4794,7 +4958,7 @@
     },
     {
       "document_id": "document-error_codes-e0029",
-      "fingerprint": "fd7201c0371dd655e5586c2118562136a901d96358cf026b262bfebb52df0e36",
+      "fingerprint": "49d3f3cd131355a0729c4c524a0078d3e6db2aeac97a035279649a7aaaafa632",
       "id": "document-error_codes-e0029-suggestion",
       "kind": "heading",
       "level": 2,
@@ -4923,7 +5087,7 @@
     },
     {
       "document_id": "document-error_codes-e0036",
-      "fingerprint": "76109cf73d229c3480d7759deda1745fd07680b5823632df76511163860ee99b",
+      "fingerprint": "99e89311da74ebcc67dd4d6c2e09e3629f111bc797147f23f9405964ea43ccfa",
       "id": "document-error_codes-e0036",
       "kind": "document",
       "level": 1,
@@ -4940,7 +5104,7 @@
     },
     {
       "document_id": "document-error_codes-e0036",
-      "fingerprint": "687d271a847e4a03f850b93d1104948a5cbb380680f960c37f3b2b5b3314fda2",
+      "fingerprint": "63b2b0b305ec8dc1fc5db008dbfed1dfa484143e808ed987c9e1ec43e8c7256f",
       "id": "document-error_codes-e0036-suggestion",
       "kind": "heading",
       "level": 2,
@@ -4949,7 +5113,7 @@
     },
     {
       "document_id": "document-error_codes-e0037",
-      "fingerprint": "a7d7c517e60e965b5c4eed713bd9efe9e7f07d202f08b5a18e0f9aa1c51441ad",
+      "fingerprint": "b179562103ed7b6197d439310acd6c4e11551049860c03c98f9f3d153a8139e6",
       "id": "document-error_codes-e0037",
       "kind": "document",
       "level": 1,
@@ -4966,7 +5130,7 @@
     },
     {
       "document_id": "document-error_codes-e0037",
-      "fingerprint": "9e04d65df57e936a82b8861077050c8deff90249718f75e92c079139966543d9",
+      "fingerprint": "9fa7773acd9a84f04775f89c6618f98d9d3c204ca9064fdc35018de00cbcf3bc",
       "id": "document-error_codes-e0037-suggestion",
       "kind": "heading",
       "level": 2,
@@ -5528,11 +5692,20 @@
     },
     {
       "document_id": "document-error_codes-e0063",
-      "fingerprint": "3c04bb4ca65901f51f221c40dcd779016c0a850a16c7f78412eaf1298274354a",
+      "fingerprint": "23a0bb3c20f51661295a5c17aa36875893dcd4b6e41c940620a9bfa6868b685c",
       "id": "document-error_codes-e0063",
       "kind": "document",
       "level": 1,
       "text": "E0063"
+    },
+    {
+      "document_id": "document-error_codes-e0063",
+      "fingerprint": "1aadac68e4eceeeae7553cc16e7a118b97be02e34a126715440f0675b9311b19",
+      "id": "document-error_codes-e0063-suggestion",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e0063",
+      "text": "Suggestion"
     },
     {
       "document_id": "document-error_codes-e0064",
@@ -5848,7 +6021,7 @@
     },
     {
       "document_id": "document-error_codes-e0076",
-      "fingerprint": "6b3f7beac77ea581bb2826a9df05f59bcc98dd1a8751bca43b296d5ea22ace42",
+      "fingerprint": "26556f9cd5d1d71551503fba410a2cce3a0dcba29062a520cb63905fe29eadfe",
       "id": "document-error_codes-e0076",
       "kind": "document",
       "level": 1,
@@ -5865,7 +6038,7 @@
     },
     {
       "document_id": "document-error_codes-e0076",
-      "fingerprint": "f696a58808be6f741ac34ce327ae96064de658b6b861a41cf5a0ee3292241de5",
+      "fingerprint": "c0515f6c06700ddaeab9cc2611dabed37c8d21beac5483f0529494fbe8cb96ff",
       "id": "document-error_codes-e0076-suggestion",
       "kind": "heading",
       "level": 2,
@@ -5874,7 +6047,7 @@
     },
     {
       "document_id": "document-error_codes-e0077",
-      "fingerprint": "523e6fc576749583d64244af5aeef560a3dc9229d2003964bde0cbe2fb943aef",
+      "fingerprint": "79ee7f59d8434aab09aed19bc2cb43409ca1a600629ce80cb760801364ab8449",
       "id": "document-error_codes-e0077",
       "kind": "document",
       "level": 1,
@@ -5891,7 +6064,7 @@
     },
     {
       "document_id": "document-error_codes-e0077",
-      "fingerprint": "10a1837b58bb08659650beffdac9d7dc78fca1683580ce8a0700f53817b6a3c4",
+      "fingerprint": "75966482002e6720d75784d9db6f2c661c5f195129de75fed7ed6ce21cdb8696",
       "id": "document-error_codes-e0077-suggestion",
       "kind": "heading",
       "level": 2,
@@ -5926,7 +6099,7 @@
     },
     {
       "document_id": "document-error_codes-e0079",
-      "fingerprint": "d164dad8d75b5b3f04bfb05dba33a5830cfd6c32d61e39a89f36cb8bed4b7fcb",
+      "fingerprint": "b10a43500ffd8ef896ee4acd0317cb1712c584c2174dc81fd7dbbe27c783323b",
       "id": "document-error_codes-e0079",
       "kind": "document",
       "level": 1,
@@ -5952,7 +6125,7 @@
     },
     {
       "document_id": "document-error_codes-e0080",
-      "fingerprint": "d02ad3a131572be434222f6b965c75b801dfc34308cbefab807116938488389d",
+      "fingerprint": "e939ac8bbbb6877dca64d3e8212b346d8a542fcbe9d4bf3ea2ecf7006df861d8",
       "id": "document-error_codes-e0080",
       "kind": "document",
       "level": 1,
@@ -5978,7 +6151,7 @@
     },
     {
       "document_id": "document-error_codes-e0081",
-      "fingerprint": "b21b852ae54ce117597dd69b2f0e4abfdd4af883fd1cdb3d7d6815568b5b1812",
+      "fingerprint": "144d000ba7aa41bda613163d37997e43d0f4f781a04120eed5e72b13ba1dfd79",
       "id": "document-error_codes-e0081",
       "kind": "document",
       "level": 1,
@@ -6208,6 +6381,110 @@
       "kind": "heading",
       "level": 2,
       "parent": "document-error_codes-e0089",
+      "text": "Suggestion"
+    },
+    {
+      "document_id": "document-error_codes-e0090",
+      "fingerprint": "a2ae50bce23bf29538a6f28b77d1452bd7da25f1a56c6e5947b8d7464eb97037",
+      "id": "document-error_codes-e0090",
+      "kind": "document",
+      "level": 1,
+      "text": "E0090"
+    },
+    {
+      "document_id": "document-error_codes-e0090",
+      "fingerprint": "0bb928aac5a9c1f41bd8b3cc1c760f4bfd7c7a9fbe34495a70936fe6fb5be9af",
+      "id": "document-error_codes-e0090-erroneous-example",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e0090",
+      "text": "Erroneous example"
+    },
+    {
+      "document_id": "document-error_codes-e0090",
+      "fingerprint": "ba99355c3ba07fbe19b3e5c30d2205b386d4891faa7deac1d359013e5ce85b00",
+      "id": "document-error_codes-e0090-suggestion",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e0090",
+      "text": "Suggestion"
+    },
+    {
+      "document_id": "document-error_codes-e0091",
+      "fingerprint": "db8e740339153ca7dc72f319d2265a3400d4331001bde61e47caf15052807dc7",
+      "id": "document-error_codes-e0091",
+      "kind": "document",
+      "level": 1,
+      "text": "E0091"
+    },
+    {
+      "document_id": "document-error_codes-e0091",
+      "fingerprint": "b6139a17f41e51f0ec2a4df8037db50b9b64f966f5f29351fe2a68dc89f4e185",
+      "id": "document-error_codes-e0091-erroneous-example",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e0091",
+      "text": "Erroneous example"
+    },
+    {
+      "document_id": "document-error_codes-e0091",
+      "fingerprint": "ae5037c99af4b34806e49aef8f9b9b8188dfd78f9ce4de9dbb4f1aea30f29c93",
+      "id": "document-error_codes-e0091-suggestion",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e0091",
+      "text": "Suggestion"
+    },
+    {
+      "document_id": "document-error_codes-e0092",
+      "fingerprint": "93532ae915388fd8dd1f98fb918d383e7b408375b761945f6a58781d9722b55a",
+      "id": "document-error_codes-e0092",
+      "kind": "document",
+      "level": 1,
+      "text": "E0092"
+    },
+    {
+      "document_id": "document-error_codes-e0092",
+      "fingerprint": "d63fbc6c1f904aa5df8ce759a1103d0bf28818ccc3fb88c734d210f2335e1851",
+      "id": "document-error_codes-e0092-erroneous-example",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e0092",
+      "text": "Erroneous example"
+    },
+    {
+      "document_id": "document-error_codes-e0092",
+      "fingerprint": "e528e7d491d4afa56fecd92a9c92613e7af8bf4a89ef4f84997257d3806a6d17",
+      "id": "document-error_codes-e0092-suggestion",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e0092",
+      "text": "Suggestion"
+    },
+    {
+      "document_id": "document-error_codes-e0093",
+      "fingerprint": "7080a00f39029d19407f95c5709bce54b7e477fe43089dbf23508e6cbf3755a2",
+      "id": "document-error_codes-e0093",
+      "kind": "document",
+      "level": 1,
+      "text": "E0093"
+    },
+    {
+      "document_id": "document-error_codes-e0093",
+      "fingerprint": "b5e302a65bd25f5a96a0dfcd35ec5a3809c012bf5d4a82b23a96568ebd036fe5",
+      "id": "document-error_codes-e0093-erroneous-example",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e0093",
+      "text": "Erroneous example"
+    },
+    {
+      "document_id": "document-error_codes-e0093",
+      "fingerprint": "c244dd93577e6c30e7cf7bb6494dadb9c6a397f8aa20e1ef6c43def3639f0593",
+      "id": "document-error_codes-e0093-suggestion",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e0093",
       "text": "Suggestion"
     },
     {
@@ -6904,7 +7181,7 @@
     },
     {
       "document_id": "document-error_codes-e3800",
-      "fingerprint": "f28f7a17d52c1ccadcc4d2ae5a09e1538289de96bdaea49ab721b3fa32174dfa",
+      "fingerprint": "5defe0ecd871e68d0e17364778b4ed6809c038b4f991adfb1cac2cf5790f4f3e",
       "id": "document-error_codes-e3800",
       "kind": "document",
       "level": 1,
@@ -7424,7 +7701,7 @@
     },
     {
       "document_id": "document-error_codes-e4022",
-      "fingerprint": "12b5bfa543a16b94ed1aa5338965e2519eac634808409374d3467752d0242679",
+      "fingerprint": "2b4b6e14d5d92c7d1034494832aa24ce0ccbf5252610479b08bfc0a0b37d4372",
       "id": "document-error_codes-e4022",
       "kind": "document",
       "level": 1,
@@ -7994,7 +8271,7 @@
     },
     {
       "document_id": "document-error_codes-e4051",
-      "fingerprint": "db41734c75558720e5400a81b6103ba43bc74a33ccafd2307459c2d57b5651cf",
+      "fingerprint": "91d4fdeff6f11db6dff069e635681603a1928b9a10f55aca12369f4a9b9268ff",
       "id": "document-error_codes-e4051",
       "kind": "document",
       "level": 1,
@@ -8002,7 +8279,7 @@
     },
     {
       "document_id": "document-error_codes-e4051",
-      "fingerprint": "6663e0502ee8563fb23faf9857a79ef7a30fb3ed3f0b1ef26bae19ea70f2e1cb",
+      "fingerprint": "5ba73aef4b40fe2661b108c06e6d917c39d323895b355616c69fdbbdf995da1c",
       "id": "document-error_codes-e4051-erroneous-example",
       "kind": "heading",
       "level": 2,
@@ -8046,7 +8323,7 @@
     },
     {
       "document_id": "document-error_codes-e4053",
-      "fingerprint": "0218867e51a0fc126fe127cec2026e2b80ccbb2c17e76dd08a5b714118a42d4f",
+      "fingerprint": "90f437f9394379e733e0fdb22f2c753f98fd8978d70877afa7f20c1bb0d147d6",
       "id": "document-error_codes-e4053",
       "kind": "document",
       "level": 1,
@@ -8271,7 +8548,7 @@
     },
     {
       "document_id": "document-error_codes-e4065",
-      "fingerprint": "de017c4277dfcddb0552c62776d12b4c95c4c38e559163f362e7d61b36370a55",
+      "fingerprint": "0c50d65127ab54300b86b09c870964fcf1a921e65dbf02f7835f94bae8d1605e",
       "id": "document-error_codes-e4065",
       "kind": "document",
       "level": 1,
@@ -8288,7 +8565,7 @@
     },
     {
       "document_id": "document-error_codes-e4065",
-      "fingerprint": "41b12ee505a893a641684231de416c361bdd19cd5e3ec809648cfa762ac0347c",
+      "fingerprint": "fbf88216886dc70fdf5eb1d2e4b6916929fe01958737e3317f4ff0e5a8e93ebc",
       "id": "document-error_codes-e4065-suggestion",
       "kind": "heading",
       "level": 2,
@@ -9421,32 +9698,6 @@
       "text": "Suggestion"
     },
     {
-      "document_id": "document-error_codes-e4121",
-      "fingerprint": "57a1f1a4db5268e7eedb59b93c740c07997a96f5f1538543810fbeb547943786",
-      "id": "document-error_codes-e4121",
-      "kind": "document",
-      "level": 1,
-      "text": "E4121"
-    },
-    {
-      "document_id": "document-error_codes-e4121",
-      "fingerprint": "2cb62aec08ccdb8d4d57d5b57d749f651b88a0d02fd4680f2b62d75a7d586eb9",
-      "id": "document-error_codes-e4121-erroneous-example",
-      "kind": "heading",
-      "level": 2,
-      "parent": "document-error_codes-e4121",
-      "text": "Erroneous example"
-    },
-    {
-      "document_id": "document-error_codes-e4121",
-      "fingerprint": "0cffe70e124274e4e899a2c02684fabd4b58440aa29ede1f2f3002eb2860d771",
-      "id": "document-error_codes-e4121-suggestion",
-      "kind": "heading",
-      "level": 2,
-      "parent": "document-error_codes-e4121",
-      "text": "Suggestion"
-    },
-    {
       "document_id": "document-error_codes-e4122",
       "fingerprint": "697720933ce954bd3deaa9656ac0b83ef351c57ef8b27d4e0e86c5d0089c78aa",
       "id": "document-error_codes-e4122",
@@ -9526,7 +9777,7 @@
     },
     {
       "document_id": "document-error_codes-e4128",
-      "fingerprint": "0307061880588937ab82ffdb58296077b8bb8d45af007f3c5d2918f26abfb088",
+      "fingerprint": "8434f85ac3eb738850470230e151dbb1ab17c0718845c0bea04dcd6904377dc8",
       "id": "document-error_codes-e4128",
       "kind": "document",
       "level": 1,
@@ -9543,7 +9794,7 @@
     },
     {
       "document_id": "document-error_codes-e4128",
-      "fingerprint": "cfcd045c3c5019543c25d42662684da42bbc0e75601c822898bec74e6c6d9987",
+      "fingerprint": "f8a97281dfffe0178e6f144c755e3e6f21a8c8baf32d99f5b546ef95ad3f9036",
       "id": "document-error_codes-e4128-suggestion",
       "kind": "heading",
       "level": 2,
@@ -9652,6 +9903,32 @@
       "kind": "heading",
       "level": 2,
       "parent": "document-error_codes-e4133",
+      "text": "Suggestion"
+    },
+    {
+      "document_id": "document-error_codes-e4134",
+      "fingerprint": "3c32ff045badd62e63f41e2752d87952b0e272d3ab81d2eb64bf0a234c94bc5d",
+      "id": "document-error_codes-e4134",
+      "kind": "document",
+      "level": 1,
+      "text": "E4134"
+    },
+    {
+      "document_id": "document-error_codes-e4134",
+      "fingerprint": "0ae49300a10fa4ba03549f7804396d7c0bc079ca775eed8064169a941c3ee55f",
+      "id": "document-error_codes-e4134-erroneous-example",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e4134",
+      "text": "Erroneous example"
+    },
+    {
+      "document_id": "document-error_codes-e4134",
+      "fingerprint": "8e786eb948841b7999379e2362c464150b8394e5a19f30934b2f57941882e394",
+      "id": "document-error_codes-e4134-suggestion",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e4134",
       "text": "Suggestion"
     },
     {
@@ -10098,7 +10375,7 @@
     },
     {
       "document_id": "document-error_codes-e4155",
-      "fingerprint": "451766e4f85ea00446e28ded8b686ed49cd6d76a28ee0ae80fa3c7bad46181bc",
+      "fingerprint": "3bd4f4e7f05469ae7694a9c6e6745f5bfd164d897d469113623f5c88358803b3",
       "id": "document-error_codes-e4155",
       "kind": "document",
       "level": 1,
@@ -10106,12 +10383,21 @@
     },
     {
       "document_id": "document-error_codes-e4155",
-      "fingerprint": "2268b17c017668823c5a0253bfdf3f557a2732dff67a22ae7f654a9a9278bdfa",
+      "fingerprint": "234c8e08131c4330d4eee6e6d0b405c7f179b058c3bb7ec22656524558426ba2",
       "id": "document-error_codes-e4155-erroneous-example",
       "kind": "heading",
       "level": 2,
       "parent": "document-error_codes-e4155",
       "text": "Erroneous example"
+    },
+    {
+      "document_id": "document-error_codes-e4155",
+      "fingerprint": "af0cb80ae174fe97e85fb7350e2642038e567e6c2bad2d3d997c6c437d4f728e",
+      "id": "document-error_codes-e4155-suggestion",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e4155",
+      "text": "Suggestion"
     },
     {
       "document_id": "document-error_codes-e4156",
@@ -10427,7 +10713,7 @@
     },
     {
       "document_id": "document-error_codes-e4171",
-      "fingerprint": "671d77074ed097a9ea105c03ce8faf74eae990ffa312fff1c3bab5d9e9d14798",
+      "fingerprint": "85824b029e2ab3242eea48826ed4b454c61d3f699f2eed00957072a479f8cfc8",
       "id": "document-error_codes-e4171",
       "kind": "document",
       "level": 1,
@@ -10435,7 +10721,7 @@
     },
     {
       "document_id": "document-error_codes-e4171",
-      "fingerprint": "739a7310c5a51a14948bb44eba15a0edce8d44f4e14a22a3426cd8906ef386b0",
+      "fingerprint": "f0fb4a62f9de50c4ef9e5d4799fef98443ede764a5091da51a20a85e7d8f7df3",
       "id": "document-error_codes-e4171-erroneous-example",
       "kind": "heading",
       "level": 2,
@@ -10444,7 +10730,7 @@
     },
     {
       "document_id": "document-error_codes-e4171",
-      "fingerprint": "568b9c4622fe15329deb270eb104595e11984bdcbddca7874827d4ed99a9ba3b",
+      "fingerprint": "aa8e941ca2e8b8eb380f54d45f70107e0ba9a82d4f00fa248d0efd858126b9c5",
       "id": "document-error_codes-e4171-suggestion",
       "kind": "heading",
       "level": 2,
@@ -10453,7 +10739,7 @@
     },
     {
       "document_id": "document-error_codes-e4172",
-      "fingerprint": "24a5544190f034c590b06d3aeea3829382e0e251b499b869338c2b2b31089ba0",
+      "fingerprint": "ded061b7cf728c8318bd44a8739a6aa384b006d3c52d89e2aaef1ffa63fa811c",
       "id": "document-error_codes-e4172",
       "kind": "document",
       "level": 1,
@@ -10479,7 +10765,7 @@
     },
     {
       "document_id": "document-error_codes-e4173",
-      "fingerprint": "6599084ca33a8df7e6e844df1045fadc573b022172a51bf86c8a2e93bea2ce93",
+      "fingerprint": "1aa7032e1bcba6c4778ca90b3666f30f01af862cf708f0dd9714c7f7f8ab77b8",
       "id": "document-error_codes-e4173",
       "kind": "document",
       "level": 1,
@@ -10487,7 +10773,7 @@
     },
     {
       "document_id": "document-error_codes-e4173",
-      "fingerprint": "68749e7b559c362d31666481596d28d23ec37c64a85d94039c372ab8858aa739",
+      "fingerprint": "db50d381f5d106a44affa8a9cab69982edc6e7f9f76ed1d3d5e6604b7228229b",
       "id": "document-error_codes-e4173-erroneous-example",
       "kind": "heading",
       "level": 2,
@@ -10496,7 +10782,7 @@
     },
     {
       "document_id": "document-error_codes-e4173",
-      "fingerprint": "3d1319e9a6a3dc06278b3914e4ed50fb2006b50e7174e0c88ed46b9a666e08c1",
+      "fingerprint": "acd31ed1449548bd59bc075f9d2c6429bd85e75af57ec371fae19d1ac45901b9",
       "id": "document-error_codes-e4173-suggestion",
       "kind": "heading",
       "level": 2,
@@ -10556,32 +10842,6 @@
       "text": "Suggestion"
     },
     {
-      "document_id": "document-error_codes-e4176",
-      "fingerprint": "4676f4c984fe7c8e83c6c8323d4e740e54df0c5296a601808aa12f3a156a917f",
-      "id": "document-error_codes-e4176",
-      "kind": "document",
-      "level": 1,
-      "text": "E4176"
-    },
-    {
-      "document_id": "document-error_codes-e4176",
-      "fingerprint": "67879924922f1264055c8c442a859333caea3de751c92f5079ff73dc5d78edf9",
-      "id": "document-error_codes-e4176-erroneous-example",
-      "kind": "heading",
-      "level": 2,
-      "parent": "document-error_codes-e4176",
-      "text": "Erroneous example"
-    },
-    {
-      "document_id": "document-error_codes-e4176",
-      "fingerprint": "320bbf6dff66e9f2961167564d7497aad02566780530a85236a501436252c75b",
-      "id": "document-error_codes-e4176-suggestion",
-      "kind": "heading",
-      "level": 2,
-      "parent": "document-error_codes-e4176",
-      "text": "Suggestion"
-    },
-    {
       "document_id": "document-error_codes-e4177",
       "fingerprint": "af707cfa3797f8099e1a75ee4369cc27334d38294a8cd498790434c2ef2193eb",
       "id": "document-error_codes-e4177",
@@ -10609,7 +10869,7 @@
     },
     {
       "document_id": "document-error_codes-e4180",
-      "fingerprint": "b3a213b1fa49a4e7561e98de7d273912d1179e051bb9c4506442764ef797cfac",
+      "fingerprint": "1588de9fd649300dc727d04d70fb83560cdffadc720c15bd857932ccf90ea9ac",
       "id": "document-error_codes-e4180",
       "kind": "document",
       "level": 1,
@@ -10626,7 +10886,7 @@
     },
     {
       "document_id": "document-error_codes-e4180",
-      "fingerprint": "1fb41afa603bcfeb8595235bec2ea76735790f27c1405f63bec4161dba7b988e",
+      "fingerprint": "a6101f771b387efa38527f39adc937c221228434c238188c7f83ab2327a17f6f",
       "id": "document-error_codes-e4180-suggestion",
       "kind": "heading",
       "level": 2,
@@ -10635,7 +10895,7 @@
     },
     {
       "document_id": "document-error_codes-e4181",
-      "fingerprint": "54f887424aca2d586cab7d6b3e1bb0fe095369861d9a34fd7c8927822a6c4477",
+      "fingerprint": "4dfebb30ff2add729bf126228c428361d07ffff92dff9c55e8a9807a3359581e",
       "id": "document-error_codes-e4181",
       "kind": "document",
       "level": 1,
@@ -10652,141 +10912,11 @@
     },
     {
       "document_id": "document-error_codes-e4181",
-      "fingerprint": "de4a5a40dda89d62f451500b8fe9e0c411ccfd8321b9566afcb5af09d38d8adb",
+      "fingerprint": "e2af93aea8f3977e2150e8a39579652e00779bbcacb0c2110e6a5f94aac73069",
       "id": "document-error_codes-e4181-suggestion",
       "kind": "heading",
       "level": 2,
       "parent": "document-error_codes-e4181",
-      "text": "Suggestion"
-    },
-    {
-      "document_id": "document-error_codes-e4182",
-      "fingerprint": "09a5b72c5579611ead9c2827eace4fc479a1f71a13091121530b4ef467dcdba1",
-      "id": "document-error_codes-e4182",
-      "kind": "document",
-      "level": 1,
-      "text": "E4182"
-    },
-    {
-      "document_id": "document-error_codes-e4182",
-      "fingerprint": "bb3d00ea2db6aedc5f302ae111b12e8267237d6ea83b5491afe6993fce1b4d5a",
-      "id": "document-error_codes-e4182-erroneous-example",
-      "kind": "heading",
-      "level": 2,
-      "parent": "document-error_codes-e4182",
-      "text": "Erroneous example"
-    },
-    {
-      "document_id": "document-error_codes-e4182",
-      "fingerprint": "88cc8070633e68d260b07e8b09b47c8ad628ad2220853da48774d3479918030b",
-      "id": "document-error_codes-e4182-suggestion",
-      "kind": "heading",
-      "level": 2,
-      "parent": "document-error_codes-e4182",
-      "text": "Suggestion"
-    },
-    {
-      "document_id": "document-error_codes-e4183",
-      "fingerprint": "39385e60124c44b2a4875d9a89b773a0a80404cb2c90e7159276d1be40cca836",
-      "id": "document-error_codes-e4183",
-      "kind": "document",
-      "level": 1,
-      "text": "E4183"
-    },
-    {
-      "document_id": "document-error_codes-e4183",
-      "fingerprint": "7bd7fa96df5aaa9ab9e0dff84cdfc250a57d8fe6a31fca8240d8dfc02b9aa060",
-      "id": "document-error_codes-e4183-erroneous-example",
-      "kind": "heading",
-      "level": 2,
-      "parent": "document-error_codes-e4183",
-      "text": "Erroneous example"
-    },
-    {
-      "document_id": "document-error_codes-e4183",
-      "fingerprint": "d4cb1360916a57112e4ea52590d69443b827af81aa40a0952aa2463e7d86f963",
-      "id": "document-error_codes-e4183-suggestion",
-      "kind": "heading",
-      "level": 2,
-      "parent": "document-error_codes-e4183",
-      "text": "Suggestion"
-    },
-    {
-      "document_id": "document-error_codes-e4184",
-      "fingerprint": "65ba964910e40e3144786082ccf2e448218d1332662fa607ca4736de7a41da41",
-      "id": "document-error_codes-e4184",
-      "kind": "document",
-      "level": 1,
-      "text": "E4184"
-    },
-    {
-      "document_id": "document-error_codes-e4184",
-      "fingerprint": "6ee35f1a2ed7aa54a9d2b77908dd10780df2118e2f91245e3fbaeeb3ef84adb7",
-      "id": "document-error_codes-e4184-erroneous-example",
-      "kind": "heading",
-      "level": 2,
-      "parent": "document-error_codes-e4184",
-      "text": "Erroneous example"
-    },
-    {
-      "document_id": "document-error_codes-e4184",
-      "fingerprint": "c50caafb929fd68d5c8fcfe4e82089d87f7e1c7b1b307cae2a52ef7555664d74",
-      "id": "document-error_codes-e4184-suggestion",
-      "kind": "heading",
-      "level": 2,
-      "parent": "document-error_codes-e4184",
-      "text": "Suggestion"
-    },
-    {
-      "document_id": "document-error_codes-e4185",
-      "fingerprint": "214d43a9acf95cf98c355c5d5d0c12b7dc9b0dc2618511892b91950cd8000a31",
-      "id": "document-error_codes-e4185",
-      "kind": "document",
-      "level": 1,
-      "text": "E4185"
-    },
-    {
-      "document_id": "document-error_codes-e4185",
-      "fingerprint": "860ef4180fb9f8f6663a7710e1b4bd7809f34801df0a2ed413983cd697ebfc6f",
-      "id": "document-error_codes-e4185-erroneous-example",
-      "kind": "heading",
-      "level": 2,
-      "parent": "document-error_codes-e4185",
-      "text": "Erroneous example"
-    },
-    {
-      "document_id": "document-error_codes-e4185",
-      "fingerprint": "726661b2eb4cfd5dd61b2e9ebdf5d812302e910ef57f0c2570aed32956418d3e",
-      "id": "document-error_codes-e4185-suggestion",
-      "kind": "heading",
-      "level": 2,
-      "parent": "document-error_codes-e4185",
-      "text": "Suggestion"
-    },
-    {
-      "document_id": "document-error_codes-e4186",
-      "fingerprint": "600bea710bffeab3e80608ad23ce1a8294ee805d582c3dfd7d738f2de309fb3c",
-      "id": "document-error_codes-e4186",
-      "kind": "document",
-      "level": 1,
-      "text": "E4186"
-    },
-    {
-      "document_id": "document-error_codes-e4186",
-      "fingerprint": "6b7c0d8959372473f8d4e625f5131a714c79ed83d0316d5c78f9273ddc22266a",
-      "id": "document-error_codes-e4186-erroneous-example",
-      "kind": "heading",
-      "level": 2,
-      "parent": "document-error_codes-e4186",
-      "text": "Erroneous example"
-    },
-    {
-      "document_id": "document-error_codes-e4186",
-      "fingerprint": "17d21d405fceddd12d68daa0eb85892a8f262c41c5aba94b815018e3a1f2c89f",
-      "id": "document-error_codes-e4186-suggestion",
-      "kind": "heading",
-      "level": 2,
-      "parent": "document-error_codes-e4186",
       "text": "Suggestion"
     },
     {
@@ -11423,7 +11553,7 @@
     },
     {
       "document_id": "document-error_codes-e4214",
-      "fingerprint": "ad4f95e227397e83c220f30362c1dd27e5f07df88de12ff7ca05052e3fc13f6d",
+      "fingerprint": "09be173e894c1121c9909320fa2eada9f52a8e1a7fa9c0523c5daee4256f5bce",
       "id": "document-error_codes-e4214",
       "kind": "document",
       "level": 1,
@@ -11440,7 +11570,7 @@
     },
     {
       "document_id": "document-error_codes-e4214",
-      "fingerprint": "e92033e48f960d3fffadc5878355022a8c11f97bebfe04a4058d3b263f5e54ad",
+      "fingerprint": "dc94a1c836de8bb00697779d7dcf75641d4e6f8df2f2db67416d5700208a5dcc",
       "id": "document-error_codes-e4214-suggestion",
       "kind": "heading",
       "level": 2,
@@ -11449,7 +11579,7 @@
     },
     {
       "document_id": "document-error_codes-e4215",
-      "fingerprint": "e0a26bac281ccef352a92de2ee134dc0a78853709afa3cc2ed9c68b7449df1b9",
+      "fingerprint": "f4584c0fee987346e66478ce6ffc7d59f0148bf6f4a08812150ee33718e68ec4",
       "id": "document-error_codes-e4215",
       "kind": "document",
       "level": 1,
@@ -11474,34 +11604,34 @@
       "text": "Suggestion"
     },
     {
-      "document_id": "document-error_codes-e4217",
-      "fingerprint": "350141210e085d632e2845df886f01a07c7ff53337b3cd23c71c12696965f4c4",
-      "id": "document-error_codes-e4217",
+      "document_id": "document-error_codes-e4216",
+      "fingerprint": "d0e3e8df885387c30e9e651e792350c656cfc12004c07a2ac1d8de4f7d70bc7a",
+      "id": "document-error_codes-e4216",
       "kind": "document",
       "level": 1,
-      "text": "E4217"
+      "text": "E4216"
     },
     {
-      "document_id": "document-error_codes-e4217",
-      "fingerprint": "8098e3ce6c213d337958a5c4ba0276c3742af87c9b796c0d381607b63f7f8473",
-      "id": "document-error_codes-e4217-erroneous-example",
+      "document_id": "document-error_codes-e4216",
+      "fingerprint": "cc3bfa472f5719135fc980a623da356c39c86153c329a8b83efb65eed3f32ae6",
+      "id": "document-error_codes-e4216-erroneous-example",
       "kind": "heading",
       "level": 2,
-      "parent": "document-error_codes-e4217",
+      "parent": "document-error_codes-e4216",
       "text": "Erroneous example"
     },
     {
-      "document_id": "document-error_codes-e4217",
-      "fingerprint": "d7ca5bfbdfd6e6f7de2e5f8e732b7183562f7b41af53ec07b044cdf62caa1d35",
-      "id": "document-error_codes-e4217-suggestion",
+      "document_id": "document-error_codes-e4216",
+      "fingerprint": "8751d02601ada0bdfdfa4e142aeed5abc4eb7c0b67a1ffcba0197ad9dad458f5",
+      "id": "document-error_codes-e4216-suggestion",
       "kind": "heading",
       "level": 2,
-      "parent": "document-error_codes-e4217",
+      "parent": "document-error_codes-e4216",
       "text": "Suggestion"
     },
     {
       "document_id": "document-error_codes-e4218",
-      "fingerprint": "0dc49d5c442cc6da559b33f900461cf5842f7dc186ca37fa522e314affbd8429",
+      "fingerprint": "4119ee63d980246e565b31d3d8b9ee8a727ce0c6ec627af2814f774e6ed7f8f8",
       "id": "document-error_codes-e4218",
       "kind": "document",
       "level": 1,
@@ -11553,7 +11683,7 @@
     },
     {
       "document_id": "document-error_codes-e4220",
-      "fingerprint": "0e6eae41f7efa98b609f955fb76361d3e687888abc514f00c5f7c5d3814c27e7",
+      "fingerprint": "a4061ce05adf5ae0e931fcfdd1d555271b10a7f735e8ab28ab5e86f17f69f36d",
       "id": "document-error_codes-e4220",
       "kind": "document",
       "level": 1,
@@ -11570,7 +11700,7 @@
     },
     {
       "document_id": "document-error_codes-e4220",
-      "fingerprint": "9fa03d9d8942b545b9a43a4672cc5ab4e29d043d4a1bd760a8cd84a108531d0f",
+      "fingerprint": "3ac1c6d842eee4d1afe824db578ab52a17b6dea8df44173965f166bda7afbc57",
       "id": "document-error_codes-e4220-suggestion",
       "kind": "heading",
       "level": 2,
@@ -11604,6 +11734,162 @@
       "text": "Suggestion"
     },
     {
+      "document_id": "document-error_codes-e4222",
+      "fingerprint": "b38c9774788e2952dd393ad10add783398a5a1be59d33a04a7fec157dacea529",
+      "id": "document-error_codes-e4222",
+      "kind": "document",
+      "level": 1,
+      "text": "E4222"
+    },
+    {
+      "document_id": "document-error_codes-e4222",
+      "fingerprint": "429b1b3b20304114418723bce25e277c0cb0943ca65223e4bd532c8effacce03",
+      "id": "document-error_codes-e4222-erroneous-example",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e4222",
+      "text": "Erroneous example"
+    },
+    {
+      "document_id": "document-error_codes-e4222",
+      "fingerprint": "61b2893771430024bdac8962a6e21a5db25424ee9562ab356af9750c880b77f4",
+      "id": "document-error_codes-e4222-suggestion",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e4222",
+      "text": "Suggestion"
+    },
+    {
+      "document_id": "document-error_codes-e4224",
+      "fingerprint": "8c4123d146ccf855cb92a5305e9bc484c77344d5cd5b2f73393bd0e8b84ebadf",
+      "id": "document-error_codes-e4224",
+      "kind": "document",
+      "level": 1,
+      "text": "E4224"
+    },
+    {
+      "document_id": "document-error_codes-e4224",
+      "fingerprint": "0547e4ed9faf4b31fb95443727fcfebe70ddf86c72ba99085ebc4e85a3959e69",
+      "id": "document-error_codes-e4224-erroneous-example",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e4224",
+      "text": "Erroneous example"
+    },
+    {
+      "document_id": "document-error_codes-e4224",
+      "fingerprint": "07028c430c7a4e7fe2a881ff61a61189d05fe1706833f0788e711591a85aab2c",
+      "id": "document-error_codes-e4224-suggestion",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e4224",
+      "text": "Suggestion"
+    },
+    {
+      "document_id": "document-error_codes-e4225",
+      "fingerprint": "f0ac4f84da1e0f5c8a018de483f4f22542dea5eb564b907d2255b88811e673d4",
+      "id": "document-error_codes-e4225",
+      "kind": "document",
+      "level": 1,
+      "text": "E4225"
+    },
+    {
+      "document_id": "document-error_codes-e4225",
+      "fingerprint": "4d7d0c8514f805cef31c91e641f2c1d8aed7dafdf57eec4b1b8d16d11e6aec5c",
+      "id": "document-error_codes-e4225-erroneous-example",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e4225",
+      "text": "Erroneous example"
+    },
+    {
+      "document_id": "document-error_codes-e4225",
+      "fingerprint": "e7cac341e8a22280fcc09d19b31fea9f6efcd435a85388413c2ddef7429e7195",
+      "id": "document-error_codes-e4225-suggestion",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e4225",
+      "text": "Suggestion"
+    },
+    {
+      "document_id": "document-error_codes-e4226",
+      "fingerprint": "7cd9bd0d1a97a11b9bc1f74a702f6e00da4abb9149c770810171d277db72183f",
+      "id": "document-error_codes-e4226",
+      "kind": "document",
+      "level": 1,
+      "text": "E4226"
+    },
+    {
+      "document_id": "document-error_codes-e4226",
+      "fingerprint": "76f69494928b9c74c20550c3fa2ffcf68df1a04775983bbcdaf164e9c3a0bd1a",
+      "id": "document-error_codes-e4226-erroneous-example",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e4226",
+      "text": "Erroneous example"
+    },
+    {
+      "document_id": "document-error_codes-e4226",
+      "fingerprint": "0dff1ca69f7472bee77c19a3aac1800ccbbab2ceba2dc3e13efc982b6a56d6bb",
+      "id": "document-error_codes-e4226-suggestion",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e4226",
+      "text": "Suggestion"
+    },
+    {
+      "document_id": "document-error_codes-e4227",
+      "fingerprint": "8b7261745bc0d080117589eb94ff63f095cc62f491de9078337aa722cbfaac92",
+      "id": "document-error_codes-e4227",
+      "kind": "document",
+      "level": 1,
+      "text": "E4227"
+    },
+    {
+      "document_id": "document-error_codes-e4227",
+      "fingerprint": "7745580f7ca01198aca685ab79164d352bb2a60fda2ec49f69cacc228ea005e2",
+      "id": "document-error_codes-e4227-erroneous-example",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e4227",
+      "text": "Erroneous example"
+    },
+    {
+      "document_id": "document-error_codes-e4227",
+      "fingerprint": "94290d484d60efb3784b52d2864301b51e732bd240ed3495954d9d4b0af9cf85",
+      "id": "document-error_codes-e4227-suggestion",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e4227",
+      "text": "Suggestion"
+    },
+    {
+      "document_id": "document-error_codes-e4228",
+      "fingerprint": "adaad652d00fee87d97f1e8af69e202ab754bafa60f089046441acd3c05326da",
+      "id": "document-error_codes-e4228",
+      "kind": "document",
+      "level": 1,
+      "text": "E4228"
+    },
+    {
+      "document_id": "document-error_codes-e4228",
+      "fingerprint": "7c8b25182ddc9ef26f40f599aae986b54173ca2ec8e45c6d14f512ad9adc5875",
+      "id": "document-error_codes-e4228-erroneous-example",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e4228",
+      "text": "Erroneous example"
+    },
+    {
+      "document_id": "document-error_codes-e4228",
+      "fingerprint": "1709dfefa73e0564824a03e486a74634b33af759423a8080bc1042ab6129b62d",
+      "id": "document-error_codes-e4228-suggestion",
+      "kind": "heading",
+      "level": 2,
+      "parent": "document-error_codes-e4228",
+      "text": "Suggestion"
+    },
+    {
       "document_id": "document-error_codes-index",
       "fingerprint": "02222311ac0acc2603a482acaf3897044f6f79a835b7814d7c62efda56cd566a",
       "id": "document-error_codes-index",
@@ -11614,7 +11900,7 @@
   ],
   "schema_version": 2,
   "source": {
-    "commit": "c86a73f5f60a34f73c4865b837f777368ad52c7a",
+    "commit": "8d9f3ba206eb17f80ee1836e4c1139068d1351b5",
     "index_path": "next/language/index.md",
     "index_sha256": "b6d7df45b48176394db49e78f27c284c4e22662217d731ff1c50768d142bd8b0",
     "index_web_url": "https://docs.moonbitlang.com/en/latest/language/",

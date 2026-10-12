@@ -1,0 +1,35 @@
+{
+  "area": "language",
+  "task": "lang-error-cleanup-order",
+  "cases": [
+    {
+      "name": "failure-only-block-scope-with-shared-lifo-order",
+      "expected": "pass",
+      "final_text": "{\"success\":[\"inner-body\",\"inner-always\",\"after-inner\",\"done\",\"outer-always\"],\"inner_error\":[\"inner-body\",\"inner-always\",\"inner-error\",\"outer-always\",\"outer-error-first\",\"caught\"],\"outer_error\":[\"inner-body\",\"inner-always\",\"after-inner\",\"outer-error-second\",\"outer-always\",\"outer-error-first\",\"caught\"]}\nEach block discards errdefer registrations on success. When an error leaves a block, its registered defer and errdefer actions share reverse registration order."
+    },
+    {
+      "name": "runs-error-cleanup-on-success",
+      "expected": "fail",
+      "final_text": "{\"success\":[\"inner-body\",\"inner-always\",\"inner-error\",\"after-inner\",\"done\",\"outer-error-second\",\"outer-always\",\"outer-error-first\"],\"inner_error\":[\"inner-body\",\"inner-always\",\"inner-error\",\"outer-always\",\"outer-error-first\",\"caught\"],\"outer_error\":[\"inner-body\",\"inner-always\",\"after-inner\",\"outer-error-second\",\"outer-always\",\"outer-error-first\",\"caught\"]}\nEvery registered cleanup runs at block exit.",
+      "must_fail_check_types": [
+        "first_line_json_is"
+      ]
+    },
+    {
+      "name": "keeps-successful-inner-error-cleanup-until-function-exit",
+      "expected": "fail",
+      "final_text": "{\"success\":[\"inner-body\",\"inner-always\",\"after-inner\",\"done\",\"outer-always\"],\"inner_error\":[\"inner-body\",\"inner-always\",\"inner-error\",\"outer-always\",\"outer-error-first\",\"caught\"],\"outer_error\":[\"inner-body\",\"inner-always\",\"after-inner\",\"outer-error-second\",\"inner-error\",\"outer-always\",\"outer-error-first\",\"caught\"]}\nAn outer error also runs all earlier inner error cleanups.",
+      "must_fail_check_types": [
+        "first_line_json_is"
+      ]
+    },
+    {
+      "name": "runs-error-cleanup-as-a-separate-priority-stack",
+      "expected": "fail",
+      "final_text": "{\"success\":[\"inner-body\",\"inner-always\",\"after-inner\",\"done\",\"outer-always\"],\"inner_error\":[\"inner-body\",\"inner-error\",\"inner-always\",\"outer-error-first\",\"outer-always\",\"caught\"],\"outer_error\":[\"inner-body\",\"inner-always\",\"after-inner\",\"outer-error-second\",\"outer-error-first\",\"outer-always\",\"caught\"]}\nError-only actions run before unconditional cleanup.",
+      "must_fail_check_types": [
+        "first_line_json_is"
+      ]
+    }
+  ]
+}

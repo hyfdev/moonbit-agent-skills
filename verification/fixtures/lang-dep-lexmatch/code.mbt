@@ -1,5 +1,5 @@
 fn release_old_scan(s : StringView) -> Int? {
-  lexmatch s {
+  lexscan s {
     (re"\r?\n", before=line, after=_) => Some(line.length())
     _ => None
   }

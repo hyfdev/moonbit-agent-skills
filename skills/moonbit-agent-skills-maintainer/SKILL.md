@@ -5,8 +5,8 @@ license: MIT
 user-invocable: true
 compatibility: Repository-maintenance workflow for hyfdev/moonbit-agent-skills. Needs Git, Node.js 24+, Vite+, and the MoonBit toolchain for executable verification.
 metadata:
-  skill-version: "0.3.0"
-  updated-date: "2026-08-07"
+  skill-version: "0.3.1"
+  updated-date: "2026-10-12"
   scope: "repository-maintenance"
   internal: true
 ---

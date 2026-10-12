@@ -6,7 +6,7 @@ Every `mbt check` block in this file is compiled and run by the repository's ver
 
 Search these exact official documentation topic names to route a question into this reference. A listed name is a discoverability route; the verification labels in the surrounding reference still determine whether its claim was executed or is documentation-only.
 
-- Control structures and iteration: Control Structures; Conditional Expressions; Match Expression; Guard Statement; Guard statement and is expression; While loop; For Loop; `for .. in` loop; Range expression in `for .. in` loop; List comprehension; Labelled Continue/Break; Labelled Blocks; `defer` expression; Iterator
+- Control structures and iteration: Control Structures; Conditional Expressions; Match Expression; Guard Statement; Guard statement and is expression; While loop; For Loop; `for .. in` loop; Range expression in `for .. in` loop; List comprehension; Labelled Continue/Break; Labelled Blocks; `defer` and `errdefer` expressions; Iterator
 
 ## `if` and `match` are expressions
 
@@ -85,7 +85,7 @@ test "control flow: C-style and range for loops" {
 }
 ```
 
-`for .. in` also walks collections, and a two-variable form gives the index (or key) alongside the value.
+`for .. in` also walks collections, and a two-variable form gives the index (or key) alongside the value. A single item binder can be an exhaustive pattern, such as `(name, count)` for tuple elements. Refutable patterns such as `Some(value)` belong inside the loop body; the loop does not silently filter unmatched items.
 
 ```mbt check
 test "control flow: for-in over collections" {
@@ -101,6 +101,19 @@ test "control flow: for-in over collections" {
     pairs.push((k, v))
   }
   debug_inspect(pairs, content="[(\"a\", 1), (\"b\", 2)]")
+}
+```
+
+```mbt check
+test "for-in destructuring is exhaustive" {
+  let names : Array[String] = []
+  let total = Ref(0)
+  for (name, count) in [("apple", 2), ("pear", 3)] {
+    names.push(name)
+    total.val += count
+  }
+  assert_eq(names, ["apple", "pear"])
+  assert_eq(total.val, 5)
 }
 ```
 
@@ -154,7 +167,7 @@ test "control flow: where records invariants" {
 
 ## Infinite loops, labelled loops, and labelled blocks
 
-The infinite loop is `for ;; { ... }` (bare `for { }` is not valid); `break value` gives it a value. Loop labels are written `name~:` before the loop, targeted by `break name~` / `continue name~` (not Rust's `'label`). Once a loop has a label, even a directly nested `break` or `continue` that targets it must name the label; leaving it implicit emits E0085 or E0086.
+The infinite loop is `for ;; { ... }` (bare `for { }` does not form an infinite loop); `break value` gives it a value. Loop labels are written `name~:` before the loop, targeted by `break name~` / `continue name~` (not Rust's `'label`). Once a loop has a label, even a directly nested `break` or `continue` that targets it must name the label; leaving it implicit emits E0085 or E0086.
 
 ```mbt check
 test "control flow: infinite and labeled loops" {
@@ -196,7 +209,7 @@ test "control flow: labelled blocks return early from nested control flow" {
 }
 ```
 
-A labelled block uses the same `name~: { ... }` prefix. `break name~ value` exits that block and makes `value` its result without returning from the enclosing function. An unlabelled `break` cannot exit or pass through a labelled block, and `continue` can target only a loop.
+A labelled block uses the same `name~: { ... }` prefix. `break name~ value` exits that block and makes `value` its result without returning from the enclosing function. An unlabelled `break` cannot exit or pass through a labelled block, and `continue` can target only a loop. Block and loop labels share one namespace; reuse in a nested scope emits E0036. Use distinct names, as verified by `lang-warning-label-shadowing`.
 
 ## The deprecated `loop`
 
@@ -353,3 +366,49 @@ test "control flow: defer is block-scoped and LIFO" {
   )
 }
 ```
+
+## `errdefer` and fallible cleanup
+
+`errdefer expr` runs only when its remaining block exits by raising an error or async cancellation. Success, `return`, `break`, and `continue` do not trigger it. Use it to release a resource when construction fails while transferring the resource to the caller on success. An `errdefer` inside a loop covers only that iteration; to roll back resources accumulated across iterations, register cleanup for the accumulated collection outside the loop.
+
+Both `defer` and `errdefer` permit raising cleanup expressions. A cleanup error replaces the body's error, and remaining outer cleanups still execute in last-in-first-out order. The cleanup expression cannot use `return`, `break`, or `continue`. The `lang-dep-fragile-catch-all` fixture proves the warning for catch-and-rethrow cleanup and the `errdefer` migration under the same warning settings.
+
+```mbt check
+priv suberror ProbeFailure {
+  Body
+  Cleanup
+}
+
+fn probe_resource(fail_body : Bool, log : Array[String]) -> Int raise ProbeFailure {
+  errdefer log.push("rollback")
+  if fail_body { raise Body }
+  7
+}
+
+fn probe_replacement(log : Array[String]) -> Unit raise ProbeFailure {
+  defer log.push("outer")
+  defer {
+    log.push("inner")
+    raise Cleanup
+  }
+  raise Body
+}
+
+test "errdefer normal return and error" {
+  let log : Array[String] = []
+  assert_eq(probe_resource(false, log), 7)
+  assert_eq(log.length(), 0)
+  try probe_resource(true, log) catch {
+    Body => ()
+    _ => fail("wrong failure")
+  } noraise { _ => fail("missing failure") }
+  assert_eq(log, ["rollback"])
+  try probe_replacement(log) catch {
+    Cleanup => ()
+    _ => fail("cleanup error did not replace body")
+  } noraise { _ => fail("missing cleanup failure") }
+  assert_eq(log, ["rollback", "inner", "outer"])
+}
+```
+
+Async cleanup is permitted in async code; cancellation also triggers both cleanup forms. The runtime boundary and cancellation behavior are covered in async-and-ffi.md.

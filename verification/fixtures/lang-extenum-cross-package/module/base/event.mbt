@@ -1,4 +1,6 @@
-pub(all) extenum Event[T] {
+pub extenum Event[T]
+
+pub(all) extenum Event[T] += {
   Started(T)
 }
 

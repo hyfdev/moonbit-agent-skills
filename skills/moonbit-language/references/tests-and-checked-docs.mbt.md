@@ -117,3 +117,9 @@ A `.mbt.md` file is executable documentation: `moon check` / `moon test` treat i
 | ```` ```moonbit ```` | display only — never compiled |
 
 Because `mbt` and `mbt check` blocks are really compiled, a deliberately-broken example must be `mbt nocheck` (or live in a fixture); it can never sit in an `mbt`/`mbt check` fence.
+
+## Qualified blackbox calls and QuickCheck
+
+Blackbox tests compile as a separate package. Refer to the tested package explicitly as `@pkg.name`; relying on implicitly imported definitions emits `test_unqualified_package` by default. The `lang-blackbox-qualification-default` fixture proves the default warning and the explicit qualification that clears it with warnings denied.
+
+QuickCheck uses `@quickcheck.check(property)` to raise on failure and `@quickcheck.report(property)` to return a structured report. The property may raise; `filter=` rejects generated inputs, `discard_ratio=` bounds excessive rejection, and `observe=` returns an array of observations constructed with `label`, `classify`, or `collect`. `Generator[T]` supplies combinators for custom generation, and the `Shrink` trait supplies counterexample candidates. The `lang-quickcheck-entrypoints` fixture executes check/report, filtering, observation, and a generator. Deriving `Shrink` is covered in types-structs-enums.mbt.md.

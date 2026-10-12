@@ -2,7 +2,7 @@
 
 Agent Skills for MoonBit. Help coding agents work with MoonBit and write better MoonBit code.
 
-- Up to date with the official latest MoonBit toolchain — **[v0.10.6 / moon 0.1.20260803](https://cli.moonbitlang.com/version.json)**
+- Up to date with the official latest MoonBit toolchain — **[v0.10.14 / moon 0.1.20260920](https://cli.moonbitlang.com/version.json)**
 - Backed by [evaluation](#evaluation) across multiple AI models
 - Automatic activation based on context
 
@@ -19,8 +19,8 @@ Agent Skills for MoonBit. Help coding agents work with MoonBit and write better 
 
 | Skill | Version | Updated | MoonBit | Verified |
 | --- | ---: | ---: | ---: | ---: |
-| [moonbit-language](skills/moonbit-language/SKILL.md) | [`0.4.0`](https://github.com/hyfdev/moonbit-agent-skills/commits/main/skills/moonbit-language) | 2026-08-07 | `0.10.6` | 2026-08-07 |
-| [moonbit-toolchain](skills/moonbit-toolchain/SKILL.md) | [`0.4.0`](https://github.com/hyfdev/moonbit-agent-skills/commits/main/skills/moonbit-toolchain) | 2026-08-07 | `0.10.6` | 2026-08-07 |
+| [moonbit-language](skills/moonbit-language/SKILL.md) | [`0.5.0`](https://github.com/hyfdev/moonbit-agent-skills/commits/main/skills/moonbit-language) | 2026-10-12 | `0.10.14` | 2026-10-12 |
+| [moonbit-toolchain](skills/moonbit-toolchain/SKILL.md) | [`0.5.0`](https://github.com/hyfdev/moonbit-agent-skills/commits/main/skills/moonbit-toolchain) | 2026-10-12 | `0.10.14` | 2026-10-12 |
 
 `moonbit-language` is the language reference for understanding, writing, and fixing MoonBit code: syntax, types, patterns, traits, errors, async, tests, and FFI.
 
@@ -126,7 +126,7 @@ Manual invocation is deliberately disabled. This keeps the skills out of manual 
 
 ### How does this compare to the official MoonBit skills?
 
-The official [MoonBit skills](https://github.com/moonbitlang/skills) focus on specialized workflows such as C bindings, OCaml migration, formal verification, and refactoring. This repository is a community-maintained, general-purpose reference for everyday MoonBit coding and project work. It also keeps fast-changing language guidance current—for example, the official guide still presents deprecated functional `loop` as current. We will explore contributing verified updates back to the official repository.
+The official [MoonBit skills](https://github.com/moonbitlang/skills) include a general coding guide and specialized workflows for C bindings, OCaml migration, formal verification, and refactoring. This community-maintained repository provides separate language and toolchain references, with executable examples and coverage checks tied to the official latest compiler and documentation.
 
 ## License
 

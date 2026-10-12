@@ -6,14 +6,14 @@
       "name": "adds-the-type-named-enum-constructor",
       "expected": "pass",
       "files": {
-        "lib.mbt": "///|\npub(all) enum Source {\n  File(String)\n  Package(String)\n} derive(Eq, Debug)\n\n///|\npub fn Source::Source(text : String) -> Source {\n  if text.has_prefix(\"pkg:\") {\n    Package(text)\n  } else {\n    File(text)\n  }\n}\n\n///|\npub fn classify(source : Source) -> String {\n  match source {\n    File(path) => \"file:\\{path}\"\n    Package(name) => \"package:\\{name}\"\n  }\n}\n"
+        "lib.mbt": "///|\npub(all) enum Source {\n  File(String)\n  Package(String)\n} derive(Eq, Debug)\n\n///|\npub extend Source with Eq::{not_equal, equal}\n\n///|\npub extend Source with @debug.Debug::{to_repr}\n\n///|\npub fn Source::Source(text : String) -> Source {\n  if text.has_prefix(\"pkg:\") {\n    Package(text)\n  } else {\n    File(text)\n  }\n}\n\n///|\npub fn classify(source : Source) -> String {\n  match source {\n    File(path) => \"file:\\{path}\"\n    Package(name) => \"package:\\{name}\"\n  }\n}\n"
       }
     },
     {
       "name": "adds-a-differently-named-factory",
       "expected": "fail",
       "files": {
-        "lib.mbt": "///|\npub(all) enum Source {\n  File(String)\n  Package(String)\n} derive(Eq, Debug)\n\n///|\npub fn Source::from_string(text : String) -> Source {\n  if text.has_prefix(\"pkg:\") { Package(text) } else { File(text) }\n}\n\n///|\npub fn classify(source : Source) -> String {\n  match source {\n    File(path) => \"file:\\{path}\"\n    Package(name) => \"package:\\{name}\"\n  }\n}\n"
+        "lib.mbt": "///|\npub(all) enum Source {\n  File(String)\n  Package(String)\n} derive(Eq, Debug)\n\n///|\npub extend Source with Eq::{not_equal, equal}\n\n///|\npub extend Source with @debug.Debug::{to_repr}\n\n///|\npub fn Source::from_string(text : String) -> Source {\n  if text.has_prefix(\"pkg:\") { Package(text) } else { File(text) }\n}\n\n///|\npub fn classify(source : Source) -> String {\n  match source {\n    File(path) => \"file:\\{path}\"\n    Package(name) => \"package:\\{name}\"\n  }\n}\n"
       },
       "must_fail_check_types": ["moon"]
     },
@@ -29,7 +29,7 @@
       "name": "keeps-the-constructor-private",
       "expected": "fail",
       "files": {
-        "lib.mbt": "///|\npub(all) enum Source {\n  File(String)\n  Package(String)\n} derive(Eq, Debug)\n\n///|\nfn Source::Source(text : String) -> Source {\n  if text.has_prefix(\"pkg:\") { Package(text) } else { File(text) }\n}\n\n///|\npub fn classify(source : Source) -> String {\n  match source {\n    File(path) => \"file:\\{path}\"\n    Package(name) => \"package:\\{name}\"\n  }\n}\n"
+        "lib.mbt": "///|\npub(all) enum Source {\n  File(String)\n  Package(String)\n} derive(Eq, Debug)\n\n///|\npub extend Source with Eq::{not_equal, equal}\n\n///|\npub extend Source with @debug.Debug::{to_repr}\n\n///|\nfn Source::Source(text : String) -> Source {\n  if text.has_prefix(\"pkg:\") { Package(text) } else { File(text) }\n}\n\n///|\npub fn classify(source : Source) -> String {\n  match source {\n    File(path) => \"file:\\{path}\"\n    Package(name) => \"package:\\{name}\"\n  }\n}\n"
       },
       "must_fail_check_types": ["moon"]
     }

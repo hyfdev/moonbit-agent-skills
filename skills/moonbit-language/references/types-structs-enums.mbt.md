@@ -35,7 +35,7 @@ test "struct construction: qualified punning and spread update" {
 
 ## Derives
 
-The working set is `Eq, Compare, Hash, Debug, ToJson, FromJson, Default, Arbitrary`. `Eq` and `Compare` inspect fields in declaration order; enum cases compare in declaration order. `Default` uses every field's default for a struct, but an enum can derive it only when exactly one case has no payload. There is **no `Clone`** (E4023) — values are GC references, and MoonBit generates no copying machinery. `derive(Show)` still compiles but is deprecated outright (warning 0027); for debugging use `Debug` (`debug_inspect`, `to_repr`) instead. `derive(FromJson)` and `derive(Arbitrary)` work too, but their traits live in `moonbitlang/core/json` and `moonbitlang/core/quickcheck`, and using them without listing those packages in the `moon.pkg` imports is deprecated (warning E0071) — so they stay out of the compiled fence below.
+The working set includes `Eq, Compare, Hash, Debug, ToJson, FromJson, Default, Arbitrary, Shrink`. `Eq` and `Compare` inspect fields in declaration order; enum cases compare in declaration order. `Default` uses every field's default for a struct, but an enum can derive it only when exactly one case has no payload. There is **no `Clone`** (E4023) — values are GC references, and MoonBit generates no copying machinery. `derive(Show)` still compiles but is deprecated outright (warning 0027); for debugging use `Debug` (`debug_inspect`, `@debug.Repr`) instead. `derive(FromJson)` and `derive(Arbitrary)` work too, but their traits live in `moonbitlang/core/json` and `moonbitlang/core/quickcheck`, and using them without listing those packages in the `moon.pkg` imports is deprecated (warning E0071) — so they stay out of the compiled fence below.
 
 ```mbt check
 pub struct ScoreCard { // pub only so every derived impl counts as used
@@ -43,7 +43,7 @@ pub struct ScoreCard { // pub only so every derived impl counts as used
 } derive(Eq, Compare, Hash, Debug, ToJson, Default)
 
 test "derives: Default and ToJson in action" {
-  let s = ScoreCard::default()
+  let s : ScoreCard = Default::default()
   json_inspect(s, content={ "points": 0 })
 }
 ```
@@ -140,7 +140,7 @@ test "generic enum" {
 
 Labelled enum payload fields may be mutable: declare `Variant(mut field~ : Type, ...)`. Narrow the enum to that variant and bind the whole constructor with `Pattern as name` before assigning `name.field`.
 
-An `extenum` is an open enum. Its declaring package supplies initial variants, and `extenum Type += { ... }` adds variants. Matches must keep a wildcard because another declaration or package may extend the type. Cross-package extension also depends on package visibility; the `lang-extenum-cross-package` fixture verifies that boundary.
+An `extenum` is an open enum. Declare `pub extenum Type` first, then add initial or later variants with separate `extenum Type += { ... }` declarations. Extension visibility controls constructor visibility. `priv extenum`, readonly `extenum`, `pub(all) extenum` declarations, and inline declaration bodies are deprecated; use a closed `enum` for a type that downstream packages must not extend. Matches must keep a wildcard because another declaration or package may extend the type. The `lang-dep-extenum-declaration` fixture rejects the old declarations and verifies replacements under the same warnings-denied settings. Cross-package extension also depends on package visibility; the `lang-extenum-cross-package` fixture verifies that boundary.
 
 ```mbt check
 priv enum TypesMutableTree {
@@ -148,7 +148,9 @@ priv enum TypesMutableTree {
   TypesNode(mut value~ : Int, child~ : TypesMutableTree)
 }
 
-priv extenum TypesEvent {
+pub extenum TypesEvent
+
+extenum TypesEvent += {
   TypesStarted
 }
 
@@ -253,7 +255,7 @@ type UserId Int // WRONG: E3002 parse error — old newtype syntax; write `struc
 
 ## Type aliases and opaque types
 
-The current alias syntax is `type Alias = Type`. The old `typealias Old as New` spelling still compiles but is deprecated; `typealias New = Old` is rejected outright (parsed as the deprecated `as` form, then fails). A bare `type Handle` with no payload declares an opaque/abstract type.
+The current alias syntax is `type Alias = Type`. The old `typealias Old as New` and `typealias New = Old` spellings are parse errors; the `lang-removed-typealias` fixture verifies the replacement. A bare `type Handle` with no payload declares an opaque/abstract type.
 
 ```mbt check
 type Label = String
@@ -267,16 +269,28 @@ test "type alias is interchangeable with its target" {
 ```
 
 ```mbt nocheck
-typealias String as Label // DEPRECATED: compiles with a warning — write `type Label = String`
-typealias Label = String  // WRONG: parsed as the deprecated `as` form, then rejected
+typealias String as Label // REMOVED: write `type Label = String`
+typealias Label = String  // REMOVED: use type Label = String
 ```
 
-## Local type definitions are deprecated
+## Local type definitions are removed
 
-The official fundamentals page still presents a type declared inside a function, but the pinned compiler emits warning 0027 `deprecated_syntax` unless that warning is suppressed. Move the declaration to top level. The `lang-dep-local-type` fixture proves both the warning and the top-level replacement with warnings denied.
+A struct or enum declaration inside a function is a parse error at this pin. Move it to top level. The `lang-dep-local-type` fixture proves rejection and the top-level replacement.
 
 ```mbt nocheck
 fn old_local_type() -> Unit {
-  enum Local { Only } // DEPRECATED: move Local to top level
+  enum Local { Only } // REMOVED: move Local to top level
 }
 ```
+
+## Non-exhaustive enums
+
+Official topic: Non-exhaustive Enum Attribute.
+
+`#non_exhaustive` lets the defining package add constructors while retaining a downstream fallback. In another package, match every known constructor and then use `Type::..`. This last branch matches any remaining runtime value but still warns when a newly added known constructor lacks an explicit branch. Use `_` when intentionally ignoring some currently known constructors; after explicitly covering all known constructors, `_` instead of `Type::..` emits a warning because it would hide future additions.
+
+The `lang-non-exhaustive-enum` fixture verifies the cross-package API and runtime branches; `lang-warning-non-exhaustive-enum` proves the warnings for a missing future fallback, an ordinary wildcard after all known cases, and an unmatched known constructor before `Type::..`. A regular enum remains closed; `#non_exhaustive` does not let downstream packages add constructors as `extenum` does.
+
+## Shrink
+
+`derive(Shrink)` implements the QuickCheck shrinking trait. Import `moonbitlang/core/quickcheck` and call `@quickcheck.Shrink::shrink(value)`. Struct candidates change one field at a time in declaration order. An enum retains its constructor while shrinking payloads; a payload-free constructor has no candidates. **Documented, not executed for recursive subterms:** the [0.10.14 release source](https://github.com/moonbitlang/website/blob/b6d21ad70b1f2b61de640a8978d84b3315084711/updates/2026-09-21/index.md) says deriving does not yet shrink a recursive value to one of its subterms; the fixture below covers struct fields and non-recursive enum payloads. Every participating field must implement `Shrink`. The `lang-derive-shrink` fixture checks field order and preservation of enum constructors at runtime.

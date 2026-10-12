@@ -17,3 +17,6 @@ pub impl Service for Handle with fn service_id(self) {
 pub fn open_handle(id : Int) -> Handle {
   { id, }
 }
+
+///|
+pub extend Handle with Service::{service_id}

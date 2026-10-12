@@ -1,12 +1,11 @@
 {
   "id": "lang-dep-local-type",
   "owner_skill": "moonbit-language",
-  "knowledge": "Local type definitions still parse at MoonBit 0.10.4 but emit deprecated_syntax; move the type to top level.",
+  "knowledge": "Local type declarations are rejected; move the declaration to top level.",
   "expect": "check-fail",
   "diagnostic_contains": [
-    "local type definition",
-    "deprecated",
-    "toplevel type definition"
+    "E3002",
+    "unexpected token `enum`"
   ],
   "fix": "Move the type declaration to top level.",
   "targets": [
@@ -20,11 +19,11 @@
   ],
   "source": "observed",
   "verified": {
-    "date": "2026-08-07",
+    "date": "2026-10-12",
     "components": {
-      "moon": "0.1.20260803 (c19f78e 2026-08-03)",
-      "moonc": "v0.10.6+80dc50f24 (2026-08-04)",
-      "moonrun": "moonrun 0.1.20260803 (c19f78e 2026-08-03)"
+      "moon": "0.1.20260920 (914d7da 2026-09-20)",
+      "moonc": "v0.10.14+7d59c7ec9 (2026-09-18)",
+      "moonrun": "moonrun 0.1.20260920 (914d7da 2026-09-20)"
     },
     "platform": "Linux-x86_64"
   }

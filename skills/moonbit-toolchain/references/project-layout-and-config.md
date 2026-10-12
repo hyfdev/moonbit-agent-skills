@@ -9,7 +9,7 @@ Use these exact headings from the official language documentation to recognize p
 - Package and module operation: Managing Projects with Packages; Packages and modules; Internal Packages
 - Virtual packages: Virtual Packages; Defining a virtual package; Implementing a virtual package; Using a virtual package; Overriding a virtual package
 
-Official toolchain headings routed here: Toolchains; Moon Build System; Module Configuration; Name; Version; Dependency Management; Meta Information; README; Repository; License; Keywords; Description; Include and Exclude; Source directory; Package Configuration; New format (`moon.pkg`); Formatter; Package type; is-main (deprecated); Importing dependencies; Import; Test import; White-box test import; Virtual Package; Declarations; Implementations; Overriding implementations; MoonBit's Build System Tutorial; Prerequisites; Creating a New Module; Understanding the Module Directory Structure; Working with Packages; Choosing a Target; Package Importing; Creating and Using a New Package; Adding Tests.
+Official toolchain headings routed here: Toolchains; Moon Build System; Module Configuration; Name; Version; Dependency Management; Meta Information; README; Repository; License; Keywords; Description; Source directory; Package Configuration; New format (`moon.pkg`); Formatter; Package type; is-main (deprecated); Importing dependencies; Import; Test import; White-box test import; Virtual Package; Declarations; Implementations; Overriding implementations; MoonBit's Build System Tutorial; Prerequisites; Creating a New Module; Understanding the Module Directory Structure; Working with Packages; Choosing a Target; Package Importing; Creating and Using a New Package; Adding Tests.
 
 ## Module and package model
 
@@ -78,6 +78,8 @@ options(
 `moon add --bin` writes a third entry kind, `options("bin-deps": { "moonbitlang/x": "0.4.46" })` — see references/dependencies-and-registry.md for the removal trap.
 
 Local path dependencies have **no** new-DSL form at all. The legacy `"deps": {"m": {"path": "../other"}}` still works in `moon.mod.json`, but migration refuses it: use a `moon.work` workspace instead (references/workspaces-and-scripts.md).
+
+Published-file selection belongs in `.moonignore`; see references/dependencies-and-registry.md for migration from legacy `include` / `exclude`.
 
 ## moon.pkg
 

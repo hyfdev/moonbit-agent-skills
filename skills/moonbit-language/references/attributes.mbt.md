@@ -14,7 +14,8 @@ Search these exact official documentation topic names to route a question into t
 
 | Attribute | Purpose |
 | --- | --- |
-| `#cfg` | conditional compilation on a target predicate |
+| `#cfg` | conditional compilation on a target/platform predicate |
+| `#non_exhaustive` | preserve a downstream fallback for future enum constructors (types-structs-enums.mbt.md) |
 | `#deprecated` | mark a symbol deprecated; using it warns |
 | `#alias` | add an alternate callable name (also trait/operator aliases) |
 | `#warnings` | enable/disable/promote warnings for one declaration |
@@ -173,3 +174,17 @@ test "attr this test never runs" {
   fail("skipped body is type-checked but not executed")
 }
 ```
+
+## `platform` predicates also select native
+
+`not(platform="windows")` includes JavaScript and Wasm. To select native builds other than Windows, use `all(target="native", not(platform="windows"))`. The `lang-cfg-platform-native-only` fixture verifies this distinction on Linux across the four pinned targets. **Documented, not executed on Windows:** the [pinned configuration-attribute reference](https://github.com/moonbitlang/moonbit-docs/blob/8d9f3ba206eb17f80ee1836e4c1139068d1351b5/next/language/attributes/cfg.md) specifies that a positive `platform="windows"` predicate also restricts the target to native.
+
+## Syntax warnings and `#warnings`
+
+`#warnings` also controls syntax-phase warnings such as `deprecated_syntax` for its declaration. The `lang-syntax-warning-suppression` fixture confirms declaration-local suppression with `--deny-warn`. Prefer a migration over suppression when a current spelling exists. **Documented, not executed for every warning category:** the [0.10.9 release source](https://github.com/moonbitlang/website/blob/b6d21ad70b1f2b61de640a8978d84b3315084711/updates/2026-08-19/index.md) excludes lexical warnings and some warnings spanning declarations from this local control.
+
+## Unused imports and mutable bindings
+
+`unused_package` warns by default when an explicit package import is unused, including core packages and imports referenced only indirectly through method calls. Remove the redundant import. The `lang-unused-package-default` and `lang-unused-package-clean` fixtures check the diagnostic and the clean configuration with `--deny-warn`.
+
+The parser recognizes `var` bindings but emits `deprecated_syntax`; write `let mut` for a mutable binding. The `lang-dep-var` fixture rejects `var` and accepts its replacement with the same warning settings.

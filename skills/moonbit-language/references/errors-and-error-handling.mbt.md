@@ -96,12 +96,12 @@ test "err handling forms" {
 }
 ```
 
-The catch may also be written **without** `try`, directly on an expression, and a catch arm may rethrow with `raise`:
+The catch may also be written **without** `try`, directly on an expression. Match a concrete error constructor when handling or rethrowing one error kind; a catch-all that only cleans up and rethrows emits `fragile_catch_all`, and should use `errdefer`.
 
 ```mbt check
 fn err_rethrow(x : Int) -> Int raise {
   try err_may2(x) catch {
-    e => raise e // rethrow the caught error
+    E2(code) => raise E2(code)
   }
 }
 
@@ -114,7 +114,7 @@ test "expression-form catch and rethrow" {
 
 ## Polymorphic `raise?` and `noraise`
 
-A higher-order function that should be fallible **only when its callback is** annotates both the callback type and its own result with `raise?`. `noraise` is the opposite marker: a function that cannot raise. Both are ordinary (non-async) markers.
+A higher-order function that should be fallible **only when its callback is** annotates both the callback type and its own result with `raise?`. `noraise` is the opposite marker: a function that cannot raise. These markers also apply to async functions; ordinary error effects are independent of the cancellation effect.
 
 ```mbt check
 fn err_apply_twice(f : (Int) -> Int raise?, x : Int) -> Int raise? {
@@ -133,11 +133,11 @@ test "raise? HOF and noraise" {
 
 ## Deprecated and removed error syntax
 
-The pre-0.10 `!`-based error syntax still compiles but warns; the `?` call suffix was removed outright.
+The `!Error` result annotation and `try?` still compile with deprecation warnings. Bang calls `f!()`, `type!` declarations, and the `?` call suffix are parse errors.
 
 ```mbt nocheck
 fn old_sig(x : Int) -> Int!OldErr { x }  // DEPRECATED: "The syntax `!Err` ... is deprecated. Use `raise Err` instead."
-old_sig!(1)                              // DEPRECATED: "The syntax `f!(..)` ... is deprecated. Use `f(..)` instead."
+old_sig!(1)                              // REMOVED: call old_sig(1) in a raising context
 let r : Result[Int, E] = try? may(1)     // DEPRECATED [0020]: "`try?` is deprecated." — catch, or build Ok/Err by hand
 let r = old_sig(1)?                       // REMOVED: Error [3002] parse error, unexpected token `?`
 ```
@@ -186,5 +186,31 @@ test "Failure via fail" {
 test "panic err array out of bounds" {
   let a : Array[Int] = [1, 2, 3]
   ignore(a[10]) // panics; passes because the test name starts with `panic`
+}
+```
+
+## Match a suberror by type
+
+`ParseError::_` matches every constructor of that suberror. `ParseError::_ as specific` narrows the captured value from `Error` to `ParseError`, so a helper expecting the concrete suberror accepts it. Keep a final `_` case when matching an `Error` that can contain other suberror types.
+
+```mbt check
+priv suberror ErrorFamily {
+  Body
+  Cleanup
+}
+
+fn error_family_classify(error : Error) -> Int {
+  match error {
+    ErrorFamily::_ as specific => error_family_specific(specific)
+    _ => 0
+  }
+}
+
+fn error_family_specific(_error : ErrorFamily) -> Int { 1 }
+
+test "suberror wildcard narrows" {
+  assert_eq(error_family_classify(ErrorFamily::Body), 1)
+  assert_eq(error_family_classify(ErrorFamily::Cleanup), 1)
+  assert_eq(error_family_classify(Failure("other")), 0)
 }
 ```

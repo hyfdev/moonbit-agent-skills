@@ -1,0 +1,43 @@
+{
+  "area": "language",
+  "task": "lang-window-contract",
+  "cases": [
+    {
+      "name": "validates-record-bounds-with-exact-view",
+      "expected": "pass",
+      "files": {
+        "lib.mbt": "///|\npub fn preview_window(values : Array[Int], start : Int, end : Int) -> Array[Int] {\n  values[start:end].to_owned()\n}\n\n///|\npub fn record_window(values : Array[Int], start : Int, end : Int) -> Array[Int] {\n  values.exact_view(start~, end~).to_owned()\n}\n"
+      }
+    },
+    {
+      "name": "keeps-clamping-invalid-records",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "///|\npub fn preview_window(values : Array[Int], start : Int, end : Int) -> Array[Int] {\n  values[start:end].to_owned()\n}\n\n///|\npub fn record_window(values : Array[Int], start : Int, end : Int) -> Array[Int] {\n  values[start:end].to_owned()\n}\n"
+      },
+      "must_fail_check_types": [
+        "moon"
+      ]
+    },
+    {
+      "name": "interprets-negative-record-offsets-from-the-end",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "///|\npub fn preview_window(values : Array[Int], start : Int, end : Int) -> Array[Int] {\n  values[start:end].to_owned()\n}\n\n///|\npub fn record_window(values : Array[Int], start : Int, end : Int) -> Array[Int] {\n  let start = if start < 0 { values.length() + start } else { start }\n  let end = if end < 0 { values.length() + end } else { end }\n  values.exact_view(start~, end~).to_owned()\n}\n"
+      },
+      "must_fail_check_types": [
+        "moon"
+      ]
+    },
+    {
+      "name": "also-makes-previews-strict",
+      "expected": "fail",
+      "files": {
+        "lib.mbt": "///|\npub fn preview_window(values : Array[Int], start : Int, end : Int) -> Array[Int] {\n  values.exact_view(start~, end~).to_owned()\n}\n\n///|\npub fn record_window(values : Array[Int], start : Int, end : Int) -> Array[Int] {\n  values.exact_view(start~, end~).to_owned()\n}\n"
+      },
+      "must_fail_check_types": [
+        "moon"
+      ]
+    }
+  ]
+}

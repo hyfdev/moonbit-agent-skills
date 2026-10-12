@@ -1,0 +1,729 @@
+{
+  "generated_by": "tooling/snapshot_release.ts",
+  "items": [
+    {
+      "id": "language-1",
+      "kind": "numbered-item",
+      "section": "language",
+      "text": "`with`-patterns now require explicit parentheses around branches that use `with`, making the precedence of `with`-patterns easier for readers to understand. Users can migrate automatically with `moon fmt`:"
+    },
+    {
+      "id": "language-1-c1",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "language-1",
+      "section": "language",
+      "text": "fn main {\n  let a = Some(\"hello\")\n  match a {\n    Some(x) | (None with x = \"\") => println(x)\n    //        ^~~~~~~~~~~~~~~~~~ parentheses required here\n  }\n}"
+    },
+    {
+      "id": "language-2",
+      "kind": "numbered-item",
+      "section": "language",
+      "text": "Bitstring patterns now support `v128le`, which extracts 16 bytes at once from a byte sequence and constructs a `V128` value. Currently only byte-granularity little-endian extraction is supported, i.e. byte 0 of the input maps to the least significant byte of the result:"
+    },
+    {
+      "id": "language-2-c1",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "language-2",
+      "section": "language",
+      "text": "fn main {\n  let bits = Bytes::makei(16, i => i.to_byte())\n  guard! bits is [v128le(bits), ..]\n  println(bits) // prints V128(0x0706050403020100, 0x0f0e0d0c0b0a0908)\n}"
+    },
+    {
+      "id": "language-3",
+      "kind": "numbered-item",
+      "section": "language",
+      "text": "`lexscan` is now officially stable."
+    },
+    {
+      "id": "language-3-b1",
+      "kind": "bullet",
+      "parent": "language-3",
+      "section": "language",
+      "text": "`lexscan` supports `@lexbuf.Lexbuf`, `@lexbuf.AsyncLexbuf`, and `@lexbuf.StringScanner`. `Lexbuf` and `AsyncLexbuf` operate in streaming mode; we have optimized their memory usage, so you can safely use them on infinite streams."
+    },
+    {
+      "id": "language-3-b2",
+      "kind": "bullet",
+      "parent": "language-3",
+      "section": "language",
+      "text": "The previous `lexscan` on `String/StringView` has been migrated to the `lexmatch` keyword."
+    },
+    {
+      "id": "language-3-b3",
+      "kind": "bullet",
+      "parent": "language-3",
+      "section": "language",
+      "text": "A catch-all case is no longer required when it is provably unreachable, and the compiler now reports warnings for unreachable cases."
+    },
+    {
+      "id": "language-3-c1",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "language-3",
+      "section": "language",
+      "text": "///|\nasync fn wordcount(\n  input : @lexbuf.AsyncLexbuf,\n  lines : Int,\n  words : Int,\n  chars : Int,\n) -> (Int, Int, Int) {\n  lexscan input {\n    re\"^\\n\" => wordcount(input, lines + 1, words, chars + 1)\n    re\"^[^ \\t\\r\\n]+\" as word =>\n      wordcount(input, lines, words + 1, chars + word.length())\n    re\"^.\" => wordcount(input, lines, words, chars + 1)\n    re\"^\" => (lines, words, chars)\n  }\n}\n\n///|\nasync fn main {\n  let utf8_reader = Utf8Reader(() => @stdio.stdin.read_some())\n  let lexbuf = @lexbuf.AsyncLexbuf::from_fn(() => utf8_reader.read())\n  let (lines, words, chars) = wordcount(lexbuf, 0, 0, 0)\n  println(\"lines: \\{lines}, words: \\{words}, chars: \\{chars}\")\n}"
+    },
+    {
+      "id": "language-3-p1",
+      "kind": "paragraph",
+      "parent": "language-3",
+      "section": "language",
+      "text": "For details, see the documentation:"
+    },
+    {
+      "id": "language-3-b4",
+      "kind": "bullet",
+      "parent": "language-3",
+      "section": "language",
+      "text": "https://docs.moonbitlang.com/en/latest/language/fundamentals.html#lexmatch"
+    },
+    {
+      "id": "language-3-b5",
+      "kind": "bullet",
+      "parent": "language-3",
+      "section": "language",
+      "text": "https://docs.moonbitlang.com/en/latest/language/fundamentals.html#lexscan"
+    },
+    {
+      "id": "language-4",
+      "kind": "numbered-item",
+      "section": "language",
+      "text": "Introduced the new `errdefer` syntax:"
+    },
+    {
+      "id": "language-4-c1",
+      "kind": "code-block",
+      "language": "text",
+      "parent": "language-4",
+      "section": "language",
+      "text": "errdefer expr\nrest"
+    },
+    {
+      "id": "language-4-p1",
+      "kind": "paragraph",
+      "parent": "language-4",
+      "section": "language",
+      "text": "If `rest` raises an error, or is cancelled while running async code, the `errdefer` statement will be triggered, executing `expr`. The error will then be re-raised. `errdefer` is especially useful for constructor-style functions, for example:"
+    },
+    {
+      "id": "language-4-c2",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "language-4",
+      "section": "language",
+      "text": "async fn connect_to(addr : @socket.Addr) -> Tcp {\n  let socket = make_tcp_socket()\n  errdefer socket.close()\n  connect_socket(socket)\n  socket\n}"
+    },
+    {
+      "id": "language-4-p2",
+      "kind": "paragraph",
+      "parent": "language-4",
+      "section": "language",
+      "text": "Here, if `connect_to` returns normally, ownership of `socket` is transferred to the caller through the return value, so `socket` should not be released. But if `connect_socket(socket)` raises an error or is cancelled, `socket` will not be returned. In this case, `socket` should be released to avoid a resource leak. `errdefer` handles this kind of resource cleanup robustly."
+    },
+    {
+      "id": "language-4-p3",
+      "kind": "paragraph",
+      "parent": "language-4",
+      "section": "language",
+      "text": "Leaving the scope of an `errdefer` via `return`/`break`/`continue` does not trigger it. Like `defer`, `errdefer` is structured: it only fires when the program leaves the scope of the entire `errdefer` expression. So the following program is wrong:"
+    },
+    {
+      "id": "language-4-c3",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "language-4",
+      "section": "language",
+      "text": "let result = []\nfor x in xs {\n  let res = make_resource(x)\n  errdefer res.close()\n  do_something_with_res(res)\n  result.push(res)\n}\nresult"
+    },
+    {
+      "id": "language-4-p4",
+      "kind": "paragraph",
+      "parent": "language-4",
+      "section": "language",
+      "text": "Here, each `errdefer` only covers the single loop iteration it belongs to. After the first iteration completes, the program has left the scope of that iteration's `errdefer` normally, so that `errdefer` will never fire again. If the second iteration then fails, only the second iteration's own `errdefer` fires, and the result of the first iteration leaks. The correct version is:"
+    },
+    {
+      "id": "language-4-c4",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "language-4",
+      "section": "language",
+      "text": "let result = []\nerrdefer result.each(res => res.close())\nfor x in xs {\n  let res = make_resource(x)\n  do_something_with_res(res)\n  result.push(res)\n}\nresult"
+    },
+    {
+      "id": "language-5",
+      "kind": "numbered-item",
+      "section": "language",
+      "text": "`defer` and `errdefer` now support `raise` and `async`. Previously, the `expr` in `defer expr` could not raise errors or call async code. This restriction has been lifted. If an error is raised inside a `defer`/`errdefer`, the new error replaces the old one. When there are multiple `defer`/`errdefer` statements and one of them raises, the remaining ones still execute in order and are not discarded."
+    },
+    {
+      "id": "language-6",
+      "kind": "numbered-item",
+      "section": "language",
+      "text": "Added a new warning for migrating `catch` to `defer`/`errdefer`."
+    },
+    {
+      "id": "language-6-p1",
+      "kind": "paragraph",
+      "parent": "language-6",
+      "section": "language",
+      "text": "Currently, in `moonbitlang/async`, a cancelled async program raises a special error as the cancellation signal, so that the cancelled program can release its resources. But this special error can be accidentally caught or transformed, causing the program to misbehave when cancelled. In the future, we plan to stop using a special error to represent the cancellation signal, and make `catch` no longer catch it. However, if a program relies on `catch` to perform resource cleanup, this change would prevent it from releasing resources correctly on cancellation. That is why we introduced `errdefer` and lifted the side-effect restrictions on `defer`: nearly all resource-release code can now be expressed with `defer`/`errdefer` (and the cancellation signal will continue to trigger `defer` and `errdefer` in the future)."
+    },
+    {
+      "id": "language-6-p2",
+      "kind": "paragraph",
+      "parent": "language-6",
+      "section": "language",
+      "text": "To help users migrate existing `catch`-based resource-release code, we provide a new warning, `fragile_catch_all`. It identifies `catch` expressions that could likely be rewritten as `defer`/`errdefer` and emits a warning prompting migration. Besides handling async cancellation correctly in the future, `defer`/`errdefer` are also more readable and robust than `catch`."
+    },
+    {
+      "id": "language-6-p3",
+      "kind": "paragraph",
+      "parent": "language-6",
+      "section": "language",
+      "text": "This new warning may produce false positives. If that happens, you can temporarily disable it for the current function with `#warnings(\"-fragile_catch_all\")`."
+    },
+    {
+      "id": "language-7",
+      "kind": "numbered-item",
+      "section": "language",
+      "text": "`guard` now performs exhaustiveness checking and warns on non-exhaustive patterns. Users who want the previous panic-on-no-match semantics should migrate to `guard!` to state that intent explicitly."
+    },
+    {
+      "id": "language-7-c1",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "language-7",
+      "section": "language",
+      "text": "fn main {\n  let string = Some(\"content\")\n  guard string is Some(content)\n  //    ^~~~~~ Warning (guard_inexhaustive):\n  //               This `guard` pattern is not exhaustive and will panic when\n  //               it does not match. Missing cases:\n  //               None\n  //               To fix: add an `else { ... }` clause after the condition to\n  //               handle those cases, or write `guard!` if the panic is intended.\n  guard! string is Some(content) // the recommended new form\n  println(content)\n}"
+    },
+    {
+      "id": "language-8",
+      "kind": "numbered-item",
+      "section": "language",
+      "text": "Labelled blocks are now supported. Once a block is labelled, you can use `break` with a value inside it to exit early, and that value becomes the result of the whole block."
+    },
+    {
+      "id": "language-8-c1",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "language-8",
+      "section": "language",
+      "text": "fn absolute(n : Int) -> Int {\n  result~: {\n    if n < 0 {\n      break result~ (-n)\n    }\n    n\n  }\n}"
+    },
+    {
+      "id": "language-8-p1",
+      "kind": "paragraph",
+      "parent": "language-8",
+      "section": "language",
+      "text": "Note that labelled blocks have no anonymous form: an unlabelled `break` always targets the nearest loop, never a block. To avoid ambiguity, MoonBit specifies that an unlabelled `break` appearing directly inside a labelled block is always an error, even when there is indeed an enclosing loop it could break out of. In that case you must use a label to state explicitly which layer of control flow to exit."
+    },
+    {
+      "id": "language-8-c2",
+      "kind": "code-block",
+      "language": "moonbit",
+      "parent": "language-8",
+      "section": "language",
+      "text": "fn f() -> Int {\n  for ;; {\n    label~: {\n      break 1\n//    ^^^^^^^ An unlabelled `break` is not allowed directly inside a labelled block.\n    }\n  }\n}"
+    },
+    {
+      "id": "language-9",
+      "kind": "numbered-item",
+      "section": "language",
+      "text": "Added a new reserved word: `nocancel`."
+    },
+    {
+      "id": "language-10",
+      "kind": "numbered-item",
+      "section": "language",
+      "text": "`#warnings` now also works on syntax warnings. Previously, `#warnings` could only suppress warnings from the type-checking phase; some syntax warnings, such as `deprecated_syntax`, could not be disabled through `#warnings`. This has been fixed: `#warnings` can now locally suppress most warnings, including syntax warnings. A few warnings that span top-level definitions, as well as lexical warnings, still cannot be suppressed with `#warnings`."
+    },
+    {
+      "id": "toolchain-1",
+      "kind": "numbered-item",
+      "section": "toolchain",
+      "text": "The default target is now `wasm`."
+    },
+    {
+      "id": "toolchain-2",
+      "kind": "numbered-item",
+      "section": "toolchain",
+      "text": "`moon prove` now works out of the box as long as at least one supported solver (Z3 / Alt-Ergo / CVC5) is installed; a separate Why3 installation is no longer required. Correspondingly, Why3's `data-dir` and `lib-dir` can no longer be specified via environment variables; they are always read from `~/.moon/share/why3/` and `~/.moon/lib/why3/`."
+    },
+    {
+      "id": "toolchain-3",
+      "kind": "numbered-item",
+      "section": "toolchain",
+      "text": "You can now run executables from mooncakes.io with `moonx username/example[@version]` (executed on the WASM backend by default; pass `--target native` to run on the native backend):"
+    },
+    {
+      "id": "toolchain-3-c1",
+      "kind": "code-block",
+      "language": "bash",
+      "parent": "toolchain-3",
+      "section": "toolchain",
+      "text": "$ moonx moonbit-community/moongrep\nerror: the following required argument was not provided: 'subcommand'\n\nUsage: moongrep <command>\n\nScan MoonBit source files with structural and taint rules.\n\nCommands:\n  scan  Scan MoonBit source files.\n  lint  Scan MoonBit source files with embedded builtin rules.\n  docs  Print embedded moongrep documentation.\n  dump  Parse a MoonBit impl or expression and print untyped_ast debug output.\n  help  Print help for the subcommand(s).\n\nOptions:\n  -h, --help  Show help information."
+    },
+    {
+      "id": "toolchain-4",
+      "kind": "numbered-item",
+      "section": "toolchain",
+      "text": "Added support for `.moonignore` files."
+    },
+    {
+      "id": "toolchain-4-b1",
+      "kind": "bullet",
+      "parent": "toolchain-4",
+      "section": "toolchain",
+      "text": "Previously, whether files were included or excluded when publishing to mooncakes.io was configured by `.gitignore` plus the `\"exclude\"` and `\"include\"` fields in `moon.mod`, which was somewhat cumbersome."
+    },
+    {
+      "id": "toolchain-4-b2",
+      "kind": "bullet",
+      "parent": "toolchain-4",
+      "section": "toolchain",
+      "text": "Packaging now follows conventional ignore-file rules: the `.moonignore` in a folder — or, if absent, `.gitignore` — is used as the ignore file."
+    },
+    {
+      "id": "toolchain-4-b3",
+      "kind": "bullet",
+      "parent": "toolchain-4",
+      "section": "toolchain",
+      "text": "By default, files and folders starting with `.` are ignored (this rule can be overridden via the ignore file), as is the `_build` folder (not overridable)."
+    },
+    {
+      "id": "toolchain-4-b4",
+      "kind": "bullet",
+      "parent": "toolchain-4",
+      "section": "toolchain",
+      "text": "The `\"exclude\"` and `\"include\"` fields in `moon.mod` will be deprecated."
+    },
+    {
+      "id": "toolchain-5",
+      "kind": "numbered-item",
+      "section": "toolchain",
+      "text": "mooncakes.io previously allowed uploading packages whose names differ only in case (e.g. `user/pkga` and `user/pkgA`). This causes problems on case-insensitive platforms, so mooncakes.io no longer allows uploading packages that differ only in case."
+    },
+    {
+      "id": "standard-library-1",
+      "kind": "numbered-item",
+      "section": "standard-library",
+      "text": "`moonbitlang/core`"
+    },
+    {
+      "id": "standard-library-1-b1",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "QuickCheck updates"
+    },
+    {
+      "id": "standard-library-1-b2",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "Two main testing entry points are now provided: `@qc.check` (raises an error on failure, and prints nothing extra on success) and `@qc.report` (returns a structured test report). Users can pass a function `(A) -> Bool raise?` for property-based testing."
+    },
+    {
+      "id": "standard-library-1-b3",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "You can pass a `filter?: (A) -> Bool` parameter to the test functions to filter out generated values that do not meet requirements; the `discard_ratio` parameter controls at what proportion of discarded values the test fails."
+    },
+    {
+      "id": "standard-library-1-b4",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "The `@qc.Generator[T]` type and related functions provide a set of common combinators to help build `Arbitrary` instances."
+    },
+    {
+      "id": "standard-library-1-b5",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "The `core/quickcheck/shrink` package provides `Shrinker`s for most common types; once a counterexample is found, it can be shrunk to search for a smaller, simpler counterexample."
+    },
+    {
+      "id": "standard-library-1-b6",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "Statistical analysis is supported: you can pass an observation combinator `(A) -> Observation` to `check` / `report` via the `observe?` parameter, where an `Observation` can be constructed with the following functions:"
+    },
+    {
+      "id": "standard-library-1-b7",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "`@qc.label(val: String)` attaches a string label"
+    },
+    {
+      "id": "standard-library-1-b8",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "`@qc.classify(cond: Bool, val: String)` attaches the label `val` when the condition `cond` holds"
+    },
+    {
+      "id": "standard-library-1-b9",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "`@qc.collect(val : T)` uses a value's debug representation as the label"
+    },
+    {
+      "id": "standard-library-1-b10",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "For more details, see the documentation: https://mooncakes.io/docs/moonbitlang/core/quickcheck"
+    },
+    {
+      "id": "standard-library-1-b11",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "New `moonbitlang/core/diff` package"
+    },
+    {
+      "id": "standard-library-1-b12",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "Provides two general-purpose sequence diff algorithms, Myers and Patience. Users can obtain the edit script between two sequences via `@diff.Diff(old~, new~).edits()`."
+    },
+    {
+      "id": "standard-library-1-b13",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "Provides several functions for computing edit distances between sequences — `edit_distance(ArrayView[T])`, `edit_distance_str(StringView)` — along with variants that cap the maximum edit distance."
+    },
+    {
+      "id": "standard-library-1-b14",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "New `moonbitlang/core/lexbuf` package, providing `StringScanner`, `Lexbuf`, and `AsyncLexbuf` for use with `lexscan`."
+    },
+    {
+      "id": "standard-library-1-b15",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "`StringScanner`: a synchronous `String`-based scanner; `lexscan` maintains the `cursor` field on the scanner."
+    },
+    {
+      "id": "standard-library-1-b16",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "`Lexbuf`/`AsyncLexbuf`: streaming scanners whose data source is defined via `Lexbuf::from_fn`; they refill automatically during `lexscan`. The difference between the two is that a `lexscan` expression over an `AsyncLexbuf` requires an async context as a whole."
+    },
+    {
+      "id": "standard-library-1-b17",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "The `immut/array` package, deprecated for a long time, has now been formally removed; use `immut/vector` instead."
+    },
+    {
+      "id": "standard-library-1-b18",
+      "kind": "bullet",
+      "parent": "standard-library-1",
+      "section": "standard-library",
+      "text": "`@debug.to_repr(x)` is deprecated; use `@debug.Repr(x)` instead."
+    },
+    {
+      "id": "standard-library-2",
+      "kind": "numbered-item",
+      "section": "standard-library",
+      "text": "`moonbitlang/async` is now at 0.21.0. The main updates since the last monthly report (0.20.2) are:"
+    },
+    {
+      "id": "standard-library-2-b1",
+      "kind": "bullet",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "**[breaking]** In the `@http` package, the type of HTTP headers changed from `Map[String, String]` to the case-insensitive `type @http.Headers = Map[@http.CaseInsensitiveString, String]`, so you no longer need to handle case-folding manually when constructing or reading HTTP headers."
+    },
+    {
+      "id": "standard-library-2-p1",
+      "kind": "paragraph",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "`@http.CaseInsensitiveString` can be implicitly constructed from `String`, so code that builds headers with `Map` literals or reads headers needs no changes."
+    },
+    {
+      "id": "standard-library-2-p2",
+      "kind": "paragraph",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "Code that wrote explicit type annotations for headers must change the type to `@http.Headers`."
+    },
+    {
+      "id": "standard-library-2-b2",
+      "kind": "bullet",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "**[breaking]** The `create` and `truncate` parameters of `@fs.open` and related APIs had been deprecated for a while, replaced by `create_mode` and `permission`."
+    },
+    {
+      "id": "standard-library-2-p3",
+      "kind": "paragraph",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "In this release, `create` and `truncate` are completely removed."
+    },
+    {
+      "id": "standard-library-2-p4",
+      "kind": "paragraph",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "In addition, the default `create_mode` of `@fs.write_file` and `@process.redirect_to_file` changed from `OpenExisting` to `CreateOrTruncate`."
+    },
+    {
+      "id": "standard-library-2-p5",
+      "kind": "paragraph",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "The default `create_mode` of `@fs.open` remains `OpenExisting`."
+    },
+    {
+      "id": "standard-library-2-b3",
+      "kind": "bullet",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "**[breaking]** The default behavior of `@async.protect_from_cancel` is now `resume_on_cancel=true`, and the `resume_on_cancel=false` option is deprecated."
+    },
+    {
+      "id": "standard-library-2-p6",
+      "kind": "paragraph",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "Going forward, only the `resume_on_cancel=true` behavior will exist."
+    },
+    {
+      "id": "standard-library-2-p7",
+      "kind": "paragraph",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "In `moonbitlang/async`, cancellation is implemented by the runtime as a persistent attribute attached to each task."
+    },
+    {
+      "id": "standard-library-2-p8",
+      "kind": "paragraph",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "Once a task is cancelled, it remains cancelled until it finishes, and users cannot revoke that state."
+    },
+    {
+      "id": "standard-library-2-p9",
+      "kind": "paragraph",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "To help cancelled code release resources, the runtime notifies it with a special error, triggering `defer` etc."
+    },
+    {
+      "id": "standard-library-2-p10",
+      "kind": "paragraph",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "However, catching this cancellation signal does not change the fact that the current task is cancelled."
+    },
+    {
+      "id": "standard-library-2-p11",
+      "kind": "paragraph",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "When cancelled, `protect_from_cancel(resume_on_cancel=false)` guarantees the inner code runs to completion, then discards its result and raises the cancellation signal."
+    },
+    {
+      "id": "standard-library-2-p12",
+      "kind": "paragraph",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "This is unsafe because the discarded result can lead to resource leaks."
+    },
+    {
+      "id": "standard-library-2-p13",
+      "kind": "paragraph",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "`protect_from_cancel(resume_on_cancel=true)` does swallow the cancellation signal, but it does not affect the cancelled state of the current task: the next async operation after it will still be cancelled, which makes `resume_on_cancel=true` the more sensible behavior."
+    },
+    {
+      "id": "standard-library-2-p14",
+      "kind": "paragraph",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "For most user code, this behavior change has no substantive impact."
+    },
+    {
+      "id": "standard-library-2-p15",
+      "kind": "paragraph",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "---"
+    },
+    {
+      "id": "standard-library-2-b4",
+      "kind": "bullet",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "`moonbitlang/async` now automatically detects deadlocks (e.g. two tasks waiting on each other) and forcibly terminates the program, preventing the event loop from spinning idly forever."
+    },
+    {
+      "id": "standard-library-2-p16",
+      "kind": "paragraph",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "You can use `@async.set_deadlock_handler` to control the behavior on deadlock or to disable deadlock detection."
+    },
+    {
+      "id": "standard-library-2-b5",
+      "kind": "bullet",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "Previously, `moonbitlang/async` had to run its own event loop on the main thread, so it could not integrate with external event loops, such as those that ship with GUI frameworks."
+    },
+    {
+      "id": "standard-library-2-p17",
+      "kind": "paragraph",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "This update adds the `@async.set_external_event_loop` API for installing an external event loop."
+    },
+    {
+      "id": "standard-library-2-p18",
+      "kind": "paragraph",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "`moonbitlang/async` will run its own event loop on a separate thread and integrate it with the external loop on the main thread."
+    },
+    {
+      "id": "standard-library-2-p19",
+      "kind": "paragraph",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "All MoonBit code still runs on the main thread."
+    },
+    {
+      "id": "standard-library-2-p20",
+      "kind": "paragraph",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "For the APIs an external event loop implementation must provide to `moonbitlang/async`, see the documentation of `@async.set_external_event_loop`."
+    },
+    {
+      "id": "standard-library-2-b6",
+      "kind": "bullet",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "Added `@process.pipe`, which redirects the output of one child process into the input of another."
+    },
+    {
+      "id": "standard-library-2-b7",
+      "kind": "bullet",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "`@process.read_from_process` and `@process.redirect_to_file` gained a `shared? : Bool = false` parameter."
+    },
+    {
+      "id": "standard-library-2-p21",
+      "kind": "paragraph",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "With `shared=true`, the output pipe used for redirection can be passed to multiple child processes at the same time, but it must be closed manually with `.close()` after the last child process has started."
+    },
+    {
+      "id": "standard-library-2-p22",
+      "kind": "paragraph",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "With `shared=false` (the default and previous behavior), the output pipe can only be passed to a single child process (though it may be passed to both `stdout` and `stderr` of that same process), and needs no manual close."
+    },
+    {
+      "id": "standard-library-2-b8",
+      "kind": "bullet",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "Added the helper function `@http.request` for performing a single HTTP request with an arbitrary method."
+    },
+    {
+      "id": "standard-library-2-b9",
+      "kind": "bullet",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "The Wasm1 backend gained `@websocket` and `@fs.realpath` support; it now supports all functionality except `@fs.Watcher`."
+    },
+    {
+      "id": "standard-library-2-b10",
+      "kind": "bullet",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "On Linux/macOS, when a child process is terminated by a signal rather than exiting normally, APIs such as `@process.run` recognize this and return `-signal`."
+    },
+    {
+      "id": "standard-library-2-b11",
+      "kind": "bullet",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "Previously, when an `async fn main` program was cancelled by a signal, it would exit with `128 + signal` as its exit code after releasing resources (the bash convention)."
+    },
+    {
+      "id": "standard-library-2-p23",
+      "kind": "paragraph",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "But this is ambiguous to the parent process."
+    },
+    {
+      "id": "standard-library-2-p24",
+      "kind": "paragraph",
+      "parent": "standard-library-2",
+      "section": "standard-library",
+      "text": "Now, when cancelled by a signal, `async fn main` finishes cleanup and then re-simulates the state of the current process being forcibly terminated by that signal as the program's exit status."
+    },
+    {
+      "id": "standard-library-3",
+      "kind": "numbered-item",
+      "section": "standard-library",
+      "text": "`moonbitlang/x`"
+    },
+    {
+      "id": "standard-library-3-b1",
+      "kind": "bullet",
+      "parent": "standard-library-3",
+      "section": "standard-library",
+      "text": "Deprecated `moonbitlang/sys`; use `moonbitlang/core/env` instead."
+    },
+    {
+      "id": "standard-library-3-b2",
+      "kind": "bullet",
+      "parent": "standard-library-3",
+      "section": "standard-library",
+      "text": "`moonbitlang/x/path` now works correctly in browser environments, and Windows path comparison now correctly handles non-ASCII characters that have case forms."
+    },
+    {
+      "id": "standard-library-3-b3",
+      "kind": "bullet",
+      "parent": "standard-library-3",
+      "section": "standard-library",
+      "text": "`moonbitlang/x/rational` no longer suffers from overflow misjudgments or zero-denominator issues."
+    }
+  ],
+  "release": "0.10.9",
+  "release_date": "2026-08-19",
+  "schema_version": 2,
+  "source": {
+    "commit": "b6d21ad70b1f2b61de640a8978d84b3315084711",
+    "path": "updates/2026-08-19/index.md",
+    "repository": "https://github.com/moonbitlang/website",
+    "sha256": "a6f586d655a0abe937be453bee60ca991b12669331beee2e5cc95f323d7cc1f1",
+    "web_url": "https://www.moonbitlang.com/updates/2026/08/19"
+  }
+}

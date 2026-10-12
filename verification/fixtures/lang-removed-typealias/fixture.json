@@ -1,0 +1,28 @@
+{
+  "id": "lang-removed-typealias",
+  "owner_skill": "moonbit-language",
+  "knowledge": "typealias declarations are removed; type New = Old declares an alias.",
+  "expect": "check-fail",
+  "targets": [
+    "wasm-gc",
+    "wasm",
+    "js",
+    "native"
+  ],
+  "moon_args": [
+    "--deny-warn"
+  ],
+  "source": "observed",
+  "diagnostic_contains": [
+    "E3002"
+  ],
+  "verified": {
+    "date": "2026-10-12",
+    "components": {
+      "moon": "0.1.20260920 (914d7da 2026-09-20)",
+      "moonc": "v0.10.14+7d59c7ec9 (2026-09-18)",
+      "moonrun": "moonrun 0.1.20260920 (914d7da 2026-09-20)"
+    },
+    "platform": "Linux-x86_64"
+  }
+}

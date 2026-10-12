@@ -103,7 +103,7 @@ impl T2 with greet(self) { ... } // WRONG: E4167 — a default body requires `= 
 
 An `impl Trait for Type` establishes trait conformance; it should not be relied on to attach the trait's methods to an owned type. MoonBit 0.10.4 deprecated that implicit attachment. Add `extend Type with Trait::{method}` for each method that should support dot calls, and use `pub extend` when the attached method must be visible outside the package. This explicit list prevents a new upstream default method from silently changing a type's method set.
 
-The release notes call this migration warning `implicit_impl_as_method` (79). The initial 2026-07-13 compiler made it opt-in, but the pinned 2026-07-15 compiler includes it in the default deprecated-warning set, so `--deny-warn` is sufficient; the repository fixture `lang-dep-implicit-impl-as-method` proves both the deprecated form and the `extend` fix at the current pin. Methods reached through a type constraint or trait object still support dot calls when they belong directly to that trait. The qualified `Trait::method(value)` form is always explicit.
+The release notes call this migration warning `implicit_impl_as_method` (79). It is enabled by default at the current pin, so `--deny-warn` is sufficient; the repository fixture `lang-dep-implicit-impl-as-method` proves both the deprecated form and the `extend` fix at the current pin. Methods reached through a type constraint or trait object still support dot calls when they belong directly to that trait. The qualified `Trait::method(value)` form is always explicit.
 
 Library authors who need to preserve a former dot-call method temporarily while steering callers away from it can put `#deprecated("message")` on the corresponding `extend` declaration. The `lang-dep-deprecated-extend` fixture proves that the dot call emits the deprecation while the qualified trait call remains available as the replacement.
 
@@ -204,7 +204,7 @@ The common builtin contracts are:
 
 ### Deriving builtin traits
 
-`derive(...)` generates implementations when the type and all required fields support the requested trait. The current useful set includes `Eq`, `Compare`, `Hash`, `Debug`, `Default`, `ToJson`, `FromJson`, and `Arbitrary`. Do not write `derive(Show)` for diagnostics; it is deprecated at this pin, and `Debug` is the replacement. The exact field/case order, enum-default restriction, JSON styles, Option representation, and container/case/field arguments live in types-structs-enums.mbt.md.
+`derive(...)` generates implementations when the type and all required fields support the requested trait. The current useful set includes `Eq`, `Compare`, `Hash`, `Debug`, `Default`, `ToJson`, `FromJson`, `Arbitrary`, and `Shrink`. Do not write `derive(Show)` for diagnostics; it is deprecated at this pin, and `Debug` is the replacement. The exact field/case order, enum-default restriction, JSON styles, Option representation, and container/case/field arguments live in types-structs-enums.mbt.md.
 
 ## Operator overloading
 
@@ -236,7 +236,7 @@ fn Volt::op_add(self : Volt, other : Volt) -> Volt { ... } // WRONG: E4018 — `
 
 ## Trait aliases
 
-There is no `trait X = Y` syntax (parse error), and `traitalias` is deprecated. The current way is the `#alias(Name)` attribute on the trait declaration; the alias works in constraints.
+There is no `trait X = Y` syntax (parse error), and `traitalias` declarations are parse errors. The current way is the `#alias(Name)` attribute on the trait declaration; the alias works in constraints.
 
 ```mbt check
 #alias(Brief)
@@ -259,5 +259,5 @@ test "trait alias via #alias" {
 
 ```mbt nocheck
 trait Brief = Summarizable          // WRONG: parse error — no `trait X = Y` form
-traitalias Summarizable as Brief    // DEPRECATED: use #alias(Brief) on the trait declaration
+traitalias Summarizable as Brief    // REMOVED: use #alias(Brief) on the trait declaration
 ```

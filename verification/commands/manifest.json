@@ -7,7 +7,13 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "new", "hello", "--user", "mbtskills"],
+          "argv": [
+            "moon",
+            "new",
+            "hello",
+            "--user",
+            "mbtskills"
+          ],
           "expect": {
             "output_contains": [
               "Created mbtskills/hello at hello"
@@ -39,15 +45,26 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "check"]
+          "argv": [
+            "moon",
+            "check"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "check", "textutil"]
+          "argv": [
+            "moon",
+            "check",
+            "textutil"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "check", "lib.mbt"],
+          "argv": [
+            "moon",
+            "check",
+            "lib.mbt"
+          ],
           "expect": {
             "output_contains": [
               "Finished."
@@ -62,7 +79,12 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "check", "--target", "all"]
+          "argv": [
+            "moon",
+            "check",
+            "--target",
+            "all"
+          ]
         }
       ]
     },
@@ -72,7 +94,11 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "check", "--frozen"]
+          "argv": [
+            "moon",
+            "check",
+            "--frozen"
+          ]
         }
       ]
     },
@@ -98,7 +124,13 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "-C", "app", "run", "cmd/main"],
+          "argv": [
+            "moon",
+            "-C",
+            "app",
+            "run",
+            "cmd/main"
+          ],
           "expect": {
             "output_contains": [
               "42"
@@ -113,7 +145,12 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "--manifest-path", "moon.mod", "check"],
+          "argv": [
+            "moon",
+            "--manifest-path",
+            "moon.mod",
+            "check"
+          ],
           "expect": {
             "exit": 2,
             "output_contains": [
@@ -129,7 +166,10 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "build"],
+          "argv": [
+            "moon",
+            "build"
+          ],
           "expect": {
             "paths_exist": [
               "_build/wasm/debug/build/cmd/main/main.wasm"
@@ -144,7 +184,12 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "build", "--target", "js"],
+          "argv": [
+            "moon",
+            "build",
+            "--target",
+            "js"
+          ],
           "expect": {
             "paths_exist": [
               "_build/js/debug/build/cmd/main/main.js",
@@ -160,7 +205,12 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "build", "--target", "all"],
+          "argv": [
+            "moon",
+            "build",
+            "--target",
+            "all"
+          ],
           "expect": {
             "paths_exist": [
               "_build/js/debug/build/cmd/main/main.js",
@@ -178,7 +228,11 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "build", "--release"],
+          "argv": [
+            "moon",
+            "build",
+            "--release"
+          ],
           "expect": {
             "paths_exist": [
               "_build/wasm/release/build/cmd/main/main.wasm"
@@ -201,7 +255,11 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "run", "cmd/main"],
+          "argv": [
+            "moon",
+            "run",
+            "cmd/main"
+          ],
           "expect": {
             "output_contains": [
               "42"
@@ -228,7 +286,13 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "run", "cmd/main", "one", "two"],
+          "argv": [
+            "moon",
+            "run",
+            "cmd/main",
+            "one",
+            "two"
+          ],
           "expect": {
             "output_contains": [
               "one",
@@ -244,7 +308,13 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "run", "--target", "native", "cmd/main"],
+          "argv": [
+            "moon",
+            "run",
+            "--target",
+            "native",
+            "cmd/main"
+          ],
           "expect": {
             "output_contains": [
               "42"
@@ -259,7 +329,13 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "build", "--target", "native", "--dry-run"],
+          "argv": [
+            "moon",
+            "build",
+            "--target",
+            "native",
+            "--dry-run"
+          ],
           "expect": {
             "output_contains": [
               "-target x86_64-unknown-linux-gnu",
@@ -291,7 +367,14 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "build", "--target", "native", "--release", "--dry-run"],
+          "argv": [
+            "moon",
+            "build",
+            "--target",
+            "native",
+            "--release",
+            "--dry-run"
+          ],
           "expect": {
             "output_contains": [
               "-target native",
@@ -328,7 +411,11 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "run", "textutil"],
+          "argv": [
+            "moon",
+            "run",
+            "textutil"
+          ],
           "expect": {
             "exit": 255,
             "output_contains": [
@@ -344,7 +431,10 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "test"],
+          "argv": [
+            "moon",
+            "test"
+          ],
           "expect": {
             "output_contains": [
               "Total tests: 2, passed: 2, failed: 0."
@@ -359,19 +449,39 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "test", "-p", "textutil"]
+          "argv": [
+            "moon",
+            "test",
+            "-p",
+            "textutil"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "test", "-p", "mbtskills/template/textutil"]
+          "argv": [
+            "moon",
+            "test",
+            "-p",
+            "mbtskills/template/textutil"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "test", "textutil"]
+          "argv": [
+            "moon",
+            "test",
+            "textutil"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "test", "textutil/shout_test.mbt", "-i", "0"],
+          "argv": [
+            "moon",
+            "test",
+            "textutil/shout_test.mbt",
+            "-i",
+            "0"
+          ],
           "expect": {
             "output_contains": [
               "Total tests: 1, passed: 1"
@@ -390,7 +500,10 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "test"],
+          "argv": [
+            "moon",
+            "test"
+          ],
           "expect": {
             "exit": 2,
             "output_contains": [
@@ -410,7 +523,11 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "test", "--test-failure-json"],
+          "argv": [
+            "moon",
+            "test",
+            "--test-failure-json"
+          ],
           "expect": {
             "exit": 2,
             "output_contains": [
@@ -426,7 +543,12 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "test", "--filter", "shout*"],
+          "argv": [
+            "moon",
+            "test",
+            "--filter",
+            "shout*"
+          ],
           "expect": {
             "output_contains": [
               "Total tests: 1, passed: 1"
@@ -441,7 +563,11 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "test", "--outline"],
+          "argv": [
+            "moon",
+            "test",
+            "--outline"
+          ],
           "expect": {
             "output_contains": [
               "name=\"shout uppercases\""
@@ -460,7 +586,11 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "test", "-u"]
+          "argv": [
+            "moon",
+            "test",
+            "-u"
+          ]
         },
         {
           "kind": "shell",
@@ -483,11 +613,21 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "test", "textutil"]
+          "argv": [
+            "moon",
+            "test",
+            "textutil"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "test", "textutil/twice.mbt", "--doc-index", "0"],
+          "argv": [
+            "moon",
+            "test",
+            "textutil/twice.mbt",
+            "--doc-index",
+            "0"
+          ],
           "expect": {
             "output_contains": [
               "Total tests: 1, passed: 1"
@@ -506,7 +646,14 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "test", "-p", "mbtskills/template/textutil", "--patch-file", "patch.json"],
+          "argv": [
+            "moon",
+            "test",
+            "-p",
+            "mbtskills/template/textutil",
+            "--patch-file",
+            "patch.json"
+          ],
           "expect": {
             "output_contains": [
               "Total tests: 2, passed: 2"
@@ -521,7 +668,11 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "coverage", "analyze"],
+          "argv": [
+            "moon",
+            "coverage",
+            "analyze"
+          ],
           "expect": {
             "output_contains": [
               "uncovered line"
@@ -536,11 +687,21 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "test", "--enable-coverage"]
+          "argv": [
+            "moon",
+            "test",
+            "--enable-coverage"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "coverage", "report", "-f", "summary"],
+          "argv": [
+            "moon",
+            "coverage",
+            "report",
+            "-f",
+            "summary"
+          ],
           "expect": {
             "output_contains": [
               "Total:"
@@ -555,11 +716,19 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "test", "--enable-coverage"]
+          "argv": [
+            "moon",
+            "test",
+            "--enable-coverage"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "coverage", "clean"]
+          "argv": [
+            "moon",
+            "coverage",
+            "clean"
+          ]
         }
       ]
     },
@@ -577,7 +746,11 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "bench", "textutil"],
+          "argv": [
+            "moon",
+            "bench",
+            "textutil"
+          ],
           "expect": {
             "output_contains": [
               "time (mean"
@@ -592,7 +765,10 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "fmt"]
+          "argv": [
+            "moon",
+            "fmt"
+          ]
         },
         {
           "kind": "shell",
@@ -611,11 +787,18 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "fmt"]
+          "argv": [
+            "moon",
+            "fmt"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "fmt", "--check"]
+          "argv": [
+            "moon",
+            "fmt",
+            "--check"
+          ]
         }
       ]
     },
@@ -629,7 +812,11 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "fmt", "--check"],
+          "argv": [
+            "moon",
+            "fmt",
+            "--check"
+          ],
           "expect": {
             "exit": 255
           }
@@ -654,11 +841,17 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "check"]
+          "argv": [
+            "moon",
+            "check"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "fmt"],
+          "argv": [
+            "moon",
+            "fmt"
+          ],
           "expect": {
             "output_contains": [
               "Migrating to moon.mod"
@@ -677,7 +870,11 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "fmt", "--block-style"],
+          "argv": [
+            "moon",
+            "fmt",
+            "--block-style"
+          ],
           "expect": {
             "exit": 2,
             "output_contains": [
@@ -693,7 +890,10 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "doc"],
+          "argv": [
+            "moon",
+            "doc"
+          ],
           "expect": {
             "paths_exist": [
               "_build/doc/mbtskills/template/members.md"
@@ -720,7 +920,10 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "doc"],
+          "argv": [
+            "moon",
+            "doc"
+          ],
           "expect": {
             "exit": 255,
             "output_contains": [
@@ -736,7 +939,10 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "info"],
+          "argv": [
+            "moon",
+            "info"
+          ],
           "expect": {
             "paths_exist": [
               "pkg.generated.mbti",
@@ -753,11 +959,17 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "build"]
+          "argv": [
+            "moon",
+            "build"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "clean"]
+          "argv": [
+            "moon",
+            "clean"
+          ]
         },
         {
           "kind": "shell",
@@ -771,7 +983,11 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "clean", "--help"],
+          "argv": [
+            "moon",
+            "clean",
+            "--help"
+          ],
           "expect": {
             "output_contains": [
               "--dep-cache",
@@ -787,9 +1003,20 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "shell-completion", "--help"],
+          "argv": [
+            "moon",
+            "shell-completion",
+            "--help"
+          ],
           "expect": {
-            "output_contains": ["bash", "elvish", "fish", "powershell", "zsh", "stdout"]
+            "output_contains": [
+              "bash",
+              "elvish",
+              "fish",
+              "powershell",
+              "zsh",
+              "stdout"
+            ]
           }
         }
       ]
@@ -800,9 +1027,18 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "generate-build-matrix", "--help"],
+          "argv": [
+            "moon",
+            "generate-build-matrix",
+            "--help"
+          ],
           "expect": {
-            "output_contains": ["legacy feature", "--output-dir", "--drow", "--mcol"]
+            "output_contains": [
+              "legacy feature",
+              "--output-dir",
+              "--drow",
+              "--mcol"
+            ]
           }
         }
       ]
@@ -813,7 +1049,11 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "runwasm", "--help"],
+          "argv": [
+            "moon",
+            "runwasm",
+            "--help"
+          ],
           "expect": {
             "output_contains": [
               "PACKAGE[@VERSION]",
@@ -829,7 +1069,10 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moonx", "--help"],
+          "argv": [
+            "moonx",
+            "--help"
+          ],
           "expect": {
             "output_contains": [
               "PACKAGE",
@@ -847,7 +1090,11 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "version", "--all"],
+          "argv": [
+            "moon",
+            "version",
+            "--all"
+          ],
           "expect": {
             "output_contains": [
               "moonc"
@@ -862,7 +1109,12 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "version", "--all", "--json"],
+          "argv": [
+            "moon",
+            "version",
+            "--all",
+            "--json"
+          ],
           "expect": {
             "output_contains": [
               "\"name\":\"moonc\""
@@ -878,7 +1130,10 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "update"],
+          "argv": [
+            "moon",
+            "update"
+          ],
           "expect": {
             "output_contains": [
               "Registry index",
@@ -895,15 +1150,27 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "add", "moonbitlang/x@0.4.46"]
+          "argv": [
+            "moon",
+            "add",
+            "moonbitlang/x@0.4.46"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "remove", "moonbitlang/x"]
+          "argv": [
+            "moon",
+            "remove",
+            "moonbitlang/x"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "add", "moonbitlang/x"]
+          "argv": [
+            "moon",
+            "add",
+            "moonbitlang/x"
+          ]
         }
       ]
     },
@@ -914,11 +1181,18 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "add", "moonbitlang/x@0.4.46"]
+          "argv": [
+            "moon",
+            "add",
+            "moonbitlang/x@0.4.46"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "tree"],
+          "argv": [
+            "moon",
+            "tree"
+          ],
           "expect": {
             "output_contains": [
               "moonbitlang/x@0.4.46"
@@ -934,11 +1208,20 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "add", "--bin", "moonbitlang/x"]
+          "argv": [
+            "moon",
+            "add",
+            "--bin",
+            "moonbitlang/x"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "remove", "moonbitlang/x"],
+          "argv": [
+            "moon",
+            "remove",
+            "moonbitlang/x"
+          ],
           "expect": {
             "exit": 255,
             "output_contains": [
@@ -954,11 +1237,18 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "package"]
+          "argv": [
+            "moon",
+            "package"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "package", "--list"],
+          "argv": [
+            "moon",
+            "package",
+            "--list"
+          ],
           "expect": {
             "output_contains": [
               "lib.mbt"
@@ -992,11 +1282,21 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "run", "cmd/show"]
+          "argv": [
+            "moon",
+            "run",
+            "cmd/show"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "run", "--target", "js", "cmd/show"],
+          "argv": [
+            "moon",
+            "run",
+            "--target",
+            "js",
+            "cmd/show"
+          ],
           "expect": {
             "output_contains": [
               "js backend"
@@ -1015,7 +1315,12 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "build", "--target", "native"],
+          "argv": [
+            "moon",
+            "build",
+            "--target",
+            "native"
+          ],
           "expect": {
             "output_contains": [
               "no work to do"
@@ -1038,7 +1343,11 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "check", "--deny-warn"]
+          "argv": [
+            "moon",
+            "check",
+            "--deny-warn"
+          ]
         }
       ]
     },
@@ -1056,7 +1365,11 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "check", "--deny-warn"]
+          "argv": [
+            "moon",
+            "check",
+            "--deny-warn"
+          ]
         }
       ]
     },
@@ -1070,7 +1383,10 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "check"],
+          "argv": [
+            "moon",
+            "check"
+          ],
           "expect": {
             "output_contains": [
               "Finished."
@@ -1089,7 +1405,11 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "check", "textutil"],
+          "argv": [
+            "moon",
+            "check",
+            "textutil"
+          ],
           "expect": {
             "exit": 255,
             "output_contains": [
@@ -1109,7 +1429,10 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "build"],
+          "argv": [
+            "moon",
+            "build"
+          ],
           "expect": {
             "paths_exist": [
               "_build/js/debug/build/cmd/main/main.js"
@@ -1136,7 +1459,10 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "build"],
+          "argv": [
+            "moon",
+            "build"
+          ],
           "expect": {
             "paths_exist": [
               "_build/js"
@@ -1163,11 +1489,21 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "build", "--target", "js"]
+          "argv": [
+            "moon",
+            "build",
+            "--target",
+            "js"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "build", "--target", "wasm"]
+          "argv": [
+            "moon",
+            "build",
+            "--target",
+            "wasm"
+          ]
         },
         {
           "kind": "shell",
@@ -1210,7 +1546,12 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "test", "--target", "native"],
+          "argv": [
+            "moon",
+            "test",
+            "--target",
+            "native"
+          ],
           "expect": {
             "output_contains": [
               "Total tests: 1, passed: 1"
@@ -1241,7 +1582,10 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "check"],
+          "argv": [
+            "moon",
+            "check"
+          ],
           "expect": {
             "paths_exist": [
               "greeting.mbt"
@@ -1256,7 +1600,12 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "ide", "peek-def", "add"],
+          "argv": [
+            "moon",
+            "ide",
+            "peek-def",
+            "add"
+          ],
           "expect": {
             "output_contains": [
               "Found 1 symbols",
@@ -1272,11 +1621,21 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "ide", "outline", "textutil/shout.mbt"]
+          "argv": [
+            "moon",
+            "ide",
+            "outline",
+            "textutil/shout.mbt"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "ide", "outline", "textutil"],
+          "argv": [
+            "moon",
+            "ide",
+            "outline",
+            "textutil"
+          ],
           "expect": {
             "output_contains": [
               "pub fn shout"
@@ -1291,11 +1650,21 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "ide", "doc", "String::*upper*"]
+          "argv": [
+            "moon",
+            "ide",
+            "doc",
+            "String::*upper*"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "ide", "doc", "@textutil"],
+          "argv": [
+            "moon",
+            "ide",
+            "doc",
+            "@textutil"
+          ],
           "expect": {
             "output_contains": [
               "package \"mbtskills/template/textutil\""
@@ -1310,7 +1679,12 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "ide", "find-references", "shout"],
+          "argv": [
+            "moon",
+            "ide",
+            "find-references",
+            "shout"
+          ],
           "expect": {
             "output_contains": [
               "references for symbol 'shout'"
@@ -1325,11 +1699,19 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "ide", "gen-symbols"]
+          "argv": [
+            "moon",
+            "ide",
+            "gen-symbols"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "ide", "analyze"],
+          "argv": [
+            "moon",
+            "ide",
+            "analyze"
+          ],
           "expect": {
             "output_contains": [
               "usage:"
@@ -1347,11 +1729,24 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "ide", "hover", "--loc", "cmd/main/main.mbt:3:16"]
+          "argv": [
+            "moon",
+            "ide",
+            "hover",
+            "--loc",
+            "cmd/main/main.mbt:3:16"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "ide", "hover", "--loc", "cmd/main/main.mbt:3:16", "--output-json"],
+          "argv": [
+            "moon",
+            "ide",
+            "hover",
+            "--loc",
+            "cmd/main/main.mbt:3:16",
+            "--output-json"
+          ],
           "expect": {
             "output_contains": [
               "\"range\""
@@ -1366,11 +1761,28 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "ide", "rename", "shout", "yell", "--loc", "textutil/shout.mbt:2"]
+          "argv": [
+            "moon",
+            "ide",
+            "rename",
+            "shout",
+            "yell",
+            "--loc",
+            "textutil/shout.mbt:2"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "ide", "rename", "shout", "yell", "--loc", "textutil/shout.mbt:2", "--apply"]
+          "argv": [
+            "moon",
+            "ide",
+            "rename",
+            "shout",
+            "yell",
+            "--loc",
+            "textutil/shout.mbt:2",
+            "--apply"
+          ]
         },
         {
           "kind": "shell",
@@ -1421,19 +1833,36 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "work", "init"]
+          "argv": [
+            "moon",
+            "work",
+            "init"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "work", "use", "base", "app"]
+          "argv": [
+            "moon",
+            "work",
+            "use",
+            "base",
+            "app"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "check"]
+          "argv": [
+            "moon",
+            "check"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "work", "sync"],
+          "argv": [
+            "moon",
+            "work",
+            "sync"
+          ],
           "expect": {
             "output_contains": [
               "app/moon.mod"
@@ -1480,15 +1909,29 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "work", "init"]
+          "argv": [
+            "moon",
+            "work",
+            "init"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "work", "use", "base", "app"]
+          "argv": [
+            "moon",
+            "work",
+            "use",
+            "base",
+            "app"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "run", "cmd/main"],
+          "argv": [
+            "moon",
+            "run",
+            "cmd/main"
+          ],
           "cwd": "app",
           "expect": {
             "output_contains": [
@@ -1504,7 +1947,12 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "run", "-e", "fn main { println(\"one-liner\") }"],
+          "argv": [
+            "moon",
+            "run",
+            "-e",
+            "fn main { println(\"one-liner\") }"
+          ],
           "expect": {
             "output_contains": [
               "one-liner"
@@ -1513,7 +1961,12 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "run", "-e", "fn main { println(\"hi\") }"],
+          "argv": [
+            "moon",
+            "run",
+            "-e",
+            "fn main { println(\"hi\") }"
+          ],
           "expect": {
             "output_contains": [
               "hi"
@@ -1544,7 +1997,11 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "run", "hello.mbtx"],
+          "argv": [
+            "moon",
+            "run",
+            "hello.mbtx"
+          ],
           "expect": {
             "output_contains": [
               "from script: 3"
@@ -1564,7 +2021,11 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "run", "pinned.mbtx"],
+          "argv": [
+            "moon",
+            "run",
+            "pinned.mbtx"
+          ],
           "expect": {
             "output_contains": [
               "Some(42)"
@@ -1583,15 +2044,26 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "check"]
+          "argv": [
+            "moon",
+            "check"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "check", "--no-render"]
+          "argv": [
+            "moon",
+            "check",
+            "--no-render"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "check", "--output-json"],
+          "argv": [
+            "moon",
+            "check",
+            "--output-json"
+          ],
           "expect": {
             "output_contains": [
               "\"$message_type\":\"diagnostic\""
@@ -1610,7 +2082,11 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "check", "--deny-warn"],
+          "argv": [
+            "moon",
+            "check",
+            "--deny-warn"
+          ],
           "expect": {
             "exit": 255,
             "output_contains": [
@@ -1630,7 +2106,12 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "check", "--warn-list", "+unnecessary_annotation"],
+          "argv": [
+            "moon",
+            "check",
+            "--warn-list",
+            "+unnecessary_annotation"
+          ],
           "expect": {
             "output_contains": [
               "[0073]"
@@ -1645,11 +2126,21 @@
       "steps": [
         {
           "kind": "moon",
-          "argv": ["moon", "explain", "--diagnostic", "4020"]
+          "argv": [
+            "moon",
+            "explain",
+            "--diagnostic",
+            "4020"
+          ]
         },
         {
           "kind": "moon",
-          "argv": ["moon", "explain", "--attribute", "deprecated"],
+          "argv": [
+            "moon",
+            "explain",
+            "--attribute",
+            "deprecated"
+          ],
           "expect": {
             "output_contains": [
               "deprecated"
@@ -1668,7 +2159,10 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "check"],
+          "argv": [
+            "moon",
+            "check"
+          ],
           "expect": {
             "exit": 255,
             "output_contains": [
@@ -1692,7 +2186,10 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "check"],
+          "argv": [
+            "moon",
+            "check"
+          ],
           "expect": {
             "exit": 255,
             "output_contains": [
@@ -1716,7 +2213,10 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "check"],
+          "argv": [
+            "moon",
+            "check"
+          ],
           "expect": {
             "output_contains": [
               "Finished."
@@ -1735,7 +2235,10 @@
         },
         {
           "kind": "moon",
-          "argv": ["moon", "check"],
+          "argv": [
+            "moon",
+            "check"
+          ],
           "expect": {
             "exit": 255,
             "output_contains": [
@@ -1777,6 +2280,940 @@
         "moon install username/module"
       ],
       "reason": "Installs a binary globally into the toolchain home, outside the CI working directory; networky and not sandboxed by the temp workdir."
+    },
+    {
+      "id": "registry-discovery-live",
+      "fixture": "empty",
+      "network": true,
+      "steps": [
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "search",
+            "html markdown",
+            "--limit",
+            "1",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "\"status\":\"success\"",
+              "\"results\":"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "view",
+            "moonbitlang/async@0.21.3",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "\"status\":\"success\"",
+              "\"module\":\"moonbitlang/async\"",
+              "\"version\":\"0.21.3\""
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "view",
+            "moonbitlang/async",
+            "--versions",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "\"status\":\"success\"",
+              "\"result\":[",
+              "\"version\":\"0.21.3\""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "registry-discovery-help",
+      "fixture": "empty",
+      "steps": [
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "view",
+            "--help"
+          ],
+          "expect": {
+            "output_contains": [
+              "--my",
+              "No login is required"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "deprecate",
+            "--help"
+          ],
+          "expect": {
+            "output_contains": [
+              "all existing versions",
+              "--reason",
+              "--undo",
+              "Deprecation does not affect version selection"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "dependency-graph-json",
+      "fixture": "template",
+      "steps": [
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "tree",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "\"modules\":[",
+              "\"name\":\"mbtskills/template\"",
+              "\"edges\":[]"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "tree",
+            "--package"
+          ],
+          "expect": {
+            "output_contains": [
+              "[cmd/main]",
+              "lib -> mbtskills/template"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "tree",
+            "--package",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "\"nodes\":[",
+              "\"rel\":\"cmd/main\"",
+              "\"alias\":\"lib\"",
+              "\"kinds\":[\"source\"]"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "publishing-moonignore-migration",
+      "fixture": "empty",
+      "steps": [
+        {
+          "kind": "shell",
+          "script": "mkdir -p '.' 'fixtures' '.well-known' '_build' 'nested/_build' 'nested' 'fallback'"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'moon.mod' <<'MBTEOF'\nname = \"mbtskills/packaging\"\nversion = \"0.1.0\"\nreadme = \"README.md\"\nrepository = \"https://example.com/mbtskills/packaging\"\nlicense = \"MIT\"\noptions(include: [\"moon.mod\", \"moon.pkg\", \"lib.mbt\", \".hidden\", \"moon-only.txt\", \"_build/**\"], exclude: [\"moon-only.txt\"])\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'moon.pkg' <<'MBTEOF'\n\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'lib.mbt' <<'MBTEOF'\npub fn answer() -> Int { 42 }\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'README.md' <<'MBTEOF'\npackaging probe\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > '.gitignore' <<'MBTEOF'\ngit-only.txt\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > '.moonignore' <<'MBTEOF'\nmoon-only.txt\n*.log\n!fixtures/expected.log\n!/.well-known/\n!/.well-known/**\n!/_build/\n!/_build/**\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'git-only.txt' <<'MBTEOF'\nkept\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'moon-only.txt' <<'MBTEOF'\ndropped\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'unexpected.log' <<'MBTEOF'\ndropped\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > '.hidden' <<'MBTEOF'\ndropped\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'fixtures/expected.log' <<'MBTEOF'\nkept\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > '.well-known/config.txt' <<'MBTEOF'\nkept\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > '_build/forbidden.txt' <<'MBTEOF'\ndropped\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'nested/_build/data.bin' <<'MBTEOF'\nkept\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'nested/.gitignore' <<'MBTEOF'\ngit-only.txt\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'nested/.moonignore' <<'MBTEOF'\nmoon-only.txt\n!rescued.log\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'nested/git-only.txt' <<'MBTEOF'\nkept\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'nested/moon-only.txt' <<'MBTEOF'\ndropped\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'nested/rescued.log' <<'MBTEOF'\nkept\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'nested/dropped.log' <<'MBTEOF'\ndropped\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'fallback/.gitignore' <<'MBTEOF'\nfallback-only.txt\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'fallback/fallback-only.txt' <<'MBTEOF'\ndropped\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'fallback/keep.txt' <<'MBTEOF'\nkept\nMBTEOF"
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "check",
+            "--deny-warn"
+          ],
+          "expect": {
+            "output_contains": [
+              "`include` and `exclude`",
+              "are deprecated",
+              "Finished."
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "package",
+            "--list"
+          ],
+          "expect": {
+            "output_contains": [
+              "\n.hidden\n",
+              "\nmoon-only.txt\n",
+              "\nmoon.mod\n",
+              "\nmoon.pkg\n",
+              "\nlib.mbt\n"
+            ],
+            "output_not_contains": [
+              "\ngit-only.txt\n",
+              "\nREADME.md\n",
+              "\n_build/forbidden.txt\n"
+            ]
+          }
+        },
+        {
+          "kind": "shell",
+          "script": "mkdir -p '.'"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'moon.mod' <<'MBTEOF'\nname = \"mbtskills/packaging\"\nversion = \"0.1.0\"\nreadme = \"README.md\"\nrepository = \"https://example.com/mbtskills/packaging\"\nlicense = \"MIT\"\nMBTEOF"
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "check",
+            "--deny-warn"
+          ],
+          "expect": {
+            "output_not_contains": [
+              "`include` and `exclude`",
+              "are deprecated"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "package",
+            "--list"
+          ],
+          "expect": {
+            "output_contains": [
+              "\n.well-known/config.txt\n",
+              "\nfixtures/expected.log\n",
+              "\ngit-only.txt\n",
+              "\nnested/git-only.txt\n",
+              "\nnested/rescued.log\n",
+              "\nnested/_build/data.bin\n",
+              "\nfallback/keep.txt\n"
+            ],
+            "output_not_contains": [
+              "\n.hidden\n",
+              "\nmoon-only.txt\n",
+              "\nunexpected.log\n",
+              "\nnested/moon-only.txt\n",
+              "\nnested/dropped.log\n",
+              "\n_build/forbidden.txt\n",
+              "\nfallback/fallback-only.txt\n"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "runwasm-migration",
+      "fixture": "template",
+      "steps": [
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "runwasm",
+            "cmd/main"
+          ],
+          "expect": {
+            "output_contains": [
+              "`moon runwasm` is deprecated",
+              "42"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "run",
+            "--target",
+            "wasm",
+            "cmd/main"
+          ],
+          "expect": {
+            "output_contains": [
+              "42"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "script-import-all-and-ide",
+      "fixture": "empty",
+      "steps": [
+        {
+          "kind": "shell",
+          "script": "mkdir -p '.'"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'moon.mod' <<'MBTEOF'\nname = \"mbtskills/scripts\"\nversion = \"0.1.0\"\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'moon.pkg' <<'MBTEOF'\n\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'import-all.mbtx' <<'MBTEOF'\nimport { \"moonbitlang/core/queue\" @q * }\nfn main { let a = Queue([1, 2, 3]); let b = @q.Queue([4, 5]); println(a.length() + b.length()) }\nMBTEOF"
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "run",
+            "import-all.mbtx",
+            "--deny-warn"
+          ],
+          "expect": {
+            "output_contains": [
+              "5"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moonx",
+            "import-all.mbtx"
+          ],
+          "expect": {
+            "output_contains": [
+              "5"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "ide",
+            "outline",
+            "import-all.mbtx"
+          ],
+          "expect": {
+            "output_contains": [
+              "fn main"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "ide",
+            "peek-def",
+            "--loc",
+            "import-all.mbtx:2:48",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "queue/queue.mbt",
+              "\"range\""
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "ide",
+            "hover",
+            "--loc",
+            "import-all.mbtx:2:48",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "@q.Queue",
+              "\"contents\""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "script-unpinned-import",
+      "fixture": "empty",
+      "network": true,
+      "steps": [
+        {
+          "kind": "shell",
+          "script": "mkdir -p '.'"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'unpinned.mbtx' <<'MBTEOF'\nimport { \"moonbitlang/x/stack\" }\nfn main { let s : @stack.Stack[Int] = @stack.new(); s.push(42); println(s.peek().unwrap()) }\nMBTEOF"
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "run",
+            "unpinned.mbtx",
+            "--deny-warn"
+          ],
+          "expect": {
+            "output_contains": [
+              "42"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "script-test-selection",
+      "fixture": "empty",
+      "steps": [
+        {
+          "kind": "shell",
+          "script": "mkdir -p '.'"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'moon.mod' <<'MBTEOF'\nname = \"mbtskills/script_tests\"\nversion = \"0.1.0\"\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'moon.pkg' <<'MBTEOF'\n\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'pkg_test.mbt' <<'MBTEOF'\ntest \"package only\" { assert_eq(1, 2) }\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'script.mbtx' <<'MBTEOF'\nfn main { abort(\"main must not run during tests\") }\ntest \"script only\" { assert_eq(2, 2) }\nMBTEOF"
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "test",
+            "script.mbtx",
+            "--deny-warn"
+          ],
+          "expect": {
+            "output_contains": [
+              "Total tests: 1, passed: 1, failed: 0."
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "test",
+            "--deny-warn"
+          ],
+          "expect": {
+            "exit": 2,
+            "output_contains": [
+              "package only",
+              "Total tests: 1, passed: 0, failed: 1."
+            ]
+          }
+        },
+        {
+          "kind": "shell",
+          "script": "mkdir -p '.'"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'pkg_test.mbt' <<'MBTEOF'\ntest \"package only\" { assert_eq(1, 1) }\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'script.mbtx' <<'MBTEOF'\nfn main { abort(\"main must not run during tests\") }\ntest \"script only\" { assert_eq(2, 3) }\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'no-main.mbtx' <<'MBTEOF'\ntest { assert_eq(1, 1) }\nMBTEOF"
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "test",
+            "--deny-warn"
+          ],
+          "expect": {
+            "output_contains": [
+              "Total tests: 1, passed: 1, failed: 0."
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "test",
+            "script.mbtx",
+            "--deny-warn"
+          ],
+          "expect": {
+            "exit": 2,
+            "output_contains": [
+              "script only",
+              "Total tests: 1, passed: 0, failed: 1."
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "test",
+            "no-main.mbtx",
+            "--deny-warn"
+          ],
+          "expect": {
+            "exit": 1,
+            "output_contains": [
+              "Missing main function"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "script-policy-file-access",
+      "fixture": "empty",
+      "network": true,
+      "steps": [
+        {
+          "kind": "shell",
+          "script": "mkdir -p '.'"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'policy.mbtx' <<'MBTEOF'\n// policy:\n//   fs:\n//     read: []\n\nimport {\n  \"moonbitlang/async@0.21.3\",\n  \"moonbitlang/async@0.21.3/fs\",\n}\nasync fn main {\n  println(@fs.read_file(\"input.txt\").text())\n}\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'input.txt' <<'MBTEOF'\npolicy-sentinel\nMBTEOF"
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moonx",
+            "policy.mbtx"
+          ],
+          "expect": {
+            "exit": 1,
+            "output_contains": [
+              "Sandbox policy blocked file read",
+              "Permission denied"
+            ]
+          }
+        },
+        {
+          "kind": "shell",
+          "script": "mkdir -p '.'"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'policy.mbtx' <<'MBTEOF'\nimport {\n  \"moonbitlang/async@0.21.3\",\n  \"moonbitlang/async@0.21.3/fs\",\n}\nasync fn main {\n  println(@fs.read_file(\"input.txt\").text())\n}\nMBTEOF"
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moonx",
+            "policy.mbtx"
+          ],
+          "expect": {
+            "output_contains": [
+              "policy-sentinel"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "experimental-prebuild-mbtx-environment",
+      "fixture": "empty",
+      "steps": [
+        {
+          "kind": "shell",
+          "script": "mkdir -p '.'"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'moon.mod' <<'MBTEOF'\nname = \"mbtskills/prebuild_env\"\nversion = \"0.1.0\"\noptions(\"--moonbit-unstable-prebuild\": \"hook.mbtx\")\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'moon.pkg' <<'MBTEOF'\npkgtype(kind: \"executable\")\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'main.mbt' <<'MBTEOF'\nfn main { println(42) }\nMBTEOF"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'hook.mbtx' <<'MBTEOF'\nimport { \"moonbitlang/core/env\" }\nfn main {\n  guard @env.get_env_var(\"MOON_BACKEND\") == Some(\"native\") else { abort(\"backend must be native\") }\n  guard @env.get_env_var(\"MOON_PROFILE\") == Some(\"debug\") else { abort(\"profile must be debug\") }\n  for key in [\"MOON_MOD\", \"MOON_BUILD_DIR\", \"MOON_HOST_OS\", \"MOON_HOST_ARCH\", \"MOON_JOBS\"] {\n    guard @env.get_env_var(key) is Some(value) && value.length() > 0 else { abort(\"missing build environment\") }\n  }\n  println(\"{}\")\n}\nMBTEOF"
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "build",
+            "--target",
+            "native",
+            "--deny-warn"
+          ]
+        },
+        {
+          "kind": "shell",
+          "script": "mkdir -p '.'"
+        },
+        {
+          "kind": "shell",
+          "script": "cat > 'hook.mbtx' <<'MBTEOF'\nfn main { abort(\"prebuild reached\") }\nMBTEOF"
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "build",
+            "--target",
+            "native",
+            "--deny-warn"
+          ],
+          "expect": {
+            "exit": 255,
+            "output_contains": [
+              "Failed to run prebuild script",
+              "hook.mbtx"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "build",
+            "--target",
+            "js",
+            "--deny-warn"
+          ]
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "build",
+            "--target",
+            "wasm",
+            "--deny-warn"
+          ]
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "build",
+            "--target",
+            "wasm-gc",
+            "--deny-warn"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ide-navigation-json-and-locations",
+      "fixture": "template",
+      "steps": [
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "ide",
+            "peek-def",
+            "--help"
+          ],
+          "expect": {
+            "output_contains": [
+              "Trait::method for Type"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "ide",
+            "find-references",
+            "--help"
+          ],
+          "expect": {
+            "output_contains": [
+              "Trait::method for Type",
+              "--include-definition"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "ide",
+            "find-references",
+            "shout",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "shout_test.mbt",
+              "\"is_test\":true"
+            ],
+            "output_not_contains": [
+              "shout.mbt",
+              "\"is_test\":false"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "ide",
+            "find-references",
+            "shout",
+            "--include-definition",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "shout.mbt",
+              "shout_test.mbt"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "ide",
+            "peek-def",
+            "add",
+            "--loc",
+            "lib.mbt",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "\"range\":\"2:8-2:11\""
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "ide",
+            "peek-def",
+            "--loc",
+            "lib.mbt:3:3",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "\"range\":\"2:12-2:13\""
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "ide",
+            "find-references",
+            "--loc",
+            "lib.mbt:3:3",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "\"range\":\"3:3-3:4\"",
+              "\"is_test\":false"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "ide",
+            "hover",
+            "--loc",
+            "cmd/main/main.mbt:3:16",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "\"contents\"",
+              "add"
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "ide",
+            "workspace-symbols",
+            "shout",
+            "--json"
+          ],
+          "expect": {
+            "output_contains": [
+              "\"name\":\"pub fn shout\"",
+              "\"kind\":\"Function\""
+            ]
+          }
+        },
+        {
+          "kind": "documented-shell",
+          "script": "moon ide workspace-symbols '' --json",
+          "expect": {
+            "output_contains": [
+              "\"name\":\"pub fn shout\"",
+              "\"name\":\"pub fn add\""
+            ]
+          }
+        },
+        {
+          "kind": "moon",
+          "argv": [
+            "moon",
+            "ide",
+            "codelens",
+            "textutil/shout.mbt"
+          ],
+          "expect": {
+            "output_contains": [
+              "\"is_test\":true",
+              "Local: 1 (1 in test)",
+              "moonbit.executeReferenceProvider"
+            ]
+          }
+        }
+      ]
     }
   ]
 }

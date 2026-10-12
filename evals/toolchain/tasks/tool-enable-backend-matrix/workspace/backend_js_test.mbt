@@ -1,4 +1,4 @@
 ///|
 test "JS implementation is selected" {
-  assert_eq(backend_name(), "js")
+  assert_eq(@backend_matrix.backend_name(), "js")
 }

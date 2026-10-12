@@ -1,9 +1,9 @@
 ///|
 test "library Codec implementation remains usable" {
-  assert_eq(encode_json(), "json")
+  assert_eq(@open_plugin_trait.encode_json(), "json")
 }
 
 ///|
 test "library sealed trait implementation remains usable" {
-  assert_eq(builtin_json_name(), "json")
+  assert_eq(@open_plugin_trait.builtin_json_name(), "json")
 }

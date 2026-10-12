@@ -56,6 +56,17 @@ function moon(argv: MoonStep["argv"]): MoonStep {
 }
 
 describe("manifest schema v2", () => {
+  it("rejects malformed excluded-output expectations", () => {
+    expect(() =>
+      parseManifest(
+        manifestWithStep({
+          kind: "moon",
+          argv: ["moon", "package", "--list"],
+          expect: { output_not_contains: [""] },
+        }),
+      ),
+    ).toThrow(/output_not_contains\[0\] must be a non-empty string/);
+  });
   it("rejects arbitrary covers on an executable entry", () => {
     expect(() =>
       parseManifest({
@@ -769,6 +780,24 @@ describe("per-step execution", () => {
       expect.stringMatching(/step 1.*output missing.*needle/s),
     ]);
     expect(call).toBe(1);
+  });
+
+  it("checks included and excluded output on the declaring step", async () => {
+    const entry: RunEntry = {
+      id: "archive-contents",
+      fixture: "empty",
+      steps: [
+        {
+          kind: "moon",
+          argv: ["moon", "package", "--list"],
+          expect: { output_contains: ["lib.mbt"], output_not_contains: ["private.txt"] },
+        },
+      ],
+    };
+    expect(await runEntry(entry, { executor: async () => result(0, "lib.mbt\n") })).toEqual([]);
+    expect(
+      await runEntry(entry, { executor: async () => result(0, "lib.mbt\nprivate.txt\n") }),
+    ).toEqual([expect.stringMatching(/output unexpectedly contains.*private.txt/s)]);
   });
 
   it("checks expected paths on the step that declares them", async () => {

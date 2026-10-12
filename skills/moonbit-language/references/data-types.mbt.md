@@ -8,7 +8,7 @@ Search these exact official documentation topic names to route a question into t
 
 - Built-in data and overloaded literals: Built-in Data Structures; Unit; Boolean; Number; String; Char; Byte(s); Choosing a Byte Container; Tuple; Ref; Option and Result; Array; ArrayView; Map; Json; Overloaded Literals; Escape Sequences in Overloaded Literals
 - Spread operator: Spread Operator
-- Lexical conventions and literals: Lexical Conventions; Common Lexical Classes; String Literals; Interpolation; Multiline String Literals; Bytes Literals; Character Literals; Byte Literals
+- Literal forms: String Literals; Interpolation; Multiline String Literals; Bytes Literals; Character Literals; Byte Literals
 
 ## Core values, mutable cells, and failure containers
 

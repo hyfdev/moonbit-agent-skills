@@ -4,6 +4,10 @@ Use this reference for tokenization questions. Checked examples of literals, int
 
 The detailed rules below are **Documented, not executed** as an exhaustive lexer conformance suite. Source: [official lexical grammar](https://github.com/moonbitlang/moonbit-docs/blob/8d9f3ba206eb17f80ee1836e4c1139068d1351b5/next/language/lexical-conventions.md). Validate a disputed spelling with the local compiler; the grammar's keyword lists can lag implemented syntax, including `errdefer`.
 
+## Common Lexical Classes
+
+Source text must be valid UTF-8. Unicode scalar values exclude the surrogate range U+D800–U+DFFF. LF, CR, CRLF, U+2028, and U+2029 form newlines and participate in semicolon insertion. Other whitespace is discarded: U+0009, U+000B, U+000C, U+0020, U+00A0, U+1680, U+2000–U+200A, U+202F, U+205F, U+3000, and U+FEFF. A line character is any scalar value except a newline character.
+
 ## Comments and Identifiers
 
 `//` starts a line comment; `///` starts a documentation comment. There is no block-comment form. An uppercase identifier starts with an ASCII uppercase letter. Other identifiers start with an ASCII lowercase letter, an underscore followed by another identifier character, or a character from the grammar's explicit non-ASCII ranges. `_` alone is a separate token. Unicode spelling is not normalized, and a leading digit starts a numeric literal.

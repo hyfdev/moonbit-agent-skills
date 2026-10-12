@@ -1380,7 +1380,6 @@
     },
     {
       "source_ids": [
-        "document-lexical-conventions-common-lexical-classes",
         "document-lexical-conventions-string-literals",
         "document-lexical-conventions-interpolation",
         "document-lexical-conventions-multiline-string-literals",
@@ -1403,7 +1402,6 @@
       "content": {
         "marker": "# Data types: numbers, text, and collections",
         "terms": [
-          "Common Lexical Classes",
           "String Literals",
           "Interpolation",
           "Multiline String Literals",
@@ -1413,7 +1411,6 @@
         ]
       },
       "reviewed": {
-        "document-lexical-conventions-common-lexical-classes": "dc9b1fca6a2558e006d5b7cf32333e4b86cb23d69821a8abeefd02a3b613786c",
         "document-lexical-conventions-string-literals": "423712da2a72ed85b0ffe01f4c61ad18b3c69187aad0637efe26b2c8ca4809ee",
         "document-lexical-conventions-interpolation": "7a4dd745cbc5952d4c01a89db6c6094b3e67933ab58c4cc7f3eee2d63275f81b",
         "document-lexical-conventions-multiline-string-literals": "23a0cdf6daaaaebe84fb46d0f8d964fcfae0d2e1900e50470a19aabc9139ba90",
@@ -3206,7 +3203,8 @@
         "document-lexical-conventions-operators-and-delimiters",
         "document-lexical-conventions-automatic-semicolon-insertion",
         "document-lexical-conventions-mbti-extensions",
-        "document-lexical-conventions"
+        "document-lexical-conventions",
+        "document-lexical-conventions-common-lexical-classes"
       ],
       "summary": "Lexical tokens and generated interface syntax",
       "disposition": "routed",
@@ -3232,7 +3230,8 @@
           "Operators and Delimiters",
           "Automatic Semicolon Insertion",
           "`.mbti` Extensions",
-          "Lexical Conventions"
+          "Lexical Conventions",
+          "Common Lexical Classes"
         ]
       },
       "reviewed": {
@@ -3247,7 +3246,8 @@
         "document-lexical-conventions-operators-and-delimiters": "6ac058e8627720775edb68d5ee8d9a7eeb5024235bc2492c8ffad2f2894ef6ad",
         "document-lexical-conventions-automatic-semicolon-insertion": "9bb882181fed5281c407697428b59c9def4869d0a245194a82c0428a577a3f5d",
         "document-lexical-conventions-mbti-extensions": "aab83c7484ead7919e4834a96e0c6b91d81275433557d0aa5d3187e0edc47e40",
-        "document-lexical-conventions": "76cbb2dc2dbf77360d86818fc837448835e4bd4292e25c49d9cf5ecebb5ecf91"
+        "document-lexical-conventions": "76cbb2dc2dbf77360d86818fc837448835e4bd4292e25c49d9cf5ecebb5ecf91",
+        "document-lexical-conventions-common-lexical-classes": "dc9b1fca6a2558e006d5b7cf32333e4b86cb23d69821a8abeefd02a3b613786c"
       }
     }
   ]
